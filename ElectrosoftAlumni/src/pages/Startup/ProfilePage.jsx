@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Navbar from "../../components/Startup/Navbar";
-import ProfileSidebar from "../../components/Startup/ProfileSidebar";
+import Navbar from "../../components/startup/Navbar";
+import ProfileSidebar from "../../components/startup/ProfileSidebar";
 import PostCreator from "../../components/startup/PostCreator";
 import FeedArea from "../../components/startup/FeedArea";
 import NewsSidebar from "../../components/startup/NewsSidebar";

@@ -26,14 +26,7 @@ const Navbar = () => {
               </span>
             </div>
 
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search"
-                className="w-64 pl-10 pr-4 py-1.5 bg-gray-100 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+
           </div>
 
           {/* Right side - Navigation Icons */}

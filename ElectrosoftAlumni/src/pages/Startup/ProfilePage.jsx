@@ -7,7 +7,7 @@ import NewsSidebar from "../../components/startup/NewsSidebar";
 import ContentRenderer from "../../components/startup/ContentRenderer";
 import NavigationOptions from "../../components/startup/NavigationOptions";
 
-const ProfilePage = () => {
+const StartupProfilePage = () => {
   const [activeContent, setActiveContent] = useState("posts");
   const [activeContentName, setActiveContentName] = useState("Posts");
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,9 +24,11 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />      {/* Search Container */}
+      <Navbar /> {/* Search Container */}
       <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-3">          <div className="flex justify-center">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          {" "}
+          <div className="flex justify-center">
             {/* Search Bar */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -55,13 +57,13 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
-        <div className="grid grid-cols-12 gap-6">          {/* Left Sidebar - Profile */}
+        <div className="grid grid-cols-12 gap-6">
+          {" "}
+          {/* Left Sidebar - Profile */}
           <div className="col-span-12 lg:col-span-3">
             <ProfileSidebar onNavigationChange={handleNavigationChange} />
           </div>
-
           {/* Main Content Area */}
           <div className="col-span-12 lg:col-span-6">
             <div className="space-y-6">
@@ -87,7 +89,6 @@ const ProfilePage = () => {
               </div>
             </div>
           </div>
-
           {/* Right Sidebar - News */}
           <div className="col-span-12 lg:col-span-3">
             <NewsSidebar />
@@ -98,4 +99,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default StartupProfilePage;

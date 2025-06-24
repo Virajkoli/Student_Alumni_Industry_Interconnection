@@ -1,7 +1,6 @@
 import React from "react";
-import StartupProfilePage from "./pages/startup/ProfilePage";
-import IndustryProfilePage from "./pages/industry/ProfilePage";
-import "./App.css";
+import StartupProfilePage from "./pages/Startup/ProfilePage";
+import IndustryProfilePage from "./pages/Industry/ProfilePage";
 
 function App() {
   return (

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Navbar from "../../components/industry/Navbar";
-import ProfileSidebar from "../../components/industry/IndustryProfileSidebar";
+import HorizontalProfileNavbar from "../../components/industry/IndustryProfileHeader";
 import PostCreator from "../../components/industry/PostCreator";
 import FeedArea from "../../components/industry/FeedArea";
 import NewsSidebar from "../../components/industry/NewsSidebar";
@@ -75,31 +75,18 @@ const IndustryProfilePage = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
+      </div>      <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
+        {/* Horizontal Profile Navbar - Full Width */}
+        <HorizontalProfileNavbar 
+          onNavigationChange={handleNavigationChange}
+          navigationOptions={navigationOptions}
+          isIndustryProfile={true}
+        />
+        
         <div className="grid grid-cols-12 gap-6">
-          {/* Left Sidebar - Profile */}
-          <div className="col-span-12 lg:col-span-3">
-            <ProfileSidebar 
-              onNavigationChange={handleNavigationChange}
-              navigationOptions={navigationOptions}
-              isIndustryProfile={true}
-            />
-          </div>
-
           {/* Main Content Area */}
-          <div className="col-span-12 lg:col-span-6">
+          <div className="col-span-12 lg:col-span-8">
             <div className="space-y-6">
-              {/* Navigation Options above content */}
-              <NavigationOptions
-                selectedOption={selectedOption}
-                onOptionSelect={handleOptionSelect}
-                options={navigationOptions}
-                isIndustryProfile={true}
-                className="overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
-              />
-
               {/* Post Creator - Only show when on posts view */}
               {activeContent === "posts" && <PostCreator isIndustry={true} />}
 
@@ -118,8 +105,8 @@ const IndustryProfilePage = () => {
             </div>
           </div>
 
-          {/* Right Sidebar - News */}
-          <div className="col-span-12 lg:col-span-3">
+          {/* Right Sidebar - News (Bottom on mobile) */}
+          <div className="col-span-12 lg:col-span-4">
             <NewsSidebar isIndustry={true} />
           </div>
         </div>

@@ -13,9 +13,9 @@ const FeedArea = () => {
     {
       id: 1,
       author: {
-        name: "TechStart Inc.",
-        title: "AI Startup",
-        avatar: "T",
+        name: "Startup",
+        title: "Startup Founder, Innovator, and Entrepreneur",
+        avatar: "S",
         verified: true,
       },
       content:
@@ -30,10 +30,10 @@ const FeedArea = () => {
     {
       id: 2,
       author: {
-        name: "Green Future Solutions",
-        title: "Sustainability Startup",
-        avatar: "G",
-        verified: false,
+        name: "Startup",
+        title: "Startup Founder, Innovator, and Entrepreneur",
+        avatar: "S",
+        verified: true,
       },
       content:
         "🌱 Just completed our Series A funding round! $5M raised to expand our carbon footprint tracking platform. Special thanks to all our investors who believe in our mission to make sustainability accessible to every business. The future is green! 💚",
@@ -47,9 +47,9 @@ const FeedArea = () => {
     {
       id: 3,
       author: {
-        name: "FinTech Innovators",
-        title: "Financial Technology",
-        avatar: "F",
+        name: "Startup",
+        title: "Startup Founder, Innovator, and Entrepreneur",
+        avatar: "S",
         verified: true,
       },
       content:

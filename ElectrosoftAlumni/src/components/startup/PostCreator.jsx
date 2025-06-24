@@ -8,7 +8,7 @@ const PostCreator = () => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
       <div className="flex items-start space-x-3">
         <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-          R
+          S
         </div>
 
         <div className="flex-1">

@@ -115,14 +115,14 @@ const ProfileSidebar = ({ onNavigationChange }) => {
 
       {/* Profile Info */}
       <div className="pt-10 px-6 pb-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Riya</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Startup</h3>
         <p className="text-sm text-gray-600 mt-1">
-          Fresher | Java full stack developer | SQL
+          Startup Founder, Innovator, and Entrepreneur
         </p>
         <p className="text-xs text-gray-500 mt-1">Mumbai, Maharashtra</p>
 
         <button className="mt-3 w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-          + Experience
+          Startup Experience
         </button>
       </div>
 

@@ -1,36 +1,17 @@
 import React, { useState } from "react";
-import Navbar from "../../components/industry/Navbar";
-import ProfileSidebar from "../../components/industry/ProfileSidebar";
-import PostCreator from "../../components/industry/PostCreator";
-import FeedArea from "../../components/industry/FeedArea";
-import NewsSidebar from "../../components/industry/NewsSidebar";
-import ContentRenderer from "../../components/industry/ContentRenderer";
-import NavigationOptions from "../../components/industry/NavigationOptions";
+import Navbar from "../../components/startup/Navbar";
+import ProfileSidebar from "../../components/startup/StartupProfileSidebar";
+import PostCreator from "../../components/startup/PostCreator";
+import FeedArea from "../../components/startup/FeedArea";
+import NewsSidebar from "../../components/startup/NewsSidebar";
+import ContentRenderer from "../../components/startup/ContentRenderer";
+import NavigationOptions from "../../components/startup/NavigationOptions";
 
-const IndustryProfilePage = () => {
-  const [activeContent, setActiveContent] = useState("industry-overview");
-  const [activeContentName, setActiveContentName] = useState("Industry Overview");
+const StartupProfilePage = () => {
+  const [activeContent, setActiveContent] = useState("posts");
+  const [activeContentName, setActiveContentName] = useState("Posts");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOption, setSelectedOption] = useState("Industry Overview");
-
-  // Industry-specific navigation options
-  const navigationOptions = [
-    "Industry Overview",
-    "Sector / Category",
-    "Job Career Opportunities",
-    "Technology",
-    "Challenges / Solutions",
-    "Success Stories",
-    "Post News and Jobs",
-    "Expert Opinions/Interview",
-    "Poll/Comment Section",
-    "Internship or Training Requests",
-    "Live Projects",
-    "Student Login",
-    "Project Success Stories",
-    "Upload Project",
-    "Add University Project"
-  ];
 
   const handleNavigationChange = (contentId, contentName) => {
     setActiveContent(contentId);
@@ -43,10 +24,10 @@ const IndustryProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      {/* Search Container */}
+      <Navbar /> {/* Search Container */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3">
+          {" "}
           <div className="flex justify-center">
             {/* Search Bar */}
             <div className="relative">
@@ -67,7 +48,7 @@ const IndustryProfilePage = () => {
               </div>
               <input
                 type="text"
-                placeholder="Search industries, projects, opportunities..."
+                placeholder="Search companies, projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-80 pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -76,18 +57,13 @@ const IndustryProfilePage = () => {
           </div>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
         <div className="grid grid-cols-12 gap-6">
+          {" "}
           {/* Left Sidebar - Profile */}
           <div className="col-span-12 lg:col-span-3">
-            <ProfileSidebar 
-              onNavigationChange={handleNavigationChange}
-              navigationOptions={navigationOptions}
-              isIndustryProfile={true}
-            />
+            <ProfileSidebar onNavigationChange={handleNavigationChange} />
           </div>
-
           {/* Main Content Area */}
           <div className="col-span-12 lg:col-span-6">
             <div className="space-y-6">
@@ -95,32 +71,27 @@ const IndustryProfilePage = () => {
               <NavigationOptions
                 selectedOption={selectedOption}
                 onOptionSelect={handleOptionSelect}
-                options={navigationOptions}
-                isIndustryProfile={true}
-                className="overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
               />
 
               {/* Post Creator - Only show when on posts view */}
-              {activeContent === "posts" && <PostCreator isIndustry={true} />}
+              {activeContent === "posts" && <PostCreator />}
 
               {/* Content Area */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 {activeContent === "posts" ? (
-                  <FeedArea isIndustry={true} />
+                  <FeedArea />
                 ) : (
                   <ContentRenderer
                     activeContent={activeContent}
                     activeContentName={activeContentName}
-                    isIndustryProfile={true}
                   />
                 )}
               </div>
             </div>
           </div>
-
           {/* Right Sidebar - News */}
           <div className="col-span-12 lg:col-span-3">
-            <NewsSidebar isIndustry={true} />
+            <NewsSidebar />
           </div>
         </div>
       </div>
@@ -128,4 +99,4 @@ const IndustryProfilePage = () => {
   );
 };
 
-export default IndustryProfilePage;
+export default StartupProfilePage;

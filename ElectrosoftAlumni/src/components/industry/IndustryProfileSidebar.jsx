@@ -47,9 +47,16 @@ const ProfileSidebar = ({ onNavigationChange, navigationOptions }) => {
           </div>
         </div>
       </div>
-      <div className="pt-12 pb-4 px-6">
-        <h2 className="text-lg font-semibold text-gray-900">Industry User</h2>
-        <p className="text-sm text-gray-500">Industry Profile</p>
+     <div className="pt-10 px-6 pb-4 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900">Industry User</h3>
+        <p className="text-sm text-gray-600 mt-1">
+          Industry Domain Expert, Innovator, and Mentor
+        </p>
+        <p className="text-xs text-gray-500 mt-1">Mumbai, Maharashtra</p>
+
+        <button className="mt-3 w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+          Industry Experience
+        </button>
       </div>
       {/* Navigation Items */}
       <div className="border-t border-gray-200">

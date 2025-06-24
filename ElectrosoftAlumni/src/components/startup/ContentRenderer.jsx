@@ -1,15 +1,15 @@
 import React from "react";
-import StartupEcosystemOverview from "../Startup/sections/StartupEcosystemOverview";
-import GrowthMarketing from "../Startup/sections/GrowthMarketing";
-import FundingInvestment from "../Startup/sections/FundingInvestment";
-import ToolsResources from "../Startup/sections/ToolsResources";
-import FAQs from "../Startup/sections/FAQs";
-import GovernmentPolicies from "../Startup/sections/GovernmentPolicies";
-import LaunchSteps from "../Startup/sections/LaunchSteps";
-import StartupQuiz from "../Startup/sections/StartupQuiz";
-import HowItWorks from "../Startup/sections/HowItWorks";
-import Industries from "../Startup/sections/Industries";
-import JobsSkills from "../Startup/sections/JobsSkills";
+import StartupEcosystemOverview from "./sections/StartupEcosystemOverview";
+import GrowthMarketing from "./sections/GrowthMarketing";
+import FundingInvestment from "./sections/FundingInvestment";
+import ToolsResources from "./sections/ToolsResources";
+import FAQs from "./sections/FAQs";
+import GovernmentPolicies from "./sections/GovernmentPolicies";
+import LaunchSteps from "./sections/LaunchSteps";
+import StartupQuiz from "./sections/StartupQuiz";
+import HowItWorks from "./sections/HowItWorks";
+import Industries from "./sections/Industries";
+import JobsSkills from "./sections/JobsSkills";
 
 const ContentRenderer = ({ activeContent, activeContentName }) => {
   const renderContent = () => {

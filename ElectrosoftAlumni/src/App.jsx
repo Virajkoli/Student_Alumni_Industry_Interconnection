@@ -1,11 +1,12 @@
 import React from "react";
-import ProfilePage from "./pages/Startup/ProfilePage";
-import "./App.css";
+import StartupProfilePage from "./pages/Startup/ProfilePage";
+import IndustryProfilePage from "./pages/Industry/ProfilePage";
 
 function App() {
   return (
     <div className="App">
-      <ProfilePage />
+      <StartupProfilePage />
+      <IndustryProfilePage />
     </div>
   );
 }

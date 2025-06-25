@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import {
-  Heart,
   MessageCircle,
   Share2,
   Send,
   MoreHorizontal,
   ThumbsUp,
+  Edit,
+  Save,
+  X,
 } from "lucide-react";
 
 const FeedArea = () => {
@@ -62,6 +64,9 @@ const FeedArea = () => {
       liked: false,
     },
   ]);
+  
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [editedContent, setEditedContent] = useState("");
 
   const handleLike = (postId) => {
     setPosts(
@@ -75,6 +80,28 @@ const FeedArea = () => {
           : post
       )
     );
+  };
+
+  const handleEditPost = (postId, currentContent) => {
+    setEditingPostId(postId);
+    setEditedContent(currentContent);
+  };
+
+  const handleSaveEdit = (postId) => {
+    setPosts(
+      posts.map((post) =>
+        post.id === postId
+          ? { ...post, content: editedContent }
+          : post
+      )
+    );
+    setEditingPostId(null);
+    setEditedContent("");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null);
+    setEditedContent("");
   };
 
   const PostCard = ({ post }) => (
@@ -100,17 +127,71 @@ const FeedArea = () => {
               <p className="text-xs text-gray-600">{post.author.title}</p>
               <p className="text-xs text-gray-500">{post.timestamp} ago</p>
             </div>
-            <button className="p-1 hover:bg-gray-200 rounded-full">
-              <MoreHorizontal className="w-4 h-4 text-gray-500" />
-            </button>
+            <div className="flex items-center space-x-2">
+              {editingPostId === post.id ? (
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={() => handleSaveEdit(post.id)}
+                    className="p-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                    title="Save changes"
+                  >
+                    <Save className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    className="p-1.5 text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 hover:text-gray-700 transition-all duration-200 shadow-sm border border-gray-200"
+                    title="Cancel editing"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleEditPost(post.id, post.content)}
+                  className="p-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                  title="Edit this post"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+              )}
+              <button className="p-1 hover:bg-gray-200 rounded-full">
+                <MoreHorizontal className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
           </div>
 
           <div className="mt-3">
-            <p className="text-sm text-gray-800 leading-relaxed">
-              {post.content}
-            </p>
+            {editingPostId === post.id ? (
+              <div className="space-y-3">
+                <textarea
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  rows="4"
+                  className="w-full p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm leading-relaxed"
+                  placeholder="What's on your mind?"
+                />
+                <div className="flex items-center justify-end space-x-2">
+                  <button
+                    onClick={handleCancelEdit}
+                    className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleSaveEdit(post.id)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-800 leading-relaxed">
+                {post.content}
+              </p>
+            )}
 
-            {post.image && (
+            {post.image && editingPostId !== post.id && (
               <div className="mt-3 rounded-lg overflow-hidden">
                 <img
                   src={post.image}
@@ -124,38 +205,40 @@ const FeedArea = () => {
             )}
           </div>
 
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-            <div className="flex items-center space-x-6">
-              <button
-                onClick={() => handleLike(post.id)}
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-colors ${
-                  post.liked
-                    ? "text-blue-600 bg-blue-50"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <ThumbsUp
-                  className={`w-4 h-4 ${post.liked ? "fill-current" : ""}`}
-                />
-                <span className="text-sm">{post.likes}</span>
-              </button>
+          {editingPostId !== post.id && (
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+              <div className="flex items-center space-x-6">
+                <button
+                  onClick={() => handleLike(post.id)}
+                  className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-colors ${
+                    post.liked
+                      ? "text-blue-600 bg-blue-50"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <ThumbsUp
+                    className={`w-4 h-4 ${post.liked ? "fill-current" : ""}`}
+                  />
+                  <span className="text-sm">{post.likes}</span>
+                </button>
+
+                <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-sm">{post.comments}</span>
+                </button>
+
+                <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                  <Share2 className="w-4 h-4" />
+                  <span className="text-sm">{post.shares}</span>
+                </button>
+              </div>
 
               <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                <MessageCircle className="w-4 h-4" />
-                <span className="text-sm">{post.comments}</span>
-              </button>
-
-              <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                <Share2 className="w-4 h-4" />
-                <span className="text-sm">{post.shares}</span>
+                <Send className="w-4 h-4" />
+                <span className="text-sm hidden sm:inline">Send</span>
               </button>
             </div>
-
-            <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-              <Send className="w-4 h-4" />
-              <span className="text-sm hidden sm:inline">Send</span>
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </div>

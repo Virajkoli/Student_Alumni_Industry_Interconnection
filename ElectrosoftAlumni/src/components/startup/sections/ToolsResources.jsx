@@ -253,10 +253,10 @@ const ToolsResources = () => {
                               </h3>
                               <button
                                 onClick={() => handleEditTool(categoryIndex, toolIndex)}
-                                className="p-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
+                                className="p-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
                                 title="Edit tool"
                               >
-                                <Edit className="w-3 h-3" />
+                                <Edit className="w-4 h-4" />
                               </button>
                             </div>
                             <span

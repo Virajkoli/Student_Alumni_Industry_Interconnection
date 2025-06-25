@@ -3,14 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import StartupProfilePage from "./pages/startup/StartupProfilePage";
 import IndustryProfilePage from "./pages/industry/IndustryProfilePage";
-
-// Placeholder for College page
-const CollegePage = () => (
-  <div className="min-h-screen flex items-center justify-center text-3xl font-bold text-gray-700">
-    College Page Coming Soon
-  </div>
-);
-
+import CollegeProfilePage from "./pages/college/CollegProfilePage";
 function App() {
   return (
     <Router>
@@ -18,7 +11,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/startup-profile" element={<StartupProfilePage />} />
         <Route path="/industry-profile" element={<IndustryProfilePage />} />
-        <Route path="/college-profile" element={<CollegePage />} />
+        <Route path="/college-profile" element={<CollegeProfilePage />} />
       </Routes>
     </Router>
   );

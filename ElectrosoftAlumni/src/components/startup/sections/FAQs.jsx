@@ -10,6 +10,7 @@ import {
 
 const FAQs = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingFaqIndex, setEditingFaqIndex] = useState(null);
   const [expandedItem, setExpandedItem] = useState(null);
   const [content, setContent] = useState({
     title: "Frequently Asked Questions",
@@ -68,6 +69,27 @@ const FAQs = () => {
     setIsEditing(false);
   };
 
+  const handleEditFaq = (index) => {
+    setEditingFaqIndex(index);
+  };
+
+  const handleSaveFaq = (index, updatedFaq) => {
+    const updatedFaqs = [...content.faqs];
+    updatedFaqs[index] = updatedFaq;
+    setContent({ ...content, faqs: updatedFaqs });
+    setEditingFaqIndex(null);
+  };
+
+  const handleCancelFaqEdit = () => {
+    setEditingFaqIndex(null);
+  };
+
+  const updateFaq = (index, field, value) => {
+    const newFaqs = [...content.faqs];
+    newFaqs[index] = { ...newFaqs[index], [field]: value };
+    setContent({ ...content, faqs: newFaqs });
+  };
+
   const toggleExpanded = (index) => {
     setExpandedItem(expandedItem === index ? null : index);
   };
@@ -87,34 +109,7 @@ const FAQs = () => {
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
+      
       </div>
 
       {/* FAQ Items */}
@@ -126,18 +121,16 @@ const FAQs = () => {
           >
             <div
               className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => !isEditing && toggleExpanded(index)}
+              onClick={() => !isEditing && !editingFaqIndex && toggleExpanded(index)}
             >
               <div className="flex items-center space-x-3 flex-1">
                 <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                {isEditing ? (
+                {editingFaqIndex === index ? (
                   <input
                     type="text"
                     value={faq.question}
-                    onChange={(e) =>
-                      updateFAQ(index, "question", e.target.value)
-                    }
-                    className="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => updateFaq(index, "question", e.target.value)}
+                    className="flex-1 p-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     onClick={(e) => e.stopPropagation()}
                   />
                 ) : (
@@ -146,23 +139,63 @@ const FAQs = () => {
                   </h3>
                 )}
               </div>
-              {!isEditing && (
-                <div className="ml-4">
-                  {expandedItem === index ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
-                  )}
-                </div>
-              )}
+              
+              <div className="flex items-center space-x-2">
+                {editingFaqIndex === index ? (
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSaveFaq(index, faq);
+                      }}
+                      className="flex items-center space-x-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCancelFaqEdit();
+                      }}
+                      className="flex items-center space-x-1 px-3 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors shadow-sm"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Cancel</span>
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditFaq(index);
+                      }}
+                      className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                      title="Edit this FAQ"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    {!isEditing && (
+                      <div className="ml-2">
+                        {expandedItem === index ? (
+                          <ChevronUp className="w-5 h-5 text-gray-500" />
+                        ) : (
+                          <ChevronDown className="w-5 h-5 text-gray-500" />
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
-            {(expandedItem === index || isEditing) && (
+            {(expandedItem === index || editingFaqIndex === index) && (
               <div className="px-4 pb-4 border-t border-gray-100">
-                {isEditing ? (
+                {editingFaqIndex === index ? (
                   <textarea
                     value={faq.answer}
-                    onChange={(e) => updateFAQ(index, "answer", e.target.value)}
+                    onChange={(e) => updateFaq(index, "answer", e.target.value)}
                     rows="4"
                     className="w-full mt-3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />

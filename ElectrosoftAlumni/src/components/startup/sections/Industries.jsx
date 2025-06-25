@@ -11,6 +11,7 @@ import {
 
 const Industries = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingIndustryIndex, setEditingIndustryIndex] = useState(null);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [content, setContent] = useState({
     title: "Industries & Sectors",
@@ -215,6 +216,28 @@ const Industries = () => {
     setIsEditing(false);
   };
 
+  const handleEditIndustry = (index) => {
+    setEditingIndustryIndex(index);
+    setSelectedIndustry(null); // Close details view when editing
+  };
+
+  const handleSaveIndustry = (index, updatedIndustry) => {
+    const updatedIndustries = [...content.industries];
+    updatedIndustries[index] = updatedIndustry;
+    setContent({ ...content, industries: updatedIndustries });
+    setEditingIndustryIndex(null);
+  };
+
+  const handleCancelIndustryEdit = () => {
+    setEditingIndustryIndex(null);
+  };
+
+  const updateIndustry = (index, field, value) => {
+    const newIndustries = [...content.industries];
+    newIndustries[index] = { ...newIndustries[index], [field]: value };
+    setContent({ ...content, industries: newIndustries });
+  };
+
   return (
     <div className="p-4">
       {/* Header */}
@@ -224,34 +247,7 @@ const Industries = () => {
           <p className="text-gray-600 text-sm mt-1">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-              >
-                <Save className="w-3 h-3" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-              >
-                <X className="w-3 h-3" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-            >
-              <Edit className="w-3 h-3" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
+       
       </div>
 
       {/* Industry Overview */}
@@ -259,51 +255,230 @@ const Industries = () => {
         {content.industries.map((industry, index) => (
           <div
             key={index}
-            className={`bg-white border rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-md ${
+            className={`bg-white border rounded-lg p-4 transition-all duration-200 hover:shadow-md ${
               selectedIndustry === index
                 ? "border-blue-500 shadow-sm"
                 : "border-gray-200"
             }`}
-            onClick={() =>
-              setSelectedIndustry(selectedIndustry === index ? null : index)
-            }
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center space-x-2">
-                <span className="text-xl">{industry.icon}</span>
-                <h3 className="text-base font-semibold text-gray-900 leading-tight">
-                  {industry.name}
-                </h3>
-              </div>
-              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium whitespace-nowrap">
-                {industry.growth}
-              </span>
-            </div>
+            {editingIndustryIndex === index ? (
+              <div className="space-y-4">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Industry Name
+                    </label>
+                    <input
+                      type="text"
+                      value={industry.name}
+                      onChange={(e) => updateIndustry(index, "name", e.target.value)}
+                      className="w-full text-base font-semibold p-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Industry name"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 ml-4">
+                    <button
+                      onClick={() => handleSaveIndustry(index, industry)}
+                      className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-300 transition-all duration-200 shadow-md border border-blue-600 min-w-[70px]"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      onClick={handleCancelIndustryEdit}
+                      className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-500 text-white rounded-lg text-sm font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-300 transition-all duration-200 shadow-md border border-gray-500 min-w-[70px]"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Cancel</span>
+                    </button>
+                  </div>
+                </div>
 
-            <p className="text-gray-600 text-xs mb-3 line-clamp-2">
-              {industry.description}
-            </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Icon (Emoji)
+                    </label>
+                    <input
+                      type="text"
+                      value={industry.icon}
+                      onChange={(e) => updateIndustry(index, "icon", e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                      placeholder="💻"
+                      maxLength="2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Growth Rate
+                    </label>
+                    <input
+                      type="text"
+                      value={industry.growth}
+                      onChange={(e) => updateIndustry(index, "growth", e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="+25%"
+                    />
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div>
-                <p className="text-sm font-bold text-gray-900">
-                  {industry.startups}
-                </p>
-                <p className="text-xs text-gray-600">Startups</p>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    value={industry.description}
+                    onChange={(e) => updateIndustry(index, "description", e.target.value)}
+                    rows="2"
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                    placeholder="Industry description"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Startups Count
+                    </label>
+                    <input
+                      type="text"
+                      value={industry.startups}
+                      onChange={(e) => updateIndustry(index, "startups", e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="15,000+"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Funding Amount
+                    </label>
+                    <input
+                      type="text"
+                      value={industry.funding}
+                      onChange={(e) => updateIndustry(index, "funding", e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="$45B"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Trends (comma-separated)
+                    </label>
+                    <textarea
+                      value={industry.trends.join(", ")}
+                      onChange={(e) => updateIndustry(index, "trends", e.target.value.split(",").map(t => t.trim()).filter(t => t.length > 0))}
+                      rows="2"
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      placeholder="Trend 1, Trend 2, Trend 3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Opportunities (comma-separated)
+                    </label>
+                    <textarea
+                      value={industry.opportunities.join(", ")}
+                      onChange={(e) => updateIndustry(index, "opportunities", e.target.value.split(",").map(o => o.trim()).filter(o => o.length > 0))}
+                      rows="2"
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      placeholder="Opportunity 1, Opportunity 2"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Challenges (comma-separated)
+                    </label>
+                    <textarea
+                      value={industry.challenges.join(", ")}
+                      onChange={(e) => updateIndustry(index, "challenges", e.target.value.split(",").map(c => c.trim()).filter(c => c.length > 0))}
+                      rows="2"
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      placeholder="Challenge 1, Challenge 2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Key Players (comma-separated)
+                    </label>
+                    <textarea
+                      value={industry.keyPlayers.join(", ")}
+                      onChange={(e) => updateIndustry(index, "keyPlayers", e.target.value.split(",").map(p => p.trim()).filter(p => p.length > 0))}
+                      rows="2"
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      placeholder="Company 1, Company 2"
+                    />
+                  </div>
+                </div>
               </div>
+            ) : (
               <div>
-                <p className="text-sm font-bold text-gray-900">
-                  {industry.funding}
+                <div className="flex items-start justify-between mb-3">
+                  <div 
+                    className="flex items-center space-x-2 flex-1 cursor-pointer"
+                    onClick={() => !isEditing && setSelectedIndustry(selectedIndustry === index ? null : index)}
+                  >
+                    <span className="text-xl">{industry.icon}</span>
+                    <h3 className="text-base font-semibold text-gray-900 leading-tight">
+                      {industry.name}
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium whitespace-nowrap">
+                      {industry.growth}
+                    </span>
+                    {!isEditing && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditIndustry(index);
+                        }}
+                        className="p-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                        title="Edit this industry"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <p 
+                  className="text-gray-600 text-xs mb-3 line-clamp-2 cursor-pointer"
+                  onClick={() => !isEditing && setSelectedIndustry(selectedIndustry === index ? null : index)}
+                >
+                  {industry.description}
                 </p>
-                <p className="text-xs text-gray-600">Funding</p>
+
+                <div 
+                  className="grid grid-cols-3 gap-2 text-center cursor-pointer"
+                  onClick={() => !isEditing && setSelectedIndustry(selectedIndustry === index ? null : index)}
+                >
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">
+                      {industry.startups}
+                    </p>
+                    <p className="text-xs text-gray-600">Startups</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">
+                      {industry.funding}
+                    </p>
+                    <p className="text-xs text-gray-600">Funding</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">
+                      {industry.growth}
+                    </p>
+                    <p className="text-xs text-gray-600">Growth Rate</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-gray-900">
-                  {industry.growth}
-                </p>
-                <p className="text-xs text-gray-600">Growth Rate</p>
-              </div>
-            </div>
+            )}
           </div>
         ))}
       </div>

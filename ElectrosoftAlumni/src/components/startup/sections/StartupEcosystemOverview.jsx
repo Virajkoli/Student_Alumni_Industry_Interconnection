@@ -11,6 +11,7 @@ import {
 
 const StartupEcosystemOverview = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingSectionIndex, setEditingSectionIndex] = useState(null);
   const [content, setContent] = useState({
     title: "Startup Ecosystem Overview",
     description:
@@ -56,6 +57,21 @@ const StartupEcosystemOverview = () => {
     // Reset content to original state if needed
   };
 
+  const handleEditSection = (index) => {
+    setEditingSectionIndex(index);
+  };
+
+  const handleSaveSection = (index, updatedSection) => {
+    const updatedSections = [...content.sections];
+    updatedSections[index] = updatedSection;
+    setContent({ ...content, sections: updatedSections });
+    setEditingSectionIndex(null);
+  };
+
+  const handleCancelSectionEdit = () => {
+    setEditingSectionIndex(null);
+  };
+
   const updateSection = (index, field, value) => {
     const newSections = [...content.sections];
     newSections[index] = { ...newSections[index], [field]: value };
@@ -71,34 +87,7 @@ const StartupEcosystemOverview = () => {
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
+      
       </div>
 
       {/* Key Statistics */}
@@ -131,35 +120,85 @@ const StartupEcosystemOverview = () => {
             key={index}
             className="bg-white border border-gray-200 rounded-lg p-6"
           >
-            {isEditing ? (
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  value={section.title}
-                  onChange={(e) =>
-                    updateSection(index, "title", e.target.value)
-                  }
-                  className="w-full text-xl font-semibold p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <textarea
-                  value={section.content}
-                  onChange={(e) =>
-                    updateSection(index, "content", e.target.value)
-                  }
-                  rows="4"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                />
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                {editingSectionIndex === index ? (
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={section.title}
+                      onChange={(e) => updateSection(index, "title", e.target.value)}
+                      className="w-full text-xl font-semibold p-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Section title"
+                    />
+                    <textarea
+                      value={section.content}
+                      onChange={(e) => updateSection(index, "content", e.target.value)}
+                      rows="4"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      placeholder="Section content"
+                    />
+                  </div>
+                ) : isEditing ? (
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={section.title}
+                      onChange={(e) =>
+                        updateSection(index, "title", e.target.value)
+                      }
+                      className="w-full text-xl font-semibold p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <textarea
+                      value={section.content}
+                      onChange={(e) =>
+                        updateSection(index, "content", e.target.value)
+                      }
+                      rows="4"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                      {section.title}
+                    </h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      {section.content}
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {section.title}
-                </h3>
-                <p className="text-gray-700 leading-relaxed">
-                  {section.content}
-                </p>
+
+              <div className="flex-shrink-0 ml-4">
+                {editingSectionIndex === index ? (
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleSaveSection(index, section)}
+                      className="flex items-center space-x-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      onClick={handleCancelSectionEdit}
+                      className="flex items-center space-x-1 px-3 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors shadow-sm"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Cancel</span>
+                    </button>
+                  </div>
+                ) : !isEditing ? (
+                  <button
+                    onClick={() => handleEditSection(index)}
+                    className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                    title="Edit this section"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                ) : null}
               </div>
-            )}
+            </div>
           </div>
         ))}
       </div>

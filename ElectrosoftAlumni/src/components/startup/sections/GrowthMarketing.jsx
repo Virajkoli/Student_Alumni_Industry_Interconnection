@@ -3,6 +3,7 @@ import { Edit, Save, X, TrendingUp, Target, Users, Zap } from "lucide-react";
 
 const GrowthMarketing = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingStrategyIndex, setEditingStrategyIndex] = useState(null);
   const [content, setContent] = useState({
     title: "Growth & Marketing Strategies",
     description:
@@ -64,6 +65,21 @@ const GrowthMarketing = () => {
     setIsEditing(false);
   };
 
+  const handleEditStrategy = (index) => {
+    setEditingStrategyIndex(index);
+  };
+
+  const handleSaveStrategy = (index, updatedStrategy) => {
+    const updatedStrategies = [...content.strategies];
+    updatedStrategies[index] = updatedStrategy;
+    setContent({ ...content, strategies: updatedStrategies });
+    setEditingStrategyIndex(null);
+  };
+
+  const handleCancelStrategyEdit = () => {
+    setEditingStrategyIndex(null);
+  };
+
   const updateStrategy = (index, field, value) => {
     const newStrategies = [...content.strategies];
     newStrategies[index] = { ...newStrategies[index], [field]: value };
@@ -79,34 +95,7 @@ const GrowthMarketing = () => {
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
+      
       </div>
 
       {/* Growth Metrics */}
@@ -140,10 +129,18 @@ const GrowthMarketing = () => {
             className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 flex-1">
                 <span className="text-2xl">{strategy.icon}</span>
-                <div>
-                  {isEditing ? (
+                <div className="flex-1">
+                  {editingStrategyIndex === index ? (
+                    <input
+                      type="text"
+                      value={strategy.title}
+                      onChange={(e) => updateStrategy(index, "title", e.target.value)}
+                      className="w-full text-lg font-semibold p-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Strategy title"
+                    />
+                  ) : isEditing ? (
                     <input
                       type="text"
                       value={strategy.title}
@@ -159,9 +156,65 @@ const GrowthMarketing = () => {
                   )}
                 </div>
               </div>
+
+              <div className="flex-shrink-0 ml-4">
+                {editingStrategyIndex === index ? (
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleSaveStrategy(index, strategy)}
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-300 transition-all duration-200 shadow-md border border-blue-600 min-w-[85px]"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      onClick={handleCancelStrategyEdit}
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg text-sm font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-300 transition-all duration-200 shadow-md border border-gray-500 min-w-[85px]"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Cancel</span>
+                    </button>
+                  </div>
+                ) : !isEditing ? (
+                  <button
+                    onClick={() => handleEditStrategy(index)}
+                    className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                    title="Edit this strategy"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                ) : null}
+              </div>
             </div>
 
-            {isEditing ? (
+            {editingStrategyIndex === index ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    value={strategy.description}
+                    onChange={(e) => updateStrategy(index, "description", e.target.value)}
+                    rows="3"
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    placeholder="Strategy description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Key Tactics (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={strategy.tactics.join(", ")}
+                    onChange={(e) => updateStrategy(index, "tactics", e.target.value.split(",").map(t => t.trim()).filter(t => t.length > 0))}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Tactic 1, Tactic 2, Tactic 3"
+                  />
+                </div>
+              </div>
+            ) : isEditing ? (
               <textarea
                 value={strategy.description}
                 onChange={(e) =>
@@ -174,21 +227,23 @@ const GrowthMarketing = () => {
               <p className="text-gray-600 mb-4">{strategy.description}</p>
             )}
 
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-gray-800">
-                Key Tactics:
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {strategy.tactics.map((tactic, tacticIndex) => (
-                  <span
-                    key={tacticIndex}
-                    className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                  >
-                    {tactic}
-                  </span>
-                ))}
+            {editingStrategyIndex !== index && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-800">
+                  Key Tactics:
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {strategy.tactics.map((tactic, tacticIndex) => (
+                    <span
+                      key={tacticIndex}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                    >
+                      {tactic}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ))}
       </div>

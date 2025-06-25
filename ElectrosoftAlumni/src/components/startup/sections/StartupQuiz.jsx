@@ -3,6 +3,7 @@ import { Edit, Save, X, Brain, Trophy, Clock, Award } from "lucide-react";
 
 const StartupQuiz = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingQuestionIndex, setEditingQuestionIndex] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -155,34 +156,7 @@ const StartupQuiz = () => {
             <p className="text-gray-600 mt-2">{content.description}</p>
           </div>
 
-          <div className="flex items-center space-x-2">
-            {isEditing ? (
-              <>
-                <button
-                  onClick={handleSave}
-                  className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Save</span>
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                  <span>Cancel</span>
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Edit className="w-4 h-4" />
-                <span>Edit</span>
-              </button>
-            )}
-          </div>
+         
         </div>
 
         {/* Quiz Overview */}

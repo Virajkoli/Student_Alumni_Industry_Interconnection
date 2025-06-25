@@ -3,6 +3,7 @@ import { Edit, Save, X, Rocket, CheckCircle, Circle } from "lucide-react";
 
 const LaunchSteps = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingStepIndex, setEditingStepIndex] = useState(null);
   const [completedSteps, setCompletedSteps] = useState([0, 1, 2]);
   const [content, setContent] = useState({
     title: "Steps to Launch Your Startup",
@@ -153,6 +154,27 @@ const LaunchSteps = () => {
     setIsEditing(false);
   };
 
+  const handleEditStep = (index) => {
+    setEditingStepIndex(index);
+  };
+
+  const handleSaveStep = (index, updatedStep) => {
+    const updatedSteps = [...content.steps];
+    updatedSteps[index] = updatedStep;
+    setContent({ ...content, steps: updatedSteps });
+    setEditingStepIndex(null);
+  };
+
+  const handleCancelStepEdit = () => {
+    setEditingStepIndex(null);
+  };
+
+  const updateStep = (index, field, value) => {
+    const newSteps = [...content.steps];
+    newSteps[index] = { ...newSteps[index], [field]: value };
+    setContent({ ...content, steps: newSteps });
+  };
+
   const toggleStepCompletion = (stepIndex) => {
     if (completedSteps.includes(stepIndex)) {
       setCompletedSteps(completedSteps.filter((index) => index !== stepIndex));
@@ -170,34 +192,6 @@ const LaunchSteps = () => {
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
       </div>
 
       {/* Progress Overview */}
@@ -237,115 +231,219 @@ const LaunchSteps = () => {
                   : "border-gray-200 hover:shadow-md"
               }`}
             >
-              <div className="flex items-start space-x-4">
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => !isEditing && toggleStepCompletion(index)}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                      isCompleted
-                        ? "bg-green-600 text-white"
-                        : isActive
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <CheckCircle className="w-5 h-5" />
-                    ) : (
-                      <span className="font-bold text-sm">{index + 1}</span>
-                    )}
-                  </button>
-                  {index < content.steps.length - 1 && (
-                    <div
-                      className={`w-0.5 h-16 mt-2 ${
-                        isCompleted ? "bg-green-300" : "bg-gray-300"
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start space-x-4 flex-1">
+                  <div className="flex flex-col items-center">
+                    <button
+                      onClick={() => !isEditing && !editingStepIndex && toggleStepCompletion(index)}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                        isCompleted
+                          ? "bg-green-600 text-white"
+                          : isActive
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 text-gray-600 hover:bg-gray-300"
                       }`}
-                    ></div>
-                  )}
+                    >
+                      {isCompleted ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : (
+                        <span className="font-bold text-sm">{index + 1}</span>
+                      )}
+                    </button>
+                    {index < content.steps.length - 1 && (
+                      <div
+                        className={`w-0.5 h-16 mt-2 ${
+                          isCompleted ? "bg-green-300" : "bg-gray-300"
+                        }`}
+                      ></div>
+                    )}
+                  </div>
+
+                  <div className="flex-1">
+                    {editingStepIndex === index ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 mr-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Step Title
+                            </label>
+                            <input
+                              type="text"
+                              value={step.title}
+                              onChange={(e) => updateStep(index, "title", e.target.value)}
+                              className="w-full text-lg font-semibold p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Step title"
+                            />
+                          </div>
+                          <div className="w-32">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Timeframe
+                            </label>
+                            <input
+                              type="text"
+                              value={step.timeframe}
+                              onChange={(e) => updateStep(index, "timeframe", e.target.value)}
+                              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                              placeholder="e.g., 2-4 weeks"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Description
+                          </label>
+                          <textarea
+                            value={step.description}
+                            onChange={(e) => updateStep(index, "description", e.target.value)}
+                            rows="3"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            placeholder="Step description"
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Key Tasks (comma-separated)
+                            </label>
+                            <textarea
+                              value={step.tasks.join(", ")}
+                              onChange={(e) => updateStep(index, "tasks", e.target.value.split(",").map(t => t.trim()).filter(t => t.length > 0))}
+                              rows="3"
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                              placeholder="Task 1, Task 2, Task 3"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Resources (comma-separated)
+                            </label>
+                            <textarea
+                              value={step.resources.join(", ")}
+                              onChange={(e) => updateStep(index, "resources", e.target.value.split(",").map(r => r.trim()).filter(r => r.length > 0))}
+                              rows="3"
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                              placeholder="Resource 1, Resource 2, Resource 3"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex items-start justify-between mb-2">
+                          <h3
+                            className={`text-lg font-semibold ${
+                              isCompleted ? "text-green-800" : "text-gray-900"
+                            }`}
+                          >
+                            {step.title}
+                          </h3>
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              isCompleted
+                                ? "bg-green-100 text-green-800"
+                                : isActive
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {step.timeframe}
+                          </span>
+                        </div>
+
+                        <p
+                          className={`mb-4 ${
+                            isCompleted ? "text-green-700" : "text-gray-600"
+                          }`}
+                        >
+                          {step.description}
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h4
+                              className={`text-sm font-medium mb-2 ${
+                                isCompleted ? "text-green-800" : "text-gray-800"
+                              }`}
+                            >
+                              Key Tasks:
+                            </h4>
+                            <ul className="space-y-1">
+                              {step.tasks.map((task, taskIndex) => (
+                                <li
+                                  key={taskIndex}
+                                  className={`text-sm flex items-center ${
+                                    isCompleted ? "text-green-700" : "text-gray-600"
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                                      isCompleted ? "bg-green-500" : "bg-gray-400"
+                                    }`}
+                                  ></span>
+                                  {task}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div>
+                            <h4
+                              className={`text-sm font-medium mb-2 ${
+                                isCompleted ? "text-green-800" : "text-gray-800"
+                              }`}
+                            >
+                              Resources:
+                            </h4>
+                            <div className="flex flex-wrap gap-1">
+                              {step.resources.map((resource, resourceIndex) => (
+                                <span
+                                  key={resourceIndex}
+                                  className={`px-2 py-1 text-xs rounded ${
+                                    isCompleted
+                                      ? "bg-green-100 text-green-700"
+                                      : "bg-blue-100 text-blue-700"
+                                  }`}
+                                >
+                                  {resource}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3
-                      className={`text-lg font-semibold ${
-                        isCompleted ? "text-green-800" : "text-gray-900"
-                      }`}
-                    >
-                      {step.title}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        isCompleted
-                          ? "bg-green-100 text-green-800"
-                          : isActive
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {step.timeframe}
-                    </span>
-                  </div>
-
-                  <p
-                    className={`mb-4 ${
-                      isCompleted ? "text-green-700" : "text-gray-600"
-                    }`}
-                  >
-                    {step.description}
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4
-                        className={`text-sm font-medium mb-2 ${
-                          isCompleted ? "text-green-800" : "text-gray-800"
-                        }`}
+                <div className="flex-shrink-0 ml-4">
+                  {editingStepIndex === index ? (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleSaveStep(index, step)}
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-300 transition-all duration-200 shadow-md border border-blue-600 min-w-[85px]"
                       >
-                        Key Tasks:
-                      </h4>
-                      <ul className="space-y-1">
-                        {step.tasks.map((task, taskIndex) => (
-                          <li
-                            key={taskIndex}
-                            className={`text-sm flex items-center ${
-                              isCompleted ? "text-green-700" : "text-gray-600"
-                            }`}
-                          >
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full mr-2 ${
-                                isCompleted ? "bg-green-500" : "bg-gray-400"
-                              }`}
-                            ></span>
-                            {task}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <h4
-                        className={`text-sm font-medium mb-2 ${
-                          isCompleted ? "text-green-800" : "text-gray-800"
-                        }`}
+                        <Save className="w-4 h-4" />
+                        <span>Save</span>
+                      </button>
+                      <button
+                        onClick={handleCancelStepEdit}
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg text-sm font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-300 transition-all duration-200 shadow-md border border-gray-500 min-w-[85px]"
                       >
-                        Resources:
-                      </h4>
-                      <div className="flex flex-wrap gap-1">
-                        {step.resources.map((resource, resourceIndex) => (
-                          <span
-                            key={resourceIndex}
-                            className={`px-2 py-1 text-xs rounded ${
-                              isCompleted
-                                ? "bg-green-100 text-green-700"
-                                : "bg-blue-100 text-blue-700"
-                            }`}
-                          >
-                            {resource}
-                          </span>
-                        ))}
-                      </div>
+                        <X className="w-4 h-4" />
+                        <span>Cancel</span>
+                      </button>
                     </div>
-                  </div>
+                  ) : !isEditing ? (
+                    <button
+                      onClick={() => handleEditStep(index)}
+                      className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                      title="Edit this step"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </button>
+                  ) : null}
                 </div>
               </div>
             </div>

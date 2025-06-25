@@ -11,6 +11,7 @@ import {
 
 const FundingInvestment = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingStageIndex, setEditingStageIndex] = useState(null);
   const [content, setContent] = useState({
     title: "Funding and Investment",
     description:
@@ -62,6 +63,21 @@ const FundingInvestment = () => {
     setIsEditing(false);
   };
 
+  const handleEditStage = (index) => {
+    setEditingStageIndex(index);
+  };
+
+  const handleSaveStage = (index, updatedStage) => {
+    const updatedStages = [...content.fundingStages];
+    updatedStages[index] = updatedStage;
+    setContent({ ...content, fundingStages: updatedStages });
+    setEditingStageIndex(null);
+  };
+
+  const handleCancelStageEdit = () => {
+    setEditingStageIndex(null);
+  };
+
   const updateStage = (index, field, value) => {
     const newStages = [...content.fundingStages];
     newStages[index] = { ...newStages[index], [field]: value };
@@ -77,34 +93,7 @@ const FundingInvestment = () => {
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
+        
       </div>
 
       {/* Funding Metrics */}
@@ -147,24 +136,67 @@ const FundingInvestment = () => {
                     {index + 1}
                   </div>
                   <div>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={stage.stage}
-                        onChange={(e) =>
-                          updateStage(index, "stage", e.target.value)
-                        }
-                        className="text-lg font-semibold p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
+                    {editingStageIndex === index ? (
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          value={stage.stage}
+                          onChange={(e) =>
+                            updateStage(index, "stage", e.target.value)
+                          }
+                          className="text-lg font-semibold p-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                          placeholder="Stage name"
+                        />
+                        <input
+                          type="text"
+                          value={stage.amount}
+                          onChange={(e) =>
+                            updateStage(index, "amount", e.target.value)
+                          }
+                          className="text-sm font-medium p-2 border border-emerald-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-emerald-600 w-full"
+                          placeholder="Amount range"
+                        />
+                      </div>
                     ) : (
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {stage.stage}
-                      </h3>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {stage.stage}
+                        </h3>
+                        <p className="text-sm text-emerald-600 font-medium">
+                          {stage.amount}
+                        </p>
+                      </div>
                     )}
-                    <p className="text-sm text-emerald-600 font-medium">
-                      {stage.amount}
-                    </p>
                   </div>
+                </div>
+
+                <div className="flex-shrink-0">
+                  {editingStageIndex === index ? (
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleSaveStage(index, stage)}
+                        className="flex items-center space-x-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors shadow-sm"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>Save</span>
+                      </button>
+                      <button
+                        onClick={handleCancelStageEdit}
+                        className="flex items-center space-x-1 px-3 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors shadow-sm"
+                      >
+                        <X className="w-4 h-4" />
+                        <span>Cancel</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleEditStage(index)}
+                      className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                      title="Edit this funding stage"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -173,7 +205,7 @@ const FundingInvestment = () => {
                   <h4 className="text-sm font-medium text-gray-800 mb-2">
                     Description
                   </h4>
-                  {isEditing ? (
+                  {editingStageIndex === index ? (
                     <textarea
                       value={stage.description}
                       onChange={(e) =>
@@ -190,7 +222,7 @@ const FundingInvestment = () => {
                   <h4 className="text-sm font-medium text-gray-800 mb-2">
                     Focus Areas
                   </h4>
-                  {isEditing ? (
+                  {editingStageIndex === index ? (
                     <input
                       type="text"
                       value={stage.focus}
@@ -207,7 +239,7 @@ const FundingInvestment = () => {
                   <h4 className="text-sm font-medium text-gray-800 mb-2">
                     Typical Investors
                   </h4>
-                  {isEditing ? (
+                  {editingStageIndex === index ? (
                     <input
                       type="text"
                       value={stage.investors}

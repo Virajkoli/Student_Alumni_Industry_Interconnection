@@ -3,6 +3,7 @@ import { Edit, Save, X, Wrench, Code, BarChart, Users } from "lucide-react";
 
 const ToolsResources = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingTool, setEditingTool] = useState(null);
   const [content, setContent] = useState({
     title: "Tools & Resources",
     description:
@@ -140,6 +141,27 @@ const ToolsResources = () => {
     setIsEditing(false);
   };
 
+  const handleEditTool = (categoryIndex, toolIndex) => {
+    setEditingTool({ categoryIndex, toolIndex });
+  };
+
+  const handleSaveTool = (categoryIndex, toolIndex, updatedTool) => {
+    const newContent = { ...content };
+    newContent.categories[categoryIndex].tools[toolIndex] = updatedTool;
+    setContent(newContent);
+    setEditingTool(null);
+  };
+
+  const handleCancelToolEdit = () => {
+    setEditingTool(null);
+  };
+
+  const updateTool = (categoryIndex, toolIndex, field, value) => {
+    const newContent = { ...content };
+    newContent.categories[categoryIndex].tools[toolIndex][field] = value;
+    setContent(newContent);
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -149,34 +171,7 @@ const ToolsResources = () => {
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
+        
       </div>
 
       {/* Tool Categories */}
@@ -198,40 +193,100 @@ const ToolsResources = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {category.tools.map((tool, toolIndex) => (
-                  <div
-                    key={toolIndex}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {tool.name}
-                      </h3>
-                      <span
-                        className={`px-2 py-1 text-xs rounded-full ${
-                          tool.price === "Free"
-                            ? "bg-green-100 text-green-800"
-                            : tool.price === "Paid"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-blue-100 text-blue-800"
-                        }`}
-                      >
-                        {tool.price}
-                      </span>
+                {category.tools.map((tool, toolIndex) => {
+                  const isEditingThis = editingTool?.categoryIndex === categoryIndex && editingTool?.toolIndex === toolIndex;
+                  
+                  return (
+                    <div
+                      key={toolIndex}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    >
+                      {isEditingThis ? (
+                        <div className="space-y-3">
+                          <input
+                            type="text"
+                            value={tool.name}
+                            onChange={(e) => updateTool(categoryIndex, toolIndex, "name", e.target.value)}
+                            className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-medium"
+                            placeholder="Tool name"
+                          />
+                          <textarea
+                            value={tool.description}
+                            onChange={(e) => updateTool(categoryIndex, toolIndex, "description", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            rows="2"
+                            placeholder="Description"
+                          />
+                          <select
+                            value={tool.price}
+                            onChange={(e) => updateTool(categoryIndex, toolIndex, "price", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xs"
+                          >
+                            <option value="Free">Free</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Free/Paid">Free/Paid</option>
+                            <option value="Pay-as-you-go">Pay-as-you-go</option>
+                          </select>
+                          <div className="flex space-x-2 pt-2">
+                            <button
+                              onClick={() => handleSaveTool(categoryIndex, toolIndex, tool)}
+                              className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                              <Save className="w-3 h-3" />
+                              <span>Save</span>
+                            </button>
+                            <button
+                              onClick={handleCancelToolEdit}
+                              className="flex items-center space-x-1 px-3 py-1.5 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                              <span>Cancel</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <h3 className="text-lg font-medium text-gray-900">
+                                {tool.name}
+                              </h3>
+                              <button
+                                onClick={() => handleEditTool(categoryIndex, toolIndex)}
+                                className="p-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
+                                title="Edit tool"
+                              >
+                                <Edit className="w-3 h-3" />
+                              </button>
+                            </div>
+                            <span
+                              className={`px-2 py-1 text-xs rounded-full ${
+                                tool.price === "Free"
+                                  ? "bg-green-100 text-green-800"
+                                  : tool.price === "Paid"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
+                              {tool.price}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-3">
+                            {tool.description}
+                          </p>
+                          <div className="flex space-x-2">
+                            <button className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors">
+                              Learn More
+                            </button>
+                            <button className="px-3 py-1.5 border border-gray-300 text-gray-700 text-xs rounded-lg hover:bg-gray-50 transition-colors">
+                              Try Free
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      {tool.description}
-                    </p>
-                    <div className="flex space-x-2">
-                      <button className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors">
-                        Learn More
-                      </button>
-                      <button className="px-3 py-1.5 border border-gray-300 text-gray-700 text-xs rounded-lg hover:bg-gray-50 transition-colors">
-                        Try Free
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );

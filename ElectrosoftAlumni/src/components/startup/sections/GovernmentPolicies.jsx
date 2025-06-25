@@ -3,6 +3,7 @@ import { Edit, Save, X, Building, FileText, TrendingUp } from "lucide-react";
 
 const GovernmentPolicies = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingPolicyIndex, setEditingPolicyIndex] = useState(null);
   const [content, setContent] = useState({
     title: "Government Policies & Tax Benefits",
     description:
@@ -78,6 +79,27 @@ const GovernmentPolicies = () => {
     setIsEditing(false);
   };
 
+  const handleEditPolicy = (index) => {
+    setEditingPolicyIndex(index);
+  };
+
+  const handleSavePolicy = (index, updatedPolicy) => {
+    const updatedPolicies = [...content.policies];
+    updatedPolicies[index] = updatedPolicy;
+    setContent({ ...content, policies: updatedPolicies });
+    setEditingPolicyIndex(null);
+  };
+
+  const handleCancelPolicyEdit = () => {
+    setEditingPolicyIndex(null);
+  };
+
+  const updatePolicy = (index, field, value) => {
+    const newPolicies = [...content.policies];
+    newPolicies[index] = { ...newPolicies[index], [field]: value };
+    setContent({ ...content, policies: newPolicies });
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -87,34 +109,7 @@ const GovernmentPolicies = () => {
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
+       
       </div>
 
       {/* Tax Benefits Overview */}
@@ -146,42 +141,128 @@ const GovernmentPolicies = () => {
             key={index}
             className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
           >
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Building className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {policy.title}
-                </h3>
-                <p className="text-gray-600 mb-4">{policy.description}</p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-800 mb-2">
-                      Key Benefits:
-                    </h4>
-                    <ul className="space-y-1">
-                      {policy.benefits.map((benefit, benefitIndex) => (
-                        <li
-                          key={benefitIndex}
-                          className="text-sm text-gray-600 flex items-center"
-                        >
-                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
-                          {benefit}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-800 mb-2">
-                      Eligibility:
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      {policy.eligibility}
-                    </p>
-                  </div>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start space-x-4 flex-1">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Building className="w-6 h-6 text-blue-600" />
                 </div>
+                <div className="flex-1">
+                  {editingPolicyIndex === index ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Policy Title
+                        </label>
+                        <input
+                          type="text"
+                          value={policy.title}
+                          onChange={(e) => updatePolicy(index, "title", e.target.value)}
+                          className="w-full text-xl font-semibold p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Policy title"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Description
+                        </label>
+                        <textarea
+                          value={policy.description}
+                          onChange={(e) => updatePolicy(index, "description", e.target.value)}
+                          rows="3"
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                          placeholder="Policy description"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Key Benefits (comma-separated)
+                        </label>
+                        <input
+                          type="text"
+                          value={policy.benefits.join(", ")}
+                          onChange={(e) => updatePolicy(index, "benefits", e.target.value.split(",").map(b => b.trim()).filter(b => b.length > 0))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Benefit 1, Benefit 2, Benefit 3"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Eligibility Criteria
+                        </label>
+                        <textarea
+                          value={policy.eligibility}
+                          onChange={(e) => updatePolicy(index, "eligibility", e.target.value)}
+                          rows="2"
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                          placeholder="Eligibility criteria"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        {policy.title}
+                      </h3>
+                      <p className="text-gray-600 mb-4">{policy.description}</p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-800 mb-2">
+                            Key Benefits:
+                          </h4>
+                          <ul className="space-y-1">
+                            {policy.benefits.map((benefit, benefitIndex) => (
+                              <li
+                                key={benefitIndex}
+                                className="text-sm text-gray-600 flex items-center"
+                              >
+                                <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                                {benefit}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-800 mb-2">
+                            Eligibility:
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {policy.eligibility}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex-shrink-0 ml-4">
+                {editingPolicyIndex === index ? (
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleSavePolicy(index, policy)}
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-300 transition-all duration-200 shadow-md border border-blue-600 min-w-[85px]"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      onClick={handleCancelPolicyEdit}
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg text-sm font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-300 transition-all duration-200 shadow-md border border-gray-500 min-w-[85px]"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Cancel</span>
+                    </button>
+                  </div>
+                ) : !isEditing ? (
+                  <button
+                    onClick={() => handleEditPolicy(index)}
+                    className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                    title="Edit this policy"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                ) : null}
               </div>
             </div>
           </div>

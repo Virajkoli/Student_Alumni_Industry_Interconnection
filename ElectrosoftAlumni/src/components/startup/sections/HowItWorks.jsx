@@ -3,6 +3,7 @@ import { Edit, Save, X, Play, CheckCircle, ArrowRight } from "lucide-react";
 
 const HowItWorks = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editingStepIndex, setEditingStepIndex] = useState(null);
   const [content, setContent] = useState({
     title: "How It Works",
     description:
@@ -111,6 +112,27 @@ const HowItWorks = () => {
     setIsEditing(false);
   };
 
+  const handleEditStep = (index) => {
+    setEditingStepIndex(index);
+  };
+
+  const handleSaveStep = (index, updatedStep) => {
+    const updatedSteps = [...content.steps];
+    updatedSteps[index] = updatedStep;
+    setContent({ ...content, steps: updatedSteps });
+    setEditingStepIndex(null);
+  };
+
+  const handleCancelStepEdit = () => {
+    setEditingStepIndex(null);
+  };
+
+  const updateStep = (index, field, value) => {
+    const newSteps = [...content.steps];
+    newSteps[index] = { ...newSteps[index], [field]: value };
+    setContent({ ...content, steps: newSteps });
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -120,34 +142,7 @@ const HowItWorks = () => {
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                <span>Cancel</span>
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
+        
       </div>
 
       {/* Benefits Overview */}
@@ -186,20 +181,91 @@ const HowItWorks = () => {
               {/* Step Content */}
               <div className="flex-1 bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Step {index + 1}: {step.title}
-                  </h3>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium">
-                    {index === 0
-                      ? "Start Here"
-                      : index === content.steps.length - 1
-                      ? "Advanced"
-                      : "Essential"}
-                  </span>
+                  <div className="flex items-center space-x-4">
+                    {editingStepIndex === index ? (
+                      <input
+                        type="text"
+                        value={step.title}
+                        onChange={(e) => updateStep(index, "title", e.target.value)}
+                        className="text-xl font-semibold p-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Step title"
+                      />
+                    ) : (
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        Step {index + 1}: {step.title}
+                      </h3>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium">
+                      {index === 0
+                        ? "Start Here"
+                        : index === content.steps.length - 1
+                        ? "Advanced"
+                        : "Essential"}
+                    </span>
+                    
+                    {editingStepIndex === index ? (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleSaveStep(index, step)}
+                          className="flex items-center space-x-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                        >
+                          <Save className="w-4 h-4" />
+                          <span>Save</span>
+                        </button>
+                        <button
+                          onClick={handleCancelStepEdit}
+                          className="flex items-center space-x-1 px-3 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors shadow-sm"
+                        >
+                          <X className="w-4 h-4" />
+                          <span>Cancel</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleEditStep(index)}
+                        className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                        title="Edit this step"
+                      >
+                        <Edit className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <p className="text-gray-600 mb-4">{step.description}</p>
-                <p className="text-sm text-gray-700 mb-4">{step.details}</p>
+                {editingStepIndex === index ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        value={step.description}
+                        onChange={(e) => updateStep(index, "description", e.target.value)}
+                        rows="2"
+                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Details
+                      </label>
+                      <textarea
+                        value={step.details}
+                        onChange={(e) => updateStep(index, "details", e.target.value)}
+                        rows="3"
+                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-gray-600 mb-4">{step.description}</p>
+                    <p className="text-sm text-gray-700 mb-4">{step.details}</p>
+                  </>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>

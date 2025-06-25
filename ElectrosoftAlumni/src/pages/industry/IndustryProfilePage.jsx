@@ -9,7 +9,8 @@ import NavigationOptions from "../../components/industry/NavigationOptions";
 
 const IndustryProfilePage = () => {
   const [activeContent, setActiveContent] = useState("industry-overview");
-  const [activeContentName, setActiveContentName] = useState("Industry Overview");
+  const [activeContentName, setActiveContentName] =
+    useState("Industry Overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOption, setSelectedOption] = useState("Industry Overview");
 
@@ -29,7 +30,7 @@ const IndustryProfilePage = () => {
     "Student Login",
     "Project Success Stories",
     "Upload Project",
-    "Add University Project"
+    "Add University Project",
   ];
 
   const handleNavigationChange = (contentId, contentName) => {
@@ -43,6 +44,18 @@ const IndustryProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <h1 className="text-3xl font-bold text-center my-8">
+        Electrosoft Alumni Platform
+      </h1>
+      <button className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
+        <a href="/startup-profile">Go to Startup Profile</a>
+      </button>
+      <button className="bg-green-500 text-white px-4 py-2 rounded mb-4 ml-4">
+        <a href="/industry-profile">Go to Industry Profile</a>
+      </button>
+      <button className="bg-red-500 text-white px-4 py-2 rounded mb-4 ml-4">
+        <a href="/college-profile">Go to College Profile</a>
+      </button>
       <Navbar />
       {/* Search Container */}
       <div className="bg-white shadow-sm border-b border-gray-200">
@@ -75,14 +88,15 @@ const IndustryProfilePage = () => {
             </div>
           </div>
         </div>
-      </div>      <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
+      </div>{" "}
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
         {/* Horizontal Profile Navbar - Full Width */}
-        <HorizontalProfileNavbar 
+        <HorizontalProfileNavbar
           onNavigationChange={handleNavigationChange}
           navigationOptions={navigationOptions}
           isIndustryProfile={true}
         />
-        
+
         <div className="grid grid-cols-12 gap-6">
           {/* Main Content Area */}
           <div className="col-span-12 lg:col-span-8">

@@ -6,7 +6,6 @@ import ToolsResources from "./sections/ToolsResources";
 import FAQs from "./sections/FAQs";
 import GovernmentPolicies from "./sections/GovernmentPolicies";
 import LaunchSteps from "./sections/LaunchSteps";
-import StartupQuiz from "./sections/StartupQuiz";
 import HowItWorks from "./sections/HowItWorks";
 import Industries from "./sections/Industries";
 import JobsSkills from "./sections/JobsSkills";
@@ -28,8 +27,6 @@ const ContentRenderer = ({ activeContent, activeContentName }) => {
         return <GovernmentPolicies />;
       case "launch-steps":
         return <LaunchSteps />;
-      case "startup-quiz":
-        return <StartupQuiz />;
       case "how-it-works":
         return <HowItWorks />;
       case "industries":

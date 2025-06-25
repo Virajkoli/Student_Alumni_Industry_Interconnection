@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Navbar from "../../components/startup/Navbar";
 import PostCreator from "../../components/startup/PostCreator";
 import FeedArea from "../../components/startup/FeedArea";
-import NewsSidebar from "../../components/startup/NewsSidebar";
+import StartupQuizSidebar from "../../components/startup/StartupQuizSidebar";
 import ContentRenderer from "../../components/startup/ContentRenderer";
 import StartupProfileHeader from "../../components/startup/StartupProfileHeader";
 
@@ -129,7 +129,7 @@ const StartupProfilePage = () => {
           </div>
           {/* Right Sidebar - News - 30% width */}
           <div className="hidden lg:block w-[30%]">
-            <NewsSidebar />
+            <StartupQuizSidebar />
           </div>
         </div>
       </div>

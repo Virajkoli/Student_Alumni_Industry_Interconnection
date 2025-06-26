@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
 const NAV_OPTIONS = [
-  { id: "college-info", name: "College Info", icon: "🏫" },
-  { id: "course-fees", name: "Course Fees", icon: "💸" },
-  { id: "review", name: "Review", icon: "⭐" },
-  { id: "admission", name: "Admission", icon: "📝" },
-  { id: "placement", name: "Placement", icon: "💼" },
-  { id: "faculty", name: "Faculty", icon: "👨‍🏫" }
+  { id: "college-info", name: "College Info" },
+  { id: "course-fees", name: "Course Fees" },
+  { id: "review", name: "Review" },
+  { id: "admission", name: "Admission" },
+  { id: "placement", name: "Placement" },
+  { id: "faculty", name: "Faculty" },
 ];
 
 const CollegeProfileHeader = ({
@@ -15,7 +15,7 @@ const CollegeProfileHeader = ({
   logo = "/college-logo.png",
   background = "/college-bg.jpg",
   activeTab,
-  setActiveTab
+  setActiveTab,
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
@@ -35,7 +35,7 @@ const CollegeProfileHeader = ({
                 alt="College Logo"
                 className="w-full h-full object-contain rounded-full"
                 onError={(e) => {
-                  e.target.style.display = 'none';
+                  e.target.style.display = "none";
                 }}
               />
             </div>
@@ -57,7 +57,7 @@ const CollegeProfileHeader = ({
         </div>
       </div>
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-blue-100">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 mb-4 pb-4 border-t border-blue-100">
         <div className="text-center">
           <div className="text-lg font-semibold text-blue-900">120+</div>
           <div className="text-xs text-blue-500">Projects</div>
@@ -75,22 +75,23 @@ const CollegeProfileHeader = ({
           <div className="text-xs text-blue-500">Rating</div>
         </div>
       </div>
-      {/* Navigation Options - Consistent with Industry/Startup, below quick stats */}
-      <div className="flex justify-center overflow-x-auto gap-6 px-6 py-3 bg-white scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 border-t border-blue-100 border-b border-blue-100 mt-2">
-        {NAV_OPTIONS.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap
-              ${activeTab === item.id ? 'bg-blue-600 text-white' : 'text-blue-700'}
-              ${activeTab === item.id ? '' : 'hover:bg-blue-100'}
-              // Removed border and bg for inactive, increased gap
-            `}
-          >
-            <span className="text-base">{item.icon}</span>
-            <span>{item.name}</span>
-          </button>
-        ))}
+      {/* Navigation Options - LinkedIn Style Horizontal */}
+      <div className="bg-white border border-gray-200">
+        <div className="flex overflow-x-auto">
+          {NAV_OPTIONS.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
+                activeTab === item.id
+                  ? "border-blue-500 text-blue-600 bg-blue-50"
+                  : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
+              }`}
+            >
+              {item.name}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

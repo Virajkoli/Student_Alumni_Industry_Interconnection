@@ -154,13 +154,31 @@ const CollegeProfilePage = () => {
   };
 
   const handleInputChange = (tab, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [tab]: {
-        ...prev[tab],
-        [field]: value
+    setFormData((prev) => {
+      if (Array.isArray(field)) {
+        // Nested field (e.g., ['breakdown', 'academics'])
+        const [parent, child] = field;
+        return {
+          ...prev,
+          [tab]: {
+            ...prev[tab],
+            [parent]: {
+              ...prev[tab][parent],
+              [child]: value
+            }
+          }
+        };
+      } else {
+        // Simple field
+        return {
+          ...prev,
+          [tab]: {
+            ...prev[tab],
+            [field]: value
+          }
+        };
       }
-    }));
+    });
   };
 
   const handleArrayChange = (tab, field, idx, value) => {

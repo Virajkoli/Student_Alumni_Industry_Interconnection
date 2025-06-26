@@ -1,25 +1,45 @@
 import React, { useState } from "react";
+import { Edit3, X, MapPin, Phone, Mail, Globe, Camera } from "lucide-react";
+
+const styles = {
+  hideScrollbar: {
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+    '&::-webkit-scrollbar': {
+      display: 'none',
+    },
+  },
+};
 
 const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
   const [activeItem, setActiveItem] = useState("industry-overview");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [profileData, setProfileData] = useState({
+    firstName: "Industry",
+    lastName: "Expert",
+    headline: "Industry Domain Expert, Innovator, and Mentor",
+    location: "Mumbai",
+    city: "Maharashtra",
+    phone: "+91 98765 43210",
+    email: "expert@industry.com",
+    website: "www.industry.com",
+    about: "Experienced industry leader with deep expertise in technology innovation and business transformation. Committed to mentoring and fostering industry-academia collaboration.",
+  });
+  const [editData, setEditData] = useState({ ...profileData });
 
   const navigationItems = [
-    { id: "posts", name: "Posts", icon: "📝", description: "Your posts and activities" },
-    { id: "industry-overview", name: "Industry Overview", icon: "🏭", description: "Overview of the industry" },
-    { id: "sector-category", name: "Sector / Category", icon: "📊", description: "Industry sectors and categories" },
-    { id: "job-career-opportunities", name: "Job Career Opportunities", icon: "💼", description: "Jobs and career paths" },
-    { id: "technology", name: "Technology", icon: "💡", description: "Technologies in the industry" },
-    { id: "challenges-solutions", name: "Challenges / Solutions", icon: "🛠️", description: "Industry challenges and solutions" },
-    { id: "success-stories", name: "Success Stories", icon: "🏆", description: "Industry success stories" },
-    { id: "post-news-jobs", name: "Post News and Jobs", icon: "📰", description: "Share news and job posts" },
-    { id: "expert-opinions-interview", name: "Expert Opinions/Interview", icon: "🎤", description: "Expert interviews and opinions" },
-    { id: "poll-comment-section", name: "Poll/Comment Section", icon: "💬", description: "Polls and comments" },
-    { id: "internship-training-requests", name: "Internship or Training Requests", icon: "📚", description: "Request internships or training" },
-    { id: "live-projects", name: "Live Projects", icon: "🚀", description: "Live industry projects" },
-    { id: "student-login", name: "Student Login", icon: "👨‍🎓", description: "Login for students" },
-    { id: "project-success-stories", name: "Project Success Stories", icon: "📈", description: "Success stories of projects" },
-    { id: "upload-project", name: "Upload Project", icon: "⬆️", description: "Upload your project" },
-    { id: "add-university-project", name: "Add University Project", icon: "🏫", description: "Add a university project" },
+    { id: "posts", name: "Posts", description: "Your posts and activities" },
+    { id: "industry-overview", name: "Industry Overview", description: "Overview of the industry" },
+    { id: "sector-category", name: "Sector / Category", description: "Industry sectors and categories" },
+    { id: "job-career-opportunities", name: "Job Career Opportunities",  description: "Jobs and career paths" },
+    { id: "technology", name: "Technology",  description: "Technologies in the industry" },
+    { id: "challenges-solutions", name: "Challenges / Solutions",  description: "Industry challenges and solutions" },
+    { id: "post-news-jobs", name: "Post News and Jobs",  description: "Share news and job posts" },
+    { id: "expert-opinions-interview", name: "Expert Opinions/Interview", description: "Expert interviews and opinions" },
+    { id: "poll-comment-section", name: "Poll/Comment Section", description: "Polls and comments" },
+    { id: "internship-training-requests", name: "Internship or Training Requests",  description: "Request internships or training" },
+    { id: "live-projects", name: "Live Projects", description: "Live industry projects" },
+    { id: "upload-project", name: "Upload Project",  description: "Upload your project" },
   ];
 
   const handleItemClick = (item) => {
@@ -29,11 +49,39 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
     }
   };
 
+  const handleEditClick = () => {
+    setEditData({ ...profileData });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveProfile = () => {
+    setProfileData({ ...editData });
+    setIsEditModalOpen(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditData({ ...profileData });
+    setIsEditModalOpen(false);
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditData(prev => ({ ...prev, [field]: value }));
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-      {/* Profile Header - Horizontal */}
+    <>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+        {/* Profile Header - Horizontal */}
       <div className="relative">
-        <div className="h-24 bg-gradient-to-r from-green-500 to-blue-600"></div>
+        <div className="h-24 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+        {/* Edit Button */}
+        <button
+          onClick={handleEditClick}
+          className="absolute top-3 right-3 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
+          title="Edit Profile"
+        >
+          <Edit3 className="w-4 h-4" />
+        </button>
         <div className="absolute -bottom-8 left-6">
           <div className="w-16 h-16 bg-white rounded-full p-1 shadow-lg">
             <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center overflow-hidden">
@@ -41,75 +89,210 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
                 src="/api/placeholder/64/64"
                 alt="Profile"
                 className="w-full h-full object-cover rounded-full"
-                onError={(e) => { e.target.style.display = 'none'; }}
+                onError={(e) => { e.target.style.display = "none"; }}
               />
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Profile Info - Horizontal Layout */}
-      <div className="pt-10 px-6 pb-6 border-b border-gray-200">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold text-gray-900">Industry User</h3>
-            <p className="text-sm text-gray-600 mt-1">
-              Industry Domain Expert, Innovator, and Mentor
-            </p>
-            <p className="text-xs text-gray-500 mt-1">📍 Mumbai, Maharashtra</p>
+
+        {/* Profile Info - Horizontal Layout */}
+        <div className="pt-10 px-6 pb-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold text-gray-900">
+                {profileData.firstName} {profileData.lastName}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {profileData.headline}
+              </p>
+              <div className="flex items-center text-xs text-gray-500 mt-1">
+                <MapPin className="w-3 h-3 mr-1" />
+                {profileData.location}, {profileData.city}
+              </div>
+            </div>
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <button className="py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                Industry Experience
+              </button>
+            </div>
           </div>
-          
-          <div className="flex gap-3">
-            <button className="py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-              Industry Experience
-            </button>
-            <button className="py-2 px-4 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors duration-200">
-              Connect
-            </button>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-gray-200">
+            <div className="text-center">
+              <div className="text-lg font-semibold text-gray-900">250+</div>
+              <div className="text-xs text-gray-500">Projects</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-semibold text-gray-900">15</div>
+              <div className="text-xs text-gray-500">Years Experience</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-semibold text-gray-900">500+</div>
+              <div className="text-xs text-gray-500">Connections</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-semibold text-gray-900">4.8</div>
+              <div className="text-xs text-gray-500">Rating</div>
+            </div>
           </div>
-        </div>
-        
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-gray-200">
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">250+</div>
-            <div className="text-xs text-gray-500">Projects</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">15</div>
-            <div className="text-xs text-gray-500">Years Experience</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">500+</div>
-            <div className="text-xs text-gray-500">Connections</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">4.8</div>
-            <div className="text-xs text-gray-500">Rating</div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Horizontal Navigation Items */}
-      <div className="px-6 py-4">
-        <div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ scrollbarWidth: 'thin' }}>
-          {navigationItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleItemClick(item)}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
-                activeItem === item.id
-                  ? "bg-green-100 text-green-700"
-                  : "text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <span className="mr-2 text-base">{item.icon}</span>
-              <span>{item.name}</span>
-            </button>
-          ))}
         </div>
       </div>
-    </div>
+
+        {/* Navigation Items - Horizontal LinkedIn Style */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="flex overflow-x-auto">
+            {navigationItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleItemClick(item)}
+                className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
+                  activeItem === item.id
+                    ? "border-blue-500 text-blue-600 bg-blue-50"
+                    : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
+                }`}
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+      {/* Edit Profile Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Edit Profile
+                </h2>
+                <button
+                  onClick={handleCancelEdit}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    value={editData.firstName}
+                    onChange={(e) => handleInputChange("firstName", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    value={editData.lastName}
+                    onChange={(e) => handleInputChange("lastName", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Professional Headline</label>
+                  <input
+                    type="text"
+                    value={editData.headline}
+                    onChange={(e) => handleInputChange("headline", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Your professional headline"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={editData.location}
+                    onChange={(e) => handleInputChange("location", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <input
+                    type="text"
+                    value={editData.city}
+                    onChange={(e) => handleInputChange("city", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <div className="flex items-center">
+                    <Phone className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      type="tel"
+                      value={editData.phone}
+                      onChange={(e) => handleInputChange("phone", e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <div className="flex items-center">
+                    <Mail className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      type="email"
+                      value={editData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                  <div className="flex items-center">
+                    <Globe className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      type="url"
+                      value={editData.website}
+                      onChange={(e) => handleInputChange("website", e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">About</label>
+                  <textarea
+                    value={editData.about}
+                    onChange={(e) => handleInputChange("about", e.target.value)}
+                    rows="4"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 bg-gray-50 border-t border-gray-200">
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={handleCancelEdit}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveProfile}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

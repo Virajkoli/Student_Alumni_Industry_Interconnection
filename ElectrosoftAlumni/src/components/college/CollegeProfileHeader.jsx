@@ -1,6 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 
-const CollegeProfileHeader = ({ name = "Electrosoft College of Engineering", location = "Your City, State", logo = "/college-logo.png", background = "/college-bg.jpg" }) => {
+const NAV_OPTIONS = [
+  { id: "college-info", name: "College Info", icon: "🏫" },
+  { id: "course-fees", name: "Course Fees", icon: "💸" },
+  { id: "review", name: "Review", icon: "⭐" },
+  { id: "admission", name: "Admission", icon: "📝" },
+  { id: "placement", name: "Placement", icon: "💼" },
+  { id: "faculty", name: "Faculty", icon: "👨‍🏫" }
+];
+
+const CollegeProfileHeader = ({
+  name = "Electrosoft College of Engineering",
+  location = "Your City, State",
+  logo = "/college-logo.png",
+  background = "/college-bg.jpg",
+  activeTab,
+  setActiveTab
+}) => {
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
       {/* Profile Header - Horizontal with custom background */}
@@ -18,7 +34,9 @@ const CollegeProfileHeader = ({ name = "Electrosoft College of Engineering", loc
                 src={logo}
                 alt="College Logo"
                 className="w-full h-full object-contain rounded-full"
-                onError={(e) => { e.target.style.display = 'none'; }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
               />
             </div>
           </div>
@@ -58,47 +76,19 @@ const CollegeProfileHeader = ({ name = "Electrosoft College of Engineering", loc
         </div>
       </div>
       {/* Navigation Options - Consistent with Industry/Startup, below quick stats */}
-      <div className="flex overflow-x-auto gap-2 px-6 py-3 bg-white scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 border-t border-blue-100 border-b border-blue-100 mt-2">
-        { [
-            {
-              id: "college-info",
-              name: "College Info",
-              icon: "🏫"
-            },
-            {
-              id: "course-fees",
-              name: "Course Fees",
-              icon: "💸"
-            },
-            {
-              id: "review",
-              name: "Review",
-              icon: "⭐"
-            },
-            {
-              id: "admission",
-              name: "Admission",
-              icon: "📝"
-            },
-            {
-              id: "placement",
-              name: "Placement",
-              icon: "💼"
-            },
-            {
-              id: "faculty",
-              name: "Faculty",
-              icon: "👨‍🏫"
-            }
-          ].map((item) => (
-            <button
-              key={item.id}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100`}
-            >
-              <span className="text-base">{item.icon}</span>
-              <span>{item.name}</span>
-            </button>
-          ))}
+      <div className="flex justify-center overflow-x-auto gap-2 px-6 py-3 bg-white scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 border-t border-blue-100 border-b border-blue-100 mt-2">
+        {NAV_OPTIONS.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap border border-blue-200 hover:bg-blue-100 ${
+              activeTab === item.id ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700'
+            }`}
+          >
+            <span className="text-base">{item.icon}</span>
+            <span>{item.name}</span>
+          </button>
+        ))}
       </div>
     </div>
   );

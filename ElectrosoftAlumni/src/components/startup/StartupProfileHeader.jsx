@@ -18,68 +18,69 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
   });
   const [editData, setEditData] = useState({ ...profileData });
 
-  const navigationItems = [
-    {
-      id: "posts",
-      name: "Posts",
-      shortName: "Posts",
-    },
-    {
-      id: "startup-ecosystem",
-      name: "Startup Ecosystem Overview",
-      shortName: "About",
-    },
-    {
-      id: "growth-marketing",
-      name: "Growth & Marketing Strategies",
-      shortName: "Activity",
-    },
-    {
-      id: "funding-investment",
-      name: "Funding and Investment",
-      shortName: "Experience",
-    },
-    {
-      id: "tools-resources",
-      name: "Tools & Resources",
-      shortName: "Education",
-    },
-    {
-      id: "faqs",
-      name: "FAQs",
-      shortName: "Skills",
-    },
-    {
-      id: "government-policies",
-      name: "Government Policies & Tax Benefits",
-      shortName: "Recommendations",
-    },
-    {
-      id: "launch-steps",
-      name: "Steps to Launch",
-      shortName: "Launch Steps",
-    },
-    {
-      id: "startup-quiz",
-      name: "Startup Quiz",
-      shortName: "Quiz",
-    },
-    {
-      id: "how-it-works",
-      name: "How It Works",
-      shortName: "How It Works",
-    },
-    {
-      id: "industries",
-      name: "Industries",
-      shortName: "Industries",
-    },
-    {
-      id: "jobs-skills",
-      name: "Jobs & Trending Skills",
-      shortName: "Jobs & Skills",
-    },
-  ];
+const navigationItems = [
+  {
+    id: "posts",
+    name: "Posts",
+    shortName: "Posts",
+  },
+  {
+    id: "startup-ecosystem",
+    name: "Startup Ecosystem Overview",
+    shortName: "Overview",
+  },
+  // {
+  //   id: "growth-marketing",
+  //   name: "Growth & Marketing Strategies",
+  //   shortName: "Growth",
+  // },
+  // {
+  //   id: "funding-investment",
+  //   name: "Funding and Investment",
+  //   shortName: "Funding",
+  // },
+  {
+    id: "tools-resources",
+    name: "Tools & Resources",
+    shortName: "Resources",
+  },
+  // {
+  //   id: "faqs",
+  //   name: "FAQs",
+  //   shortName: "FAQs",
+  // },
+  // {
+  //   id: "government-policies",
+  //   name: "Government Policies & Tax Benefits",
+  //   shortName: "Policies",
+  // },
+  {
+    id: "launch-steps",
+    name: "Steps to Launch",
+    shortName: "Launch",
+  },
+  // {
+  //   id: "startup-quiz",
+  //   name: "Startup Quiz",
+  //   shortName: "Quiz",
+  // },
+  {
+    id: "how-it-works",
+    name: "How It Works",
+    shortName: "How-To",
+  },
+  // {
+  //   id: "industries",
+  //   name: "Industries",
+  //   shortName: "Sectors",
+  // },
+  {
+    id: "jobs-skills",
+    name: "Jobs & Trending Skills",
+    shortName: "Jobs",
+  },
+];
+
 
   const handleItemClick = (item) => {
     setActiveItem(item.id);

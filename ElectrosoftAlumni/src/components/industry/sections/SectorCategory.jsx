@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Edit3, Building2, TrendingUp, MapPin, Users } from "lucide-react";
+import { Edit3, Building2, TrendingUp, MapPin, Users, X, Plus, Globe, ChartBar } from "lucide-react";
 
 const SectorCategory = () => {
   const [editingId, setEditingId] = useState(null);
@@ -13,8 +13,7 @@ const SectorCategory = () => {
       employment: "5.2M",
       growth: "+12%",
       majorCities: ["Mumbai", "Chennai", "Pune", "Gujarat"],
-      icon: "🏭",
-      color: "blue",
+     
     },
     {
       id: 2,
@@ -25,7 +24,7 @@ const SectorCategory = () => {
       employment: "4.8M",
       growth: "+18%",
       majorCities: ["Bangalore", "Hyderabad", "Pune", "Chennai"],
-      icon: "💻",
+      
       color: "green",
     },
     {
@@ -37,7 +36,7 @@ const SectorCategory = () => {
       employment: "3.1M",
       growth: "+15%",
       majorCities: ["Mumbai", "Hyderabad", "Delhi", "Bangalore"],
-      icon: "🏥",
+      
       color: "red",
     },
     {
@@ -49,7 +48,7 @@ const SectorCategory = () => {
       employment: "2.8M",
       growth: "+14%",
       majorCities: ["Mumbai", "Delhi", "Bangalore", "Chennai"],
-      icon: "💰",
+      
       color: "purple",
     },
     {
@@ -61,7 +60,7 @@ const SectorCategory = () => {
       employment: "1.5M",
       growth: "+25%",
       majorCities: ["Gujarat", "Rajasthan", "Karnataka", "Tamil Nadu"],
-      icon: "🌱",
+      
       color: "emerald",
     },
     {
@@ -73,7 +72,7 @@ const SectorCategory = () => {
       employment: "2.2M",
       growth: "+8%",
       majorCities: ["Chennai", "Pune", "Gurgaon", "Bangalore"],
-      icon: "🚗",
+     
       color: "orange",
     },
   ]);
@@ -88,8 +87,11 @@ const SectorCategory = () => {
     color: "blue",
   });
 
-  const handleEdit = (sector) => {
-    setEditingId(sector.id);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSector, setSelectedSector] = useState(null);
+
+  const handleEditClick = (sector) => {
+    setSelectedSector(sector);
     setEditData({
       name: sector.name,
       description: sector.description,
@@ -99,50 +101,70 @@ const SectorCategory = () => {
       majorCities: sector.majorCities.join(", "),
       color: sector.color,
     });
+    setIsModalOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setSelectedSector(null);
+    setEditData({
+      name: "",
+      description: "",
+      companies: "",
+      employment: "",
+      growth: "",
+      majorCities: "",
+      color: "blue",
+    });
+    setIsModalOpen(true);
   };
 
   const handleSave = () => {
-    setSectors(
-      sectors.map((sector) =>
-        sector.id === editingId
-          ? {
-              ...sector,
-              name: editData.name,
-              description: editData.description,
-              companies: parseInt(editData.companies),
-              employment: editData.employment,
-              growth: editData.growth,
-              majorCities: editData.majorCities
-                .split(",")
-                .map((city) => city.trim()),
-              color: editData.color,
-            }
-          : sector
-      )
-    );
-    setEditingId(null);
-    setEditData({
-      name: "",
-      description: "",
-      companies: "",
-      employment: "",
-      growth: "",
-      majorCities: "",
-      color: "blue",
-    });
+    if (selectedSector) {
+      // Edit existing sector
+      setSectors(
+        sectors.map((sector) =>
+          sector.id === selectedSector.id
+            ? {
+                ...sector,
+                name: editData.name,
+                description: editData.description,
+                companies: parseInt(editData.companies),
+                employment: editData.employment,
+                growth: editData.growth,
+                majorCities: editData.majorCities
+                  .split(",")
+                  .map((city) => city.trim()),
+                color: editData.color,
+              }
+            : sector
+        )
+      );
+    } else {
+      // Add new sector
+      setSectors([
+        ...sectors,
+        {
+          id: sectors.length + 1,
+          name: editData.name,
+          description: editData.description,
+          companies: parseInt(editData.companies),
+          employment: editData.employment,
+          growth: editData.growth,
+          majorCities: editData.majorCities
+            .split(",")
+            .map((city) => city.trim()),
+          color: editData.color,
+          icon: "🏢", // Default icon
+        },
+      ]);
+    }
+    setIsModalOpen(false);
+    setSelectedSector(null);
   };
 
   const handleCancel = () => {
-    setEditingId(null);
-    setEditData({
-      name: "",
-      description: "",
-      companies: "",
-      employment: "",
-      growth: "",
-      majorCities: "",
-      color: "blue",
-    });
+    setIsModalOpen(false);
+    setSelectedSector(null);
   };
 
   const getColorClasses = (color) => {
@@ -158,283 +180,324 @@ const SectorCategory = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Industry Sectors & Categories
-          </h2>
-          <p className="text-gray-600 mt-1">
-            Explore different sectors and their market dynamics
-          </p>
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      {/* Header Section - More minimal and clean */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900">Industry Sectors</h2>
+            <p className="text-gray-600 mt-1">Overview of key industry sectors and their performance</p>
+          </div>
+          <button
+            onClick={handleAddNew}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Sector
+          </button>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          Add New Sector
-        </button>
+
+        {/* Summary Stats - More subtle and inline */}
+        <div className="flex flex-wrap gap-8">
+          <div className="flex items-center gap-3">
+            <Building2 className="w-5 h-5 text-blue-600" />
+            <div>
+              <p className="text-2xl font-semibold text-gray-900">
+                {sectors.reduce((sum, s) => sum + s.companies, 0).toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-500">Companies</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Users className="w-5 h-5 text-blue-600" />
+            <div>
+              <p className="text-2xl font-semibold text-gray-900">19.6M</p>
+              <p className="text-sm text-gray-500">Employees</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Globe className="w-5 h-5 text-blue-600" />
+            <div>
+              <p className="text-2xl font-semibold text-gray-900">{sectors.length}</p>
+              <p className="text-sm text-gray-500">Sectors</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <ChartBar className="w-5 h-5 text-blue-600" />
+            <div>
+              <p className="text-2xl font-semibold text-gray-900">15.2%</p>
+              <p className="text-sm text-gray-500">Avg Growth</p>
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Sectors Grid - More minimal and elegant */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sectors.map((sector) => (
           <div
             key={sector.id}
-            className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+            className="group relative bg-white rounded-lg p-6 hover:shadow-lg transition-shadow duration-200"
           >
-            {editingId === sector.id ? (
-              // Edit Mode
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Sector Name
-                    </label>
-                    <input
-                      type="text"
-                      value={editData.name}
-                      onChange={(e) =>
-                        setEditData({ ...editData, name: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description
-                    </label>
-                    <textarea
-                      value={editData.description}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          description: e.target.value,
-                        })
-                      }
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Companies
-                      </label>
-                      <input
-                        type="number"
-                        value={editData.companies}
-                        onChange={(e) =>
-                          setEditData({
-                            ...editData,
-                            companies: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Employment
-                      </label>
-                      <input
-                        type="text"
-                        value={editData.employment}
-                        onChange={(e) =>
-                          setEditData({
-                            ...editData,
-                            employment: e.target.value,
-                          })
-                        }
-                        placeholder="e.g., 5.2M"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Growth Rate
-                    </label>
-                    <input
-                      type="text"
-                      value={editData.growth}
-                      onChange={(e) =>
-                        setEditData({ ...editData, growth: e.target.value })
-                      }
-                      placeholder="e.g., +12%"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Major Cities (comma separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={editData.majorCities}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          majorCities: e.target.value,
-                        })
-                      }
-                      placeholder="Mumbai, Chennai, Pune"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Color Theme
-                    </label>
-                    <select
-                      value={editData.color}
-                      onChange={(e) =>
-                        setEditData({ ...editData, color: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="blue">Blue</option>
-                      <option value="green">Green</option>
-                      <option value="red">Red</option>
-                      <option value="purple">Purple</option>
-                      <option value="emerald">Emerald</option>
-                      <option value="orange">Orange</option>
-                    </select>
-                  </div>
-                  <div className="flex space-x-3 pt-2">
-                    <button
-                      onClick={handleSave}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-                    >
-                      Cancel
-                    </button>
+            {/* Sector Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${getColorClasses(sector.color)} flex items-center justify-center text-2xl`}>
+                  {sector.icon}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{sector.name}</h3>
+                  <div className="flex items-center mt-1">
+                    <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
+                    <span className="text-sm font-medium text-green-600">{sector.growth}</span>
                   </div>
                 </div>
               </div>
-            ) : (
-              // View Mode
+              <button
+                onClick={() => handleEditClick(sector)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <Edit3 className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Description */}
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">{sector.description}</p>
+
+            {/* Key Stats */}
+            <div className="flex gap-4 mb-4">
               <div>
-                {/* Header with gradient */}
-                <div
-                  className={`h-24 bg-gradient-to-r ${getColorClasses(
-                    sector.color
-                  )} rounded-t-xl relative`}
-                >
-                  <button
-                    onClick={() => handleEdit(sector)}
-                    className="absolute top-3 right-3 p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
-                    title="Edit Sector"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-                  <div className="absolute -bottom-6 left-6">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-lg">
-                      {sector.icon}
-                    </div>
-                  </div>
+                <div className="flex items-center text-gray-500 text-sm mb-1">
+                  <Building2 className="w-4 h-4 mr-1" />
+                  Companies
                 </div>
-
-                {/* Content */}
-                <div className="pt-8 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {sector.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                    {sector.description}
-                  </p>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="text-center">
-                      <div className="flex items-center justify-center space-x-1 mb-1">
-                        <Building2 className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-500">Companies</span>
-                      </div>
-                      <p className="text-lg font-bold text-gray-900">
-                        {sector.companies.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center space-x-1 mb-1">
-                        <Users className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-500">
-                          Employment
-                        </span>
-                      </div>
-                      <p className="text-lg font-bold text-gray-900">
-                        {sector.employment}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Growth */}
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-full">
-                      <TrendingUp className="w-4 h-4 text-green-600" />
-                      <span className="text-green-700 font-semibold">
-                        {sector.growth}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Major Cities */}
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <MapPin className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm font-medium text-gray-700">
-                        Major Hubs
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {sector.majorCities.map((city, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-                        >
-                          {city}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <p className="font-semibold text-gray-900">{sector.companies.toLocaleString()}</p>
               </div>
-            )}
+              <div>
+                <div className="flex items-center text-gray-500 text-sm mb-1">
+                  <Users className="w-4 h-4 mr-1" />
+                  Employment
+                </div>
+                <p className="font-semibold text-gray-900">{sector.employment}</p>
+              </div>
+            </div>
+
+            {/* Cities */}
+            <div>
+              <div className="flex items-center text-gray-500 text-sm mb-2">
+                <MapPin className="w-4 h-4 mr-1" />
+                Major Hubs
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {sector.majorCities.map((city, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700"
+                  >
+                    {city}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Overall Statistics */}
-      <div className="mt-8 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Sector Overview Statistics
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-blue-600">
-              {sectors
-                .reduce((sum, s) => sum + s.companies, 0)
-                .toLocaleString()}
-            </p>
-            <p className="text-sm text-gray-600">Total Companies</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-green-600">19.6M</p>
-            <p className="text-sm text-gray-600">Total Employment</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-purple-600">
-              {sectors.length}
-            </p>
-            <p className="text-sm text-gray-600">Active Sectors</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-orange-600">+15.2%</p>
-            <p className="text-sm text-gray-600">Avg Growth</p>
+      {/* Modal - Keep existing modal code but update styling */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-100">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {selectedSector ? "Edit Sector" : "Add New Sector"}
+                </h2>
+                <button
+                  onClick={handleCancel}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Form Fields - Modern, clean styling */}
+            <form className="p-6 space-y-6">
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">Basic Information</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Sector Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={editData.name}
+                      onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      placeholder="e.g., Technology"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Growth Rate</label>
+                    <input
+                      type="text"
+                      name="growth"
+                      value={editData.growth}
+                      onChange={(e) => setEditData({ ...editData, growth: e.target.value })}
+                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      placeholder="e.g., 12.5%"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    name="description"
+                    value={editData.description}
+                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                    rows={3}
+                    className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Brief description of the sector..."
+                  />
+                </div>
+              </div>
+
+              {/* Statistics */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">Statistics</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Companies</label>
+                    <input
+                      type="number"
+                      name="companies"
+                      value={editData.companies}
+                      onChange={(e) => setEditData({ ...editData, companies: e.target.value })}
+                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      placeholder="e.g., 1000"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Employment</label>
+                    <input
+                      type="text"
+                      name="employment"
+                      value={editData.employment}
+                      onChange={(e) => setEditData({ ...editData, employment: e.target.value })}
+                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      placeholder="e.g., 2.5M"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Major Cities */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">Major Hubs</h3>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Major Cities</label>
+                  <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    {editData.majorCities.split(",").map((city, index) => (
+                      <div
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-200"
+                      >
+                        {city}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cities = editData.majorCities.split(",");
+                            cities.splice(index, 1);
+                            setEditData({ ...editData, majorCities: cities.join(",") });
+                          }}
+                          className="ml-2 text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <input
+                      type="text"
+                      value={editData.newCity}
+                      onChange={(e) => setEditData({ ...editData, newCity: e.target.value })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && editData.newCity.trim() !== "") {
+                          setEditData({
+                            ...editData,
+                            majorCities: `${editData.majorCities}, ${editData.newCity.trim()}`,
+                            newCity: "",
+                          });
+                          e.preventDefault();
+                        }
+                      }}
+                      className="flex-1 min-w-[150px] bg-transparent border-0 focus:ring-0 text-sm p-0"
+                      placeholder="Type and press Enter to add..."
+                    />
+                  </div>
+                  <p className="mt-1 text-sm text-gray-500">Press Enter to add a new city</p>
+                </div>
+              </div>
+
+              {/* Visual */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">Visual</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+                    <input
+                      type="text"
+                      name="icon"
+                      value={editData.icon}
+                      onChange={(e) => setEditData({ ...editData, icon: e.target.value })}
+                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      placeholder="Icon emoji or symbol"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Color Theme</label>
+                    <select
+                      name="color"
+                      value={editData.color}
+                      onChange={(e) => setEditData({ ...editData, color: e.target.value })}
+                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                      <option value="blue">Blue</option>
+                      <option value="green">Green</option>
+                      <option value="purple">Purple</option>
+                      <option value="orange">Orange</option>
+                      <option value="red">Red</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {selectedSector ? "Save Changes" : "Add Sector"}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

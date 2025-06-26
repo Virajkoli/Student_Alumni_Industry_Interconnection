@@ -1,8 +1,25 @@
 import React, { useState } from "react";
-import { Edit, Save, X, Rocket, CheckCircle, Circle } from "lucide-react";
+import {
+  Edit,
+  Save,
+  X,
+  Plus,
+  CheckCircle,
+  Lightbulb,
+  Brain,
+  Ruler,
+  TestTube,
+  FileText,
+  DollarSign,
+  Rocket,
+  Megaphone,
+  Users,
+  BarChart3,
+} from "lucide-react";
 
 const LaunchSteps = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [editingStepIndex, setEditingStepIndex] = useState(null);
   const [completedSteps, setCompletedSteps] = useState([0, 1, 2]);
   const [content, setContent] = useState({
@@ -11,168 +28,271 @@ const LaunchSteps = () => {
       "A comprehensive roadmap to take your startup from idea to market launch.",
     steps: [
       {
-        title: "Ideation & Market Research",
+        id: 1,
+        icon: "💡",
+        iconComponent: Lightbulb,
+        title: "Validate Your Idea",
         description:
-          "Validate your business idea through comprehensive market research and customer interviews.",
+          "Identify the problem you're solving and validate market demand.",
         tasks: [
-          "Define problem statement",
-          "Conduct market research",
-          "Analyze competitors",
-          "Interview potential customers",
+          "Identify the problem you're solving",
+          "Define your target users",
+          "Conduct market research & competitor analysis",
+          "Build a simple landing page or waitlist",
+          "Collect user feedback (surveys, interviews)",
         ],
         timeframe: "2-4 weeks",
-        resources: [
-          "Market research templates",
-          "Customer interview guides",
-          "Competitor analysis tools",
-        ],
+        status: "completed",
       },
       {
-        title: "Business Planning",
+        id: 2,
+        icon: "🧠",
+        iconComponent: Brain,
+        title: "Define Business Model",
         description:
-          "Create a detailed business plan and define your business model.",
+          "Choose your revenue model and create a lean business plan.",
         tasks: [
-          "Write business plan",
-          "Define revenue model",
-          "Financial projections",
-          "Risk assessment",
+          "Choose the revenue model (subscription, freemium, marketplace, etc.)",
+          "Create a lean business plan or canvas",
+          "Identify your key value proposition",
         ],
-        timeframe: "3-6 weeks",
-        resources: [
-          "Business plan template",
-          "Financial modeling spreadsheet",
-          "Pitch deck template",
-        ],
+        timeframe: "1-2 weeks",
+        status: "completed",
       },
       {
-        title: "Legal Foundation",
-        description:
-          "Establish legal structure and protect your intellectual property.",
+        id: 3,
+        icon: "📐",
+        iconComponent: Ruler,
+        title: "Build MVP (Minimum Viable Product)",
+        description: "Design and build your core features for early testing.",
         tasks: [
-          "Choose business structure",
-          "Register company",
-          "Trademark/Patent filing",
-          "Legal agreements",
-        ],
-        timeframe: "2-3 weeks",
-        resources: [
-          "Legal entity guide",
-          "Trademark search",
-          "Contract templates",
-        ],
-      },
-      {
-        title: "Product Development",
-        description:
-          "Build your minimum viable product (MVP) and test with early users.",
-        tasks: [
-          "Define MVP features",
-          "Develop prototype",
-          "User testing",
-          "Iterate based on feedback",
-        ],
-        timeframe: "6-12 weeks",
-        resources: [
-          "Development frameworks",
-          "Design tools",
-          "Testing platforms",
-        ],
-      },
-      {
-        title: "Team Building",
-        description: "Recruit key team members and establish company culture.",
-        tasks: [
-          "Define roles",
-          "Recruit co-founders",
-          "Hire early employees",
-          "Set up equity distribution",
+          "Design UI/UX wireframes",
+          "Build core features only",
+          "Use no-code/low-code tools if needed",
+          "Test usability with early adopters",
         ],
         timeframe: "4-8 weeks",
-        resources: [
-          "Job posting templates",
-          "Interview guides",
-          "Equity calculators",
-        ],
+        status: "completed",
       },
       {
-        title: "Funding Preparation",
+        id: 4,
+        icon: "🧪",
+        iconComponent: TestTube,
+        title: "Validate Product-Market Fit",
+        description: "Measure engagement and iterate based on user feedback.",
+        tasks: [
+          "Measure user retention & engagement",
+          "Get testimonials or case studies",
+          "Iterate based on user feedback",
+        ],
+        timeframe: "2-4 weeks",
+        status: "active",
+      },
+      {
+        id: 5,
+        icon: "📝",
+        iconComponent: FileText,
+        title: "Register Your Startup",
+        description: "Set up legal structure and government registrations.",
+        tasks: [
+          "Choose a legal structure (LLP, Pvt Ltd, etc.)",
+          "Register under Startup India (if applicable)",
+          "Get GST, PAN, bank account",
+          "Protect IP (if needed)",
+        ],
+        timeframe: "2-3 weeks",
+        status: "pending",
+      },
+      {
+        id: 6,
+        icon: "💸",
+        iconComponent: DollarSign,
+        title: "Funding Readiness",
         description: "Prepare for fundraising and secure initial investment.",
         tasks: [
-          "Create pitch deck",
-          "Financial projections",
-          "Investor outreach",
-          "Due diligence prep",
+          "Bootstrap initially or raise from friends/family",
+          "Prepare pitch deck & financials",
+          "Reach out to angels, VCs, or apply to incubators/accelerators",
+          "Participate in pitch competitions",
         ],
-        timeframe: "8-16 weeks",
-        resources: [
-          "Pitch deck examples",
-          "Investor databases",
-          "Financial templates",
-        ],
+        timeframe: "4-8 weeks",
+        status: "pending",
       },
       {
-        title: "Marketing & Launch",
-        description: "Develop marketing strategy and execute product launch.",
+        id: 7,
+        icon: "🚀",
+        iconComponent: Rocket,
+        title: "Launch Publicly",
+        description: "Execute your public launch and onboard first users.",
         tasks: [
-          "Marketing strategy",
-          "Brand development",
-          "Digital presence",
-          "Launch campaign",
+          "Launch on platforms like Product Hunt, LinkedIn, Twitter",
+          "Run early access / beta programs",
+          "Onboard first 100 users",
+          "Build community (Discord, Slack, etc.)",
         ],
-        timeframe: "4-6 weeks",
-        resources: [
-          "Marketing templates",
-          "Social media guides",
-          "Launch checklists",
-        ],
+        timeframe: "2-4 weeks",
+        status: "pending",
       },
       {
-        title: "Growth & Scale",
-        description: "Focus on customer acquisition and business growth.",
+        id: 8,
+        icon: "📣",
+        iconComponent: Megaphone,
+        title: "Marketing & Growth",
+        description: "Build your marketing channels and grow user base.",
         tasks: [
-          "Customer acquisition",
-          "Optimize operations",
-          "Scale team",
-          "Expand market",
+          "Set up website, SEO, and analytics",
+          "Run digital campaigns (Google, Meta, etc.)",
+          "Publish blogs & founder stories",
+          "Partner with influencers or B2B networks",
         ],
         timeframe: "Ongoing",
-        resources: [
-          "Growth hacking guides",
-          "Analytics tools",
-          "Scaling frameworks",
+        status: "pending",
+      },
+      {
+        id: 9,
+        icon: "👥",
+        iconComponent: Users,
+        title: "Build Your Team",
+        description: "Recruit key team members and establish culture.",
+        tasks: [
+          "Identify core roles (tech, marketing, ops)",
+          "Hire interns or freelancers initially",
+          "Use ESOPs for early hires",
+          "Set up company culture",
         ],
+        timeframe: "4-6 weeks",
+        status: "pending",
+      },
+      {
+        id: 10,
+        icon: "📊",
+        iconComponent: BarChart3,
+        title: "Track & Optimize",
+        description: "Monitor performance and optimize for growth.",
+        tasks: [
+          "Monitor KPIs and feedback",
+          "Set OKRs",
+          "Build scalable systems (CRM, automation, support)",
+          "Plan for next phase: fundraising or expansion",
+        ],
+        timeframe: "Ongoing",
+        status: "pending",
       },
     ],
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    console.log("Saving launch steps content:", content);
+  const [newStep, setNewStep] = useState({
+    title: "",
+    description: "",
+    tasks: [],
+    timeframe: "",
+    icon: "💡",
+  });
+
+  const [editStep, setEditStep] = useState({
+    title: "",
+    description: "",
+    tasks: [],
+    timeframe: "",
+    icon: "💡",
+  });
+
+  const handleAddStep = () => {
+    setShowAddModal(true);
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
+  const handleSaveStep = () => {
+    if (newStep.title.trim() && newStep.description.trim()) {
+      const step = {
+        id: content.steps.length + 1,
+        iconComponent: Lightbulb,
+        status: "pending",
+        ...newStep,
+        tasks:
+          typeof newStep.tasks === "string"
+            ? newStep.tasks
+                .split(",")
+                .map((t) => t.trim())
+                .filter((t) => t.length > 0)
+            : newStep.tasks,
+      };
+      setContent((prev) => ({
+        ...prev,
+        steps: [...prev.steps, step],
+      }));
+      setNewStep({
+        title: "",
+        description: "",
+        tasks: [],
+        timeframe: "",
+        icon: "💡",
+      });
+      setShowAddModal(false);
+    }
   };
 
-  const handleEditStep = (index) => {
+  const handleCancelAdd = () => {
+    setNewStep({
+      title: "",
+      description: "",
+      tasks: [],
+      timeframe: "",
+      icon: "💡",
+    });
+    setShowAddModal(false);
+  };
+
+  const handleEditClick = (index) => {
+    setEditStep({ ...content.steps[index] });
     setEditingStepIndex(index);
   };
 
-  const handleSaveStep = (index, updatedStep) => {
-    const updatedSteps = [...content.steps];
-    updatedSteps[index] = updatedStep;
-    setContent({ ...content, steps: updatedSteps });
-    setEditingStepIndex(null);
+  const handleSaveEdit = () => {
+    if (editStep.title.trim() && editStep.description.trim()) {
+      const updatedSteps = [...content.steps];
+      updatedSteps[editingStepIndex] = {
+        ...updatedSteps[editingStepIndex],
+        ...editStep,
+        tasks:
+          typeof editStep.tasks === "string"
+            ? editStep.tasks
+                .split(",")
+                .map((t) => t.trim())
+                .filter((t) => t.length > 0)
+            : editStep.tasks,
+      };
+      setContent((prev) => ({
+        ...prev,
+        steps: updatedSteps,
+      }));
+      setEditingStepIndex(null);
+      setEditStep({
+        title: "",
+        description: "",
+        tasks: [],
+        timeframe: "",
+        icon: "💡",
+      });
+    }
   };
 
-  const handleCancelStepEdit = () => {
+  const handleCancelEdit = () => {
     setEditingStepIndex(null);
+    setEditStep({
+      title: "",
+      description: "",
+      tasks: [],
+      timeframe: "",
+      icon: "💡",
+    });
   };
 
-  const updateStep = (index, field, value) => {
-    const newSteps = [...content.steps];
-    newSteps[index] = { ...newSteps[index], [field]: value };
-    setContent({ ...content, steps: newSteps });
+  const handleInputChange = (field, value, isEdit = false) => {
+    if (isEdit) {
+      setEditStep((prev) => ({ ...prev, [field]: value }));
+    } else {
+      setNewStep((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   const toggleStepCompletion = (stepIndex) => {
@@ -184,154 +304,115 @@ const LaunchSteps = () => {
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{content.title}</h1>
-          <p className="text-gray-600 mt-2">{content.description}</p>
+    <>
+      <div className="bg-white border border-gray-200 rounded-lg">
+        {/* Header with Edit Button */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {content.title}
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">{content.description}</p>
+          </div>
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            title={isEditing ? "Done editing" : "Edit Steps"}
+          >
+            {isEditing ? (
+              <>
+                <Save className="w-4 h-4" />
+                <span className="text-sm font-medium">Done</span>
+              </>
+            ) : (
+              <>
+                <Edit className="w-4 h-4" />
+                <span className="text-sm font-medium">Edit</span>
+              </>
+            )}
+          </button>
         </div>
 
-      </div>
-
-      {/* Progress Overview */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-8 border border-blue-200">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Launch Progress
-          </h3>
-          <span className="text-sm text-gray-600">
-            {completedSteps.length}/{content.steps.length} steps completed
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
-            style={{
-              width: `${(completedSteps.length / content.steps.length) * 100}%`,
-            }}
-          ></div>
-        </div>
-      </div>
-
-      {/* Launch Steps */}
-      <div className="space-y-6">
-        {content.steps.map((step, index) => {
-          const isCompleted = completedSteps.includes(index);
-          const isActive = index === completedSteps.length && !isCompleted;
-
-          return (
-            <div
-              key={index}
-              className={`bg-white border rounded-lg p-6 transition-all duration-200 ${
-                isCompleted
-                  ? "border-green-200 bg-green-50"
-                  : isActive
-                  ? "border-blue-200 bg-blue-50"
-                  : "border-gray-200 hover:shadow-md"
-              }`}
+        {/* Add Step Button (when editing) */}
+        {isEditing && (
+          <div className="p-4 border-b border-gray-200 bg-gray-50">
+            <button
+              onClick={handleAddStep}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-start space-x-4 flex-1">
-                  <div className="flex flex-col items-center">
-                    <button
-                      onClick={() => !isEditing && !editingStepIndex && toggleStepCompletion(index)}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                        isCompleted
-                          ? "bg-green-600 text-white"
-                          : isActive
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                      }`}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle className="w-5 h-5" />
-                      ) : (
-                        <span className="font-bold text-sm">{index + 1}</span>
-                      )}
-                    </button>
-                    {index < content.steps.length - 1 && (
-                      <div
-                        className={`w-0.5 h-16 mt-2 ${
-                          isCompleted ? "bg-green-300" : "bg-gray-300"
-                        }`}
-                      ></div>
-                    )}
-                  </div>
+              <Plus className="w-4 h-4" />
+              Add New Step
+            </button>
+          </div>
+        )}
 
-                  <div className="flex-1">
-                    {editingStepIndex === index ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1 mr-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Step Title
-                            </label>
-                            <input
-                              type="text"
-                              value={step.title}
-                              onChange={(e) => updateStep(index, "title", e.target.value)}
-                              className="w-full text-lg font-semibold p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              placeholder="Step title"
-                            />
-                          </div>
-                          <div className="w-32">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Timeframe
-                            </label>
-                            <input
-                              type="text"
-                              value={step.timeframe}
-                              onChange={(e) => updateStep(index, "timeframe", e.target.value)}
-                              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                              placeholder="e.g., 2-4 weeks"
-                            />
-                          </div>
-                        </div>
-                        
+        {/* Progress Overview */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Launch Progress
+              </h3>
+              <span className="text-sm text-gray-600">
+                {completedSteps.length}/{content.steps.length} steps completed
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
+                style={{
+                  width: `${
+                    (completedSteps.length / content.steps.length) * 100
+                  }%`,
+                }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Launch Steps */}
+        <div className="divide-y divide-gray-200">
+          {content.steps.map((step, index) => {
+            const isCompleted = completedSteps.includes(index);
+            const isActive = index === completedSteps.length && !isCompleted;
+
+            return (
+              <div key={step.id} className="group">
+                <div className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex flex-col items-center">
+                      <button
+                        onClick={() =>
+                          !isEditing &&
+                          !editingStepIndex &&
+                          toggleStepCompletion(index)
+                        }
+                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors text-xl ${
+                          isCompleted
+                            ? "bg-green-600 text-white"
+                            : isActive
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <CheckCircle className="w-6 h-6" />
+                        ) : (
+                          <span>{step.icon}</span>
+                        )}
+                      </button>
+                      {index < content.steps.length - 1 && (
+                        <div
+                          className={`w-0.5 h-12 mt-2 ${
+                            isCompleted ? "bg-green-300" : "bg-gray-300"
+                          }`}
+                        ></div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-2">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Description
-                          </label>
-                          <textarea
-                            value={step.description}
-                            onChange={(e) => updateStep(index, "description", e.target.value)}
-                            rows="3"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                            placeholder="Step description"
-                          />
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Key Tasks (comma-separated)
-                            </label>
-                            <textarea
-                              value={step.tasks.join(", ")}
-                              onChange={(e) => updateStep(index, "tasks", e.target.value.split(",").map(t => t.trim()).filter(t => t.length > 0))}
-                              rows="3"
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                              placeholder="Task 1, Task 2, Task 3"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Resources (comma-separated)
-                            </label>
-                            <textarea
-                              value={step.resources.join(", ")}
-                              onChange={(e) => updateStep(index, "resources", e.target.value.split(",").map(r => r.trim()).filter(r => r.length > 0))}
-                              rows="3"
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                              placeholder="Resource 1, Resource 2, Resource 3"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="flex items-start justify-between mb-2">
                           <h3
                             className={`text-lg font-semibold ${
                               isCompleted ? "text-green-800" : "text-gray-900"
@@ -339,6 +420,15 @@ const LaunchSteps = () => {
                           >
                             {step.title}
                           </h3>
+                          <p
+                            className={`text-sm ${
+                              isCompleted ? "text-green-700" : "text-gray-600"
+                            }`}
+                          >
+                            {step.description}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 ml-4">
                           <span
                             className={`px-2 py-1 text-xs rounded-full ${
                               isCompleted
@@ -350,110 +440,54 @@ const LaunchSteps = () => {
                           >
                             {step.timeframe}
                           </span>
-                        </div>
-
-                        <p
-                          className={`mb-4 ${
-                            isCompleted ? "text-green-700" : "text-gray-600"
-                          }`}
-                        >
-                          {step.description}
-                        </p>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h4
-                              className={`text-sm font-medium mb-2 ${
-                                isCompleted ? "text-green-800" : "text-gray-800"
-                              }`}
+                          {isEditing && (
+                            <button
+                              onClick={() => handleEditClick(index)}
+                              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+                              title="Edit step"
                             >
-                              Key Tasks:
-                            </h4>
-                            <ul className="space-y-1">
-                              {step.tasks.map((task, taskIndex) => (
-                                <li
-                                  key={taskIndex}
-                                  className={`text-sm flex items-center ${
-                                    isCompleted ? "text-green-700" : "text-gray-600"
-                                  }`}
-                                >
-                                  <span
-                                    className={`w-1.5 h-1.5 rounded-full mr-2 ${
-                                      isCompleted ? "bg-green-500" : "bg-gray-400"
-                                    }`}
-                                  ></span>
-                                  {task}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div>
-                            <h4
-                              className={`text-sm font-medium mb-2 ${
-                                isCompleted ? "text-green-800" : "text-gray-800"
-                              }`}
-                            >
-                              Resources:
-                            </h4>
-                            <div className="flex flex-wrap gap-1">
-                              {step.resources.map((resource, resourceIndex) => (
-                                <span
-                                  key={resourceIndex}
-                                  className={`px-2 py-1 text-xs rounded ${
-                                    isCompleted
-                                      ? "bg-green-100 text-green-700"
-                                      : "bg-blue-100 text-blue-700"
-                                  }`}
-                                >
-                                  {resource}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
+                              <Edit className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </div>
-                    )}
+
+                      <div className="mt-3">
+                        <h4
+                          className={`text-sm font-medium mb-2 ${
+                            isCompleted ? "text-green-800" : "text-gray-800"
+                          }`}
+                        >
+                          Key Tasks:
+                        </h4>
+                        <div className="space-y-1">
+                          {step.tasks.map((task, taskIndex) => (
+                            <div
+                              key={taskIndex}
+                              className={`text-sm flex items-start ${
+                                isCompleted ? "text-green-700" : "text-gray-600"
+                              }`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full mr-2 mt-2 flex-shrink-0 ${
+                                  isCompleted ? "bg-green-500" : "bg-gray-400"
+                                }`}
+                              ></span>
+                              <span>{task}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex-shrink-0 ml-4">
-                  {editingStepIndex === index ? (
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => handleSaveStep(index, step)}
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-300 transition-all duration-200 shadow-md border border-blue-600 min-w-[85px]"
-                      >
-                        <Save className="w-4 h-4" />
-                        <span>Save</span>
-                      </button>
-                      <button
-                        onClick={handleCancelStepEdit}
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg text-sm font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-300 transition-all duration-200 shadow-md border border-gray-500 min-w-[85px]"
-                      >
-                        <X className="w-4 h-4" />
-                        <span>Cancel</span>
-                      </button>
-                    </div>
-                  ) : !isEditing ? (
-                    <button
-                      onClick={() => handleEditStep(index)}
-                      className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
-                      title="Edit this step"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                  ) : null}
-                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      {/* Action Center */}
-      {!isEditing && (
-        <div className="mt-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-6 text-white">
+        {/* Action Center */}
+        <div className="p-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-b-lg">
           <h3 className="text-xl font-semibold mb-2">Ready to Launch?</h3>
           <p className="mb-4">
             Get personalized guidance and support throughout your startup
@@ -468,8 +502,252 @@ const LaunchSteps = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Add Step Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Add New Step
+                </h2>
+                <button
+                  onClick={handleCancelAdd}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Icon */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Icon *
+                </label>
+                <input
+                  type="text"
+                  value={newStep.icon}
+                  onChange={(e) => handleInputChange("icon", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter emoji (e.g., 💡)"
+                />
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Step Title *
+                </label>
+                <input
+                  type="text"
+                  value={newStep.title}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter step title"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  value={newStep.description}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  placeholder="Describe what this step involves"
+                />
+              </div>
+
+              {/* Tasks */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Key Tasks *
+                </label>
+                <textarea
+                  value={
+                    Array.isArray(newStep.tasks)
+                      ? newStep.tasks.join(", ")
+                      : newStep.tasks
+                  }
+                  onChange={(e) => handleInputChange("tasks", e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  placeholder="Enter tasks separated by commas"
+                />
+              </div>
+
+              {/* Timeframe */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Timeframe *
+                </label>
+                <input
+                  type="text"
+                  value={newStep.timeframe}
+                  onChange={(e) =>
+                    handleInputChange("timeframe", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="e.g., 2-4 weeks"
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+              <button
+                onClick={handleCancelAdd}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveStep}
+                disabled={!newStep.title.trim() || !newStep.description.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Step
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-    </div>
+
+      {/* Edit Step Modal */}
+      {editingStepIndex !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Edit Step
+                </h2>
+                <button
+                  onClick={handleCancelEdit}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Icon */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Icon *
+                </label>
+                <input
+                  type="text"
+                  value={editStep.icon}
+                  onChange={(e) =>
+                    handleInputChange("icon", e.target.value, true)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter emoji (e.g., 💡)"
+                />
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Step Title *
+                </label>
+                <input
+                  type="text"
+                  value={editStep.title}
+                  onChange={(e) =>
+                    handleInputChange("title", e.target.value, true)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter step title"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  value={editStep.description}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value, true)
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  placeholder="Describe what this step involves"
+                />
+              </div>
+
+              {/* Tasks */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Key Tasks *
+                </label>
+                <textarea
+                  value={
+                    Array.isArray(editStep.tasks)
+                      ? editStep.tasks.join(", ")
+                      : editStep.tasks
+                  }
+                  onChange={(e) =>
+                    handleInputChange("tasks", e.target.value, true)
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  placeholder="Enter tasks separated by commas"
+                />
+              </div>
+
+              {/* Timeframe */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Timeframe *
+                </label>
+                <input
+                  type="text"
+                  value={editStep.timeframe}
+                  onChange={(e) =>
+                    handleInputChange("timeframe", e.target.value, true)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="e.g., 2-4 weeks"
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+              <button
+                onClick={handleCancelEdit}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={
+                  !editStep.title.trim() || !editStep.description.trim()
+                }
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

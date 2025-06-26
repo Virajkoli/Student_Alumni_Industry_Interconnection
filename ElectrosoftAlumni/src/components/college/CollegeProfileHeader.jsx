@@ -76,14 +76,16 @@ const CollegeProfileHeader = ({
         </div>
       </div>
       {/* Navigation Options - Consistent with Industry/Startup, below quick stats */}
-      <div className="flex justify-center overflow-x-auto gap-2 px-6 py-3 bg-white scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 border-t border-blue-100 border-b border-blue-100 mt-2">
+      <div className="flex justify-center overflow-x-auto gap-6 px-6 py-3 bg-white scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 border-t border-blue-100 border-b border-blue-100 mt-2">
         {NAV_OPTIONS.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap border border-blue-200 hover:bg-blue-100 ${
-              activeTab === item.id ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap
+              ${activeTab === item.id ? 'bg-blue-600 text-white' : 'text-blue-700'}
+              ${activeTab === item.id ? '' : 'hover:bg-blue-100'}
+              // Removed border and bg for inactive, increased gap
+            `}
           >
             <span className="text-base">{item.icon}</span>
             <span>{item.name}</span>

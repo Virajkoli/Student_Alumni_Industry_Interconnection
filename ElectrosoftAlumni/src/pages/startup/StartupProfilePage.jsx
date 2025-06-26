@@ -102,12 +102,11 @@ const StartupProfilePage = () => {
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
+        {/* Profile Header Section with integrated navigation */}
         <div className="w-full mb-6">
-          <StartupProfileHeader
-            onNavigationChange={handleNavigationChange}
-            navigationOptions={navigationOptions}
-          />
+          <StartupProfileHeader onNavigationChange={handleNavigationChange} />
         </div>
+
         <div className="flex gap-6">
           {/* Main Content Area - 70% width */}
           <div className="w-full lg:w-[70%] flex flex-col">

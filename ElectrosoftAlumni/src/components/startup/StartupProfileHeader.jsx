@@ -22,74 +22,62 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
     {
       id: "posts",
       name: "Posts",
-      icon: "📝",
-      description: "Your posts and activities",
+      shortName: "Posts",
     },
     {
       id: "startup-ecosystem",
       name: "Startup Ecosystem Overview",
-      icon: "🏢",
-      description: "Complete overview of startup ecosystem",
+      shortName: "About",
     },
     {
       id: "growth-marketing",
       name: "Growth & Marketing Strategies",
-      icon: "📈",
-      description: "Marketing and growth strategies",
+      shortName: "Activity",
     },
     {
       id: "funding-investment",
       name: "Funding and Investment",
-      icon: "💰",
-      description: "Investment and funding opportunities",
+      shortName: "Experience",
     },
     {
       id: "tools-resources",
       name: "Tools & Resources",
-      icon: "🛠️",
-      description: "Essential tools and resources",
+      shortName: "Education",
     },
     {
       id: "faqs",
       name: "FAQs",
-      icon: "❓",
-      description: "Frequently asked questions",
+      shortName: "Skills",
     },
     {
       id: "government-policies",
       name: "Government Policies & Tax Benefits",
-      icon: "🏛️",
-      description: "Policies and tax benefits",
+      shortName: "Recommendations",
     },
     {
       id: "launch-steps",
       name: "Steps to Launch",
-      icon: "🚀",
-      description: "Step-by-step launch guide",
+      shortName: "Launch Steps",
     },
-    // {
-    //   id: "startup-quiz",
-    //   name: "Startup Quiz",
-    //   icon: "🎯",
-    //   description: "Test your startup knowledge",
-    // },
+    {
+      id: "startup-quiz",
+      name: "Startup Quiz",
+      shortName: "Quiz",
+    },
     {
       id: "how-it-works",
       name: "How It Works",
-      icon: "⚙️",
-      description: "How our platform works",
+      shortName: "How It Works",
     },
     {
       id: "industries",
       name: "Industries",
-      icon: "🏭",
-      description: "Industry sectors and trends",
+      shortName: "Industries",
     },
     {
       id: "jobs-skills",
       name: "Jobs & Trending Skills",
-      icon: "💼",
-      description: "Job opportunities and skills",
+      shortName: "Jobs & Skills",
     },
   ];
 
@@ -191,22 +179,23 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
           </div>
         </div>
 
-        {/* Navigation Items - Horizontal */}
-        <div className="flex overflow-x-auto gap-2 px-6 py-3 bg-white scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-          {navigationItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleItemClick(item)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
-                activeItem === item.id
-                  ? "bg-blue-100 text-blue-700 border border-blue-400"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent"
-              }`}
-            >
-              <span className="text-base">{item.icon}</span>
-              <span>{item.name}</span>
-            </button>
-          ))}
+        {/* Navigation Items - Horizontal LinkedIn Style */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="flex overflow-x-auto">
+            {navigationItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleItemClick(item)}
+                className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
+                  activeItem === item.id
+                    ? "border-blue-500 text-blue-600 bg-blue-50"
+                    : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
+                }`}
+              >
+                {item.shortName}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

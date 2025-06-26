@@ -3,10 +3,10 @@ import { Edit3, X, MapPin, Phone, Mail, Globe, Camera } from "lucide-react";
 
 const styles = {
   hideScrollbar: {
-    scrollbarWidth: 'none',
-    msOverflowStyle: 'none',
-    '&::-webkit-scrollbar': {
-      display: 'none',
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+    "&::-webkit-scrollbar": {
+      display: "none",
     },
   },
 };
@@ -23,23 +23,60 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
     phone: "+91 98765 43210",
     email: "expert@industry.com",
     website: "www.industry.com",
-    about: "Experienced industry leader with deep expertise in technology innovation and business transformation. Committed to mentoring and fostering industry-academia collaboration.",
+    about:
+      "Experienced industry leader with deep expertise in technology innovation and business transformation. Committed to mentoring and fostering industry-academia collaboration.",
   });
   const [editData, setEditData] = useState({ ...profileData });
 
   const navigationItems = [
     { id: "posts", name: "Posts", description: "Your posts and activities" },
-    { id: "industry-overview", name: "Industry Overview", description: "Overview of the industry" },
-    { id: "sector-category", name: "Sector / Category", description: "Industry sectors and categories" },
-    { id: "job-career-opportunities", name: "Job Career Opportunities",  description: "Jobs and career paths" },
-    { id: "technology", name: "Technology",  description: "Technologies in the industry" },
-    { id: "challenges-solutions", name: "Challenges / Solutions",  description: "Industry challenges and solutions" },
-    { id: "post-news-jobs", name: "Post News and Jobs",  description: "Share news and job posts" },
-    { id: "expert-opinions-interview", name: "Expert Opinions/Interview", description: "Expert interviews and opinions" },
-    { id: "poll-comment-section", name: "Poll/Comment Section", description: "Polls and comments" },
-    { id: "internship-training-requests", name: "Internship or Training Requests",  description: "Request internships or training" },
-    { id: "live-projects", name: "Live Projects", description: "Live industry projects" },
-    { id: "upload-project", name: "Upload Project",  description: "Upload your project" },
+    {
+      id: "industry-overview",
+      name: "Industry Overview",
+      description: "Overview of the industry",
+    },
+    {
+      id: "sector-category",
+      name: "Sector / Category",
+      description: "Industry sectors and categories",
+    },
+    {
+      id: "job-career-opportunities",
+      name: "Job Career Opportunities",
+      description: "Jobs and career paths",
+    },
+    // { id: "technology", name: "Technology",  description: "Technologies in the industry" },
+    {
+      id: "challenges-solutions",
+      name: "Challenges / Solutions",
+      description: "Industry challenges and solutions",
+    },
+    {
+      id: "post-news-jobs",
+      name: "Post News and Jobs",
+      description: "Share news and job posts",
+    },
+    {
+      id: "expert-opinions-interview",
+      name: "Expert Opinions/Interview",
+      description: "Expert interviews and opinions",
+    },
+    {
+      id: "poll-comment-section",
+      name: "Poll/Comment Section",
+      description: "Polls and comments",
+    },
+    // { id: "internship-training-requests", name: "Internship or Training Requests",  description: "Request internships or training" },
+    {
+      id: "live-projects",
+      name: "Live Projects",
+      description: "Live industry projects",
+    },
+    {
+      id: "upload-project",
+      name: "Upload Project",
+      description: "Upload your project",
+    },
   ];
 
   const handleItemClick = (item) => {
@@ -65,36 +102,38 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
   };
 
   const handleInputChange = (field, value) => {
-    setEditData(prev => ({ ...prev, [field]: value }));
+    setEditData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
         {/* Profile Header - Horizontal */}
-      <div className="relative">
-        <div className="h-24 bg-gradient-to-r from-blue-500 to-purple-600"></div>
-        {/* Edit Button */}
-        <button
-          onClick={handleEditClick}
-          className="absolute top-3 right-3 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
-          title="Edit Profile"
-        >
-          <Edit3 className="w-4 h-4" />
-        </button>
-        <div className="absolute -bottom-8 left-6">
-          <div className="w-16 h-16 bg-white rounded-full p-1 shadow-lg">
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center overflow-hidden">
-              <img
-                src="/api/placeholder/64/64"
-                alt="Profile"
-                className="w-full h-full object-cover rounded-full"
-                onError={(e) => { e.target.style.display = "none"; }}
-              />
+        <div className="relative">
+          <div className="h-24 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+          {/* Edit Button */}
+          <button
+            onClick={handleEditClick}
+            className="absolute top-3 right-3 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
+            title="Edit Profile"
+          >
+            <Edit3 className="w-4 h-4" />
+          </button>
+          <div className="absolute -bottom-8 left-6">
+            <div className="w-16 h-16 bg-white rounded-full p-1 shadow-lg">
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/api/placeholder/64/64"
+                  alt="Profile"
+                  className="w-full h-full object-cover rounded-full"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
         {/* Profile Info - Horizontal Layout */}
         <div className="pt-10 px-6 pb-6 border-b border-gray-200">
@@ -138,8 +177,6 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
             </div>
           </div>
         </div>
-      </div>
-
         {/* Navigation Items - Horizontal LinkedIn Style */}
         <div className="bg-white border-b border-gray-200">
           <div className="flex overflow-x-auto">
@@ -158,6 +195,7 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
             ))}
           </div>
         </div>
+      </div>
 
       {/* Edit Profile Modal */}
       {isEditModalOpen && (
@@ -180,44 +218,62 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
             <div className="p-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    First Name
+                  </label>
                   <input
                     type="text"
                     value={editData.firstName}
-                    onChange={(e) => handleInputChange("firstName", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("firstName", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name
+                  </label>
                   <input
                     type="text"
                     value={editData.lastName}
-                    onChange={(e) => handleInputChange("lastName", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("lastName", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Professional Headline</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Professional Headline
+                  </label>
                   <input
                     type="text"
                     value={editData.headline}
-                    onChange={(e) => handleInputChange("headline", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("headline", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Your professional headline"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Location
+                  </label>
                   <input
                     type="text"
                     value={editData.location}
-                    onChange={(e) => handleInputChange("location", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("location", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    City
+                  </label>
                   <input
                     type="text"
                     value={editData.city}
@@ -226,43 +282,57 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone
+                  </label>
                   <div className="flex items-center">
                     <Phone className="w-5 h-5 text-gray-400 mr-2" />
                     <input
                       type="tel"
                       value={editData.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("phone", e.target.value)
+                      }
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
                   <div className="flex items-center">
                     <Mail className="w-5 h-5 text-gray-400 mr-2" />
                     <input
                       type="email"
                       value={editData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("email", e.target.value)
+                      }
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Website
+                  </label>
                   <div className="flex items-center">
                     <Globe className="w-5 h-5 text-gray-400 mr-2" />
                     <input
                       type="url"
                       value={editData.website}
-                      onChange={(e) => handleInputChange("website", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("website", e.target.value)
+                      }
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">About</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    About
+                  </label>
                   <textarea
                     value={editData.about}
                     onChange={(e) => handleInputChange("about", e.target.value)}

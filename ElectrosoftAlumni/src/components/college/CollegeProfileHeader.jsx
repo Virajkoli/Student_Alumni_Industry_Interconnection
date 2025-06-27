@@ -33,6 +33,8 @@ const CollegeProfileHeader = ({
     quickStats: QUICK_STATS_DEFAULT,
     navOptions: NAV_OPTIONS_DEFAULT,
   });
+  // Add state for floating form visibility
+  const [showFloatingForm, setShowFloatingForm] = useState(false);
 
   const handleHeaderChange = (field, value) => {
     setHeaderData((prev) => ({ ...prev, [field]: value }));
@@ -82,7 +84,7 @@ const CollegeProfileHeader = ({
           <button
             className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-blue-100 transition-colors z-10"
             title="Edit College Header"
-            onClick={() => setEditHeader(true)}
+            onClick={() => setShowFloatingForm(true)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -226,6 +228,95 @@ const CollegeProfileHeader = ({
           )}
         </div>
       </div>
+      {/* Floating form modal for editing profile */}
+      {showFloatingForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative">
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
+              onClick={() => setShowFloatingForm(false)}
+              title="Close"
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-blue-900">
+              Edit College Profile
+            </h2>
+            <div className="flex flex-col gap-4">
+              <input
+                className="text-lg font-bold text-blue-900 bg-white border border-gray-300 rounded px-2 py-1"
+                value={headerData.name}
+                onChange={(e) => handleHeaderChange("name", e.target.value)}
+                placeholder="College Name"
+              />
+              <input
+                className="text-sm text-blue-500 bg-white border border-gray-300 rounded px-2 py-1"
+                value={headerData.location}
+                onChange={(e) => handleHeaderChange("location", e.target.value)}
+                placeholder="Location"
+              />
+              <input
+                className="text-sm bg-white border border-gray-300 rounded px-2 py-1"
+                value={headerData.logo}
+                onChange={(e) => handleHeaderChange("logo", e.target.value)}
+                placeholder="Logo URL"
+              />
+              <input
+                className="text-sm bg-white border border-gray-300 rounded px-2 py-1"
+                value={headerData.background}
+                onChange={(e) => handleHeaderChange("background", e.target.value)}
+                placeholder="Background Image URL"
+              />
+              {/* Quick Stats Editing */}
+              <div>
+                <div className="font-semibold text-blue-900 mb-1">Quick Stats</div>
+                {headerData.quickStats.map((stat, idx) => (
+                  <div className="flex gap-2 mb-1" key={idx}>
+                    <input
+                      className="text-sm border border-gray-300 rounded px-2 py-1 w-20"
+                      value={stat.value}
+                      onChange={(e) =>
+                        handleQuickStatChange(idx, "value", e.target.value)
+                      }
+                      placeholder="Value"
+                    />
+                    <input
+                      className="text-sm border border-gray-300 rounded px-2 py-1 w-32"
+                      value={stat.label}
+                      onChange={(e) =>
+                        handleQuickStatChange(idx, "label", e.target.value)
+                      }
+                      placeholder="Label"
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Navigation Options Editing */}
+              <div>
+                <div className="font-semibold text-blue-900 mb-1">Navigation Tabs</div>
+                {headerData.navOptions.map((item, idx) => (
+                  <input
+                    key={item.id}
+                    className="text-sm border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                    value={item.name}
+                    onChange={(e) => handleNavOptionChange(idx, e.target.value)}
+                    placeholder="Tab Name"
+                  />
+                ))}
+              </div>
+              <button
+                className="mt-4 py-2 px-6 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200"
+                onClick={() => {
+                  setEditHeader(false);
+                  setShowFloatingForm(false);
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

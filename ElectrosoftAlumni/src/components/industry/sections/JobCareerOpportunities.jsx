@@ -6,10 +6,20 @@ import {
   Clock,
   Briefcase,
   Star,
+  Search,
+  Plus,
+  X,
+  Users,
+  Building2,
+  Bookmark,
 } from "lucide-react";
 
 const JobCareerOpportunities = () => {
   const [editingId, setEditingId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
   const [jobData, setJobData] = useState([
     {
       id: 1,
@@ -60,7 +70,7 @@ const JobCareerOpportunities = () => {
     company: "",
     location: "",
     salary: "",
-    type: "",
+    type: "Full-time",
     experience: "",
     skills: "",
     description: "",
@@ -78,152 +88,322 @@ const JobCareerOpportunities = () => {
       skills: job.skills.join(", "),
       description: job.description,
     });
+    setIsModalOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingId(null);
+    setEditData({
+      title: "",
+      company: "",
+      location: "",
+      salary: "",
+      type: "Full-time",
+      experience: "",
+      skills: "",
+      description: "",
+    });
+    setIsModalOpen(true);
   };
 
   const handleSave = () => {
-    setJobData(
-      jobData.map((job) =>
-        job.id === editingId
-          ? {
-              ...job,
-              title: editData.title,
-              company: editData.company,
-              location: editData.location,
-              salary: editData.salary,
-              type: editData.type,
-              experience: editData.experience,
-              skills: editData.skills.split(",").map((skill) => skill.trim()),
-              description: editData.description,
-            }
-          : job
-      )
-    );
+    if (editingId) {
+      // Edit existing job
+      setJobData(
+        jobData.map((job) =>
+          job.id === editingId
+            ? {
+                ...job,
+                title: editData.title,
+                company: editData.company,
+                location: editData.location,
+                salary: editData.salary,
+                type: editData.type,
+                experience: editData.experience,
+                skills: editData.skills.split(",").map((skill) => skill.trim()),
+                description: editData.description,
+              }
+            : job
+        )
+      );
+    } else {
+      // Add new job
+      setJobData([
+        ...jobData,
+        {
+          id: jobData.length + 1,
+          ...editData,
+          skills: editData.skills.split(",").map((skill) => skill.trim()),
+          posted: "Just now",
+          applicants: "0",
+        },
+      ]);
+    }
+    setIsModalOpen(false);
     setEditingId(null);
-    setEditData({
-      title: "",
-      company: "",
-      location: "",
-      salary: "",
-      type: "",
-      experience: "",
-      skills: "",
-      description: "",
-    });
-  };
-
-  const handleCancel = () => {
-    setEditingId(null);
-    setEditData({
-      title: "",
-      company: "",
-      location: "",
-      salary: "",
-      type: "",
-      experience: "",
-      skills: "",
-      description: "",
-    });
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Job & Career Opportunities
-          </h2>
-          <p className="text-gray-600 mt-1">
-            Discover latest job openings and career paths in your industry
-          </p>
+    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      {/* Header Section with Search */}
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Job & Career Opportunities
+            </h2>
+            <p className="text-gray-600 mt-1">
+              Discover your next career move with leading companies
+            </p>
+          </div>
+          <button
+            onClick={handleAddNew}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors gap-2 self-start"
+          >
+            <Plus className="w-4 h-4" />
+            Post New Job
+          </button>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          Post New Job
-        </button>
+
+        {/* Search and Filter Bar */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search jobs by title, company, or skills..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              >
+                <option value="">All Types</option>
+                <option value="full-time">Full Time</option>
+                <option value="part-time">Part Time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+              </select>
+              <select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              >
+                <option value="">All Locations</option>
+                <option value="mumbai">Mumbai</option>
+                <option value="delhi">Delhi</option>
+                <option value="bangalore">Bangalore</option>
+                <option value="remote">Remote</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-6">
+      {/* Job Listings */}
+      <div className="grid gap-6">
         {jobData.map((job) => (
           <div
             key={job.id}
-            className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+            className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
           >
-            {editingId === job.id ? (
-              // Edit Mode
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex items-start justify-between">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Job Title
-                      </label>
-                      <input
-                        type="text"
-                        value={editData.title}
-                        onChange={(e) =>
-                          setEditData({ ...editData, title: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                      <h3 className="text-xl font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                        {job.title}
+                      </h3>
+                      <p className="text-lg text-blue-600 font-medium">
+                        {job.company}
+                      </p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Company
-                      </label>
-                      <input
-                        type="text"
-                        value={editData.company}
-                        onChange={(e) =>
-                          setEditData({ ...editData, company: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                    <button
+                      onClick={() => handleEdit(job)}
+                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mt-3">
+                    <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-full">
+                      <MapPin className="w-4 h-4" />
+                      <span>{job.location}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-full">
+                      <DollarSign className="w-4 h-4" />
+                      <span>{job.salary}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-full">
+                      <Briefcase className="w-4 h-4" />
+                      <span>{job.type}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-full">
+                      <Clock className="w-4 h-4" />
+                      <span>{job.experience}</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Location
-                      </label>
-                      <input
-                        type="text"
-                        value={editData.location}
-                        onChange={(e) =>
-                          setEditData({ ...editData, location: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Salary
-                      </label>
-                      <input
-                        type="text"
-                        value={editData.salary}
-                        onChange={(e) =>
-                          setEditData({ ...editData, salary: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Job Type
-                      </label>
-                      <select
-                        value={editData.type}
-                        onChange={(e) =>
-                          setEditData({ ...editData, type: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="Full-time">Full-time</option>
-                        <option value="Part-time">Part-time</option>
-                        <option value="Internship">Internship</option>
-                        <option value="Contract">Contract</option>
-                        <option value="Remote">Remote</option>
-                      </select>
-                    </div>
+                </div>
+              </div>
+
+              <div className="prose prose-sm max-w-none text-gray-600 mb-4">
+                {job.description}
+              </div>
+
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-gray-900 mb-2">
+                  Required Skills:
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {job.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-blue-50 text-blue-700 text-sm font-medium rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    Posted {job.posted}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    {job.applicants} applicants
+                  </span>
+                </div>
+                <div className="flex gap-3">
+                  <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <Bookmark className="w-4 h-4" />
+                    Save
+                  </button>
+                  <button className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                    Apply Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Floating Modal Form */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-100">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {editingId ? "Edit Job Posting" : "Create New Job Posting"}
+                </h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Job Information */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Job Information
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Job Title
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.title}
+                      onChange={(e) =>
+                        setEditData({ ...editData, title: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., Senior Software Engineer"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Company Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.company}
+                      onChange={(e) =>
+                        setEditData({ ...editData, company: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., Tech Solutions Inc."
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.location}
+                      onChange={(e) =>
+                        setEditData({ ...editData, location: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., Mumbai, Maharashtra"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Job Type
+                    </label>
+                    <select
+                      value={editData.type}
+                      onChange={(e) =>
+                        setEditData({ ...editData, type: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contract">Contract</option>
+                      <option value="Internship">Internship</option>
+                      <option value="Remote">Remote</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Salary Range
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.salary}
+                      onChange={(e) =>
+                        setEditData({ ...editData, salary: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., ₹15-25 LPA"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -235,165 +415,70 @@ const JobCareerOpportunities = () => {
                       onChange={(e) =>
                         setEditData({ ...editData, experience: e.target.value })
                       }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="e.g., 3-5 years"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Required Skills (comma separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={editData.skills}
-                      onChange={(e) =>
-                        setEditData({ ...editData, skills: e.target.value })
-                      }
-                      placeholder="React, Node.js, MongoDB"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Job Description
-                    </label>
-                    <textarea
-                      value={editData.description}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          description: e.target.value,
-                        })
-                      }
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div className="flex space-x-3 pt-2">
-                    <button
-                      onClick={handleSave}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-                    >
-                      Cancel
-                    </button>
                   </div>
                 </div>
               </div>
-            ) : (
-              // View Mode
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        {job.title}
-                      </h3>
-                      <button
-                        onClick={() => handleEdit(job)}
-                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Edit Job"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <p className="text-lg text-blue-600 font-medium mb-3">
-                      {job.company}
-                    </p>
 
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="w-4 h-4" />
-                        <span>{job.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <DollarSign className="w-4 h-4" />
-                        <span>{job.salary}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Briefcase className="w-4 h-4" />
-                        <span>{job.type}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{job.experience}</span>
-                      </div>
-                    </div>
-                  </div>
+              {/* Skills & Description */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Skills & Description
+                </h3>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Required Skills
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.skills}
+                    onChange={(e) =>
+                      setEditData({ ...editData, skills: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., React, Node.js, MongoDB (comma separated)"
+                  />
+                  <p className="mt-1 text-sm text-gray-500">
+                    Add multiple skills separated by commas
+                  </p>
                 </div>
 
-                <p className="text-gray-700 mb-4 leading-relaxed">
-                  {job.description}
-                </p>
-
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">
-                    Required Skills:
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {job.skills.map((skill, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span>Posted {job.posted}</span>
-                    <span>{job.applicants} applicants</span>
-                  </div>
-                  <div className="flex space-x-3">
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                      Save Job
-                    </button>
-                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                      Apply Now
-                    </button>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Job Description
+                  </label>
+                  <textarea
+                    value={editData.description}
+                    onChange={(e) =>
+                      setEditData({ ...editData, description: e.target.value })
+                    }
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Describe the role, responsibilities, and requirements..."
+                  />
                 </div>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Job Categories */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Browse by Category
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { name: "Engineering", count: "450+ jobs", icon: "⚙️" },
-            { name: "Management", count: "280+ jobs", icon: "👔" },
-            { name: "Design", count: "190+ jobs", icon: "🎨" },
-            { name: "Sales", count: "320+ jobs", icon: "📈" },
-            { name: "Marketing", count: "240+ jobs", icon: "📢" },
-            { name: "HR", count: "150+ jobs", icon: "👥" },
-            { name: "Finance", count: "200+ jobs", icon: "💰" },
-            { name: "Operations", count: "180+ jobs", icon: "⚡" },
-          ].map((category, index) => (
-            <div
-              key={index}
-              className="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-            >
-              <div className="text-2xl mb-2">{category.icon}</div>
-              <h4 className="font-medium text-gray-900">{category.name}</h4>
-              <p className="text-sm text-gray-600">{category.count}</p>
             </div>
-          ))}
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {editingId ? "Save Changes" : "Post Job"}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

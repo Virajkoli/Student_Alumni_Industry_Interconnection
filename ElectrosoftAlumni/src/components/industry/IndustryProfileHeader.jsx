@@ -110,87 +110,93 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
         {/* Profile Header - Horizontal */}
         <div className="relative">
-          <div className="h-24 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+          <div className="h-32 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[url('/college-bg.jpg')] opacity-20 mix-blend-overlay"></div>
+          </div>
           {/* Edit Button */}
           <button
             onClick={handleEditClick}
-            className="absolute top-3 right-3 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
+            className="absolute top-4 right-4 p-2.5 bg-white/20 hover:bg-white/30 text-white rounded-full transition-all duration-200 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
             title="Edit Profile"
           >
-            <Edit3 className="w-4 h-4" />
+            <Edit3 className="w-5 h-5" />
           </button>
-          <div className="absolute -bottom-8 left-6">
-            <div className="w-16 h-16 bg-white rounded-full p-1 shadow-lg">
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center overflow-hidden">
+          <div className="absolute -bottom-12 left-8">
+            <div className="w-24 h-24 bg-white rounded-full p-1 shadow-xl ring-4 ring-white">
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center overflow-hidden relative group">
                 <img
-                  src="/api/placeholder/64/64"
+                  src="/api/placeholder/96/96"
                   alt="Profile"
-                  className="w-full h-full object-cover rounded-full"
+                  className="w-full h-full object-cover rounded-full group-hover:opacity-90 transition-opacity"
                   onError={(e) => {
                     e.target.style.display = "none";
                   }}
                 />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Profile Info - Horizontal Layout */}
-        <div className="pt-10 px-6 pb-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="pt-16 px-8 pb-8 border-b border-gray-200 bg-white shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
                 {profileData.firstName} {profileData.lastName}
               </h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-base text-blue-600 font-medium mt-1">
                 {profileData.headline}
               </p>
-              <div className="flex items-center text-xs text-gray-500 mt-1">
-                <MapPin className="w-3 h-3 mr-1" />
+              <div className="flex items-center text-sm text-gray-600 mt-2">
+                <MapPin className="w-4 h-4 mr-2 text-gray-400" />
                 {profileData.location}, {profileData.city}
               </div>
+              
+              {/* Simple Stats */}
+              <div className="flex items-center gap-6 mt-4 text-sm text-gray-600">
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-gray-900">250+</span>
+                  <span>Projects</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-gray-900">500+</span>
+                  <span>Connections</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-gray-900">4.8</span>
+                  <span>Rating</span>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col items-start gap-2 sm:items-end">
-              <button className="py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+            <div className="flex flex-col items-start gap-3 sm:items-end">
+              <button className="py-2.5 px-6 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow flex items-center gap-2">
                 Industry Experience
               </button>
-            </div>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-gray-200">
-            <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">250+</div>
-              <div className="text-xs text-gray-500">Projects</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">15</div>
-              <div className="text-xs text-gray-500">Years Experience</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">500+</div>
-              <div className="text-xs text-gray-500">Connections</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">4.8</div>
-              <div className="text-xs text-gray-500">Rating</div>
             </div>
           </div>
         </div>
         {/* Navigation Items - Horizontal LinkedIn Style */}
         <div className="bg-white border-b border-gray-200">
-          <div className="flex overflow-x-auto">
+          <div className="flex overflow-x-auto px-2" style={styles.hideScrollbar}>
             {navigationItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
-                className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
+                className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap relative group ${
                   activeItem === item.id
-                    ? "border-blue-500 text-blue-600 bg-blue-50"
+                    ? "border-blue-600 text-blue-600 bg-blue-50/50"
                     : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
                 }`}
               >
                 {item.name}
+                {/* Tooltip */}
+                <div className="absolute left-1/2 -translate-x-1/2 -top-12 bg-gray-900 text-white text-xs py-1.5 px-3 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-normal w-48 text-center shadow-lg">
+                  {item.description}
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+                </div>
               </button>
             ))}
           </div>

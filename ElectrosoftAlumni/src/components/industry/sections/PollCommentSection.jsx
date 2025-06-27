@@ -8,10 +8,13 @@ import {
   Plus,
   ThumbsUp,
   ThumbsDown,
+  X,
 } from "lucide-react";
 
 const PollCommentSection = () => {
   const [editingId, setEditingId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [polls, setPolls] = useState([
     {
       id: 1,
@@ -87,6 +90,7 @@ const PollCommentSection = () => {
 
   const handleEdit = (poll) => {
     setEditingId(poll.id);
+    setIsModalOpen(true);
     setEditData({
       question: poll.question,
       type: poll.type,
@@ -125,6 +129,7 @@ const PollCommentSection = () => {
       )
     );
     setEditingId(null);
+    setIsModalOpen(false);
     setEditData({
       question: "",
       type: "multiple",
@@ -137,6 +142,7 @@ const PollCommentSection = () => {
 
   const handleCancel = () => {
     setEditingId(null);
+    setIsModalOpen(false);
     setEditData({
       question: "",
       type: "multiple",
@@ -162,6 +168,7 @@ const PollCommentSection = () => {
 
   return (
     <div className="p-6">
+      {/* Header Section */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
@@ -183,263 +190,289 @@ const PollCommentSection = () => {
             key={poll.id}
             className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
           >
-            {editingId === poll.id ? (
-              // Edit Mode
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Poll Question
-                    </label>
-                    <input
-                      type="text"
-                      value={editData.question}
-                      onChange={(e) =>
-                        setEditData({ ...editData, question: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
+            {isModalOpen && editingId === poll.id && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        Edit Poll
+                      </h2>
+                      <button
+                        onClick={handleCancel}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      >
+                        <X className="w-5 h-5 text-gray-500" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
+
+                  <div className="p-6 space-y-6">
+                    {/* Poll Question */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Poll Type
-                      </label>
-                      <select
-                        value={editData.type}
-                        onChange={(e) =>
-                          setEditData({ ...editData, type: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="multiple">Multiple Choice</option>
-                        <option value="binary">Yes/No</option>
-                        <option value="rating">Rating Scale</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Category
-                      </label>
-                      <select
-                        value={editData.category}
-                        onChange={(e) =>
-                          setEditData({ ...editData, category: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="Technology">Technology</option>
-                        <option value="Workplace">Workplace</option>
-                        <option value="Industry">Industry</option>
-                        <option value="Business">Business</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        End Date
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Poll Question
                       </label>
                       <input
-                        type="date"
-                        value={editData.endDate}
+                        type="text"
+                        value={editData.question}
                         onChange={(e) =>
-                          setEditData({ ...editData, endDate: e.target.value })
+                          setEditData({ ...editData, question: e.target.value })
                         }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your question"
+                      />
+                    </div>
+
+                    {/* Grid Layout */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Poll Type
+                        </label>
+                        <select
+                          value={editData.type}
+                          onChange={(e) =>
+                            setEditData({ ...editData, type: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="multiple">Multiple Choice</option>
+                          <option value="binary">Yes/No</option>
+                          <option value="rating">Rating Scale</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Category
+                        </label>
+                        <select
+                          value={editData.category}
+                          onChange={(e) =>
+                            setEditData({ ...editData, category: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="Technology">Technology</option>
+                          <option value="Workplace">Workplace</option>
+                          <option value="Industry">Industry</option>
+                          <option value="Business">Business</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          End Date
+                        </label>
+                        <input
+                          type="date"
+                          value={editData.endDate}
+                          onChange={(e) =>
+                            setEditData({ ...editData, endDate: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Poll Options */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Poll Options (one per line)
+                      </label>
+                      <textarea
+                        value={editData.options}
+                        onChange={(e) =>
+                          setEditData({ ...editData, options: e.target.value })
+                        }
+                        rows={4}
+                        placeholder="Option 1&#10;Option 2&#10;Option 3"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
+
+                    {/* Allow Comments */}
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="allowComments"
+                        checked={editData.allowComments}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            allowComments: e.target.checked,
+                          })
+                        }
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label
+                        htmlFor="allowComments"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Allow comments on this poll
+                      </label>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Options (one per line)
-                    </label>
-                    <textarea
-                      value={editData.options}
-                      onChange={(e) =>
-                        setEditData({ ...editData, options: e.target.value })
-                      }
-                      rows={4}
-                      placeholder="Option 1&#10;Option 2&#10;Option 3"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="allowComments"
-                      checked={editData.allowComments}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          allowComments: e.target.checked,
-                        })
-                      }
-                      className="rounded border-gray-300"
-                    />
-                    <label
-                      htmlFor="allowComments"
-                      className="text-sm text-gray-700"
-                    >
-                      Allow comments
-                    </label>
-                  </div>
-                  <div className="flex space-x-3 pt-2">
-                    <button
-                      onClick={handleSave}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Save Changes
-                    </button>
+
+                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
                     <button
                       onClick={handleCancel}
-                      className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                     >
                       Cancel
                     </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              // View Mode
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {poll.question}
-                      </h3>
-                      <button
-                        onClick={() => handleEdit(poll)}
-                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Edit Poll"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center space-x-4 mb-4 text-sm text-gray-600">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                          poll.status
-                        )}`}
-                      >
-                        {poll.status}
-                      </span>
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                        {poll.category}
-                      </span>
-                      <div className="flex items-center space-x-1">
-                        <Users className="w-4 h-4" />
-                        <span>{poll.totalVotes} votes</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>
-                          Ends {new Date(poll.endDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Poll Options */}
-                <div className="mb-6">
-                  <div className="space-y-3">
-                    {poll.options.map((option) => (
-                      <div
-                        key={option.id}
-                        className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors"
-                      >
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-900">{option.text}</span>
-                          <span className="text-sm font-medium text-gray-600">
-                            {option.percentage}%
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${option.percentage}%` }}
-                          ></div>
-                        </div>
-                        <div className="mt-1 text-xs text-gray-500">
-                          {option.votes} votes
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 text-center">
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                      Vote Now
+                    <button
+                      onClick={handleSave}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                    >
+                      Save Changes
                     </button>
                   </div>
                 </div>
-
-                {/* Comments Section */}
-                {poll.allowComments && (
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <MessageCircle className="w-5 h-5 text-gray-600" />
-                      <span className="font-medium text-gray-900">
-                        Comments (
-                        {comments.filter((c) => c.pollId === poll.id).length})
-                      </span>
-                    </div>
-
-                    <div className="space-y-4">
-                      {comments
-                        .filter((comment) => comment.pollId === poll.id)
-                        .map((comment) => (
-                          <div
-                            key={comment.id}
-                            className="bg-gray-50 rounded-lg p-4"
-                          >
-                            <div className="flex justify-between items-start mb-2">
-                              <span className="font-medium text-gray-900">
-                                {comment.author}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {comment.timestamp}
-                              </span>
-                            </div>
-                            <p className="text-gray-700 mb-3 leading-relaxed">
-                              {comment.content}
-                            </p>
-                            <div className="flex items-center space-x-4">
-                              <button className="flex items-center space-x-1 text-green-600 hover:text-green-700">
-                                <ThumbsUp className="w-4 h-4" />
-                                <span className="text-sm">{comment.likes}</span>
-                              </button>
-                              <button className="flex items-center space-x-1 text-red-600 hover:text-red-700">
-                                <ThumbsDown className="w-4 h-4" />
-                                <span className="text-sm">
-                                  {comment.dislikes}
-                                </span>
-                              </button>
-                              <button className="text-blue-600 hover:text-blue-700 text-sm">
-                                Reply
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-
-                    <div className="mt-4">
-                      <textarea
-                        placeholder="Share your thoughts..."
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      <div className="mt-2 flex justify-end">
-                        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                          Post Comment
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
+
+            {/* View Mode */}
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {poll.question}
+                    </h3>
+                    <button
+                      onClick={() => handleEdit(poll)}
+                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit Poll"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center space-x-4 mb-4 text-sm text-gray-600">
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
+                        poll.status
+                      )}`}
+                    >
+                      {poll.status}
+                    </span>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                      {poll.category}
+                    </span>
+                    <div className="flex items-center space-x-1">
+                      <Users className="w-4 h-4" />
+                      <span>{poll.totalVotes} votes</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        Ends {new Date(poll.endDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Poll Options */}
+              <div className="mb-6">
+                <div className="space-y-3">
+                  {poll.options.map((option) => (
+                    <div
+                      key={option.id}
+                      className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-900">{option.text}</span>
+                        <span className="text-sm font-medium text-gray-600">
+                          {option.percentage}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${option.percentage}%` }}
+                        ></div>
+                      </div>
+                      <div className="mt-1 text-xs text-gray-500">
+                        {option.votes} votes
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 text-center">
+                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Vote Now
+                  </button>
+                </div>
+              </div>
+
+              {/* Comments Section */}
+              {poll.allowComments && (
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <MessageCircle className="w-5 h-5 text-gray-600" />
+                    <span className="font-medium text-gray-900">
+                      Comments (
+                      {comments.filter((c) => c.pollId === poll.id).length})
+                    </span>
+                  </div>
+
+                  <div className="space-y-4">
+                    {comments
+                      .filter((comment) => comment.pollId === poll.id)
+                      .map((comment) => (
+                        <div
+                          key={comment.id}
+                          className="bg-gray-50 rounded-lg p-4"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="font-medium text-gray-900">
+                              {comment.author}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {comment.timestamp}
+                            </span>
+                          </div>
+                          <p className="text-gray-700 mb-3 leading-relaxed">
+                            {comment.content}
+                          </p>
+                          <div className="flex items-center space-x-4">
+                            <button className="flex items-center space-x-1 text-green-600 hover:text-green-700">
+                              <ThumbsUp className="w-4 h-4" />
+                              <span className="text-sm">{comment.likes}</span>
+                            </button>
+                            <button className="flex items-center space-x-1 text-red-600 hover:text-red-700">
+                              <ThumbsDown className="w-4 h-4" />
+                              <span className="text-sm">
+                                {comment.dislikes}
+                              </span>
+                            </button>
+                            <button className="text-blue-600 hover:text-blue-700 text-sm">
+                              Reply
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  <div className="mt-4">
+                    <textarea
+                      placeholder="Share your thoughts..."
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <div className="mt-2 flex justify-end">
+                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Post Comment
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>

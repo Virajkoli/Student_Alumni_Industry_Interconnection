@@ -7,10 +7,12 @@ import {
   TrendingUp,
   Users,
   Clock,
+  X,
 } from "lucide-react";
 
 const ChallengesSolutions = () => {
   const [editingId, setEditingId] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [challengeSolutions, setChallengeSolutions] = useState([
     {
       id: 1,
@@ -94,6 +96,7 @@ const ChallengesSolutions = () => {
 
   const handleEdit = (item) => {
     setEditingId(item.id);
+    setIsEditModalOpen(true);
     setEditData({
       challenge: item.challenge,
       description: item.description,
@@ -133,6 +136,7 @@ const ChallengesSolutions = () => {
       )
     );
     setEditingId(null);
+    setIsEditModalOpen(false);
     setEditData({
       challenge: "",
       description: "",
@@ -150,6 +154,7 @@ const ChallengesSolutions = () => {
 
   const handleCancel = () => {
     setEditingId(null);
+    setIsEditModalOpen(false);
     setEditData({
       challenge: "",
       description: "",
@@ -209,6 +214,242 @@ const ChallengesSolutions = () => {
           Add Challenge
         </button>
       </div>
+
+      {/* Edit Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Edit Challenge & Solution
+                </h2>
+                <button
+                  onClick={handleCancel}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Challenge Section */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Challenge Details
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Challenge Title
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.challenge}
+                      onChange={(e) =>
+                        setEditData({ ...editData, challenge: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Challenge Description
+                    </label>
+                    <textarea
+                      value={editData.description}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          description: e.target.value,
+                        })
+                      }
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Impact Level
+                      </label>
+                      <select
+                        value={editData.impact}
+                        onChange={(e) =>
+                          setEditData({ ...editData, impact: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Affected Companies
+                      </label>
+                      <input
+                        type="text"
+                        value={editData.affectedCompanies}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            affectedCompanies: e.target.value,
+                          })
+                        }
+                        placeholder="e.g., 85%"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Status
+                      </label>
+                      <select
+                        value={editData.status}
+                        onChange={(e) =>
+                          setEditData({ ...editData, status: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Growing">Growing</option>
+                        <option value="Emerging">Emerging</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Solution Section */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Solution Details
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Solution Title
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.solution}
+                      onChange={(e) =>
+                        setEditData({ ...editData, solution: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Solution Description
+                    </label>
+                    <textarea
+                      value={editData.solutionDescription}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          solutionDescription: e.target.value,
+                        })
+                      }
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Implemented By (comma separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.implementedBy}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          implementedBy: e.target.value,
+                        })
+                      }
+                      placeholder="Amazon, Walmart, Unilever"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Success Rate
+                      </label>
+                      <input
+                        type="text"
+                        value={editData.successRate}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            successRate: e.target.value,
+                          })
+                        }
+                        placeholder="e.g., 78%"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Time to Implement
+                      </label>
+                      <input
+                        type="text"
+                        value={editData.timeToImplement}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            timeToImplement: e.target.value,
+                          })
+                        }
+                        placeholder="e.g., 6-12 months"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Cost Saving
+                      </label>
+                      <input
+                        type="text"
+                        value={editData.costSaving}
+                        onChange={(e) =>
+                          setEditData({
+                            ...editData,
+                            costSaving: e.target.value,
+                          })
+                        }
+                        placeholder="e.g., 25-40%"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-6">
         {challengeSolutions.map((item) => (

@@ -8,10 +8,12 @@ import {
   Share2,
   Briefcase,
   Newspaper,
+  X,
 } from "lucide-react";
 
 const PostNewsJobs = () => {
   const [editingId, setEditingId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [postsData, setPostsData] = useState([
     {
       id: 1,
@@ -76,6 +78,7 @@ const PostNewsJobs = () => {
 
   const handleEdit = (post) => {
     setEditingId(post.id);
+    setIsModalOpen(true);
     setEditData({
       title: post.title,
       content: post.content,
@@ -120,6 +123,7 @@ const PostNewsJobs = () => {
 
   const handleCancel = () => {
     setEditingId(null);
+    setIsModalOpen(false);
     setEditData({
       title: "",
       content: "",
@@ -179,247 +183,265 @@ const PostNewsJobs = () => {
       </div>
 
       <div className="space-y-6">
+        {/* Edit Modal */}
+        {isModalOpen && editingId && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Edit{" "}
+                    {postsData.find((p) => p.id === editingId)?.type.charAt(0).toUpperCase() +
+                      postsData.find((p) => p.id === editingId)?.type.slice(1)}
+                  </h2>
+                  <button
+                    onClick={handleCancel}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.title}
+                    onChange={(e) =>
+                      setEditData({ ...editData, title: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter title"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Company
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.company}
+                      onChange={(e) =>
+                        setEditData({ ...editData, company: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter company name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Author
+                    </label>
+                    <input
+                      type="text"
+                      value={editData.author}
+                      onChange={(e) =>
+                        setEditData({ ...editData, author: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Enter author name"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Content
+                  </label>
+                  <textarea
+                    value={editData.content}
+                    onChange={(e) =>
+                      setEditData({ ...editData, content: e.target.value })
+                    }
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter content"
+                  />
+                </div>
+
+                {postsData.find((p) => p.id === editingId)?.type === "job" && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Location
+                        </label>
+                        <input
+                          type="text"
+                          value={editData.location}
+                          onChange={(e) =>
+                            setEditData({ ...editData, location: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter job location"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Salary
+                        </label>
+                        <input
+                          type="text"
+                          value={editData.salary}
+                          onChange={(e) =>
+                            setEditData({ ...editData, salary: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Enter salary range"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Requirements (comma-separated)
+                      </label>
+                      <textarea
+                        value={editData.requirements}
+                        onChange={(e) =>
+                          setEditData({ ...editData, requirements: e.target.value })
+                        }
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter requirements separated by commas"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                <button
+                  onClick={handleCancel}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Posts List */}
         {postsData.map((post) => (
           <div
             key={post.id}
             className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
           >
-            {editingId === post.id ? (
-              // Edit Mode
-              <div className="p-6">
-                <div className="space-y-4">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center space-x-3">
+                  {getPostIcon(post.type)}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      value={editData.title}
-                      onChange={(e) =>
-                        setEditData({ ...editData, title: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Company
-                      </label>
-                      <input
-                        type="text"
-                        value={editData.company}
-                        onChange={(e) =>
-                          setEditData({ ...editData, company: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {post.title}
+                      </h3>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${getPostTypeColor(
+                          post.type
+                        )}`}
+                      >
+                        {post.type.toUpperCase()}
+                      </span>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Author
-                      </label>
-                      <input
-                        type="text"
-                        value={editData.author}
-                        onChange={(e) =>
-                          setEditData({ ...editData, author: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                      <span className="font-medium">{post.company}</span>
+                      <span>•</span>
+                      <div className="flex items-center space-x-1">
+                        <User className="w-3 h-3" />
+                        <span>{post.author}</span>
+                      </div>
+                      <span>•</span>
+                      <span>{post.date}</span>
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Content
-                    </label>
-                    <textarea
-                      value={editData.content}
-                      onChange={(e) =>
-                        setEditData({ ...editData, content: e.target.value })
-                      }
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  {post.type === "job" && (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Location
-                          </label>
-                          <input
-                            type="text"
-                            value={editData.location}
-                            onChange={(e) =>
-                              setEditData({
-                                ...editData,
-                                location: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Salary
-                          </label>
-                          <input
-                            type="text"
-                            value={editData.salary}
-                            onChange={(e) =>
-                              setEditData({
-                                ...editData,
-                                salary: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Requirements (comma separated)
-                        </label>
-                        <input
-                          type="text"
-                          value={editData.requirements}
-                          onChange={(e) =>
-                            setEditData({
-                              ...editData,
-                              requirements: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                    </>
-                  )}
-                  <div className="flex space-x-3 pt-2">
-                    <button
-                      onClick={handleSave}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-                    >
-                      Cancel
-                    </button>
                   </div>
                 </div>
+                <button
+                  onClick={() => handleEdit(post)}
+                  className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  title="Edit Post"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </button>
               </div>
-            ) : (
-              // View Mode
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center space-x-3">
-                    {getPostIcon(post.type)}
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {post.title}
-                        </h3>
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${getPostTypeColor(
-                            post.type
-                          )}`}
-                        >
-                          {post.type.toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
-                        <span className="font-medium">{post.company}</span>
-                        <span>•</span>
-                        <div className="flex items-center space-x-1">
-                          <User className="w-3 h-3" />
-                          <span>{post.author}</span>
-                        </div>
-                        <span>•</span>
-                        <span>{post.date}</span>
-                      </div>
+
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                {post.content}
+              </p>
+
+              {post.type === "job" && post.requirements && (
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">
+                    Requirements:
+                  </h4>
+                  <ul className="list-disc list-inside space-y-1">
+                    {post.requirements.map((req, index) => (
+                      <li key={index} className="text-sm text-gray-700">
+                        {req}
+                      </li>
+                    ))}
+                  </ul>
+                  {post.location && (
+                    <div className="mt-2 flex items-center justify-between text-sm">
+                      <span className="text-gray-600">📍 {post.location}</span>
+                      <span className="text-green-600 font-semibold">
+                        {post.salary}
+                      </span>
                     </div>
+                  )}
+                </div>
+              )}
+
+              {post.type === "event" && post.eventDate && (
+                <div className="mb-4 p-3 bg-purple-50 rounded-lg">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700">
+                      📅 Event Date: {post.eventDate}
+                    </span>
+                    <span className="text-gray-700">📍 {post.location}</span>
                   </div>
-                  <button
-                    onClick={() => handleEdit(post)}
-                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="Edit Post"
-                  >
-                    <Edit3 className="w-4 h-4" />
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div className="flex items-center space-x-6">
+                  <button className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors">
+                    <Heart className="w-4 h-4" />
+                    <span className="text-sm">{post.likes}</span>
+                  </button>
+                  <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
+                    <MessageCircle className="w-4 h-4" />
+                    <span className="text-sm">{post.comments}</span>
+                  </button>
+                  <button className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
+                    <Share2 className="w-4 h-4" />
+                    <span className="text-sm">{post.shares}</span>
                   </button>
                 </div>
-
-                <p className="text-gray-700 mb-4 leading-relaxed">
-                  {post.content}
-                </p>
-
-                {post.type === "job" && post.requirements && (
-                  <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">
-                      Requirements:
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1">
-                      {post.requirements.map((req, index) => (
-                        <li key={index} className="text-sm text-gray-700">
-                          {req}
-                        </li>
-                      ))}
-                    </ul>
-                    {post.location && (
-                      <div className="mt-2 flex items-center justify-between text-sm">
-                        <span className="text-gray-600">
-                          📍 {post.location}
-                        </span>
-                        <span className="text-green-600 font-semibold">
-                          {post.salary}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {post.type === "event" && post.eventDate && (
-                  <div className="mb-4 p-3 bg-purple-50 rounded-lg">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-700">
-                        📅 Event Date: {post.eventDate}
-                      </span>
-                      <span className="text-gray-700">📍 {post.location}</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <div className="flex items-center space-x-6">
-                    <button className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors">
-                      <Heart className="w-4 h-4" />
-                      <span className="text-sm">{post.likes}</span>
+                <div className="flex space-x-3">
+                  {post.type === "job" && (
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                      Apply Now
                     </button>
-                    <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
-                      <MessageCircle className="w-4 h-4" />
-                      <span className="text-sm">{post.comments}</span>
-                    </button>
-                    <button className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
-                      <Share2 className="w-4 h-4" />
-                      <span className="text-sm">{post.shares}</span>
-                    </button>
-                  </div>
-                  <div className="flex space-x-3">
-                    {post.type === "job" && (
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                        Apply Now
-                      </button>
-                    )}
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                      Save
-                    </button>
-                  </div>
+                  )}
+                  <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                    Save
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         ))}
       </div>

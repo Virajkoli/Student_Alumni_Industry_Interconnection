@@ -7,10 +7,12 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
+  X,
 } from "lucide-react";
 
 const LiveProjects = () => {
   const [editingId, setEditingId] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [projectsData, setProjectsData] = useState([
     {
       id: 1,
@@ -97,6 +99,23 @@ const LiveProjects = () => {
       type: project.type,
       priority: project.priority,
     });
+    setIsEditModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
+    setIsEditModalOpen(false);
+    setEditData({
+      title: "",
+      company: "",
+      description: "",
+      budget: "",
+      duration: "",
+      deadline: "",
+      skillsRequired: "",
+      type: "",
+      priority: "",
+    });
   };
 
   const handleSave = () => {
@@ -121,21 +140,7 @@ const LiveProjects = () => {
       )
     );
     setEditingId(null);
-    setEditData({
-      title: "",
-      company: "",
-      description: "",
-      budget: "",
-      duration: "",
-      deadline: "",
-      skillsRequired: "",
-      type: "",
-      priority: "",
-    });
-  };
-
-  const handleCancel = () => {
-    setEditingId(null);
+    setIsEditModalOpen(false);
     setEditData({
       title: "",
       company: "",
@@ -461,6 +466,182 @@ const LiveProjects = () => {
           </div>
         ))}
       </div>
+
+      {/* Edit Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Edit Project Details
+                </h2>
+                <button
+                  onClick={handleCancel}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Form fields */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Title
+                </label>
+                <input
+                  type="text"
+                  value={editData.title}
+                  onChange={(e) =>
+                    setEditData({ ...editData, title: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Company
+                </label>
+                <input
+                  type="text"
+                  value={editData.company}
+                  onChange={(e) =>
+                    setEditData({ ...editData, company: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={editData.description}
+                  onChange={(e) =>
+                    setEditData({
+                      ...editData,
+                      description: e.target.value,
+                    })
+                  }
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Budget
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.budget}
+                    onChange={(e) =>
+                      setEditData({ ...editData, budget: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Duration
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.duration}
+                    onChange={(e) =>
+                      setEditData({ ...editData, duration: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Deadline
+                  </label>
+                  <input
+                    type="date"
+                    value={editData.deadline}
+                    onChange={(e) =>
+                      setEditData({ ...editData, deadline: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Project Type
+                  </label>
+                  <select
+                    value={editData.type}
+                    onChange={(e) =>
+                      setEditData({ ...editData, type: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="Development">Development</option>
+                    <option value="Analytics">Analytics</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="Research">Research</option>
+                    <option value="Consulting">Consulting</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Priority
+                  </label>
+                  <select
+                    value={editData.priority}
+                    onChange={(e) =>
+                      setEditData({ ...editData, priority: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Skills Required (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={editData.skillsRequired}
+                  onChange={(e) =>
+                    setEditData({
+                      ...editData,
+                      skillsRequired: e.target.value,
+                    })
+                  }
+                  placeholder="Python, Machine Learning, API Integration"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Project Statistics */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">

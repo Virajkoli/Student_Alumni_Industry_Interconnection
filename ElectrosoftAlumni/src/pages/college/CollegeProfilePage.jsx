@@ -5,11 +5,13 @@ import Navbar from "../../components/college/sections/Navbar";
 
 const NAV_OPTIONS = [
   { id: "college-info", name: "College Info" },
+  { id: "course-details", name: "Course Details" }, // Added Course Details as a separate tab
   { id: "course-fees", name: "Course Fees" },
   { id: "review", name: "Review" },
   { id: "admission", name: "Admission" },
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
+  { id: "downloads", name: "Downloads" },
 ];
 
 const CollegeProfilePage = () => {
@@ -140,6 +142,81 @@ const CollegeProfilePage = () => {
         "Extensive research publications and patents",
       ],
     },
+    downloads: {
+      forms: [
+        {
+          name: "Admission Application Form",
+          description:
+            "Official application form for admission to various programs",
+          fileSize: "250 KB",
+          format: "PDF",
+          url: "/downloads/admission-form-2025.pdf",
+        },
+        {
+          name: "Scholarship Application Form",
+          description: "Form to apply for merit and need-based scholarships",
+          fileSize: "180 KB",
+          format: "PDF",
+          url: "/downloads/scholarship-form-2025.pdf",
+        },
+        {
+          name: "Hostel Accommodation Form",
+          description: "Form for requesting on-campus hostel accommodation",
+          fileSize: "200 KB",
+          format: "PDF",
+          url: "/downloads/hostel-form-2025.pdf",
+        },
+      ],
+      brochures: [
+        {
+          name: "College Brochure 2025",
+          description:
+            "Comprehensive guide about IIT Kanpur's programs, facilities, and achievements",
+          fileSize: "5.2 MB",
+          format: "PDF",
+          url: "/downloads/iitk-brochure-2025.pdf",
+        },
+        {
+          name: "Department Courses Catalog",
+          description: "Detailed information about courses offered by each department",
+          fileSize: "3.8 MB",
+          format: "PDF",
+          url: "/downloads/course-catalog-2025.pdf",
+        },
+      ],
+      syllabus: [
+        {
+          name: "B.Tech Course Syllabus",
+          description: "Complete syllabus for all B.Tech programs",
+          fileSize: "1.8 MB",
+          format: "PDF",
+          url: "/downloads/btech-syllabus-2025.pdf",
+        },
+        {
+          name: "M.Tech Course Syllabus",
+          description: "Complete syllabus for all M.Tech specializations",
+          fileSize: "2.1 MB",
+          format: "PDF",
+          url: "/downloads/mtech-syllabus-2025.pdf",
+        },
+      ],
+      other: [
+        {
+          name: "Student Handbook",
+          description: "Guidelines, rules, and regulations for students",
+          fileSize: "1.5 MB",
+          format: "PDF",
+          url: "/downloads/student-handbook-2025.pdf",
+        },
+        {
+          name: "Fee Structure",
+          description: "Detailed fee structure for all programs",
+          fileSize: "300 KB",
+          format: "PDF",
+          url: "/downloads/fee-structure-2025.pdf",
+        },
+      ],
+    },
   };
 
   const [formData, setFormData] = useState(initialData);
@@ -238,6 +315,110 @@ const CollegeProfilePage = () => {
                   <li key={idx}>{item}</li>
                 ))}
               </ul>
+            </div>
+          </div>
+        );
+      case "course-details":
+        return (
+          <div className="p-6">
+            <h2 className="text-2xl font-bold text-blue-900 mb-4">Course Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* B.Tech */}
+              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">B.Tech</h3>
+                <ul className="text-gray-700 text-base space-y-1">
+                  <li><span className="font-medium">Duration:</span> 4 Years</li>
+                  <li><span className="font-medium">Eligibility:</span> 10+2 (PCM) + JEE Advanced</li>
+                  <li><span className="font-medium">Branches & Seats:</span>
+                    <ul className="ml-4 list-disc">
+                      <li>Computer Science & Engineering: 120</li>
+                      <li>Electrical Engineering: 110</li>
+                      <li>Mechanical Engineering: 100</li>
+                      <li>Chemical Engineering: 80</li>
+                      <li>Civil Engineering: 80</li>
+                      <li>Aerospace Engineering: 60</li>
+                      <li>Materials Science & Engineering: 50</li>
+                      <li>Biological Sciences & Bioengineering: 30</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Annual Fees:</span> ₹2,00,000</li>
+                  <li><span className="font-medium">Total Seats:</span> 800+</li>
+                </ul>
+              </div>
+              {/* M.Tech */}
+              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">M.Tech</h3>
+                <ul className="text-gray-700 text-base space-y-1">
+                  <li><span className="font-medium">Duration:</span> 2 Years</li>
+                  <li><span className="font-medium">Eligibility:</span> B.E./B.Tech + GATE</li>
+                  <li><span className="font-medium">Branches & Seats:</span>
+                    <ul className="ml-4 list-disc">
+                      <li>Computer Science & Engineering: 60</li>
+                      <li>Electrical Engineering: 55</li>
+                      <li>Mechanical Engineering: 50</li>
+                      <li>Chemical Engineering: 40</li>
+                      <li>Civil Engineering: 40</li>
+                      <li>Aerospace Engineering: 30</li>
+                      <li>Environmental Engineering: 20</li>
+                      <li>Materials Science & Engineering: 20</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Annual Fees:</span> ₹1,50,000</li>
+                  <li><span className="font-medium">Total Seats:</span> 400+</li>
+                </ul>
+              </div>
+              {/* MSc */}
+              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">MSc</h3>
+                <ul className="text-gray-700 text-base space-y-1">
+                  <li><span className="font-medium">Duration:</span> 2 Years</li>
+                  <li><span className="font-medium">Eligibility:</span> B.Sc. + JAM</li>
+                  <li><span className="font-medium">Branches & Seats:</span>
+                    <ul className="ml-4 list-disc">
+                      <li>Physics: 60</li>
+                      <li>Chemistry: 50</li>
+                      <li>Mathematics & Statistics: 40</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Annual Fees:</span> ₹50,000</li>
+                  <li><span className="font-medium">Total Seats:</span> 150+</li>
+                </ul>
+              </div>
+              {/* MBA */}
+              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">MBA</h3>
+                <ul className="text-gray-700 text-base space-y-1">
+                  <li><span className="font-medium">Duration:</span> 2 Years</li>
+                  <li><span className="font-medium">Eligibility:</span> UG Degree + CAT</li>
+                  <li><span className="font-medium">Branches & Seats:</span>
+                    <ul className="ml-4 list-disc">
+                      <li>General Management: 40</li>
+                      <li>Analytics: 30</li>
+                      <li>Operations: 10</li>
+                      <li>Marketing: 10</li>
+                      <li>Finance: 5</li>
+                      <li>Human Resource Management: 5</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Annual Fees:</span> ₹2,50,000</li>
+                  <li><span className="font-medium">Total Seats:</span> 100+</li>
+                </ul>
+              </div>
+              {/* Ph.D. */}
+              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">Ph.D.</h3>
+                <ul className="text-gray-700 text-base space-y-1">
+                  <li><span className="font-medium">Duration:</span> 3-5 Years</li>
+                  <li><span className="font-medium">Eligibility:</span> PG Degree + GATE/NET</li>
+                  <li><span className="font-medium">Branches & Seats:</span>
+                    <ul className="ml-4 list-disc">
+                      <li>All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Annual Fees:</span> ₹60,000</li>
+                  <li><span className="font-medium">Total Seats:</span> 200+</li>
+                </ul>
+              </div>
             </div>
           </div>
         );
@@ -431,11 +612,17 @@ const CollegeProfilePage = () => {
             </div>
             <div className="mb-4">
               <h3 className="font-semibold text-blue-800 mb-2 text-lg">Departments</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["faculty"].departments.map((item, idx) => (
-                  <li key={idx}>{item}</li>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-700 text-base">
+                {formData["faculty"].departments.map((dept, idx) => (
+                  <div key={idx}>
+                    <input
+                      className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
+                      value={dept}
+                      onChange={(e) => handleSectionFormArrayChange("departments", idx, e.target.value)}
+                    />
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
             <div>
               <h3 className="font-semibold text-blue-800 mb-2 text-lg">Achievements</h3>
@@ -444,6 +631,202 @@ const CollegeProfilePage = () => {
                   <li key={idx}>{item}</li>
                 ))}
               </ul>
+            </div>
+          </div>
+        );
+      case "downloads":
+        return (
+          <div className="p-6">
+            <div className="flex justify-between items-start mb-2">
+              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-3">
+                <span className="text-3xl">📥</span> Downloads
+              </h2>
+              <button
+                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
+                onClick={() => openSectionForm("downloads")}
+              >
+                Edit
+              </button>
+            </div>
+
+            {/* Forms Section */}
+            <div className="mb-8">
+              <h3 className="font-semibold text-blue-800 mb-4 text-lg">Forms</h3>
+              <div className="grid gap-4">
+                {formData.downloads.forms.map((doc, idx) => (
+                  <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                    <div className="flex-1">
+                      <input
+                        className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                        value={doc.name}
+                        onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, name: e.target.value })}
+                        placeholder="Document Name"
+                      />
+                      <input
+                        className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                        value={doc.description}
+                        onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, description: e.target.value })}
+                        placeholder="Description"
+                      />
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
+                          value={doc.fileSize}
+                          onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, fileSize: e.target.value })}
+                          placeholder="Size"
+                        />
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
+                          value={doc.format}
+                          onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, format: e.target.value })}
+                          placeholder="Format"
+                        />
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
+                          value={doc.url}
+                          onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, url: e.target.value })}
+                          placeholder="Download URL"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Brochures Section */}
+            <div className="mb-8">
+              <h3 className="font-semibold text-blue-800 mb-4 text-lg">Brochures & Catalogs</h3>
+              <div className="grid gap-4">
+                {formData.downloads.brochures.map((doc, idx) => (
+                  <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                    <div className="flex-1">
+                      <input
+                        className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                        value={doc.name}
+                        onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, name: e.target.value })}
+                        placeholder="Document Name"
+                      />
+                      <input
+                        className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                        value={doc.description}
+                        onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, description: e.target.value })}
+                        placeholder="Description"
+                      />
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
+                          value={doc.fileSize}
+                          onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, fileSize: e.target.value })}
+                          placeholder="Size"
+                        />
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
+                          value={doc.format}
+                          onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, format: e.target.value })}
+                          placeholder="Format"
+                        />
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
+                          value={doc.url}
+                          onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, url: e.target.value })}
+                          placeholder="Download URL"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Syllabus Section */}
+            <div className="mb-8">
+              <h3 className="font-semibold text-blue-800 mb-4 text-lg">Course Syllabus</h3>
+              <div className="grid gap-4">
+                {formData.downloads.syllabus.map((doc, idx) => (
+                  <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                    <div className="flex-1">
+                      <input
+                        className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                        value={doc.name}
+                        onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, name: e.target.value })}
+                        placeholder="Document Name"
+                      />
+                      <input
+                        className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                        value={doc.description}
+                        onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, description: e.target.value })}
+                        placeholder="Description"
+                      />
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
+                          value={doc.fileSize}
+                          onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, fileSize: e.target.value })}
+                          placeholder="Size"
+                        />
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
+                          value={doc.format}
+                          onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, format: e.target.value })}
+                          placeholder="Format"
+                        />
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
+                          value={doc.url}
+                          onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, url: e.target.value })}
+                          placeholder="Download URL"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Other Documents Section */}
+            <div>
+              <h3 className="font-semibold text-blue-800 mb-4 text-lg">Other Documents</h3>
+              <div className="grid gap-4">
+                {formData.downloads.other.map((doc, idx) => (
+                  <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                    <div className="flex-1">
+                      <input
+                        className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                        value={doc.name}
+                        onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, name: e.target.value })}
+                        placeholder="Document Name"
+                      />
+                      <input
+                        className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                        value={doc.description}
+                        onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, description: e.target.value })}
+                        placeholder="Description"
+                      />
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
+                          value={doc.fileSize}
+                          onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, fileSize: e.target.value })}
+                          placeholder="Size"
+                        />
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
+                          value={doc.format}
+                          onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, format: e.target.value })}
+                          placeholder="Format"
+                        />
+                        <input
+                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
+                          value={doc.url}
+                          onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, url: e.target.value })}
+                          placeholder="Download URL"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         );
@@ -684,6 +1067,109 @@ const CollegeProfilePage = () => {
                       </li>
                     ))}
                   </ul>
+                </div>
+              </div>
+            )}
+            {showSectionForm === "course-details" && (
+              <div>
+                <h2 className="text-2xl font-bold text-blue-900 mb-4">Course Details</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* B.Tech */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-2">B.Tech</h3>
+                    <ul className="text-gray-700 text-base space-y-1">
+                      <li><span className="font-medium">Duration:</span> 4 Years</li>
+                      <li><span className="font-medium">Eligibility:</span> 10+2 (PCM) + JEE Advanced</li>
+                      <li><span className="font-medium">Branches & Seats:</span>
+                        <ul className="ml-4 list-disc">
+                          <li>Computer Science & Engineering: 120</li>
+                          <li>Electrical Engineering: 110</li>
+                          <li>Mechanical Engineering: 100</li>
+                          <li>Chemical Engineering: 80</li>
+                          <li>Civil Engineering: 80</li>
+                          <li>Aerospace Engineering: 60</li>
+                          <li>Materials Science & Engineering: 50</li>
+                          <li>Biological Sciences & Bioengineering: 30</li>
+                        </ul>
+                      </li>
+                      <li><span className="font-medium">Annual Fees:</span> ₹2,00,000</li>
+                      <li><span className="font-medium">Total Seats:</span> 800+</li>
+                    </ul>
+                  </div>
+                  {/* M.Tech */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-2">M.Tech</h3>
+                    <ul className="text-gray-700 text-base space-y-1">
+                      <li><span className="font-medium">Duration:</span> 2 Years</li>
+                      <li><span className="font-medium">Eligibility:</span> B.E./B.Tech + GATE</li>
+                      <li><span className="font-medium">Branches & Seats:</span>
+                        <ul className="ml-4 list-disc">
+                          <li>Computer Science & Engineering: 60</li>
+                          <li>Electrical Engineering: 55</li>
+                          <li>Mechanical Engineering: 50</li>
+                          <li>Chemical Engineering: 40</li>
+                          <li>Civil Engineering: 40</li>
+                          <li>Aerospace Engineering: 30</li>
+                          <li>Environmental Engineering: 20</li>
+                          <li>Materials Science & Engineering: 20</li>
+                        </ul>
+                      </li>
+                      <li><span className="font-medium">Annual Fees:</span> ₹1,50,000</li>
+                      <li><span className="font-medium">Total Seats:</span> 400+</li>
+                    </ul>
+                  </div>
+                  {/* MSc */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-2">MSc</h3>
+                    <ul className="text-gray-700 text-base space-y-1">
+                      <li><span className="font-medium">Duration:</span> 2 Years</li>
+                      <li><span className="font-medium">Eligibility:</span> B.Sc. + JAM</li>
+                      <li><span className="font-medium">Branches & Seats:</span>
+                        <ul className="ml-4 list-disc">
+                          <li>Physics: 60</li>
+                          <li>Chemistry: 50</li>
+                          <li>Mathematics & Statistics: 40</li>
+                        </ul>
+                      </li>
+                      <li><span className="font-medium">Annual Fees:</span> ₹50,000</li>
+                      <li><span className="font-medium">Total Seats:</span> 150+</li>
+                    </ul>
+                  </div>
+                  {/* MBA */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-2">MBA</h3>
+                    <ul className="text-gray-700 text-base space-y-1">
+                      <li><span className="font-medium">Duration:</span> 2 Years</li>
+                      <li><span className="font-medium">Eligibility:</span> UG Degree + CAT</li>
+                      <li><span className="font-medium">Branches & Seats:</span>
+                        <ul className="ml-4 list-disc">
+                          <li>General Management: 40</li>
+                          <li>Analytics: 30</li>
+                          <li>Operations: 10</li>
+                          <li>Marketing: 10</li>
+                          <li>Finance: 5</li>
+                          <li>Human Resource Management: 5</li>
+                        </ul>
+                      </li>
+                      <li><span className="font-medium">Annual Fees:</span> ₹2,50,000</li>
+                      <li><span className="font-medium">Total Seats:</span> 100+</li>
+                    </ul>
+                  </div>
+                  {/* Ph.D. */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-2">Ph.D.</h3>
+                    <ul className="text-gray-700 text-base space-y-1">
+                      <li><span className="font-medium">Duration:</span> 3-5 Years</li>
+                      <li><span className="font-medium">Eligibility:</span> PG Degree + GATE/NET</li>
+                      <li><span className="font-medium">Branches & Seats:</span>
+                        <ul className="ml-4 list-disc">
+                          <li>All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+</li>
+                        </ul>
+                      </li>
+                      <li><span className="font-medium">Annual Fees:</span> ₹60,000</li>
+                      <li><span className="font-medium">Total Seats:</span> 200+</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}
@@ -1095,70 +1581,230 @@ const CollegeProfilePage = () => {
             {showSectionForm === "faculty" && (
               <div>
                 <div className="mb-6">
-                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-                    Faculty Strength
-                  </h3>
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">Faculty Strength</h3>
                   <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
                     {sectionFormData.strength.map((item, idx) => (
                       <li key={idx}>
                         <input
                           className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
                           value={item}
-                          onChange={(e) =>
-                            handleSectionFormArrayChange(
-                              "strength",
-                              idx,
-                              e.target.value
-                            )
-                          }
+                          onChange={(e) => handleSectionFormArrayChange("strength", idx, e.target.value)}
                         />
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div className="mb-4">
-                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-                    Departments
-                  </h3>
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">Departments</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-700 text-base">
                     {sectionFormData.departments.map((dept, idx) => (
                       <div key={idx}>
                         <input
                           className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
                           value={dept}
-                          onChange={(e) =>
-                            handleSectionFormArrayChange(
-                              "departments",
-                              idx,
-                              e.target.value
-                            )
-                          }
+                          onChange={(e) => handleSectionFormArrayChange("departments", idx, e.target.value)}
                         />
                       </div>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-                    Achievements
-                  </h3>
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">Achievements</h3>
                   <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
                     {sectionFormData.achievements.map((item, idx) => (
                       <li key={idx}>
                         <input
                           className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
                           value={item}
-                          onChange={(e) =>
-                            handleSectionFormArrayChange(
-                              "achievements",
-                              idx,
-                              e.target.value
-                            )
-                          }
+                          onChange={(e) => handleSectionFormArrayChange("achievements", idx, e.target.value)}
                         />
                       </li>
                     ))}
                   </ul>
+                </div>
+              </div>
+            )}
+            {showSectionForm === "downloads" && (
+              <div>
+                {/* Forms Section */}
+                <div className="mb-8">
+                 
+                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">Forms</h3>
+                  <div className="grid gap-4">
+                    {sectionFormData.forms.map((doc, idx) => (
+                      <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                        <div className="flex-1">
+                          <input
+                            className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                            value={doc.name}
+                            onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, name: e.target.value })}
+                            placeholder="Document Name"
+                          />
+                          <input
+                            className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                            value={doc.description}
+                            onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, description: e.target.value })}
+                            placeholder="Description"
+                          />
+                          <div className="flex gap-2 mt-1">
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
+                              value={doc.fileSize}
+                              onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, fileSize: e.target.value })}
+                              placeholder="Size"
+                            />
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
+                              value={doc.format}
+                              onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, format: e.target.value })}
+                              placeholder="Format"
+                            />
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
+                              value={doc.url}
+                              onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, url: e.target.value })}
+                              placeholder="Download URL"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Brochures Section */}
+                <div className="mb-8">
+                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">Brochures & Catalogs</h3>
+                  <div className="grid gap-4">
+                    {sectionFormData.brochures.map((doc, idx) => (
+                      <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                        <div className="flex-1">
+                          <input
+                            className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                            value={doc.name}
+                            onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, name: e.target.value })}
+                            placeholder="Document Name"
+                          />
+                          <input
+                            className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                            value={doc.description}
+                            onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, description: e.target.value })}
+                            placeholder="Description"
+                          />
+                          <div className="flex gap-2 mt-1">
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
+                              value={doc.fileSize}
+                              onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, fileSize: e.target.value })}
+                              placeholder="Size"
+                            />
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
+                              value={doc.format}
+                              onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, format: e.target.value })}
+                              placeholder="Format"
+                            />
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
+                              value={doc.url}
+                              onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, url: e.target.value })}
+                              placeholder="Download URL"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Syllabus Section */}
+                <div className="mb-8">
+                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">Course Syllabus</h3>
+                  <div className="grid gap-4">
+                    {sectionFormData.syllabus.map((doc, idx) => (
+                      <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                        <div className="flex-1">
+                          <input
+                            className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                            value={doc.name}
+                            onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, name: e.target.value })}
+                            placeholder="Document Name"
+                          />
+                          <input
+                            className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                            value={doc.description}
+                            onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, description: e.target.value })}
+                            placeholder="Description"
+                          />
+                          <div className="flex gap-2 mt-1">
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
+                              value={doc.fileSize}
+                              onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, fileSize: e.target.value })}
+                              placeholder="Size"
+                            />
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
+                              value={doc.format}
+                              onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, format: e.target.value })}
+                              placeholder="Format"
+                            />
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
+                              value={doc.url}
+                              onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, url: e.target.value })}
+                              placeholder="Download URL"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Other Documents */}
+                <div>
+                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">Other Documents</h3>
+                  <div className="grid gap-4">
+                    {sectionFormData.other.map((doc, idx) => (
+                      <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                        <div className="flex-1">
+                          <input
+                            className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                            value={doc.name}
+                            onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, name: e.target.value })}
+                            placeholder="Document Name"
+                          />
+                          <input
+                            className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
+                            value={doc.description}
+                            onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, description: e.target.value })}
+                            placeholder="Description"
+                          />
+                          <div className="flex gap-2 mt-1">
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
+                              value={doc.fileSize}
+                              onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, fileSize: e.target.value })}
+                              placeholder="Size"
+                            />
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
+                              value={doc.format}
+                              onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, format: e.target.value })}
+                              placeholder="Format"
+                            />
+                            <input
+                              className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
+                              value={doc.url}
+                              onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, url: e.target.value })}
+                              placeholder="Download URL"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -1181,6 +1827,6 @@ const CollegeProfilePage = () => {
       )}
     </div>
   );
-};
+}
 
 export default CollegeProfilePage;

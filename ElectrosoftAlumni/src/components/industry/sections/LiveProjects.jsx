@@ -13,13 +13,17 @@ import {
   Mail,
   Phone,
   User,
+  Download,
+  Eye,
 } from "lucide-react";
+import jsPDF from "jspdf";
 
 const LiveProjects = () => {
   const [editingId, setEditingId] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [projectsData, setProjectsData] = useState([
     {
@@ -38,6 +42,24 @@ const LiveProjects = () => {
       type: "Development",
       priority: "High",
       postedDate: "2024-01-10",
+      requirements: [
+        "Bachelor's degree in Computer Science or related field",
+        "Minimum 2 years of experience in Python development",
+        "Experience with NLP libraries (NLTK, spaCy, or similar)",
+        "Knowledge of machine learning frameworks (TensorFlow, PyTorch)",
+        "Experience with REST API development and integration",
+        "Understanding of cloud platforms (AWS, Azure, or GCP)",
+      ],
+      deliverables: [
+        "Fully functional chatbot with NLP capabilities",
+        "Integration with existing customer service systems",
+        "Comprehensive documentation and user manual",
+        "Training data and model optimization",
+        "Testing and quality assurance reports",
+        "Deployment guide and maintenance documentation",
+      ],
+      additionalInfo:
+        "This project is part of our digital transformation initiative. The successful candidate will work closely with our customer service team and will have opportunities for skill development in advanced AI technologies. Remote work is acceptable with weekly check-ins.",
     },
     {
       id: 2,
@@ -342,6 +364,203 @@ const LiveProjects = () => {
       }
 
       setApplicationData({ ...applicationData, resume: file });
+    }
+  };
+
+  // View Details handlers
+  const handleViewDetails = (project) => {
+    setSelectedProject(project);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleDetailsModalClose = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedProject(null);
+  };
+
+  const generatePDF = async () => {
+    if (!selectedProject) return;
+
+    try {
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const lineHeight = 7;
+      let currentY = margin;
+
+      // Helper function to add text with word wrapping
+      const addWrappedText = (text, x, y, maxWidth, fontSize = 12) => {
+        pdf.setFontSize(fontSize);
+        const lines = pdf.splitTextToSize(text, maxWidth);
+        lines.forEach((line, index) => {
+          if (y + index * lineHeight > pageHeight - margin) {
+            pdf.addPage();
+            y = margin;
+          }
+          pdf.text(line, x, y + index * lineHeight);
+        });
+        return y + lines.length * lineHeight + 5;
+      };
+
+      // Helper function to add section header
+      const addSectionHeader = (title, y) => {
+        if (y > pageHeight - margin - 20) {
+          pdf.addPage();
+          y = margin;
+        }
+        pdf.setFontSize(16);
+        pdf.setFont(undefined, "bold");
+        pdf.text(title, margin, y);
+        pdf.setFont(undefined, "normal");
+        return y + lineHeight + 3;
+      };
+
+      // Title and company
+      pdf.setFontSize(20);
+      pdf.setFont(undefined, "bold");
+      currentY = addWrappedText(
+        selectedProject.title,
+        margin,
+        currentY,
+        pageWidth - 2 * margin,
+        20
+      );
+
+      pdf.setFontSize(14);
+      pdf.setFont(undefined, "normal");
+      pdf.setTextColor(100, 100, 100);
+      currentY = addWrappedText(
+        `by ${selectedProject.company}`,
+        margin,
+        currentY,
+        pageWidth - 2 * margin,
+        14
+      );
+
+      pdf.setTextColor(0, 0, 0);
+      currentY += 10;
+
+      // Project Overview
+      currentY = addSectionHeader("Project Overview", currentY);
+      currentY = addWrappedText(
+        selectedProject.description,
+        margin,
+        currentY,
+        pageWidth - 2 * margin
+      );
+
+      // Project Details
+      currentY = addSectionHeader("Project Details", currentY);
+
+      const details = [
+        `Type: ${selectedProject.type}`,
+        `Budget: ${selectedProject.budget}`,
+        `Duration: ${selectedProject.duration}`,
+        `Deadline: ${new Date(selectedProject.deadline).toLocaleDateString()}`,
+        `Status: ${selectedProject.status}`,
+        `Priority: ${selectedProject.priority}`,
+        `Posted Date: ${new Date(
+          selectedProject.postedDate
+        ).toLocaleDateString()}`,
+        `Required Candidates: ${selectedProject.requiredCandidates}`,
+        `Current Applicants: ${selectedProject.applicants}`,
+        `Remaining Positions: ${
+          selectedProject.requiredCandidates - selectedProject.applicants
+        }`,
+      ];
+
+      details.forEach((detail) => {
+        currentY = addWrappedText(
+          detail,
+          margin,
+          currentY,
+          pageWidth - 2 * margin
+        );
+      });
+
+      // Skills Required
+      currentY = addSectionHeader("Skills Required", currentY);
+      const skillsText = selectedProject.skillsRequired.join(", ");
+      currentY = addWrappedText(
+        skillsText,
+        margin,
+        currentY,
+        pageWidth - 2 * margin
+      );
+
+      // Requirements (if available)
+      if (
+        selectedProject.requirements &&
+        selectedProject.requirements.length > 0
+      ) {
+        currentY = addSectionHeader("Requirements", currentY);
+        selectedProject.requirements.forEach((requirement, index) => {
+          currentY = addWrappedText(
+            `${index + 1}. ${requirement}`,
+            margin,
+            currentY,
+            pageWidth - 2 * margin
+          );
+        });
+      }
+
+      // Deliverables (if available)
+      if (
+        selectedProject.deliverables &&
+        selectedProject.deliverables.length > 0
+      ) {
+        currentY = addSectionHeader("Deliverables", currentY);
+        selectedProject.deliverables.forEach((deliverable, index) => {
+          currentY = addWrappedText(
+            `${index + 1}. ${deliverable}`,
+            margin,
+            currentY,
+            pageWidth - 2 * margin
+          );
+        });
+      }
+
+      // Additional Information (if available)
+      if (selectedProject.additionalInfo) {
+        currentY = addSectionHeader("Additional Information", currentY);
+        currentY = addWrappedText(
+          selectedProject.additionalInfo,
+          margin,
+          currentY,
+          pageWidth - 2 * margin
+        );
+      }
+
+      // Footer
+      if (currentY > pageHeight - margin - 30) {
+        pdf.addPage();
+        currentY = margin;
+      }
+
+      currentY = pageHeight - margin - 15;
+      pdf.setFontSize(10);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text(
+        `Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+        margin,
+        currentY
+      );
+      pdf.text(
+        `ElectroSoft Alumni Platform - Live Projects`,
+        margin,
+        currentY + 5
+      );
+
+      // Download the PDF
+      pdf.save(
+        `${selectedProject.title
+          .replace(/[^a-z0-9]/gi, "_")
+          .toLowerCase()}_details.pdf`
+      );
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Error generating PDF. Please try again.");
     }
   };
 
@@ -664,11 +883,13 @@ const LiveProjects = () => {
                     {new Date(project.postedDate).toLocaleDateString()}
                   </div>
                   <div className="flex space-x-3">
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                      Save Project
-                    </button>
-                    <button className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors">
-                      View Details
+                    
+                    <button
+                      onClick={() => handleViewDetails(project)}
+                      className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors flex items-center space-x-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>View Details</span>
                     </button>
                     <button
                       onClick={() => handleApplyNow(project)}
@@ -1396,6 +1617,282 @@ const LiveProjects = () => {
               >
                 Post Project
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Details Modal */}
+      {isDetailsModalOpen && selectedProject && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Project Details
+                </h2>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={generatePDF}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download PDF</span>
+                  </button>
+                  <button
+                    onClick={handleDetailsModalClose}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="project-details-content" className="p-6">
+              {/* Project Header */}
+              <div className="mb-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                      {selectedProject.title}
+                    </h1>
+                    <p className="text-lg text-gray-600 mb-2">
+                      {selectedProject.company}
+                    </p>
+                    <div className="flex items-center space-x-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                          selectedProject.status
+                        )}`}
+                      >
+                        {selectedProject.status}
+                      </span>
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(
+                          selectedProject.priority
+                        )}`}
+                      >
+                        {selectedProject.priority} Priority
+                      </span>
+                      <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
+                        {selectedProject.type}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Project Description */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Project Description
+                </h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {selectedProject.description}
+                </p>
+              </div>
+
+              {/* Project Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <DollarSign className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">
+                        Budget
+                      </p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {selectedProject.budget}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Clock className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">
+                        Duration
+                      </p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {selectedProject.duration}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Calendar className="w-5 h-5 text-orange-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">
+                        Deadline
+                      </p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {new Date(selectedProject.deadline).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <Users className="w-5 h-5 text-purple-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">
+                        Required Candidates
+                      </p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {selectedProject.requiredCandidates}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">
+                        Current Applicants
+                      </p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {selectedProject.applicants}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Calendar className="w-5 h-5 text-gray-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">
+                        Posted Date
+                      </p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {new Date(
+                          selectedProject.postedDate
+                        ).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Skills Required */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Skills Required
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedProject.skillsRequired.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-4 py-2 bg-blue-100 text-blue-800 text-sm font-medium rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Application Progress */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Application Progress
+                </h3>
+                <div className="bg-gray-200 rounded-full h-3 mb-2">
+                  <div
+                    className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(
+                        (selectedProject.applicants /
+                          selectedProject.requiredCandidates) *
+                          100,
+                        100
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>{selectedProject.applicants} applied</span>
+                  <span>{selectedProject.requiredCandidates} needed</span>
+                </div>
+                {selectedProject.applicants >=
+                  selectedProject.requiredCandidates && (
+                  <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-800 text-sm font-medium">
+                      🎉 All positions have been filled for this project!
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Contact Information */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Project Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-600">Project ID:</p>
+                    <p className="font-medium text-gray-900">
+                      PRJ-{selectedProject.id.toString().padStart(4, "0")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Category:</p>
+                    <p className="font-medium text-gray-900">
+                      {selectedProject.type}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Status:</p>
+                    <p className="font-medium text-gray-900">
+                      {selectedProject.status}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Priority Level:</p>
+                    <p className="font-medium text-gray-900">
+                      {selectedProject.priority}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                Last updated:{" "}
+                {new Date().toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
+              <div className="flex space-x-3">
+                {selectedProject.applicants <
+                  selectedProject.requiredCandidates && (
+                  <button
+                    onClick={() => {
+                      handleDetailsModalClose();
+                      handleApplyNow(selectedProject);
+                    }}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Apply Now
+                  </button>
+                )}
+                <button
+                  onClick={handleDetailsModalClose}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

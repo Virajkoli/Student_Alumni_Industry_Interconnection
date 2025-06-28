@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { Edit3, User, Calendar, Play, MessageCircle, X } from "lucide-react";
+import {
+  Edit3,
+  User,
+  Calendar,
+  Play,
+  MessageCircle,
+  X,
+  Plus,
+} from "lucide-react";
 
 const ExpertOpinionsInterview = () => {
   const [editingId, setEditingId] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [interviews, setInterviews] = useState([
     {
       id: 1,
@@ -57,6 +66,16 @@ const ExpertOpinionsInterview = () => {
     tags: "",
   });
 
+  const [addData, setAddData] = useState({
+    title: "",
+    expert: "",
+    role: "",
+    type: "Video Interview",
+    duration: "",
+    description: "",
+    tags: "",
+  });
+
   const handleEdit = (interview) => {
     setEditingId(interview.id);
     setIsEditModalOpen(true);
@@ -95,6 +114,52 @@ const ExpertOpinionsInterview = () => {
     setEditData({ title: "", expert: "", role: "", description: "", tags: "" });
   };
 
+  const handleAdd = () => {
+    const newId = Math.max(...interviews.map((interview) => interview.id)) + 1;
+    const newInterview = {
+      id: newId,
+      title: addData.title,
+      expert: addData.expert,
+      role: addData.role,
+      date: new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      type: addData.type,
+      duration: addData.duration,
+      description: addData.description,
+      tags: addData.tags.split(",").map((tag) => tag.trim()),
+      views: "0",
+      likes: "0",
+    };
+
+    setInterviews([newInterview, ...interviews]);
+    setIsAddModalOpen(false);
+    setAddData({
+      title: "",
+      expert: "",
+      role: "",
+      type: "Video Interview",
+      duration: "",
+      description: "",
+      tags: "",
+    });
+  };
+
+  const handleAddCancel = () => {
+    setIsAddModalOpen(false);
+    setAddData({
+      title: "",
+      expert: "",
+      role: "",
+      type: "Video Interview",
+      duration: "",
+      description: "",
+      tags: "",
+    });
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -106,8 +171,12 @@ const ExpertOpinionsInterview = () => {
             Gain insights from industry leaders and experts
           </p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          Add New Interview
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Interview</span>
         </button>
       </div>
 
@@ -224,6 +293,154 @@ const ExpertOpinionsInterview = () => {
         </div>
       )}
 
+      {/* Add Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Add New Interview
+                </h2>
+                <button
+                  onClick={handleAddCancel}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Interview Title
+                </label>
+                <input
+                  type="text"
+                  value={addData.title}
+                  onChange={(e) =>
+                    setAddData({ ...addData, title: e.target.value })
+                  }
+                  placeholder="Enter interview title"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Expert Name
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.expert}
+                    onChange={(e) =>
+                      setAddData({ ...addData, expert: e.target.value })
+                    }
+                    placeholder="Enter expert name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Role/Position
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.role}
+                    onChange={(e) =>
+                      setAddData({ ...addData, role: e.target.value })
+                    }
+                    placeholder="Enter expert's role/position"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Interview Type
+                  </label>
+                  <select
+                    value={addData.type}
+                    onChange={(e) =>
+                      setAddData({ ...addData, type: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="Video Interview">Video Interview</option>
+                    <option value="Written Interview">Written Interview</option>
+                    <option value="Panel Discussion">Panel Discussion</option>
+                    <option value="Podcast">Podcast</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duration
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.duration}
+                    onChange={(e) =>
+                      setAddData({ ...addData, duration: e.target.value })
+                    }
+                    placeholder="e.g., 45 min, 15 min read"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={addData.description}
+                  onChange={(e) =>
+                    setAddData({ ...addData, description: e.target.value })
+                  }
+                  rows={4}
+                  placeholder="Enter interview description"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tags (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={addData.tags}
+                  onChange={(e) =>
+                    setAddData({ ...addData, tags: e.target.value })
+                  }
+                  placeholder="AI, Healthcare, Innovation"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={handleAddCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAdd}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Add Interview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-6">
         {interviews.map((interview) => (
           <div
@@ -251,9 +468,7 @@ const ExpertOpinionsInterview = () => {
                       <span>{interview.duration}</span>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">
-                    {interview.role}
-                  </p>
+                  <p className="text-sm text-gray-600 mb-1">{interview.role}</p>
                 </div>
                 <button
                   onClick={() => handleEdit(interview)}

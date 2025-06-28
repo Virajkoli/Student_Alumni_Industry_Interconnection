@@ -2,11 +2,13 @@ import React, { useState } from "react";
 
 const NAV_OPTIONS_DEFAULT = [
   { id: "college-info", name: "College Info" },
+  { id: "course-details", name: "Course Details" }, // Added Course Details as a separate tab
   { id: "course-fees", name: "Course Fees" },
   { id: "review", name: "Review" },
   { id: "admission", name: "Admission" },
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
+  { id: "downloads", name: "Downloads" },
 ];
 
 const QUICK_STATS_DEFAULT = [
@@ -17,7 +19,7 @@ const QUICK_STATS_DEFAULT = [
 ];
 
 const CollegeProfileHeader = ({
-  name = "Electrosoft College of Engineering",
+  name = "IIT Kanpur",
   location = "Your City, State",
   logo = "/college-logo.png",
   background = "/college-bg.jpg",

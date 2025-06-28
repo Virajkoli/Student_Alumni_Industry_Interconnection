@@ -8,11 +8,19 @@ import {
   CheckCircle,
   AlertCircle,
   X,
+  Upload,
+  FileText,
+  Mail,
+  Phone,
+  User,
 } from "lucide-react";
 
 const LiveProjects = () => {
   const [editingId, setEditingId] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+  const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [projectsData, setProjectsData] = useState([
     {
       id: 1,
@@ -26,6 +34,7 @@ const LiveProjects = () => {
       skillsRequired: ["Python", "NLP", "Machine Learning", "API Integration"],
       status: "Open",
       applicants: 24,
+      requiredCandidates: 30,
       type: "Development",
       priority: "High",
       postedDate: "2024-01-10",
@@ -47,6 +56,7 @@ const LiveProjects = () => {
       ],
       status: "In Progress",
       applicants: 18,
+      requiredCandidates: 25,
       type: "Analytics",
       priority: "Medium",
       postedDate: "2024-01-05",
@@ -68,6 +78,7 @@ const LiveProjects = () => {
       ],
       status: "Open",
       applicants: 31,
+      requiredCandidates: 40,
       type: "Hardware",
       priority: "High",
       postedDate: "2024-01-12",
@@ -84,6 +95,32 @@ const LiveProjects = () => {
     skillsRequired: "",
     type: "",
     priority: "",
+    requiredCandidates: "",
+  });
+
+  const [newProjectData, setNewProjectData] = useState({
+    title: "",
+    company: "",
+    description: "",
+    budget: "",
+    duration: "",
+    deadline: "",
+    skillsRequired: "",
+    type: "",
+    priority: "",
+    requiredCandidates: "",
+  });
+
+  const [applicationData, setApplicationData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    experience: "",
+    skills: "",
+    portfolio: "",
+    coverLetter: "",
+    resume: null,
+    availability: "",
   });
 
   const handleEdit = (project) => {
@@ -98,6 +135,7 @@ const LiveProjects = () => {
       skillsRequired: project.skillsRequired.join(", "),
       type: project.type,
       priority: project.priority,
+      requiredCandidates: project.requiredCandidates.toString(),
     });
     setIsEditModalOpen(true);
   };
@@ -115,6 +153,7 @@ const LiveProjects = () => {
       skillsRequired: "",
       type: "",
       priority: "",
+      requiredCandidates: "",
     });
   };
 
@@ -135,6 +174,7 @@ const LiveProjects = () => {
                 .map((skill) => skill.trim()),
               type: editData.type,
               priority: editData.priority,
+              requiredCandidates: parseInt(editData.requiredCandidates) || 0,
             }
           : project
       )
@@ -151,7 +191,63 @@ const LiveProjects = () => {
       skillsRequired: "",
       type: "",
       priority: "",
+      requiredCandidates: "",
     });
+  };
+
+  // New project handlers
+  const handleNewProject = () => {
+    setIsNewProjectModalOpen(true);
+  };
+
+  const handleNewProjectCancel = () => {
+    setIsNewProjectModalOpen(false);
+    setNewProjectData({
+      title: "",
+      company: "",
+      description: "",
+      budget: "",
+      duration: "",
+      deadline: "",
+      skillsRequired: "",
+      type: "",
+      priority: "",
+      requiredCandidates: "",
+    });
+  };
+
+  const handleNewProjectSubmit = () => {
+    // Generate new project ID
+    const newId = Math.max(...projectsData.map((p) => p.id)) + 1;
+
+    // Create new project object
+    const newProject = {
+      id: newId,
+      title: newProjectData.title,
+      company: newProjectData.company,
+      description: newProjectData.description,
+      budget: newProjectData.budget,
+      duration: newProjectData.duration,
+      deadline: newProjectData.deadline,
+      skillsRequired: newProjectData.skillsRequired
+        .split(",")
+        .map((skill) => skill.trim()),
+      status: "Open",
+      applicants: 0,
+      requiredCandidates: parseInt(newProjectData.requiredCandidates) || 0,
+      type: newProjectData.type,
+      priority: newProjectData.priority,
+      postedDate: new Date().toISOString().split("T")[0],
+    };
+
+    // Add to projects list
+    setProjectsData([...projectsData, newProject]);
+
+    // Close modal and reset form
+    handleNewProjectCancel();
+
+    // Show success message
+    alert("Project posted successfully!");
   };
 
   const getStatusColor = (status) => {
@@ -182,6 +278,73 @@ const LiveProjects = () => {
     }
   };
 
+  // Application handlers
+  const handleApplyNow = (project) => {
+    setSelectedProject(project);
+    setIsApplicationModalOpen(true);
+  };
+
+  const handleApplicationCancel = () => {
+    setIsApplicationModalOpen(false);
+    setSelectedProject(null);
+    setApplicationData({
+      fullName: "",
+      email: "",
+      phone: "",
+      experience: "",
+      skills: "",
+      portfolio: "",
+      coverLetter: "",
+      resume: null,
+      availability: "",
+    });
+  };
+
+  const handleApplicationSubmit = () => {
+    // Update the project's applicants count
+    setProjectsData(
+      projectsData.map((project) =>
+        project.id === selectedProject.id
+          ? { ...project, applicants: project.applicants + 1 }
+          : project
+      )
+    );
+
+    // Here you would typically send the application data to your backend
+    console.log("Application submitted:", {
+      projectId: selectedProject.id,
+      applicationData,
+    });
+
+    // Close modal and reset form
+    handleApplicationCancel();
+
+    // Show success message (you could add a toast notification here)
+    alert("Application submitted successfully!");
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = [".pdf", ".doc", ".docx"];
+      const fileExtension = "." + file.name.split(".").pop().toLowerCase();
+
+      if (!allowedTypes.includes(fileExtension)) {
+        alert("Please upload a PDF, DOC, or DOCX file.");
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size should be less than 5MB.");
+        return;
+      }
+
+      setApplicationData({ ...applicationData, resume: file });
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -193,7 +356,10 @@ const LiveProjects = () => {
             Collaborate on real-world projects and solve industry challenges
           </p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+        <button
+          onClick={handleNewProject}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
           Post New Project
         </button>
       </div>
@@ -344,6 +510,24 @@ const LiveProjects = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Required Candidates
+                    </label>
+                    <input
+                      type="number"
+                      value={editData.requiredCandidates}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          requiredCandidates: e.target.value,
+                        })
+                      }
+                      placeholder="30"
+                      min="1"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
                   <div className="flex space-x-3 pt-2">
                     <button
                       onClick={handleSave}
@@ -401,7 +585,7 @@ const LiveProjects = () => {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm text-gray-600 mb-4">
                       <div className="flex items-center space-x-1">
                         <DollarSign className="w-4 h-4" />
                         <span>{project.budget}</span>
@@ -419,6 +603,36 @@ const LiveProjects = () => {
                       <div className="flex items-center space-x-1">
                         <Users className="w-4 h-4" />
                         <span>{project.applicants} applicants</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <CheckCircle className="w-4 h-4" />
+                        <span>
+                          {project.requiredCandidates - project.applicants}{" "}
+                          positions left
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Positions Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Positions Filled</span>
+                        <span>
+                          {project.applicants}/{project.requiredCandidates}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          style={{
+                            width: `${Math.min(
+                              (project.applicants /
+                                project.requiredCandidates) *
+                                100,
+                              100
+                            )}%`,
+                          }}
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -456,8 +670,20 @@ const LiveProjects = () => {
                     <button className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors">
                       View Details
                     </button>
-                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                      Apply Now
+                    <button
+                      onClick={() => handleApplyNow(project)}
+                      className={`px-6 py-2 rounded-lg transition-colors ${
+                        project.applicants >= project.requiredCandidates
+                          ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                          : "bg-blue-600 text-white hover:bg-blue-700"
+                      }`}
+                      disabled={
+                        project.applicants >= project.requiredCandidates
+                      }
+                    >
+                      {project.applicants >= project.requiredCandidates
+                        ? "Positions Filled"
+                        : "Apply Now"}
                     </button>
                   </div>
                 </div>
@@ -623,6 +849,24 @@ const LiveProjects = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Required Candidates
+                </label>
+                <input
+                  type="number"
+                  value={editData.requiredCandidates}
+                  onChange={(e) =>
+                    setEditData({
+                      ...editData,
+                      requiredCandidates: e.target.value,
+                    })
+                  }
+                  placeholder="30"
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
             </div>
 
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
@@ -637,6 +881,520 @@ const LiveProjects = () => {
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Application Modal */}
+      {isApplicationModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Apply for {selectedProject?.title}
+                </h2>
+                <button
+                  onClick={handleApplicationCancel}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Project Info Summary */}
+              {selectedProject && (
+                <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                  <h3 className="font-medium text-gray-900 mb-2">
+                    Project Details
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Company:</span>
+                      <span className="ml-2 font-medium">
+                        {selectedProject.company}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Budget:</span>
+                      <span className="ml-2 font-medium">
+                        {selectedProject.budget}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Duration:</span>
+                      <span className="ml-2 font-medium">
+                        {selectedProject.duration}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Registered:</span>
+                      <span className="ml-2 font-medium">
+                        {selectedProject.applicants}/
+                        {selectedProject.requiredCandidates} candidates
+                      </span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-gray-600">
+                        Remaining Positions:
+                      </span>
+                      <span className="ml-2 font-medium text-green-600">
+                        {selectedProject.requiredCandidates -
+                          selectedProject.applicants}{" "}
+                        positions available
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Application form fields */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={applicationData.fullName}
+                  onChange={(e) =>
+                    setApplicationData({
+                      ...applicationData,
+                      fullName: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={applicationData.email}
+                  onChange={(e) =>
+                    setApplicationData({
+                      ...applicationData,
+                      email: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  value={applicationData.phone}
+                  onChange={(e) =>
+                    setApplicationData({
+                      ...applicationData,
+                      phone: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Experience (in years)
+                </label>
+                <input
+                  type="number"
+                  value={applicationData.experience}
+                  onChange={(e) =>
+                    setApplicationData({
+                      ...applicationData,
+                      experience: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Skills
+                </label>
+                <input
+                  type="text"
+                  value={applicationData.skills}
+                  onChange={(e) =>
+                    setApplicationData({
+                      ...applicationData,
+                      skills: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. Python, Data Analysis"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Portfolio URL
+                </label>
+                <input
+                  type="url"
+                  value={applicationData.portfolio}
+                  onChange={(e) =>
+                    setApplicationData({
+                      ...applicationData,
+                      portfolio: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Cover Letter
+                </label>
+                <textarea
+                  value={applicationData.coverLetter}
+                  onChange={(e) =>
+                    setApplicationData({
+                      ...applicationData,
+                      coverLetter: e.target.value,
+                    })
+                  }
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Resume *
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-colors">
+                  <input
+                    type="file"
+                    onChange={handleFileUpload}
+                    accept=".pdf,.doc,.docx"
+                    className="hidden"
+                    id="resume-upload"
+                  />
+                  <label
+                    htmlFor="resume-upload"
+                    className="flex flex-col items-center justify-center cursor-pointer"
+                  >
+                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-600">
+                      {applicationData.resume ? (
+                        <div className="text-center">
+                          <div className="text-green-600 font-medium">
+                            {applicationData.resume.name}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {(
+                              applicationData.resume.size /
+                              1024 /
+                              1024
+                            ).toFixed(2)}{" "}
+                            MB
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <div>Click to upload your resume</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            PDF, DOC, DOCX (max 5MB)
+                          </div>
+                        </div>
+                      )}
+                    </span>
+                  </label>
+                  {applicationData.resume && (
+                    <div className="mt-2 text-center">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setApplicationData({
+                            ...applicationData,
+                            resume: null,
+                          })
+                        }
+                        className="text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove file
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Availability
+                </label>
+                <input
+                  type="text"
+                  value={applicationData.availability}
+                  onChange={(e) =>
+                    setApplicationData({
+                      ...applicationData,
+                      availability: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. Immediately, 2 weeks notice"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={handleApplicationCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApplicationSubmit}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Submit Application
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Project Modal */}
+      {isNewProjectModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Post New Project
+              </h3>
+              <button
+                onClick={handleNewProjectCancel}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Project Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={newProjectData.title}
+                    onChange={(e) =>
+                      setNewProjectData({
+                        ...newProjectData,
+                        title: e.target.value,
+                      })
+                    }
+                    placeholder="Enter project title"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Company *
+                  </label>
+                  <input
+                    type="text"
+                    value={newProjectData.company}
+                    onChange={(e) =>
+                      setNewProjectData({
+                        ...newProjectData,
+                        company: e.target.value,
+                      })
+                    }
+                    placeholder="Company name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Description *
+                </label>
+                <textarea
+                  value={newProjectData.description}
+                  onChange={(e) =>
+                    setNewProjectData({
+                      ...newProjectData,
+                      description: e.target.value,
+                    })
+                  }
+                  rows={4}
+                  placeholder="Describe the project requirements and objectives"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Budget *
+                  </label>
+                  <input
+                    type="text"
+                    value={newProjectData.budget}
+                    onChange={(e) =>
+                      setNewProjectData({
+                        ...newProjectData,
+                        budget: e.target.value,
+                      })
+                    }
+                    placeholder="e.g. ₹5-10 Lakhs"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Duration *
+                  </label>
+                  <input
+                    type="text"
+                    value={newProjectData.duration}
+                    onChange={(e) =>
+                      setNewProjectData({
+                        ...newProjectData,
+                        duration: e.target.value,
+                      })
+                    }
+                    placeholder="e.g. 3 months"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Deadline *
+                  </label>
+                  <input
+                    type="date"
+                    value={newProjectData.deadline}
+                    onChange={(e) =>
+                      setNewProjectData({
+                        ...newProjectData,
+                        deadline: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Required Skills *
+                </label>
+                <input
+                  type="text"
+                  value={newProjectData.skillsRequired}
+                  onChange={(e) =>
+                    setNewProjectData({
+                      ...newProjectData,
+                      skillsRequired: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. Python, Machine Learning, API Integration (comma separated)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Project Type *
+                  </label>
+                  <select
+                    value={newProjectData.type}
+                    onChange={(e) =>
+                      setNewProjectData({
+                        ...newProjectData,
+                        type: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select type</option>
+                    <option value="Development">Development</option>
+                    <option value="Analytics">Analytics</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="Research">Research</option>
+                    <option value="Design">Design</option>
+                    <option value="Consulting">Consulting</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Priority *
+                  </label>
+                  <select
+                    value={newProjectData.priority}
+                    onChange={(e) =>
+                      setNewProjectData({
+                        ...newProjectData,
+                        priority: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select priority</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Required Candidates *
+                  </label>
+                  <input
+                    type="number"
+                    value={newProjectData.requiredCandidates}
+                    onChange={(e) =>
+                      setNewProjectData({
+                        ...newProjectData,
+                        requiredCandidates: e.target.value,
+                      })
+                    }
+                    placeholder="Number of candidates needed"
+                    min="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={handleNewProjectCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleNewProjectSubmit}
+                disabled={
+                  !newProjectData.title ||
+                  !newProjectData.company ||
+                  !newProjectData.description ||
+                  !newProjectData.budget ||
+                  !newProjectData.duration ||
+                  !newProjectData.deadline ||
+                  !newProjectData.skillsRequired ||
+                  !newProjectData.type ||
+                  !newProjectData.priority ||
+                  !newProjectData.requiredCandidates
+                }
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Post Project
               </button>
             </div>
           </div>

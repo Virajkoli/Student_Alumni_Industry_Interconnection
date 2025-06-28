@@ -41,6 +41,11 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
       description: "Industry sectors and categories",
     },
     {
+      id: "live-projects",
+      name: "Live Projects",
+      description: "Live industry projects",
+    },
+    {
       id: "job-career-opportunities",
       name: "Job Career Opportunities",
       description: "Jobs and career paths",
@@ -67,16 +72,11 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
       description: "Polls and comments",
     },
     // { id: "internship-training-requests", name: "Internship or Training Requests",  description: "Request internships or training" },
-    {
-      id: "live-projects",
-      name: "Live Projects",
-      description: "Live industry projects",
-    },
-    {
-      id: "upload-project",
-      name: "Upload Project",
-      description: "Upload your project",
-    },
+    // {
+    //   id: "upload-project",
+    //   name: "Upload Project",
+    //   description: "Upload your project",
+    // },
   ];
 
   const handleItemClick = (item) => {
@@ -154,7 +154,7 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
                 <MapPin className="w-4 h-4 mr-2 text-gray-400" />
                 {profileData.location}, {profileData.city}
               </div>
-              
+
               {/* Simple Stats */}
               <div className="flex items-center gap-6 mt-4 text-sm text-gray-600">
                 <div className="flex items-center gap-1">
@@ -180,7 +180,10 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
         </div>
         {/* Navigation Items - Horizontal LinkedIn Style */}
         <div className="bg-white border-b border-gray-200">
-          <div className="flex overflow-x-auto px-2" style={styles.hideScrollbar}>
+          <div
+            className="flex overflow-x-auto px-2"
+            style={styles.hideScrollbar}
+          >
             {navigationItems.map((item) => (
               <button
                 key={item.id}

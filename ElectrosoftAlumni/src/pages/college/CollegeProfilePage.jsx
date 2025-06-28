@@ -367,6 +367,24 @@ const CollegeProfilePage = () => {
                   <li><span className="font-medium">Total Seats:</span> 400+</li>
                 </ul>
               </div>
+              {/* B.Sc. */}
+              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">B.Sc.</h3>
+                <ul className="text-gray-700 text-base space-y-1">
+                  <li><span className="font-medium">Duration:</span> 3 Years</li>
+                  <li><span className="font-medium">Eligibility:</span> 10+2 (PCM/PCB) + IIT JAM</li>
+                  <li><span className="font-medium">Branches & Seats:</span>
+                    <ul className="ml-4 list-disc">
+                      <li>Physics: 50</li>
+                      <li>Chemistry: 50</li>
+                      <li>Mathematics: 50</li>
+                      <li>Biology: 50</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Annual Fees:</span> ₹50,000</li>
+                  <li><span className="font-medium">Total Seats:</span> 200+</li>
+                </ul>
+              </div>
               {/* MSc */}
               <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
                 <h3 className="text-lg font-semibold text-blue-800 mb-2">MSc</h3>
@@ -1116,6 +1134,24 @@ const CollegeProfilePage = () => {
                       </li>
                       <li><span className="font-medium">Annual Fees:</span> ₹1,50,000</li>
                       <li><span className="font-medium">Total Seats:</span> 400+</li>
+                    </ul>
+                  </div>
+                  {/* B.Sc. */}
+                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-2">B.Sc.</h3>
+                    <ul className="text-gray-700 text-base space-y-1">
+                      <li><span className="font-medium">Duration:</span> 3 Years</li>
+                      <li><span className="font-medium">Eligibility:</span> 10+2 (PCM/PCB) + IIT JAM</li>
+                      <li><span className="font-medium">Branches & Seats:</span>
+                        <ul className="ml-4 list-disc">
+                          <li>Physics: 50</li>
+                          <li>Chemistry: 50</li>
+                          <li>Mathematics: 50</li>
+                          <li>Biology: 50</li>
+                        </ul>
+                      </li>
+                      <li><span className="font-medium">Annual Fees:</span> ₹50,000</li>
+                      <li><span className="font-medium">Total Seats:</span> 200+</li>
                     </ul>
                   </div>
                   {/* MSc */}

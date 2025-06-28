@@ -169,134 +169,145 @@ const SectorCategory = () => {
 
   const getColorClasses = (color) => {
     const colors = {
-      blue: "from-blue-500 to-blue-600",
-      green: "from-green-500 to-green-600",
-      red: "from-red-500 to-red-600",
-      purple: "from-purple-500 to-purple-600",
-      emerald: "from-emerald-500 to-emerald-600",
-      orange: "from-orange-500 to-orange-600",
+      blue: {
+        gradient: "from-blue-500 to-blue-600",
+        bg: "bg-blue-50",
+        text: "text-blue-600",
+        border: "border-blue-200",
+        hover: "group-hover:bg-blue-100",
+      },
+      green: {
+        gradient: "from-green-500 to-green-600",
+        bg: "bg-green-50",
+        text: "text-green-600",
+        border: "border-green-200",
+        hover: "group-hover:bg-green-100",
+      },
+      red: {
+        gradient: "from-red-500 to-red-600",
+        bg: "bg-red-50",
+        text: "text-red-600",
+        border: "border-red-200",
+        hover: "group-hover:bg-red-100",
+      },
+      purple: {
+        gradient: "from-purple-500 to-purple-600",
+        bg: "bg-purple-50",
+        text: "text-purple-600",
+        border: "border-purple-200",
+        hover: "group-hover:bg-purple-100",
+      },
+      emerald: {
+        gradient: "from-emerald-500 to-emerald-600",
+        bg: "bg-emerald-50",
+        text: "text-emerald-600",
+        border: "border-emerald-200",
+        hover: "group-hover:bg-emerald-100",
+      },
+      orange: {
+        gradient: "from-orange-500 to-orange-600",
+        bg: "bg-orange-50",
+        text: "text-orange-600",
+        border: "border-orange-200",
+        hover: "group-hover:bg-orange-100",
+      },
     };
     return colors[color] || colors.blue;
   };
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      {/* Header Section - More minimal and clean */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-6">
+      {/* Header Section - Clean and Professional */}
+      <div className="mb-10">
+        <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">Industry Sectors</h2>
-            <p className="text-gray-600 mt-1">Overview of key industry sectors and their performance</p>
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Industry Sectors</h2>
+            
           </div>
           <button
             onClick={handleAddNew}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors gap-2"
+            className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 mr-1.5" />
             Add Sector
           </button>
         </div>
-
-        {/* Summary Stats - More subtle and inline */}
-        <div className="flex flex-wrap gap-8">
-          <div className="flex items-center gap-3">
-            <Building2 className="w-5 h-5 text-blue-600" />
-            <div>
-              <p className="text-2xl font-semibold text-gray-900">
-                {sectors.reduce((sum, s) => sum + s.companies, 0).toLocaleString()}
-              </p>
-              <p className="text-sm text-gray-500">Companies</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Users className="w-5 h-5 text-blue-600" />
-            <div>
-              <p className="text-2xl font-semibold text-gray-900">19.6M</p>
-              <p className="text-sm text-gray-500">Employees</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Globe className="w-5 h-5 text-blue-600" />
-            <div>
-              <p className="text-2xl font-semibold text-gray-900">{sectors.length}</p>
-              <p className="text-sm text-gray-500">Sectors</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <ChartBar className="w-5 h-5 text-blue-600" />
-            <div>
-              <p className="text-2xl font-semibold text-gray-900">15.2%</p>
-              <p className="text-sm text-gray-500">Avg Growth</p>
-            </div>
-          </div>
-        </div>
+        
+       
       </div>
 
-      {/* Sectors Grid - More minimal and elegant */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Sectors Grid - 2 cards per row */}
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         {sectors.map((sector) => (
           <div
             key={sector.id}
-            className="group relative bg-white rounded-lg p-6 hover:shadow-lg transition-shadow duration-200"
+            className="bg-white rounded-xl border border-gray-200 hover:border-indigo-500 transition-all duration-200 group"
           >
-            {/* Sector Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${getColorClasses(sector.color)} flex items-center justify-center text-2xl`}>
-                  {sector.icon}
+            {/* Card Header */}
+            <div className="p-6 space-y-4">
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-4">
+                  <div className="text-3xl bg-gray-50 p-3 rounded-lg">{sector.icon}</div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {sector.name}
+                    </h3>
+                    <div className="inline-flex items-center mt-2 text-sm text-emerald-600 font-medium bg-emerald-50 px-2.5 py-1 rounded-full">
+                      <TrendingUp className="w-4 h-4 mr-1.5" />
+                      {sector.growth} Growth
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{sector.name}</h3>
-                  <div className="flex items-center mt-1">
-                    <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                    <span className="text-sm font-medium text-green-600">{sector.growth}</span>
+                <button
+                  onClick={() => handleEditClick(sector)}
+                  className="p-2 text-gray-400 hover:text-indigo-600 rounded-full hover:bg-gray-50"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </button>
+              </div>
+
+              <p className="text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-4">
+                {sector.description}
+              </p>
+
+              {/* Stats */}
+              <div className="flex items-center gap-8">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {sector.companies.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-500">Companies</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {sector.employment}
+                    </div>
+                    <div className="text-xs text-gray-500">Employees</div>
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => handleEditClick(sector)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <Edit3 className="w-4 h-4" />
-              </button>
-            </div>
 
-            {/* Description */}
-            <p className="text-gray-600 text-sm mb-4 line-clamp-2">{sector.description}</p>
-
-            {/* Key Stats */}
-            <div className="flex gap-4 mb-4">
-              <div>
-                <div className="flex items-center text-gray-500 text-sm mb-1">
-                  <Building2 className="w-4 h-4 mr-1" />
-                  Companies
+              {/* Major Cities */}
+              <div className="border-t border-gray-100 pt-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <MapPin className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700">Major Hubs</span>
                 </div>
-                <p className="font-semibold text-gray-900">{sector.companies.toLocaleString()}</p>
-              </div>
-              <div>
-                <div className="flex items-center text-gray-500 text-sm mb-1">
-                  <Users className="w-4 h-4 mr-1" />
-                  Employment
+                <div className="flex flex-wrap gap-2">
+                  {sector.majorCities.map((city, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 rounded-full bg-gray-50 text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      {city}
+                    </span>
+                  ))}
                 </div>
-                <p className="font-semibold text-gray-900">{sector.employment}</p>
-              </div>
-            </div>
-
-            {/* Cities */}
-            <div>
-              <div className="flex items-center text-gray-500 text-sm mb-2">
-                <MapPin className="w-4 h-4 mr-1" />
-                Major Hubs
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {sector.majorCities.map((city, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700"
-                  >
-                    {city}
-                  </span>
-                ))}
               </div>
             </div>
           </div>
@@ -363,37 +374,6 @@ const SectorCategory = () => {
                     className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     placeholder="Brief description of the sector..."
                   />
-                </div>
-              </div>
-
-              {/* Statistics */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium text-gray-700">Statistics</h3>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Companies</label>
-                    <input
-                      type="number"
-                      name="companies"
-                      value={editData.companies}
-                      onChange={(e) => setEditData({ ...editData, companies: e.target.value })}
-                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      placeholder="e.g., 1000"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Employment</label>
-                    <input
-                      type="text"
-                      name="employment"
-                      value={editData.employment}
-                      onChange={(e) => setEditData({ ...editData, employment: e.target.value })}
-                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      placeholder="e.g., 2.5M"
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -490,7 +470,7 @@ const SectorCategory = () => {
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 {selectedSector ? "Save Changes" : "Add Sector"}
               </button>

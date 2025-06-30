@@ -34,15 +34,14 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, custom
   }, []);
 
   const [profileData, setProfileData] = useState({
-    firstName: "John",
-    lastName: "Doe",
+    firstName: "Electrosoft",
+    lastName: "",
     headline: "Startup Founder, Innovator, and Entrepreneur",
-    universityAffiliation: "MIT - Massachusetts Institute of Technology",
-    naacRating: 5,
+    
     location: "Mumbai",
     city: "Maharashtra",
     phone: "+91 98765 43210",
-    email: "john.doe@startup.com",
+    email: "electrosoft@startup.com",
     website: "www.startup.com",
     about:
       "Passionate entrepreneur with 15+ years of experience in building innovative tech solutions. Founded multiple successful startups and helped scale businesses from idea to IPO.",

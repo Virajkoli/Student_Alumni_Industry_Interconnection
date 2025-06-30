@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Edit3 } from "lucide-react";
 import Navbar from "../../components/startup/Navbar";
 import PostCreator from "../../components/startup/PostCreator";
 import FeedArea from "../../components/startup/FeedArea";
@@ -24,13 +25,42 @@ const navigationOptions = [
 const StartupProfilePage = () => {
   const [activeContent, setActiveContent] = useState("posts");
   const [activeContentName, setActiveContentName] = useState("Posts");
+  const [activeCustomContent, setActiveCustomContent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOption, setSelectedOption] = useState(navigationOptions[0]);
+  const [customNavigations, setCustomNavigations] = useState([]);
 
-  const handleNavigationChange = (contentId, contentName) => {
+  const handleNavigationChange = (contentId, contentName, customNavItem = null) => {
     setActiveContent(contentId);
     setActiveContentName(contentName);
+    setActiveCustomContent(customNavItem);
     setSelectedOption(contentName);
+    
+    // No need to add custom navigation to local state here since it's already managed by the header component
+  };
+
+  const handleCustomContentUpdate = (customNavId, newContent) => {
+    // Update the custom navigation content in our local state
+    setCustomNavigations(prev => 
+      prev.map(nav => 
+        nav.id === customNavId ? { ...nav, content: newContent } : nav
+      )
+    );
+    
+    // Also update the activeCustomContent if it's the currently active one
+    if (activeCustomContent && activeCustomContent.id === customNavId) {
+      setActiveCustomContent(prev => ({ ...prev, content: newContent }));
+    }
+  };
+
+  const handleEditCustomContent = (customNavItem) => {
+    // Find the StartupProfileHeader and trigger its edit modal
+    // This will be handled by the StartupProfileHeader component
+    // We can trigger a custom event or use a ref to communicate with it
+    const event = new CustomEvent('editCustomNavigation', {
+      detail: { customNavItem }
+    });
+    window.dispatchEvent(event);
   };
 
   const handleOptionSelect = (option) => {
@@ -104,7 +134,11 @@ const StartupProfilePage = () => {
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
         {/* Profile Header Section with integrated navigation */}
         <div className="w-full mb-6">
-          <StartupProfileHeader onNavigationChange={handleNavigationChange} />
+          <StartupProfileHeader 
+            onNavigationChange={handleNavigationChange}
+            customNavigations={customNavigations}
+            onCustomNavigationUpdate={setCustomNavigations}
+          />
         </div>
 
         <div className="flex gap-6">
@@ -121,6 +155,8 @@ const StartupProfilePage = () => {
                   <ContentRenderer
                     activeContent={activeContent}
                     activeContentName={activeContentName}
+                    customNavItem={activeCustomContent}
+                    onEditCustomContent={handleEditCustomContent}
                   />
                 )}
               </div>

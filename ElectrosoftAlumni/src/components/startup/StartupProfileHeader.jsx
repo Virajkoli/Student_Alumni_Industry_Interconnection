@@ -1,9 +1,38 @@
-import React, { useState } from "react";
-import { Edit3, X, MapPin, Phone, Mail, Globe, Camera } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Edit3, X, MapPin, Phone, Mail, Globe, Camera, Plus } from "lucide-react";
 
-const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
+const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, customNavigations = [], onCustomNavigationUpdate }) => {
   const [activeItem, setActiveItem] = useState("posts");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isNewNavModalOpen, setIsNewNavModalOpen] = useState(false);
+  const [newNavData, setNewNavData] = useState({
+    name: "",
+    contentType: "text",
+    content: ""
+  });
+  const [editingCustomNav, setEditingCustomNav] = useState(null);
+  const [isEditingCustomNav, setIsEditingCustomNav] = useState(false);
+
+  // Listen for custom navigation edit events
+  useEffect(() => {
+    const handleEditCustomNavigation = (event) => {
+      const { customNavItem } = event.detail;
+      setEditingCustomNav(customNavItem);
+      setNewNavData({
+        name: customNavItem.name,
+        contentType: customNavItem.contentType,
+        content: customNavItem.content
+      });
+      setIsEditingCustomNav(true);
+    };
+
+    window.addEventListener('editCustomNavigation', handleEditCustomNavigation);
+    
+    return () => {
+      window.removeEventListener('editCustomNavigation', handleEditCustomNavigation);
+    };
+  }, []);
+
   const [profileData, setProfileData] = useState({
     firstName: "John",
     lastName: "Doe",
@@ -82,11 +111,89 @@ const navigationItems = [
 ];
 
 
+  // Combine default and custom navigation items
+  const allNavigationItems = [...navigationItems, ...customNavigations];
+
   const handleItemClick = (item) => {
     setActiveItem(item.id);
     if (onNavigationChange) {
-      onNavigationChange(item.id, item.name);
+      // Pass the full custom navigation item if it's a custom navigation
+      if (item.isCustom) {
+        onNavigationChange(item.id, item.name, item);
+      } else {
+        onNavigationChange(item.id, item.name);
+      }
     }
+  };
+
+  const handleAddNewNavigation = () => {
+    setIsNewNavModalOpen(true);
+  };
+
+  const handleSaveNewNavigation = () => {
+    if (newNavData.name.trim()) {
+      const newNavItem = {
+        id: `custom-${Date.now()}`,
+        name: newNavData.name,
+        shortName: newNavData.name.length > 15 ? newNavData.name.substring(0, 12) + "..." : newNavData.name,
+        contentType: newNavData.contentType,
+        content: newNavData.content,
+        isCustom: true
+      };
+      
+      // Update the parent component's custom navigation state
+      if (onCustomNavigationUpdate) {
+        onCustomNavigationUpdate(prev => [...prev, newNavItem]);
+      }
+      
+      setNewNavData({ name: "", contentType: "text", content: "" });
+      setIsNewNavModalOpen(false);
+      
+      // Automatically switch to the new navigation
+      setActiveItem(newNavItem.id);
+      if (onNavigationChange) {
+        onNavigationChange(newNavItem.id, newNavItem.name, newNavItem);
+      }
+    }
+  };
+
+  const handleCancelNewNavigation = () => {
+    setNewNavData({ name: "", contentType: "text", content: "" });
+    setIsNewNavModalOpen(false);
+    setIsEditingCustomNav(false);
+    setEditingCustomNav(null);
+  };
+
+  const handleSaveCustomNavEdit = () => {
+    if (editingCustomNav && newNavData.name.trim()) {
+      // Update the custom navigation item
+      const updatedNavItem = {
+        ...editingCustomNav,
+        name: newNavData.name,
+        contentType: newNavData.contentType,
+        content: newNavData.content
+      };
+
+      // Update the parent component's custom navigation state
+      if (onCustomNavigationUpdate) {
+        onCustomNavigationUpdate(prev => 
+          prev.map(nav => nav.id === editingCustomNav.id ? updatedNavItem : nav)
+        );
+      }
+
+      setNewNavData({ name: "", contentType: "text", content: "" });
+      setIsEditingCustomNav(false);
+      setEditingCustomNav(null);
+      
+      // Refresh the current view if this was the active navigation
+      if (activeItem === editingCustomNav.id && onNavigationChange) {
+        onNavigationChange(updatedNavItem.id, updatedNavItem.name, updatedNavItem);
+      }
+    }
+  };
+
+  const handleNewNavInputChange = (field, value) => {
+    setNewNavData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleEditClick = () => {
@@ -182,7 +289,7 @@ const navigationItems = [
         {/* Navigation Items - Horizontal LinkedIn Style */}
         <div className="bg-white border-b border-gray-200">
           <div className="flex overflow-x-auto">
-            {navigationItems.map((item) => (
+            {allNavigationItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
@@ -195,6 +302,14 @@ const navigationItems = [
                 {item.shortName}
               </button>
             ))}
+            {/* Add New Navigation Button */}
+            <button
+              onClick={handleAddNewNavigation}
+              className="flex-shrink-0 px-4 py-4 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors duration-200 whitespace-nowrap"
+              title="Add new navigation"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
@@ -410,6 +525,537 @@ const navigationItems = [
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Navigation Modal */}
+      {(isNewNavModalOpen || isEditingCustomNav) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {isEditingCustomNav ? "Edit Navigation" : "Add New Navigation"}
+                </h2>
+                <button
+                  onClick={handleCancelNewNavigation}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Navigation Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Navigation Name *
+                </label>
+                <input
+                  type="text"
+                  value={newNavData.name}
+                  onChange={(e) => handleNewNavInputChange("name", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter navigation name"
+                  maxLength={50}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {newNavData.name.length}/50 characters
+                </p>
+              </div>
+
+              {/* Content Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Content Type *
+                </label>
+                <select
+                  value={newNavData.contentType}
+                  onChange={(e) => handleNewNavInputChange("contentType", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  <option value="text">Simple Text Content</option>
+                  <option value="html">Rich Text/HTML</option>
+                  <option value="structured">Structured Section (Cards/Lists)</option>
+                  <option value="dashboard">Dashboard with Stats</option>
+                  <option value="form">Interactive Form</option>
+                  <option value="gallery">Image/Video Gallery</option>
+                  <option value="timeline">Timeline/Steps</option>
+                  <option value="link">External Link</option>
+                  <option value="document">Document Collection</option>
+                </select>
+              </div>
+
+              {/* Section Layout (for structured content) */}
+              {newNavData.contentType === "structured" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Layout Style
+                  </label>
+                  <select
+                    value={newNavData.layoutStyle || "cards"}
+                    onChange={(e) => handleNewNavInputChange("layoutStyle", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    <option value="cards">Card Layout</option>
+                    <option value="list">List Layout</option>
+                    <option value="grid">Grid Layout</option>
+                    <option value="table">Table Layout</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Background Color */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Background Style
+                </label>
+                <select
+                  value={newNavData.bgStyle || "default"}
+                  onChange={(e) => handleNewNavInputChange("bgStyle", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  <option value="default">Default (Light)</option>
+                  <option value="gradient">Gradient Background</option>
+                  <option value="dark">Dark Theme</option>
+                  <option value="colorful">Colorful Cards</option>
+                  <option value="minimal">Minimal White</option>
+                </select>
+              </div>
+
+              {/* Dynamic Content Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Content *
+                </label>
+                
+                {/* Simple Text Content */}
+                {newNavData.contentType === "text" && (
+                  <textarea
+                    value={newNavData.content}
+                    onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                    placeholder="Enter your text content..."
+                  />
+                )}
+                
+                {/* HTML Content */}
+                {newNavData.contentType === "html" && (
+                  <textarea
+                    value={newNavData.content}
+                    onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none font-mono text-sm"
+                    placeholder="Enter HTML content..."
+                  />
+                )}
+                
+                {/* Structured Section Content */}
+                {newNavData.contentType === "structured" && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Section Title
+                      </label>
+                      <input
+                        type="text"
+                        value={newNavData.sectionTitle || ""}
+                        onChange={(e) => handleNewNavInputChange("sectionTitle", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., Our Services, Features, Benefits"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Template Type
+                      </label>
+                      <select
+                        value={newNavData.structuredTemplate || "services"}
+                        onChange={(e) => {
+                          const template = e.target.value;
+                          handleNewNavInputChange("structuredTemplate", template);
+                          // Auto-populate with template data
+                          if (template === "services") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.sectionTitle || "Our Services",
+                              items: [
+                                {name: "Web Development", description: "Custom web applications"},
+                                {name: "Mobile Apps", description: "iOS and Android development"},
+                                {name: "Consulting", description: "Strategic technology advice"}
+                              ]
+                            }));
+                          } else if (template === "features") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.sectionTitle || "Key Features",
+                              items: [
+                                {name: "Fast Performance", description: "Lightning-fast loading times"},
+                                {name: "Secure", description: "Bank-level security protocols"},
+                                {name: "Scalable", description: "Grows with your business"}
+                              ]
+                            }));
+                          } else if (template === "team") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.sectionTitle || "Our Team",
+                              items: [
+                                {name: "John Doe", description: "CEO & Founder"},
+                                {name: "Jane Smith", description: "CTO"},
+                                {name: "Mike Johnson", description: "Lead Developer"}
+                              ]
+                            }));
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      >
+                        <option value="services">Services/Products</option>
+                        <option value="features">Features/Benefits</option>
+                        <option value="team">Team Members</option>
+                        <option value="steps">Process Steps</option>
+                        <option value="custom">Custom Items</option>
+                      </select>
+                    </div>
+
+                    {/* Custom Items Builder */}
+                    {newNavData.structuredTemplate === "custom" && (
+                      <div className="space-y-3">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Add Items (up to 6)
+                        </label>
+                        {[1, 2, 3, 4].map((num) => (
+                          <div key={num} className="grid grid-cols-1 gap-2 p-3 border border-gray-200 rounded-lg">
+                            <input
+                              type="text"
+                              placeholder="Item Name/Title"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              onChange={(e) => {
+                                const items = JSON.parse(newNavData.content || '{"items":[]}').items || [];
+                                items[num-1] = {...(items[num-1] || {}), name: e.target.value};
+                                handleNewNavInputChange("content", JSON.stringify({
+                                  title: newNavData.sectionTitle || "Custom Section",
+                                  items: items.filter(s => s.name)
+                                }));
+                              }}
+                            />
+                            <textarea
+                              rows={2}
+                              placeholder="Description/Details"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                              onChange={(e) => {
+                                const items = JSON.parse(newNavData.content || '{"items":[]}').items || [];
+                                items[num-1] = {...(items[num-1] || {}), description: e.target.value};
+                                handleNewNavInputChange("content", JSON.stringify({
+                                  title: newNavData.sectionTitle || "Custom Section",
+                                  items: items.filter(s => s.name)
+                                }));
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="text-xs text-gray-500 bg-green-50 p-3 rounded-lg">
+                      <p>💡 <strong>Preview:</strong> Your content will display as cards with titles and descriptions</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Dashboard Content */}
+                {newNavData.contentType === "dashboard" && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Dashboard Title
+                      </label>
+                      <input
+                        type="text"
+                        value={newNavData.dashboardTitle || ""}
+                        onChange={(e) => handleNewNavInputChange("dashboardTitle", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., Performance Dashboard"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Dashboard Template
+                      </label>
+                      <select
+                        value={newNavData.dashboardTemplate || "business"}
+                        onChange={(e) => {
+                          const template = e.target.value;
+                          handleNewNavInputChange("dashboardTemplate", template);
+                          // Auto-populate with template data
+                          if (template === "business") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.dashboardTitle || "Business Dashboard",
+                              stats: [
+                                {label: "Revenue", value: "$45,230", trend: "+12%"},
+                                {label: "Users", value: "1,847", trend: "+8%"},
+                                {label: "Projects", value: "23", trend: "+3"},
+                                {label: "Rating", value: "4.9/5", trend: "+0.2"}
+                              ]
+                            }));
+                          } else if (template === "startup") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.dashboardTitle || "Startup Metrics",
+                              stats: [
+                                {label: "Total Users", value: "12,847", trend: "+15.2%"},
+                                {label: "Monthly Revenue", value: "$89,234", trend: "+23.5%"},
+                                {label: "Active Projects", value: "47", trend: "+8.1%"},
+                                {label: "Team Members", value: "24", trend: "+2"}
+                              ]
+                            }));
+                          } else if (template === "simple") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.dashboardTitle || "Quick Stats",
+                              stats: [
+                                {label: "Total", value: "100", trend: "+5%"},
+                                {label: "Active", value: "85", trend: "+3%"}
+                              ]
+                            }));
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      >
+                        <option value="business">Business Dashboard (4 stats)</option>
+                        <option value="startup">Startup Metrics (4 stats)</option>
+                        <option value="simple">Simple Stats (2 stats)</option>
+                        <option value="custom">Custom (manual entry)</option>
+                      </select>
+                    </div>
+
+                    {/* Custom Stats Builder */}
+                    {newNavData.dashboardTemplate === "custom" && (
+                      <div className="space-y-3">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Add Statistics (up to 6)
+                        </label>
+                        {[1, 2, 3, 4].map((num) => (
+                          <div key={num} className="grid grid-cols-3 gap-2 p-3 border border-gray-200 rounded-lg">
+                            <input
+                              type="text"
+                              placeholder="Label (e.g., Revenue)"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              onChange={(e) => {
+                                const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
+                                stats[num-1] = {...(stats[num-1] || {}), label: e.target.value};
+                                handleNewNavInputChange("content", JSON.stringify({
+                                  title: newNavData.dashboardTitle || "Custom Dashboard",
+                                  stats: stats.filter(s => s.label && s.value)
+                                }));
+                              }}
+                            />
+                            <input
+                              type="text"
+                              placeholder="Value (e.g., $45K)"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              onChange={(e) => {
+                                const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
+                                stats[num-1] = {...(stats[num-1] || {}), value: e.target.value};
+                                handleNewNavInputChange("content", JSON.stringify({
+                                  title: newNavData.dashboardTitle || "Custom Dashboard",
+                                  stats: stats.filter(s => s.label && s.value)
+                                }));
+                              }}
+                            />
+                            <input
+                              type="text"
+                              placeholder="Trend (e.g., +12%)"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              onChange={(e) => {
+                                const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
+                                stats[num-1] = {...(stats[num-1] || {}), trend: e.target.value};
+                                handleNewNavInputChange("content", JSON.stringify({
+                                  title: newNavData.dashboardTitle || "Custom Dashboard",
+                                  stats: stats.filter(s => s.label && s.value)
+                                }));
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="text-xs text-gray-500 bg-blue-50 p-3 rounded-lg">
+                      <p>💡 <strong>Dashboard Preview:</strong> Your dashboard will display beautiful stat cards with the data above</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Form Content */}
+                {newNavData.contentType === "form" && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Form Title
+                      </label>
+                      <input
+                        type="text"
+                        value={newNavData.formTitle || ""}
+                        onChange={(e) => handleNewNavInputChange("formTitle", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., Contact Us, Registration Form"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Form Template
+                      </label>
+                      <select
+                        value={newNavData.formTemplate || "contact"}
+                        onChange={(e) => {
+                          const template = e.target.value;
+                          handleNewNavInputChange("formTemplate", template);
+                          // Auto-populate with template data
+                          if (template === "contact") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.formTitle || "Contact Us",
+                              fields: [
+                                {type: "text", label: "Full Name", required: true},
+                                {type: "email", label: "Email Address", required: true},
+                                {type: "tel", label: "Phone Number", required: false},
+                                {type: "textarea", label: "Message", required: true}
+                              ]
+                            }));
+                          } else if (template === "registration") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.formTitle || "Registration",
+                              fields: [
+                                {type: "text", label: "First Name", required: true},
+                                {type: "text", label: "Last Name", required: true},
+                                {type: "email", label: "Email", required: true},
+                                {type: "password", label: "Password", required: true},
+                                {type: "tel", label: "Phone", required: false}
+                              ]
+                            }));
+                          } else if (template === "feedback") {
+                            handleNewNavInputChange("content", JSON.stringify({
+                              title: newNavData.formTitle || "Feedback Form",
+                              fields: [
+                                {type: "text", label: "Name", required: true},
+                                {type: "select", label: "Rating", options: ["Excellent", "Good", "Average", "Poor"], required: true},
+                                {type: "textarea", label: "Comments", required: true}
+                              ]
+                            }));
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      >
+                        <option value="contact">Contact Form</option>
+                        <option value="registration">Registration Form</option>
+                        <option value="feedback">Feedback/Survey</option>
+                        <option value="newsletter">Newsletter Signup</option>
+                        <option value="custom">Custom Form</option>
+                      </select>
+                    </div>
+
+                    <div className="text-xs text-gray-500 bg-purple-50 p-3 rounded-lg">
+                      <p>💡 <strong>Form Preview:</strong> Creates an interactive form with the selected fields</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Gallery Content */}
+                {newNavData.contentType === "gallery" && (
+                  <div className="space-y-4">
+                    <textarea
+                      value={newNavData.content}
+                      onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                      rows={6}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      placeholder="Enter gallery items as JSON...&#10;Example:&#10;{&#10;  'title': 'Project Gallery',&#10;  'items': [&#10;    {'type': 'image', 'url': 'https://...', 'title': 'Project 1'},&#10;    {'type': 'video', 'url': 'https://...', 'title': 'Demo Video'}&#10;  ]&#10;}"
+                    />
+                    <div className="text-xs text-gray-500">
+                      <p>💡 Supports: Images, videos, mixed media galleries</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Timeline Content */}
+                {newNavData.contentType === "timeline" && (
+                  <div className="space-y-4">
+                    <textarea
+                      value={newNavData.content}
+                      onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                      rows={6}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      placeholder="Enter timeline steps as JSON...&#10;Example:&#10;{&#10;  'title': 'Product Development',&#10;  'steps': [&#10;    {'step': 1, 'title': 'Research', 'description': 'Market research phase'},&#10;    {'step': 2, 'title': 'Design', 'description': 'UI/UX design phase'}&#10;  ]&#10;}"
+                    />
+                    <div className="text-xs text-gray-500">
+                      <p>💡 Perfect for: Process flows, roadmaps, step-by-step guides</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Link/Document URL Input */}
+                {(newNavData.contentType === "link" || newNavData.contentType === "document") && (
+                  <input
+                    type="url"
+                    value={newNavData.content}
+                    onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder={`Enter ${newNavData.contentType} URL...`}
+                  />
+                )}
+                
+                {/* Character/Content Length Display */}
+                {(newNavData.contentType === "text" || newNavData.contentType === "html") && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {newNavData.content.length}/2000 characters
+                  </p>
+                )}
+              </div>
+
+              {/* Content Preview */}
+              {newNavData.content && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preview
+                  </label>
+                  <div className="border border-gray-200 rounded-lg p-3 bg-gray-50 max-h-32 overflow-y-auto">
+                    {newNavData.contentType === "text" && (
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{newNavData.content}</p>
+                    )}
+                    {newNavData.contentType === "html" && (
+                      <div className="text-sm" dangerouslySetInnerHTML={{ __html: newNavData.content }} />
+                    )}
+                    {newNavData.contentType === "link" && (
+                      <a href={newNavData.content} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
+                        {newNavData.content}
+                      </a>
+                    )}
+                    {newNavData.contentType === "image" && (
+                      <img src={newNavData.content} alt="Preview" className="max-w-full h-20 object-cover rounded" onError={(e) => {e.target.style.display = 'none'}} />
+                    )}
+                    {(newNavData.contentType === "video" || newNavData.contentType === "document") && (
+                      <p className="text-sm text-gray-600">{newNavData.contentType}: {newNavData.content}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+              <button
+                onClick={handleCancelNewNavigation}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={isEditingCustomNav ? handleSaveCustomNavEdit : handleSaveNewNavigation}
+                disabled={!newNavData.name.trim() || !newNavData.content.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                {isEditingCustomNav ? "Save Changes" : "Add Navigation"}
               </button>
             </div>
           </div>

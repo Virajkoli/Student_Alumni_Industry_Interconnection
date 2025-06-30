@@ -18,6 +18,8 @@ import {
   BarChart2,
   X,
   PlayCircle, // Added for video
+  Edit, // Added for edit button
+  Save, // Added for save button
 } from "lucide-react";
 
 // Map skill names to specific Lucide icons for a professional look
@@ -33,6 +35,10 @@ const iconMap = {
 };
 
 const JobsSkills = () => {
+  // State for editing functionality
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState({});
+  
   // Simplified state containing only the data needed for display
   const [content] = useState({
     title: "Jobs & Trending Skills",
@@ -251,6 +257,41 @@ const JobsSkills = () => {
     setSelectedSkill(null);
   };
 
+  // Edit functionality handlers
+  const handleEditClick = () => {
+    // Initialize edit content with current content structure
+    setEditContent({
+      title: content.title,
+      description: content.description,
+      trendingSkills: [...content.trendingSkills],
+      marketStats: content.marketStats.map(stat => ({
+        value: stat.value,
+        label: stat.label
+      }))
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    try {
+      // In a real application, you would update the content state and save to backend
+      console.log("Content would be saved:", editContent);
+      
+      // For demo purposes, you could update the local content:
+      // setContent({...content, ...editContent});
+      
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving content:", error);
+      alert("Error saving content. Please try again.");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditContent({});
+  };
+
   // A dedicated component for skill cards for better structure and readability
   const SkillCard = ({ skill, onLearnClick, onViewJobsClick }) => (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
@@ -451,9 +492,25 @@ const JobsSkills = () => {
   };
 
   const JobsModal = ({ isOpen, onClose, skill, jobs }) => {
+    const [isEditingJob, setIsEditingJob] = useState(false); // Renamed to avoid conflict
+    const [editedJob, setEditedJob] = useState(null); // State to hold the job being edited
+
     if (!isOpen || !skill) return null;
 
     const listings = jobs[skill.name] || [];
+
+    const handleEditClick = (job) => {
+      setIsEditingJob(true);
+      setEditedJob(job);
+    };
+
+    const handleSaveClick = () => {
+      // Logic to save the edited job listing
+      // This could involve updating the state, making an API call, etc.
+      console.log("Saving job:", editedJob);
+      setIsEditingJob(false);
+      setEditedJob(null);
+    };
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -484,14 +541,22 @@ const JobsSkills = () => {
                         <h3 className="font-bold text-lg text-gray-800">{job.title}</h3>
                         <p className="text-sm text-gray-600">{job.company} - {job.location}</p>
                       </div>
-                      <a
-                        href={job.applyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 text-sm"
-                      >
-                        Apply Now
-                      </a>
+                      <div className="flex gap-2">
+                        <a
+                          href={job.applyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 text-sm"
+                        >
+                          Apply Now
+                        </a>
+                        <button
+                          onClick={() => handleEditClick(job)}
+                          className="py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-300 text-sm"
+                        >
+                          Edit
+                        </button>
+                      </div>
                     </div>
                     <p className="text-sm text-gray-500 mt-1 font-semibold">{job.salary}</p>
                     <p className="text-sm text-gray-700 mt-2">{job.description}</p>
@@ -501,6 +566,85 @@ const JobsSkills = () => {
                 <p className="text-center text-gray-500 py-8">No current job openings for this skill.</p>
               )}
             </div>
+
+            {isEditingJob && editedJob && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Edit Job Listing
+                </h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Job Title
+                    </label>
+                    <input
+                      type="text"
+                      value={editedJob.title}
+                      onChange={(e) => setEditedJob({ ...editedJob, title: e.target.value })}
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Company
+                    </label>
+                    <input
+                      type="text"
+                      value={editedJob.company}
+                      onChange={(e) => setEditedJob({ ...editedJob, company: e.target.value })}
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      value={editedJob.location}
+                      onChange={(e) => setEditedJob({ ...editedJob, location: e.target.value })}
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Salary
+                    </label>
+                    <input
+                      type="text"
+                      value={editedJob.salary}
+                      onChange={(e) => setEditedJob({ ...editedJob, salary: e.target.value })}
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={editedJob.description}
+                      onChange={(e) => setEditedJob({ ...editedJob, description: e.target.value })}
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                </div>
+                <div className="mt-4 flex justify-end gap-2">
+                  <button
+                    onClick={() => setIsEditingJob(false)}
+                    className="py-2 px-4 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 transition-colors duration-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveClick}
+                    className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -510,7 +654,16 @@ const JobsSkills = () => {
   return (
     <div className="bg-gray-50/50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className=" mb-12">
+        <div className="mb-12 relative">
+          {/* Edit button positioned at top right */}
+          <button
+            onClick={handleEditClick}
+            className="absolute top-0 right-0 p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+            title="Edit Content"
+          >
+            <Edit size={20} />
+          </button>
+          
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
             {content.title}
           </h1>
@@ -553,6 +706,182 @@ const JobsSkills = () => {
         skill={selectedSkill}
         jobs={content.jobListings}
       />
+      
+      {/* Edit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-xl font-semibold text-gray-800">Edit Jobs & Skills Content</h2>
+              <button
+                onClick={handleCancelEdit}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+              <div className="space-y-6">
+                {/* Title Section */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Section Title
+                  </label>
+                  <input
+                    type="text"
+                    value={editContent.title || content.title}
+                    onChange={(e) => setEditContent({...editContent, title: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="Enter section title"
+                  />
+                </div>
+
+                {/* Description Section */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={editContent.description || content.description}
+                    onChange={(e) => setEditContent({...editContent, description: e.target.value})}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                    placeholder="Enter section description"
+                  />
+                </div>
+
+                {/* Market Statistics */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Market Statistics
+                  </label>
+                  <div className="space-y-3">
+                    {(editContent.marketStats || content.marketStats).map((stat, index) => (
+                      <div key={index} className="grid grid-cols-2 gap-3 p-3 border border-gray-200 rounded-lg">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Value</label>
+                          <input
+                            type="text"
+                            value={stat.value}
+                            onChange={(e) => {
+                              const newStats = [...(editContent.marketStats || content.marketStats)];
+                              newStats[index] = {...newStats[index], value: e.target.value};
+                              setEditContent({...editContent, marketStats: newStats});
+                            }}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Label</label>
+                          <input
+                            type="text"
+                            value={stat.label}
+                            onChange={(e) => {
+                              const newStats = [...(editContent.marketStats || content.marketStats)];
+                              newStats[index] = {...newStats[index], label: e.target.value};
+                              setEditContent({...editContent, marketStats: newStats});
+                            }}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Trending Skills */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Trending Skills
+                  </label>
+                  <div className="space-y-3">
+                    {(editContent.trendingSkills || content.trendingSkills).map((skill, index) => (
+                      <div key={index} className="p-3 border border-gray-200 rounded-lg">
+                        <div className="grid grid-cols-2 gap-3 mb-2">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Skill Name</label>
+                            <input
+                              type="text"
+                              value={skill.name}
+                              onChange={(e) => {
+                                const newSkills = [...(editContent.trendingSkills || content.trendingSkills)];
+                                newSkills[index] = {...newSkills[index], name: e.target.value};
+                                setEditContent({...editContent, trendingSkills: newSkills});
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Demand Level</label>
+                            <select
+                              value={skill.demand}
+                              onChange={(e) => {
+                                const newSkills = [...(editContent.trendingSkills || content.trendingSkills)];
+                                newSkills[index] = {...newSkills[index], demand: e.target.value};
+                                setEditContent({...editContent, trendingSkills: newSkills});
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            >
+                              <option value="High">High</option>
+                              <option value="Medium">Medium</option>
+                              <option value="Low">Low</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Growth Rate</label>
+                            <input
+                              type="text"
+                              value={skill.growth}
+                              onChange={(e) => {
+                                const newSkills = [...(editContent.trendingSkills || content.trendingSkills)];
+                                newSkills[index] = {...newSkills[index], growth: e.target.value};
+                                setEditContent({...editContent, trendingSkills: newSkills});
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Average Salary</label>
+                            <input
+                              type="text"
+                              value={skill.avgSalary}
+                              onChange={(e) => {
+                                const newSkills = [...(editContent.trendingSkills || content.trendingSkills)];
+                                newSkills[index] = {...newSkills[index], avgSalary: e.target.value};
+                                setEditContent({...editContent, trendingSkills: newSkills});
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
+              <button
+                onClick={handleCancelEdit}
+                className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <Save size={16} />
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

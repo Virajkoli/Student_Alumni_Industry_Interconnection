@@ -34,15 +34,15 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, custom
   }, []);
 
   const [profileData, setProfileData] = useState({
-    firstName: "Electrosoft",
-    lastName: "",
-    headline: "Domain of startup",
+    firstName: "John",
+    lastName: "Doe",
+    headline: "Startup Founder, Innovator, and Entrepreneur",
     universityAffiliation: "MIT - Massachusetts Institute of Technology",
     naacRating: 5,
     location: "Mumbai",
     city: "Maharashtra",
     phone: "+91 98765 43210",
-    email: "electrosoft@startup.com",
+    email: "john.doe@startup.com",
     website: "www.startup.com",
     about:
       "Passionate entrepreneur with 15+ years of experience in building innovative tech solutions. Founded multiple successful startups and helped scale businesses from idea to IPO.",
@@ -251,7 +251,7 @@ const navigationItems = [
         {/* Profile Info - Horizontal Layout */}
         {/* Increased top padding from pt-10 to pt-16 to accommodate larger image */}
         <div className="pt-16 px-8 pb-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex-1">
               <h3 className="text-2xl font-bold text-gray-900">
                 {profileData.firstName} {profileData.lastName}
@@ -264,47 +264,6 @@ const navigationItems = [
                 {profileData.location}, {profileData.city}
               </div>
             </div>
-            
-            {/* University Affiliation and NAAC Rating - Middle Section */}
-            <div className="flex-1 max-w-md mx-4">
-              {/* University Affiliation */}
-              {profileData.universityAffiliation && (
-                <div className="flex items-center text-sm text-gray-600 mb-3">
-                  <div className="w-4 h-4 mr-2 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700 block">University Affiliation</span>
-                    <span className="text-xs text-gray-500">{profileData.universityAffiliation}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* NAAC Accreditation */}
-              {profileData.naacRating && (
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <span className="font-medium text-gray-700 mr-3">NAAC Rating:</span>
-                    <div className="flex items-center space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-4 h-4 ${
-                            star <= profileData.naacRating
-                              ? "text-yellow-400 fill-current"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <span className="ml-2 text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                    {profileData.naacRating}/5
-                  </span>
-                </div>
-              )}
-            </div>
-
             <div className="flex flex-col items-start gap-2 sm:items-end">
               <button className="py-2 px-5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors duration-200">
                 Connect
@@ -449,41 +408,6 @@ const navigationItems = [
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   placeholder="Enter your professional headline"
                 />
-              </div>
-
-              {/* University Affiliation and NAAC Rating */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    University Affiliation
-                  </label>
-                  <input
-                    type="text"
-                    value={editData.universityAffiliation || ""}
-                    onChange={(e) =>
-                      handleInputChange("universityAffiliation", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    placeholder="e.g., MIT - Massachusetts Institute of Technology"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    NAAC Accreditation (Stars)
-                  </label>
-                  <select
-                    value={editData.naacRating || ""}
-                    onChange={(e) => handleInputChange("naacRating", parseInt(e.target.value) || "")}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  >
-                    <option value="">Select NAAC Rating</option>
-                    <option value="1">1 Star</option>
-                    <option value="2">2 Stars</option>
-                    <option value="3">3 Stars</option>
-                    <option value="4">4 Stars</option>
-                    <option value="5">5 Stars</option>
-                  </select>
-                </div>
               </div>
 
               {/* Location */}

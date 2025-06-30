@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
   Edit,
   Save,
@@ -11,12 +14,25 @@ import {
   Calendar,
   Shield,
   ExternalLink,
+  Phone,
+  Mail,
 } from "lucide-react";
 
 const StartupEcosystemOverview = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditLocationsModalOpen, setIsEditLocationsModalOpen] =
     useState(false);
+  
+  // Fix leaflet default markers
+  useEffect(() => {
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    });
+  }, []);
+
   const [aboutData, setAboutData] = useState({
     overview:
       "A problem isn't truly solved until it's solved for all. Startups build products that help create opportunities for everyone, whether down the street or across the globe. Bring your insight, imagination and a healthy disregard for the impossible. Bring everything that makes you unique. Together, we can build for everyone.",
@@ -44,28 +60,43 @@ const StartupEcosystemOverview = () => {
     ],
     locations: [
       {
-        name: "Headquarters",
-        address: "1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+        name: "Jalgaon Office",
+        address: "IT Park, Jalgaon, Maharashtra 425001, India",
+        type: "Office",
+        employees: "150+",
+        coordinates: [21.0077, 75.5626], // Jalgaon, Maharashtra
+        ceo: "Raj Patil",
+        contact: {
+          phone: "+91 257 2251000",
+          email: "jalgaon@mystartup.com"
+        },
+        image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&h=150&fit=crop",
+      },
+      {
+        name: "Pune Office",
+        address: "Hinjewadi IT Park, Pune, Maharashtra 411057, India",
         type: "HQ",
-        employees: "50,000+",
+        employees: "500+",
+        coordinates: [18.5204, 73.8567], // Pune, Maharashtra
+        ceo: "Priya Sharma",
+        contact: {
+          phone: "+91 20 6710 5000",
+          email: "pune@mystartup.com"
+        },
+        image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=200&h=150&fit=crop",
       },
       {
-        name: "New York Office",
-        address: "111 8th Avenue, New York, NY 10011, USA",
+        name: "Nashik Office",
+        address: "MIDC Area, Nashik, Maharashtra 422010, India",
         type: "Office",
-        employees: "5,000+",
-      },
-      {
-        name: "London Office",
-        address: "6 Pancras Square, London N1C 4AG, UK",
-        type: "Office",
-        employees: "3,000+",
-      },
-      {
-        name: "Bangalore Office",
-        address: "3rd Floor, RMZ Infinity Tower C, Bangalore 560001, India",
-        type: "Office",
-        employees: "2,000+",
+        employees: "200+",
+        coordinates: [19.9975, 73.7898], // Nashik, Maharashtra
+        ceo: "Amit Deshmukh",
+        contact: {
+          phone: "+91 253 2351000",
+          email: "nashik@mystartup.com"
+        },
+        image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=200&h=150&fit=crop",
       },
     ],
   });
@@ -124,9 +155,26 @@ const StartupEcosystemOverview = () => {
   const handleLocationChange = (index, field, value) => {
     setEditData((prev) => ({
       ...prev,
-      locations: prev.locations.map((location, i) =>
-        i === index ? { ...location, [field]: value } : location
-      ),
+      locations: prev.locations.map((location, i) => {
+        if (i === index) {
+          if (field.startsWith('contact.')) {
+            const contactField = field.split('.')[1];
+            return {
+              ...location,
+              contact: {
+                ...location.contact,
+                [contactField]: value
+              }
+            };
+          } else if (field === 'coordinates') {
+            // Parse coordinates from string "lat,lng"
+            const coords = value.split(',').map(coord => parseFloat(coord.trim()));
+            return { ...location, [field]: coords.length === 2 ? coords : [0, 0] };
+          }
+          return { ...location, [field]: value };
+        }
+        return location;
+      }),
     }));
   };
 
@@ -140,6 +188,13 @@ const StartupEcosystemOverview = () => {
           address: "",
           type: "Office",
           employees: "",
+          coordinates: [0, 0],
+          ceo: "",
+          contact: {
+            phone: "",
+            email: ""
+          },
+          image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop",
         },
       ],
     }));
@@ -301,6 +356,107 @@ const StartupEcosystemOverview = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+        
+        <hr className="border-t border-gray-300 my-4" />
+        
+        {/* Interactive Map Section */}
+        <div className="bg-white rounded-lg">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">Global Presence Map</h2>
+            <Globe className="w-6 h-6 text-gray-400" />
+          </div>
+
+          {/* Map Container */}
+          <div className="p-6">
+            <div className="h-96 rounded-lg overflow-hidden border border-gray-200">
+              <MapContainer
+                center={[19.5, 74.5]} // Center on Maharashtra, India
+                zoom={7}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {aboutData.locations.map((location, index) => (
+                  <Marker key={index} position={location.coordinates}>
+                    <Popup 
+                      maxWidth={220} 
+                      minWidth={220}
+                      className="compact-popup"
+                    >
+                      <div className="p-1">
+                        <div className="flex items-start gap-2 mb-2">
+                          <img
+                            src={location.image}
+                            alt={location.name}
+                            className="w-12 h-12 rounded object-cover flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-gray-900 text-sm truncate">{location.name}</h3>
+                            <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
+                              {location.type}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-1 text-xs">
+                          <div className="flex items-start gap-1">
+                            <MapPin className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                            <p className="text-gray-600 leading-tight">{location.address}</p>
+                          </div>
+                          
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3 h-3 text-gray-400" />
+                            <p className="text-gray-600">{location.employees} employees</p>
+                          </div>
+                          
+                          <div className="border-t pt-1 mt-1">
+                            <p className="font-medium text-gray-900 text-xs">CEO: {location.ceo}</p>
+                          </div>
+                          
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1">
+                              <Phone className="w-3 h-3 text-gray-400" />
+                              <a 
+                                href={`tel:${location.contact.phone}`}
+                                className="text-blue-600 hover:text-blue-700 text-xs truncate"
+                              >
+                                {location.contact.phone}
+                              </a>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Mail className="w-3 h-3 text-gray-400" />
+                              <a 
+                                href={`mailto:${location.contact.email}`}
+                                className="text-blue-600 hover:text-blue-700 text-xs truncate"
+                              >
+                                {location.contact.email}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </div>
+            
+            {/* Map Legend */}
+            <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span>Office Locations</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-gray-400" />
+                <span>Click markers for location details</span>
+              </div>
             </div>
           </div>
         </div>
@@ -593,6 +749,103 @@ const StartupEcosystemOverview = () => {
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                         placeholder="e.g., 50+, 1,000+"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Coordinates (lat, lng)
+                      </label>
+                      <input
+                        type="text"
+                        value={location.coordinates ? location.coordinates.join(', ') : '0, 0'}
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "coordinates",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., 37.4220, -122.0841"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Regional CEO
+                      </label>
+                      <input
+                        type="text"
+                        value={location.ceo || ''}
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "ceo",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., John Doe"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Image URL
+                      </label>
+                      <input
+                        type="url"
+                        value={location.image || ''}
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "image",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        value={location.contact?.phone || ''}
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "contact.phone",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="+1 (555) 123-4567"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={location.contact?.email || ''}
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "contact.email",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="office@company.com"
                       />
                     </div>
                   </div>

@@ -14,11 +14,56 @@ const NAV_OPTIONS = [
   { id: "downloads", name: "Downloads" },
 ];
 
+// Mock external review form responses (in a real app, this would come from an API/database)
+const externalReviewResponses = [
+  { rating: 4.8, academics: 4.9, placements: 4.8, infrastructure: 4.7, faculty: 4.8, campusLife: 4.7, value: 4.6 },
+  { rating: 4.6, academics: 4.7, placements: 4.9, infrastructure: 4.6, faculty: 4.7, campusLife: 4.5, value: 4.4 },
+  { rating: 4.7, academics: 4.8, placements: 4.9, infrastructure: 4.7, faculty: 4.8, campusLife: 4.6, value: 4.5 },
+  // Add more responses as needed
+];
+
+const calculateAverageRating = (responses) => {
+  if (!responses || responses.length === 0) return { rating: 0, breakdown: {} };
+  
+  const total = responses.reduce((acc, curr) => ({
+    rating: acc.rating + curr.rating,
+    academics: acc.academics + curr.academics,
+    placements: acc.placements + curr.placements,
+    infrastructure: acc.infrastructure + curr.infrastructure,
+    faculty: acc.faculty + curr.faculty,
+    campusLife: acc.campusLife + curr.campusLife,
+    value: acc.value + curr.value
+  }), {
+    rating: 0,
+    academics: 0,
+    placements: 0,
+    infrastructure: 0,
+    faculty: 0,
+    campusLife: 0,
+    value: 0
+  });
+
+  const count = responses.length;
+  return {
+    rating: (total.rating / count).toFixed(1),
+    breakdown: {
+      academics: (total.academics / count).toFixed(1) + "/5",
+      placements: (total.placements / count).toFixed(1) + "/5",
+      infrastructure: (total.infrastructure / count).toFixed(1) + "/5",
+      faculty: (total.faculty / count).toFixed(1) + "/5",
+      campusLife: (total.campusLife / count).toFixed(1) + "/5",
+      value: (total.value / count).toFixed(1) + "/5"
+    }
+  };
+};
+
 const CollegeProfilePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(NAV_OPTIONS[0].id);
-
-  const initialData = {
+  const [externalRatings, setExternalRatings] = useState(() => calculateAverageRating(externalReviewResponses));
+  const [showSectionForm, setShowSectionForm] = useState(null);
+  const [sectionFormData, setSectionFormData] = useState({});
+  const [formData, setFormData] = useState({
     "college-info": {
       name: "Indian Institute of Technology Kanpur (IIT Kanpur)",
       description:
@@ -40,6 +85,74 @@ const CollegeProfilePage = () => {
         "Global collaborations and alumni network",
       ],
     },
+    "course-details": {
+      btechDuration: "4 Years",
+      btechEligibility: "10+2 (PCM) + JEE Advanced",
+      btechBranches: [
+        "Computer Science & Engineering: 120",
+        "Electrical Engineering: 110",
+        "Mechanical Engineering: 100",
+        "Chemical Engineering: 80",
+        "Civil Engineering: 80",
+        "Aerospace Engineering: 60",
+        "Materials Science & Engineering: 50",
+        "Biological Sciences & Bioengineering: 30",
+      ],
+      btechFees: "₹2,00,000",
+      btechTotalSeats: "800+",
+      mtechDuration: "2 Years",
+      mtechEligibility: "B.E./B.Tech + GATE",
+      mtechBranches: [
+        "Computer Science & Engineering: 60",
+        "Electrical Engineering: 55",
+        "Mechanical Engineering: 50",
+        "Chemical Engineering: 40",
+        "Civil Engineering: 40",
+        "Aerospace Engineering: 30",
+        "Environmental Engineering: 20",
+        "Materials Science & Engineering: 20",
+      ],
+      mtechFees: "₹1,50,000",
+      mtechTotalSeats: "400+",
+      bscDuration: "3 Years",
+      bscEligibility: "10+2 (PCM/PCB) + IIT JAM",
+      bscBranches: [
+        "Physics: 50",
+        "Chemistry: 50",
+        "Mathematics: 50",
+        "Biology: 50",
+      ],
+      bscFees: "₹50,000",
+      bscTotalSeats: "200+",
+      mscDuration: "2 Years",
+      mscEligibility: "B.Sc. + JAM",
+      mscBranches: [
+        "Physics: 60",
+        "Chemistry: 50",
+        "Mathematics & Statistics: 40",
+      ],
+      mscFees: "₹50,000",
+      mscTotalSeats: "150+",
+      mbaDuration: "2 Years",
+      mbaEligibility: "UG Degree + CAT",
+      mbaBranches: [
+        "General Management: 40",
+        "Analytics: 30",
+        "Operations: 10",
+        "Marketing: 10",
+        "Finance: 5",
+        "Human Resource Management: 5",
+      ],
+      mbaFees: "₹2,50,000",
+      mbaTotalSeats: "100+",
+      phdDuration: "3-5 Years",
+      phdEligibility: "PG Degree + GATE/NET",
+      phdBranches: [
+        "All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+",
+      ],
+      phdFees: "₹60,000",
+      phdTotalSeats: "200+",
+    },
     "course-fees": {
       btech: "₹2,00,000",
       mtech: "₹1,50,000",
@@ -57,21 +170,12 @@ const CollegeProfilePage = () => {
       other: "₹10,000/year",
     },
     review: {
-      rating: "4.7",
       comments: [
         "“Excellent academic environment and research facilities.”",
         "“Placements are top-notch, with many global recruiters.”",
         "“Campus life is amazing, with lots of clubs and fests.”",
         "“Supportive faculty and great peer group.”",
       ],
-      breakdown: {
-        academics: "4.8/5",
-        placements: "4.9/5",
-        infrastructure: "4.7/5",
-        faculty: "4.8/5",
-        campusLife: "4.6/5",
-        value: "4.5/5",
-      },
     },
     admission: {
       eligibility: [
@@ -217,15 +321,19 @@ const CollegeProfilePage = () => {
         },
       ],
     },
-  };
-
-  const [formData, setFormData] = useState(initialData);
-  const [showSectionForm, setShowSectionForm] = useState(null);
-  const [sectionFormData, setSectionFormData] = useState({});
+  });
 
   const openSectionForm = (tab) => {
     setShowSectionForm(tab);
-    setSectionFormData(formData[tab]);
+    if (tab === "review") {
+      setSectionFormData({
+        ...formData[tab],
+        // Only pass comments since ratings are from external source
+        comments: formData[tab].comments || [],
+      });
+    } else {
+      setSectionFormData(formData[tab]);
+    }
   };
   const closeSectionForm = () => setShowSectionForm(null);
   const handleSectionFormChange = (field, value) => {
@@ -263,8 +371,8 @@ const CollegeProfilePage = () => {
         return (
           <div className="p-6">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-3">
-                <span className="text-3xl">🏫</span> {formData["college-info"].name}
+              <h2 className="text-2xl font-bold text-blue-900 mb-6">
+                {formData["college-info"].name}
               </h2>
               <button
                 className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
@@ -321,122 +429,156 @@ const CollegeProfilePage = () => {
       case "course-details":
         return (
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-blue-900 mb-4">Course Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* B.Tech */}
-              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">B.Tech</h3>
-                <ul className="text-gray-700 text-base space-y-1">
-                  <li><span className="font-medium">Duration:</span> 4 Years</li>
-                  <li><span className="font-medium">Eligibility:</span> 10+2 (PCM) + JEE Advanced</li>
-                  <li><span className="font-medium">Branches & Seats:</span>
-                    <ul className="ml-4 list-disc">
-                      <li>Computer Science & Engineering: 120</li>
-                      <li>Electrical Engineering: 110</li>
-                      <li>Mechanical Engineering: 100</li>
-                      <li>Chemical Engineering: 80</li>
-                      <li>Civil Engineering: 80</li>
-                      <li>Aerospace Engineering: 60</li>
-                      <li>Materials Science & Engineering: 50</li>
-                      <li>Biological Sciences & Bioengineering: 30</li>
-                    </ul>
-                  </li>
-                  <li><span className="font-medium">Annual Fees:</span> ₹2,00,000</li>
-                  <li><span className="font-medium">Total Seats:</span> 800+</li>
-                </ul>
-              </div>
-              {/* M.Tech */}
-              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">M.Tech</h3>
-                <ul className="text-gray-700 text-base space-y-1">
-                  <li><span className="font-medium">Duration:</span> 2 Years</li>
-                  <li><span className="font-medium">Eligibility:</span> B.E./B.Tech + GATE</li>
-                  <li><span className="font-medium">Branches & Seats:</span>
-                    <ul className="ml-4 list-disc">
-                      <li>Computer Science & Engineering: 60</li>
-                      <li>Electrical Engineering: 55</li>
-                      <li>Mechanical Engineering: 50</li>
-                      <li>Chemical Engineering: 40</li>
-                      <li>Civil Engineering: 40</li>
-                      <li>Aerospace Engineering: 30</li>
-                      <li>Environmental Engineering: 20</li>
-                      <li>Materials Science & Engineering: 20</li>
-                    </ul>
-                  </li>
-                  <li><span className="font-medium">Annual Fees:</span> ₹1,50,000</li>
-                  <li><span className="font-medium">Total Seats:</span> 400+</li>
-                </ul>
-              </div>
-              {/* B.Sc. */}
-              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">B.Sc.</h3>
-                <ul className="text-gray-700 text-base space-y-1">
-                  <li><span className="font-medium">Duration:</span> 3 Years</li>
-                  <li><span className="font-medium">Eligibility:</span> 10+2 (PCM/PCB) + IIT JAM</li>
-                  <li><span className="font-medium">Branches & Seats:</span>
-                    <ul className="ml-4 list-disc">
-                      <li>Physics: 50</li>
-                      <li>Chemistry: 50</li>
-                      <li>Mathematics: 50</li>
-                      <li>Biology: 50</li>
-                    </ul>
-                  </li>
-                  <li><span className="font-medium">Annual Fees:</span> ₹50,000</li>
-                  <li><span className="font-medium">Total Seats:</span> 200+</li>
-                </ul>
-              </div>
-              {/* MSc */}
-              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">MSc</h3>
-                <ul className="text-gray-700 text-base space-y-1">
-                  <li><span className="font-medium">Duration:</span> 2 Years</li>
-                  <li><span className="font-medium">Eligibility:</span> B.Sc. + JAM</li>
-                  <li><span className="font-medium">Branches & Seats:</span>
-                    <ul className="ml-4 list-disc">
-                      <li>Physics: 60</li>
-                      <li>Chemistry: 50</li>
-                      <li>Mathematics & Statistics: 40</li>
-                    </ul>
-                  </li>
-                  <li><span className="font-medium">Annual Fees:</span> ₹50,000</li>
-                  <li><span className="font-medium">Total Seats:</span> 150+</li>
-                </ul>
-              </div>
-              {/* MBA */}
-              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">MBA</h3>
-                <ul className="text-gray-700 text-base space-y-1">
-                  <li><span className="font-medium">Duration:</span> 2 Years</li>
-                  <li><span className="font-medium">Eligibility:</span> UG Degree + CAT</li>
-                  <li><span className="font-medium">Branches & Seats:</span>
-                    <ul className="ml-4 list-disc">
-                      <li>General Management: 40</li>
-                      <li>Analytics: 30</li>
-                      <li>Operations: 10</li>
-                      <li>Marketing: 10</li>
-                      <li>Finance: 5</li>
-                      <li>Human Resource Management: 5</li>
-                    </ul>
-                  </li>
-                  <li><span className="font-medium">Annual Fees:</span> ₹2,50,000</li>
-                  <li><span className="font-medium">Total Seats:</span> 100+</li>
-                </ul>
-              </div>
-              {/* Ph.D. */}
-              <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">Ph.D.</h3>
-                <ul className="text-gray-700 text-base space-y-1">
-                  <li><span className="font-medium">Duration:</span> 3-5 Years</li>
-                  <li><span className="font-medium">Eligibility:</span> PG Degree + GATE/NET</li>
-                  <li><span className="font-medium">Branches & Seats:</span>
-                    <ul className="ml-4 list-disc">
-                      <li>All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+</li>
-                    </ul>
-                  </li>
-                  <li><span className="font-medium">Annual Fees:</span> ₹60,000</li>
-                  <li><span className="font-medium">Total Seats:</span> 200+</li>
-                </ul>
-              </div>
+            <div className="flex justify-between items-start mb-2">
+              <h2 className="text-2xl font-bold text-blue-900 mb-4">Course Details</h2>
+              <button
+                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
+                onClick={() => openSectionForm("course-details")}
+              >
+                Edit
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+                <thead className="bg-blue-50">
+                  <tr>
+                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Program</th>
+                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Duration</th>
+                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Eligibility</th>
+                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Branches & Seats</th>
+                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Annual Fees</th>
+                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Total Seats</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-800">
+                  {/* B.Tech */}
+                  <tr>
+                    <td className="py-3 px-4 font-bold text-blue-800">B.Tech</td>
+                    <td className="py-3 px-4">{formData["course-details"].btechDuration || "4 Years"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].btechEligibility || "10+2 (PCM) + JEE Advanced"}</td>
+                    <td className="py-3 px-4">
+                      <ul className="list-disc list-inside space-y-1">
+                        {(formData["course-details"].btechBranches || [
+                          "Computer Science & Engineering: 120",
+                          "Electrical Engineering: 110",
+                          "Mechanical Engineering: 100",
+                          "Chemical Engineering: 80",
+                          "Civil Engineering: 80",
+                          "Aerospace Engineering: 60",
+                          "Materials Science & Engineering: 50",
+                          "Biological Sciences & Bioengineering: 30",
+                        ]).map((branch, idx) => (
+                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="py-3 px-4">{formData["course-details"].btechFees || "₹2,00,000"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].btechTotalSeats || "800+"}</td>
+                  </tr>
+                  {/* M.Tech */}
+                  <tr>
+                    <td className="py-3 px-4 font-bold text-blue-800">M.Tech</td>
+                    <td className="py-3 px-4">{formData["course-details"].mtechDuration || "2 Years"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].mtechEligibility || "B.E./B.Tech + GATE"}</td>
+                    <td className="py-3 px-4">
+                      <ul className="list-disc list-inside space-y-1">
+                        {(formData["course-details"].mtechBranches || [
+                          "Computer Science & Engineering: 60",
+                          "Electrical Engineering: 55",
+                          "Mechanical Engineering: 50",
+                          "Chemical Engineering: 40",
+                          "Civil Engineering: 40",
+                          "Aerospace Engineering: 30",
+                          "Environmental Engineering: 20",
+                          "Materials Science & Engineering: 20",
+                        ]).map((branch, idx) => (
+                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="py-3 px-4">{formData["course-details"].mtechFees || "₹1,50,000"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].mtechTotalSeats || "400+"}</td>
+                  </tr>
+                  {/* B.Sc. */}
+                  <tr>
+                    <td className="py-3 px-4 font-bold text-blue-800">B.Sc.</td>
+                    <td className="py-3 px-4">{formData["course-details"].bscDuration || "3 Years"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].bscEligibility || "10+2 (PCM/PCB) + IIT JAM"}</td>
+                    <td className="py-3 px-4">
+                      <ul className="list-disc list-inside space-y-1">
+                        {(formData["course-details"].bscBranches || [
+                          "Physics: 50",
+                          "Chemistry: 50",
+                          "Mathematics: 50",
+                          "Biology: 50",
+                        ]).map((branch, idx) => (
+                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="py-3 px-4">{formData["course-details"].bscFees || "₹50,000"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].bscTotalSeats || "200+"}</td>
+                  </tr>
+                  {/* MSc */}
+                  <tr>
+                    <td className="py-3 px-4 font-bold text-blue-800">MSc</td>
+                    <td className="py-3 px-4">{formData["course-details"].mscDuration || "2 Years"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].mscEligibility || "B.Sc. + JAM"}</td>
+                    <td className="py-3 px-4">
+                      <ul className="list-disc list-inside space-y-1">
+                        {(formData["course-details"].mscBranches || [
+                          "Physics: 60",
+                          "Chemistry: 50",
+                          "Mathematics & Statistics: 40",
+                        ]).map((branch, idx) => (
+                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="py-3 px-4">{formData["course-details"].mscFees || "₹50,000"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].mscTotalSeats || "150+"}</td>
+                  </tr>
+                  {/* MBA */}
+                  <tr>
+                    <td className="py-3 px-4 font-bold text-blue-800">MBA</td>
+                    <td className="py-3 px-4">{formData["course-details"].mbaDuration || "2 Years"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].mbaEligibility || "UG Degree + CAT"}</td>
+                    <td className="py-3 px-4">
+                      <ul className="list-disc list-inside space-y-1">
+                        {(formData["course-details"].mbaBranches || [
+                          "General Management: 40",
+                          "Analytics: 30",
+                          "Operations: 10",
+                          "Marketing: 10",
+                          "Finance: 5",
+                          "Human Resource Management: 5",
+                        ]).map((branch, idx) => (
+                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="py-3 px-4">{formData["course-details"].mbaFees || "₹2,50,000"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].mbaTotalSeats || "100+"}</td>
+                  </tr>
+                  {/* Ph.D. */}
+                  <tr>
+                    <td className="py-3 px-4 font-bold text-blue-800">Ph.D.</td>
+                    <td className="py-3 px-4">{formData["course-details"].phdDuration || "3-5 Years"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].phdEligibility || "PG Degree + GATE/NET"}</td>
+                    <td className="py-3 px-4">
+                      <ul className="list-disc list-inside space-y-1">
+                        {(formData["course-details"].phdBranches || [
+                          "All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+",
+                        ]).map((branch, idx) => (
+                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="py-3 px-4">{formData["course-details"].phdFees || "₹60,000"}</td>
+                    <td className="py-3 px-4">{formData["course-details"].phdTotalSeats || "200+"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         );
@@ -444,8 +586,8 @@ const CollegeProfilePage = () => {
         return (
           <div className="p-6">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-3">
-                <span className="text-3xl">💸</span> Course Fees & Scholarships
+              <h2 className="text-2xl font-bold text-blue-900 mb-6">
+                Course Fees & Scholarships
               </h2>
               <button
                 className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
@@ -493,8 +635,8 @@ const CollegeProfilePage = () => {
         return (
           <div className="p-6">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-3">
-                <span className="text-3xl">⭐</span> Student Reviews
+              <h2 className="text-2xl font-bold text-blue-900 mb-6">
+                Student Reviews
               </h2>
               <button
                 className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
@@ -503,26 +645,93 @@ const CollegeProfilePage = () => {
                 Edit
               </button>
             </div>
-            <div className="flex items-center gap-2 text-yellow-500 text-2xl mb-2">
-              <span className="font-bold text-yellow-700 text-xl">{formData["review"].rating}</span>
-              <span>★</span>
-              <span className="text-gray-600 text-base">(Based on 1200+ reviews)</span>
-            </div>
-            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7 mb-4">
-              {formData["review"].comments.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-            <div>
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Rating Breakdown</h3>
-              <div className="grid grid-cols-2 gap-4 text-gray-700 text-base">
-                <div>Academics: <span className="font-semibold">{formData["review"].breakdown.academics}</span></div>
-                <div>Placements: <span className="font-semibold">{formData["review"].breakdown.placements}</span></div>
-                <div>Infrastructure: <span className="font-semibold">{formData["review"].breakdown.infrastructure}</span></div>
-                <div>Faculty: <span className="font-semibold">{formData["review"].breakdown.faculty}</span></div>
-                <div>Campus Life: <span className="font-semibold">{formData["review"].breakdown.campusLife}</span></div>
-                <div>Value for Money: <span className="font-semibold">{formData["review"].breakdown.value}</span></div>
+            <div className="flex items-center gap-2 text-yellow-500 text-2xl mb-4">
+              <div className="flex flex-col">
+                <span className="w-16 bg-gray-100 border border-gray-300 rounded px-2 py-1 text-yellow-700 text-xl text-center font-bold">
+                  {externalRatings.rating}
+                </span>
+                <span className="text-sm text-gray-500 mt-1">External Rating</span>
               </div>
+              <span>★</span>
+              <span className="text-gray-600 text-base">
+                (Based on {externalReviewResponses.length} verified reviews)
+              </span>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="font-semibold text-blue-800 mb-3 text-lg">Comments & Feedback</h3>
+              {(sectionFormData.comments || []).map((comment, idx) => (
+                <textarea
+                  key={idx}
+                  className="w-full mb-4 text-base leading-7 bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
+                  value={comment}
+                  onChange={(e) => handleSectionFormArrayChange("comments", idx, e.target.value)}
+                />
+              ))}
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-blue-800 mb-3 text-lg">Rating Breakdown</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                <div className="flex justify-between items-center">
+                  <span>Academics:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                      {externalRatings.breakdown.academics}
+                    </span>
+                    <span className="text-yellow-500">★</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Placements:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                      {externalRatings.breakdown.placements}
+                    </span>
+                    <span className="text-yellow-500">★</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Infrastructure:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                      {externalRatings.breakdown.infrastructure}
+                    </span>
+                    <span className="text-yellow-500">★</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Faculty:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                      {externalRatings.breakdown.faculty}
+                    </span>
+                    <span className="text-yellow-500">★</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Campus Life:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                      {externalRatings.breakdown.campusLife}
+                    </span>
+                    <span className="text-yellow-500">★</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Value for Money:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                      {externalRatings.breakdown.value}
+                    </span>
+                    <span className="text-yellow-500">★</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 text-gray-600 text-sm">
+              <p className="italic">* Ratings are calculated automatically from verified student and alumni reviews.</p>
             </div>
           </div>
         );
@@ -530,8 +739,8 @@ const CollegeProfilePage = () => {
         return (
           <div className="p-6">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-3">
-                <span className="text-3xl">📝</span> Admission
+              <h2 className="text-2xl font-bold text-blue-900 mb-6">
+                Admission
               </h2>
               <button
                 className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
@@ -570,8 +779,8 @@ const CollegeProfilePage = () => {
         return (
           <div className="p-6">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-3">
-                <span className="text-3xl">💼</span> Placement
+              <h2 className="text-2xl font-bold text-blue-900 mb-6">
+                Placement
               </h2>
               <button
                 className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
@@ -610,8 +819,8 @@ const CollegeProfilePage = () => {
         return (
           <div className="p-6">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-3">
-                <span className="text-3xl">👨‍🏫</span> Faculty
+              <h2 className="text-2xl font-bold text-blue-900 mb-6">
+                Faculty
               </h2>
               <button
                 className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
@@ -656,8 +865,8 @@ const CollegeProfilePage = () => {
         return (
           <div className="p-6">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-3">
-                <span className="text-3xl">📥</span> Downloads
+              <h2 className="text-2xl font-bold text-blue-900 mb-6">
+                Downloads
               </h2>
               <button
                 className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
@@ -671,7 +880,7 @@ const CollegeProfilePage = () => {
             <div className="mb-8">
               <h3 className="font-semibold text-blue-800 mb-4 text-lg">Forms</h3>
               <div className="grid gap-4">
-                {formData.downloads.forms.map((doc, idx) => (
+                {(sectionFormData.forms || []).map((doc, idx) => (
                   <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
                     <div className="flex-1">
                       <input
@@ -716,7 +925,7 @@ const CollegeProfilePage = () => {
             <div className="mb-8">
               <h3 className="font-semibold text-blue-800 mb-4 text-lg">Brochures & Catalogs</h3>
               <div className="grid gap-4">
-                {formData.downloads.brochures.map((doc, idx) => (
+                {(sectionFormData.brochures || []).map((doc, idx) => (
                   <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
                     <div className="flex-1">
                       <input
@@ -761,7 +970,7 @@ const CollegeProfilePage = () => {
             <div className="mb-8">
               <h3 className="font-semibold text-blue-800 mb-4 text-lg">Course Syllabus</h3>
               <div className="grid gap-4">
-                {formData.downloads.syllabus.map((doc, idx) => (
+                {(sectionFormData.syllabus || []).map((doc, idx) => (
                   <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
                     <div className="flex-1">
                       <input
@@ -802,11 +1011,11 @@ const CollegeProfilePage = () => {
               </div>
             </div>
 
-            {/* Other Documents Section */}
+            {/* Other Documents */}
             <div>
               <h3 className="font-semibold text-blue-800 mb-4 text-lg">Other Documents</h3>
               <div className="grid gap-4">
-                {formData.downloads.other.map((doc, idx) => (
+                {(sectionFormData.other || []).map((doc, idx) => (
                   <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
                     <div className="flex-1">
                       <input
@@ -1090,122 +1299,147 @@ const CollegeProfilePage = () => {
             )}
             {showSectionForm === "course-details" && (
               <div>
-                <h2 className="text-2xl font-bold text-blue-900 mb-4">Course Details</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* B.Tech */}
-                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-blue-800 mb-2">B.Tech</h3>
-                    <ul className="text-gray-700 text-base space-y-1">
-                      <li><span className="font-medium">Duration:</span> 4 Years</li>
-                      <li><span className="font-medium">Eligibility:</span> 10+2 (PCM) + JEE Advanced</li>
-                      <li><span className="font-medium">Branches & Seats:</span>
-                        <ul className="ml-4 list-disc">
-                          <li>Computer Science & Engineering: 120</li>
-                          <li>Electrical Engineering: 110</li>
-                          <li>Mechanical Engineering: 100</li>
-                          <li>Chemical Engineering: 80</li>
-                          <li>Civil Engineering: 80</li>
-                          <li>Aerospace Engineering: 60</li>
-                          <li>Materials Science & Engineering: 50</li>
-                          <li>Biological Sciences & Bioengineering: 30</li>
-                        </ul>
-                      </li>
-                      <li><span className="font-medium">Annual Fees:</span> ₹2,00,000</li>
-                      <li><span className="font-medium">Total Seats:</span> 800+</li>
-                    </ul>
-                  </div>
-                  {/* M.Tech */}
-                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-blue-800 mb-2">M.Tech</h3>
-                    <ul className="text-gray-700 text-base space-y-1">
-                      <li><span className="font-medium">Duration:</span> 2 Years</li>
-                      <li><span className="font-medium">Eligibility:</span> B.E./B.Tech + GATE</li>
-                      <li><span className="font-medium">Branches & Seats:</span>
-                        <ul className="ml-4 list-disc">
-                          <li>Computer Science & Engineering: 60</li>
-                          <li>Electrical Engineering: 55</li>
-                          <li>Mechanical Engineering: 50</li>
-                          <li>Chemical Engineering: 40</li>
-                          <li>Civil Engineering: 40</li>
-                          <li>Aerospace Engineering: 30</li>
-                          <li>Environmental Engineering: 20</li>
-                          <li>Materials Science & Engineering: 20</li>
-                        </ul>
-                      </li>
-                      <li><span className="font-medium">Annual Fees:</span> ₹1,50,000</li>
-                      <li><span className="font-medium">Total Seats:</span> 400+</li>
-                    </ul>
-                  </div>
-                  {/* B.Sc. */}
-                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-blue-800 mb-2">B.Sc.</h3>
-                    <ul className="text-gray-700 text-base space-y-1">
-                      <li><span className="font-medium">Duration:</span> 3 Years</li>
-                      <li><span className="font-medium">Eligibility:</span> 10+2 (PCM/PCB) + IIT JAM</li>
-                      <li><span className="font-medium">Branches & Seats:</span>
-                        <ul className="ml-4 list-disc">
-                          <li>Physics: 50</li>
-                          <li>Chemistry: 50</li>
-                          <li>Mathematics: 50</li>
-                          <li>Biology: 50</li>
-                        </ul>
-                      </li>
-                      <li><span className="font-medium">Annual Fees:</span> ₹50,000</li>
-                      <li><span className="font-medium">Total Seats:</span> 200+</li>
-                    </ul>
-                  </div>
-                  {/* MSc */}
-                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-blue-800 mb-2">MSc</h3>
-                    <ul className="text-gray-700 text-base space-y-1">
-                      <li><span className="font-medium">Duration:</span> 2 Years</li>
-                      <li><span className="font-medium">Eligibility:</span> B.Sc. + JAM</li>
-                      <li><span className="font-medium">Branches & Seats:</span>
-                        <ul className="ml-4 list-disc">
-                          <li>Physics: 60</li>
-                          <li>Chemistry: 50</li>
-                          <li>Mathematics & Statistics: 40</li>
-                        </ul>
-                      </li>
-                      <li><span className="font-medium">Annual Fees:</span> ₹50,000</li>
-                      <li><span className="font-medium">Total Seats:</span> 150+</li>
-                    </ul>
-                  </div>
-                  {/* MBA */}
-                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-blue-800 mb-2">MBA</h3>
-                    <ul className="text-gray-700 text-base space-y-1">
-                      <li><span className="font-medium">Duration:</span> 2 Years</li>
-                      <li><span className="font-medium">Eligibility:</span> UG Degree + CAT</li>
-                      <li><span className="font-medium">Branches & Seats:</span>
-                        <ul className="ml-4 list-disc">
-                          <li>General Management: 40</li>
-                          <li>Analytics: 30</li>
-                          <li>Operations: 10</li>
-                          <li>Marketing: 10</li>
-                          <li>Finance: 5</li>
-                          <li>Human Resource Management: 5</li>
-                        </ul>
-                      </li>
-                      <li><span className="font-medium">Annual Fees:</span> ₹2,50,000</li>
-                      <li><span className="font-medium">Total Seats:</span> 100+</li>
-                    </ul>
-                  </div>
-                  {/* Ph.D. */}
-                  <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                    <h3 className="text-lg font-semibold text-blue-800 mb-2">Ph.D.</h3>
-                    <ul className="text-gray-700 text-base space-y-1">
-                      <li><span className="font-medium">Duration:</span> 3-5 Years</li>
-                      <li><span className="font-medium">Eligibility:</span> PG Degree + GATE/NET</li>
-                      <li><span className="font-medium">Branches & Seats:</span>
-                        <ul className="ml-4 list-disc">
-                          <li>All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+</li>
-                        </ul>
-                      </li>
-                      <li><span className="font-medium">Annual Fees:</span> ₹60,000</li>
-                      <li><span className="font-medium">Total Seats:</span> 200+</li>
-                    </ul>
-                  </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+                    <thead className="bg-blue-50">
+                      <tr>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Program</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Duration</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Eligibility</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Branches & Seats</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Annual Fees</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Total Seats</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-gray-800">
+                      {/* B.Tech */}
+                      <tr>
+                        <td className="py-3 px-4 font-bold text-blue-800">B.Tech</td>
+                        <td className="py-3 px-4">{formData["course-details"].btechDuration || "4 Years"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].btechEligibility || "10+2 (PCM) + JEE Advanced"}</td>
+                        <td className="py-3 px-4">
+                          <ul className="list-disc list-inside space-y-1">
+                            {(formData["course-details"].btechBranches || [
+                              "Computer Science & Engineering: 120",
+                              "Electrical Engineering: 110",
+                              "Mechanical Engineering: 100",
+                              "Chemical Engineering: 80",
+                              "Civil Engineering: 80",
+                              "Aerospace Engineering: 60",
+                              "Materials Science & Engineering: 50",
+                              "Biological Sciences & Bioengineering: 30",
+                            ]).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td className="py-3 px-4">{formData["course-details"].btechFees || "₹2,00,000"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].btechTotalSeats || "800+"}</td>
+                      </tr>
+                      {/* M.Tech */}
+                      <tr>
+                        <td className="py-3 px-4 font-bold text-blue-800">M.Tech</td>
+                        <td className="py-3 px-4">{formData["course-details"].mtechDuration || "2 Years"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].mtechEligibility || "B.E./B.Tech + GATE"}</td>
+                        <td className="py-3 px-4">
+                          <ul className="list-disc list-inside space-y-1">
+                            {(formData["course-details"].mtechBranches || [
+                              "Computer Science & Engineering: 60",
+                              "Electrical Engineering: 55",
+                              "Mechanical Engineering: 50",
+                              "Chemical Engineering: 40",
+                              "Civil Engineering: 40",
+                              "Aerospace Engineering: 30",
+                              "Environmental Engineering: 20",
+                              "Materials Science & Engineering: 20",
+                            ]).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td className="py-3 px-4">{formData["course-details"].mtechFees || "₹1,50,000"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].mtechTotalSeats || "400+"}</td>
+                      </tr>
+                      {/* B.Sc. */}
+                      <tr>
+                        <td className="py-3 px-4 font-bold text-blue-800">B.Sc.</td>
+                        <td className="py-3 px-4">{formData["course-details"].bscDuration || "3 Years"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].bscEligibility || "10+2 (PCM/PCB) + IIT JAM"}</td>
+                        <td className="py-3 px-4">
+                          <ul className="list-disc list-inside space-y-1">
+                            {(formData["course-details"].bscBranches || [
+                              "Physics: 50",
+                              "Chemistry: 50",
+                              "Mathematics: 50",
+                              "Biology: 50",
+                            ]).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td className="py-3 px-4">{formData["course-details"].bscFees || "₹50,000"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].bscTotalSeats || "200+"}</td>
+                      </tr>
+                      {/* MSc */}
+                      <tr>
+                        <td className="py-3 px-4 font-bold text-blue-800">MSc</td>
+                        <td className="py-3 px-4">{formData["course-details"].mscDuration || "2 Years"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].mscEligibility || "B.Sc. + JAM"}</td>
+                        <td className="py-3 px-4">
+                          <ul className="list-disc list-inside space-y-1">
+                            {(formData["course-details"].mscBranches || [
+                              "Physics: 60",
+                              "Chemistry: 50",
+                              "Mathematics & Statistics: 40",
+                            ]).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td className="py-3 px-4">{formData["course-details"].mscFees || "₹50,000"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].mscTotalSeats || "150+"}</td>
+                      </tr>
+                      {/* MBA */}
+                      <tr>
+                        <td className="py-3 px-4 font-bold text-blue-800">MBA</td>
+                        <td className="py-3 px-4">{formData["course-details"].mbaDuration || "2 Years"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].mbaEligibility || "UG Degree + CAT"}</td>
+                        <td className="py-3 px-4">
+                          <ul className="list-disc list-inside space-y-1">
+                            {(formData["course-details"].mbaBranches || [
+                              "General Management: 40",
+                              "Analytics: 30",
+                              "Operations: 10",
+                              "Marketing: 10",
+                              "Finance: 5",
+                              "Human Resource Management: 5",
+                            ]).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td className="py-3 px-4">{formData["course-details"].mbaFees || "₹2,50,000"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].mbaTotalSeats || "100+"}</td>
+                      </tr>
+                      {/* Ph.D. */}
+                      <tr>
+                        <td className="py-3 px-4 font-bold text-blue-800">Ph.D.</td>
+                        <td className="py-3 px-4">{formData["course-details"].phdDuration || "3-5 Years"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].phdEligibility || "PG Degree + GATE/NET"}</td>
+                        <td className="py-3 px-4">
+                          <ul className="list-disc list-inside space-y-1">
+                            {(formData["course-details"].phdBranches || [
+                              "All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+",
+                            ]).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td className="py-3 px-4">{formData["course-details"].phdFees || "₹60,000"}</td>
+                        <td className="py-3 px-4">{formData["course-details"].phdTotalSeats || "200+"}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
@@ -1346,131 +1580,93 @@ const CollegeProfilePage = () => {
             )}
             {showSectionForm === "review" && (
               <div>
-                <div className="flex items-center gap-2 text-yellow-500 text-2xl mb-2">
-                  <input
-                    className="w-16 bg-white border border-gray-300 rounded px-2 py-1 text-yellow-700 text-xl"
-                    value={sectionFormData.rating}
-                    onChange={(e) =>
-                      handleSectionFormChange("rating", e.target.value)
-                    }
-                  />
+                <div className="flex items-center gap-2 text-yellow-500 text-2xl mb-4">
+                  <div className="flex flex-col">
+                    <span className="w-16 bg-gray-100 border border-gray-300 rounded px-2 py-1 text-yellow-700 text-xl text-center font-bold">
+                      {externalRatings.rating}
+                    </span>
+                    <span className="text-sm text-gray-500 mt-1">External Rating</span>
+                  </div>
                   <span>★</span>
                   <span className="text-gray-600 text-base">
-                    (Based on 1200+ reviews)
+                    (Based on {externalReviewResponses.length} verified reviews)
                   </span>
                 </div>
-                <textarea
-                  className="w-full mb-4 text-base leading-7 bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
-                  value={sectionFormData.comments[0]}
-                  onChange={(e) =>
-                    handleSectionFormArrayChange("comments", 0, e.target.value)
-                  }
-                />
-                <textarea
-                  className="w-full mb-4 text-base leading-7 bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
-                  value={sectionFormData.comments[1]}
-                  onChange={(e) =>
-                    handleSectionFormArrayChange("comments", 1, e.target.value)
-                  }
-                />
-                <textarea
-                  className="w-full mb-4 text-base leading-7 bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
-                  value={sectionFormData.comments[2]}
-                  onChange={(e) =>
-                    handleSectionFormArrayChange("comments", 2, e.target.value)
-                  }
-                />
-                <textarea
-                  className="w-full mb-4 text-base leading-7 bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
-                  value={sectionFormData.comments[3]}
-                  onChange={(e) =>
-                    handleSectionFormArrayChange("comments", 3, e.target.value)
-                  }
-                />
+
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-3 text-lg">Comments & Feedback</h3>
+                  {(sectionFormData.comments || []).map((comment, idx) => (
+                    <textarea
+                      key={idx}
+                      className="w-full mb-4 text-base leading-7 bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
+                      value={comment}
+                      onChange={(e) => handleSectionFormArrayChange("comments", idx, e.target.value)}
+                    />
+                  ))}
+                </div>
+
                 <div>
-                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-                    Rating Breakdown
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4 text-gray-700 text-base">
-                    <div>
-                      Academics:{" "}
-                      <input
-                        className="bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                        value={sectionFormData.breakdown.academics}
-                        onChange={(e) =>
-                          handleSectionFormChange(
-                            ["breakdown", "academics"],
-                            e.target.value
-                          )
-                        }
-                      />
+                  <h3 className="font-semibold text-blue-800 mb-3 text-lg">Rating Breakdown</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                    <div className="flex justify-between items-center">
+                      <span>Academics:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                          {externalRatings.breakdown.academics}
+                        </span>
+                        <span className="text-yellow-500">★</span>
+                      </div>
                     </div>
-                    <div>
-                      Placements:{" "}
-                      <input
-                        className="bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                        value={sectionFormData.breakdown.placements}
-                        onChange={(e) =>
-                          handleSectionFormChange(
-                            ["breakdown", "placements"],
-                            e.target.value
-                          )
-                        }
-                      />
+                    <div className="flex justify-between items-center">
+                      <span>Placements:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                          {externalRatings.breakdown.placements}
+                        </span>
+                        <span className="text-yellow-500">★</span>
+                      </div>
                     </div>
-                    <div>
-                      Infrastructure:{" "}
-                      <input
-                        className="bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                        value={sectionFormData.breakdown.infrastructure}
-                        onChange={(e) =>
-                          handleSectionFormChange(
-                            ["breakdown", "infrastructure"],
-                            e.target.value
-                          )
-                        }
-                      />
+                    <div className="flex justify-between items-center">
+                      <span>Infrastructure:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                          {externalRatings.breakdown.infrastructure}
+                        </span>
+                        <span className="text-yellow-500">★</span>
+                      </div>
                     </div>
-                    <div>
-                      Faculty:{" "}
-                      <input
-                        className="bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                        value={sectionFormData.breakdown.faculty}
-                        onChange={(e) =>
-                          handleSectionFormChange(
-                            ["breakdown", "faculty"],
-                            e.target.value
-                          )
-                        }
-                      />
+                    <div className="flex justify-between items-center">
+                      <span>Faculty:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                          {externalRatings.breakdown.faculty}
+                        </span>
+                        <span className="text-yellow-500">★</span>
+                      </div>
                     </div>
-                    <div>
-                      Campus Life:{" "}
-                      <input
-                        className="bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                        value={sectionFormData.breakdown.campusLife}
-                        onChange={(e) =>
-                          handleSectionFormChange(
-                            ["breakdown", "campusLife"],
-                            e.target.value
-                          )
-                        }
-                      />
+                    <div className="flex justify-between items-center">
+                      <span>Campus Life:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                          {externalRatings.breakdown.campusLife}
+                        </span>
+                        <span className="text-yellow-500">★</span>
+                      </div>
                     </div>
-                    <div>
-                      Value for Money:{" "}
-                      <input
-                        className="bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                        value={sectionFormData.breakdown.value}
-                        onChange={(e) =>
-                          handleSectionFormChange(
-                            ["breakdown", "value"],
-                            e.target.value
-                          )
-                        }
-                      />
+                    <div className="flex justify-between items-center">
+                      <span>Value for Money:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
+                          {externalRatings.breakdown.value}
+                        </span>
+                        <span className="text-yellow-500">★</span>
+                      </div>
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-6 text-gray-600 text-sm">
+                  <p className="italic">* Ratings are calculated automatically from verified student and alumni reviews.</p>
                 </div>
               </div>
             )}
@@ -1660,14 +1856,13 @@ const CollegeProfilePage = () => {
                 </div>
               </div>
             )}
-            {showSectionForm === "downloads" && (
+            {showSectionForm === "downloads" && sectionFormData && (
               <div>
                 {/* Forms Section */}
                 <div className="mb-8">
-                 
                   <h3 className="font-semibold text-blue-800 mb-4 text-lg">Forms</h3>
                   <div className="grid gap-4">
-                    {sectionFormData.forms.map((doc, idx) => (
+                    {(sectionFormData.forms || []).map((doc, idx) => (
                       <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
                         <div className="flex-1">
                           <input
@@ -1712,7 +1907,7 @@ const CollegeProfilePage = () => {
                 <div className="mb-8">
                   <h3 className="font-semibold text-blue-800 mb-4 text-lg">Brochures & Catalogs</h3>
                   <div className="grid gap-4">
-                    {sectionFormData.brochures.map((doc, idx) => (
+                    {(sectionFormData.brochures || []).map((doc, idx) => (
                       <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
                         <div className="flex-1">
                           <input
@@ -1757,7 +1952,7 @@ const CollegeProfilePage = () => {
                 <div className="mb-8">
                   <h3 className="font-semibold text-blue-800 mb-4 text-lg">Course Syllabus</h3>
                   <div className="grid gap-4">
-                    {sectionFormData.syllabus.map((doc, idx) => (
+                    {(sectionFormData.syllabus || []).map((doc, idx) => (
                       <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
                         <div className="flex-1">
                           <input
@@ -1802,7 +1997,7 @@ const CollegeProfilePage = () => {
                 <div>
                   <h3 className="font-semibold text-blue-800 mb-4 text-lg">Other Documents</h3>
                   <div className="grid gap-4">
-                    {sectionFormData.other.map((doc, idx) => (
+                    {(sectionFormData.other || []).map((doc, idx) => (
                       <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
                         <div className="flex-1">
                           <input

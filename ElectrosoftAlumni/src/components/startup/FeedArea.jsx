@@ -350,177 +350,135 @@ const FeedArea = () => {
             </p>
           )}
 
-            {post.image && editingPostId !== post.id && (
-              <div className="mt-3 rounded-lg overflow-hidden">
-                <img
-                  src={post.image}
-                  alt="Post content"
-                  className="w-full h-64 object-cover"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
-                />
-              </div>
-            )}
+          {post.image && editingPostId !== post.id && (
+            <div className="mt-3 rounded-lg overflow-hidden">
+              <img
+                src={post.image}
+                alt="Post content"
+                className="w-full h-64 object-cover"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                }}
+              />
+            </div>
+          )}
 
-            {/* Display Attachments */}
-            {post.attachments && post.attachments.length > 0 && editingPostId !== post.id && (
-              <div className="mt-3 space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Attachments:</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {post.attachments.map((attachment, index) => (
-                    <div key={attachment.id || index} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
-                      {attachment.type === 'photo' && (
-                        <div className="space-y-2">
-                          <img
-                            src={attachment.url}
-                            alt={attachment.name}
-                            className="w-full h-32 object-cover rounded cursor-pointer"
-                            onClick={() => window.open(attachment.url, '_blank')}
-                          />
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs font-medium text-gray-900 truncate">{attachment.name}</p>
-                              <p className="text-xs text-gray-500">{formatFileSize(attachment.size)}</p>
-                            </div>
-                            <button
-                              onClick={() => handleDownload(attachment)}
-                              className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
-                              title="Download"
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {attachment.type === 'video' && (
-                        <div className="space-y-2">
-                          {attachment.url ? (
-                            <video
-                              src={attachment.url}
-                              controls
-                              className="w-full h-32 object-cover rounded"
-                            >
-                              Your browser does not support video playback.
-                            </video>
-                          ) : (
-                            <div className="w-full h-32 bg-gray-100 rounded flex items-center justify-center">
-                              <div className="text-center">
-                                <Video className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                                <p className="text-xs text-gray-600">{attachment.previewText || 'Video file'}</p>
-                              </div>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs font-medium text-gray-900 truncate">{attachment.name}</p>
-                              <p className="text-xs text-gray-500">{formatFileSize(attachment.size)}</p>
-                            </div>
-                            <button
-                              onClick={() => handleDownload(attachment)}
-                              className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
-                              title="Download"
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {attachment.type === 'document' && (
-                        <div className="flex items-center space-x-3">
-                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            {getFileIcon(attachment.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
+          {/* Display Attachments */}
+          {post.attachments && post.attachments.length > 0 && editingPostId !== post.id && (
+            <div className="mt-3 space-y-2">
+              <h4 className="text-sm font-medium text-gray-700">Attachments:</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {post.attachments.map((attachment, index) => (
+                  <div key={attachment.id || index} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                    {attachment.type === 'photo' && (
+                      <div className="space-y-2">
+                        <img
+                          src={attachment.url}
+                          alt={attachment.name}
+                          className="w-full h-32 object-cover rounded cursor-pointer"
+                          onClick={() => window.open(attachment.url, '_blank')}
+                        />
+                        <div className="flex items-center justify-between">
+                          <div>
                             <p className="text-xs font-medium text-gray-900 truncate">{attachment.name}</p>
                             <p className="text-xs text-gray-500">{formatFileSize(attachment.size)}</p>
-                            {attachment.previewText && (
-                              <p className="text-xs text-blue-500">{attachment.previewText}</p>
-                            )}
                           </div>
-                          <div className="flex space-x-1">
-                            {attachment.fileData && (
-                              <button
-                                onClick={() => window.open(attachment.fileData, '_blank')}
-                                className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors"
-                                title="Open"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDownload(attachment)}
-                              className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
-                              title="Download"
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => handleDownload(attachment)}
+                            className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                            title="Download"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                      </div>
+                    )}
+                    
+                    {attachment.type === 'video' && (
+                      <div className="space-y-2">
+                        {attachment.url ? (
+                          <video
+                            src={attachment.url}
+                            controls
+                            className="w-full h-32 object-cover rounded"
+                          >
+                            Your browser does not support video playback.
+                          </video>
+                        ) : (
+                          <div className="w-full h-32 bg-gray-100 rounded flex items-center justify-center">
+                            <div className="text-center">
+                              <Video className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+                              <p className="text-xs text-gray-600">{attachment.previewText || 'Video file'}</p>
+                            </div>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-gray-900 truncate">{attachment.name}</p>
+                            <p className="text-xs text-gray-500">{formatFileSize(attachment.size)}</p>
+                          </div>
+                          <button
+                            onClick={() => handleDownload(attachment)}
+                            className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                            title="Download"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {attachment.type === 'document' && (
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          {getFileIcon(attachment.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-900 truncate">{attachment.name}</p>
+                          <p className="text-xs text-gray-500">{formatFileSize(attachment.size)}</p>
+                          {attachment.previewText && (
+                            <p className="text-xs text-blue-500">{attachment.previewText}</p>
+                          )}
+                        </div>
+                        <div className="flex space-x-1">
+                          {attachment.fileData && (
+                            <button
+                              onClick={() => window.open(attachment.fileData, '_blank')}
+                              className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors"
+                              title="Open"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDownload(attachment)}
+                            className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                            title="Download"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-
-        {editingPostId !== post.id && (
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-            <div className="flex items-center space-x-6">
-              <button
-                onClick={() => handleLike(post.id)}
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-colors ${
-                  post.liked
-                    ? "text-blue-600 bg-blue-50"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <ThumbsUp
-                  className={`w-4 h-4 ${post.liked ? "fill-current" : ""}`}
-                />
-                <span className="text-sm">{post.likes}</span>
-              </button>
-
-              <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                <MessageCircle className="w-4 h-4" />
-                <span className="text-sm">{post.comments}</span>
-              </button>
-
-              <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                <Share2 className="w-4 h-4" />
-                <span className="text-sm">{post.shares}</span>
-              </button>
             </div>
-
-            <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-              <Send className="w-4 h-4" />
-              <span className="text-sm hidden sm:inline">Send</span>
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
+          )}
+        </div> {/* End .mt-3 */}
+      </div> {/* End .flex-1 */}
+    </div> {/* End .flex.items-start */}
+  </div> /* End .border-b */
 );
 
   return (
-    <div className="space-y-4">
-      {/* Feed Posts */}
-      <div className="space-y-0">
+    <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="space-y-4">
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
-
-        <div className="p-6 text-center">
-          <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-            Load more posts...
-          </button>
-        </div>
       </div>
     </div>
   );

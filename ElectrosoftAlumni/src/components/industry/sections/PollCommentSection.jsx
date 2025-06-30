@@ -14,7 +14,8 @@ import {
 const PollCommentSection = () => {
   const [editingId, setEditingId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const [polls, setPolls] = useState([
     {
       id: 1,
@@ -88,6 +89,15 @@ const PollCommentSection = () => {
     allowComments: true,
   });
 
+  const [addData, setAddData] = useState({
+    question: "",
+    type: "multiple",
+    options: "",
+    endDate: "",
+    category: "Technology",
+    allowComments: true,
+  });
+
   const handleEdit = (poll) => {
     setEditingId(poll.id);
     setIsModalOpen(true);
@@ -153,6 +163,56 @@ const PollCommentSection = () => {
     });
   };
 
+  const handleAdd = () => {
+    const newId = Math.max(...polls.map((poll) => poll.id)) + 1;
+    const optionsArray = addData.options
+      .split("\n")
+      .filter((opt) => opt.trim())
+      .map((opt, index) => ({
+        id: index + 1,
+        text: opt.trim(),
+        votes: 0,
+        percentage: 0,
+      }));
+
+    const newPoll = {
+      id: newId,
+      question: addData.question,
+      type: addData.type,
+      options: optionsArray,
+      totalVotes: 0,
+      createdBy: "Industry User",
+      createdDate: new Date().toISOString().split("T")[0],
+      endDate: addData.endDate,
+      status: "Active",
+      allowComments: addData.allowComments,
+      category: addData.category,
+    };
+
+    setPolls([newPoll, ...polls]);
+    setIsAddModalOpen(false);
+    setAddData({
+      question: "",
+      type: "multiple",
+      options: "",
+      endDate: "",
+      category: "Technology",
+      allowComments: true,
+    });
+  };
+
+  const handleAddCancel = () => {
+    setIsAddModalOpen(false);
+    setAddData({
+      question: "",
+      type: "multiple",
+      options: "",
+      endDate: "",
+      category: "Technology",
+      allowComments: true,
+    });
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case "Active":
@@ -178,7 +238,10 @@ const PollCommentSection = () => {
             Voice your opinion and engage with industry professionals
           </p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+        >
           <Plus className="w-4 h-4" />
           <span>Create Poll</span>
         </button>
@@ -250,7 +313,10 @@ const PollCommentSection = () => {
                         <select
                           value={editData.category}
                           onChange={(e) =>
-                            setEditData({ ...editData, category: e.target.value })
+                            setEditData({
+                              ...editData,
+                              category: e.target.value,
+                            })
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
@@ -269,7 +335,10 @@ const PollCommentSection = () => {
                           type="date"
                           value={editData.endDate}
                           onChange={(e) =>
-                            setEditData({ ...editData, endDate: e.target.value })
+                            setEditData({
+                              ...editData,
+                              endDate: e.target.value,
+                            })
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
@@ -327,6 +396,150 @@ const PollCommentSection = () => {
                       className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                     >
                       Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Add Modal */}
+            {isAddModalOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        Create New Poll
+                      </h2>
+                      <button
+                        onClick={handleAddCancel}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      >
+                        <X className="w-5 h-5 text-gray-500" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                    {/* Poll Question */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Poll Question
+                      </label>
+                      <input
+                        type="text"
+                        value={addData.question}
+                        onChange={(e) =>
+                          setAddData({ ...addData, question: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your question"
+                      />
+                    </div>
+
+                    {/* Grid Layout */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Poll Type
+                        </label>
+                        <select
+                          value={addData.type}
+                          onChange={(e) =>
+                            setAddData({ ...addData, type: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="multiple">Multiple Choice</option>
+                          <option value="binary">Yes/No</option>
+                          <option value="rating">Rating Scale</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Category
+                        </label>
+                        <select
+                          value={addData.category}
+                          onChange={(e) =>
+                            setAddData({ ...addData, category: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="Technology">Technology</option>
+                          <option value="Workplace">Workplace</option>
+                          <option value="Industry">Industry</option>
+                          <option value="Business">Business</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          End Date
+                        </label>
+                        <input
+                          type="date"
+                          value={addData.endDate}
+                          onChange={(e) =>
+                            setAddData({ ...addData, endDate: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Poll Options */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Poll Options (one per line)
+                      </label>
+                      <textarea
+                        value={addData.options}
+                        onChange={(e) =>
+                          setAddData({ ...addData, options: e.target.value })
+                        }
+                        rows={4}
+                        placeholder="Option 1&#10;Option 2&#10;Option 3"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+
+                    {/* Allow Comments */}
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="addAllowComments"
+                        checked={addData.allowComments}
+                        onChange={(e) =>
+                          setAddData({
+                            ...addData,
+                            allowComments: e.target.checked,
+                          })
+                        }
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label
+                        htmlFor="addAllowComments"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Allow comments on this poll
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                    <button
+                      onClick={handleAddCancel}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAdd}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                    >
+                      Create Poll
                     </button>
                   </div>
                 </div>

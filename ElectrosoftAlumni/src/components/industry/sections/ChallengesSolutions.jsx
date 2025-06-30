@@ -8,11 +8,13 @@ import {
   Users,
   Clock,
   X,
+  Plus,
 } from "lucide-react";
 
 const ChallengesSolutions = () => {
   const [editingId, setEditingId] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [challengeSolutions, setChallengeSolutions] = useState([
     {
       id: 1,
@@ -81,6 +83,20 @@ const ChallengesSolutions = () => {
   ]);
 
   const [editData, setEditData] = useState({
+    challenge: "",
+    description: "",
+    impact: "Medium",
+    affectedCompanies: "",
+    solution: "",
+    solutionDescription: "",
+    implementedBy: "",
+    successRate: "",
+    timeToImplement: "",
+    costSaving: "",
+    status: "Active",
+  });
+
+  const [addData, setAddData] = useState({
     challenge: "",
     description: "",
     impact: "Medium",
@@ -170,6 +186,59 @@ const ChallengesSolutions = () => {
     });
   };
 
+  const handleAdd = () => {
+    const newId = Math.max(...challengeSolutions.map((item) => item.id)) + 1;
+    const newChallengeSolution = {
+      id: newId,
+      challenge: addData.challenge,
+      description: addData.description,
+      impact: addData.impact,
+      affectedCompanies: addData.affectedCompanies,
+      solution: addData.solution,
+      solutionDescription: addData.solutionDescription,
+      implementedBy: addData.implementedBy
+        .split(",")
+        .map((company) => company.trim()),
+      successRate: addData.successRate,
+      timeToImplement: addData.timeToImplement,
+      costSaving: addData.costSaving,
+      status: addData.status,
+    };
+
+    setChallengeSolutions([...challengeSolutions, newChallengeSolution]);
+    setIsAddModalOpen(false);
+    setAddData({
+      challenge: "",
+      description: "",
+      impact: "Medium",
+      affectedCompanies: "",
+      solution: "",
+      solutionDescription: "",
+      implementedBy: "",
+      successRate: "",
+      timeToImplement: "",
+      costSaving: "",
+      status: "Active",
+    });
+  };
+
+  const handleAddCancel = () => {
+    setIsAddModalOpen(false);
+    setAddData({
+      challenge: "",
+      description: "",
+      impact: "Medium",
+      affectedCompanies: "",
+      solution: "",
+      solutionDescription: "",
+      implementedBy: "",
+      successRate: "",
+      timeToImplement: "",
+      costSaving: "",
+      status: "Active",
+    });
+  };
+
   const getImpactColor = (impact) => {
     switch (impact) {
       case "Critical":
@@ -210,8 +279,12 @@ const ChallengesSolutions = () => {
             transformation
           </p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          Add Challenge
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Challenge</span>
         </button>
       </div>
 
@@ -445,6 +518,227 @@ const ChallengesSolutions = () => {
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Add New Challenge & Solution
+                </h2>
+                <button
+                  onClick={handleAddCancel}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Challenge Title
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.challenge}
+                    onChange={(e) =>
+                      setAddData({ ...addData, challenge: e.target.value })
+                    }
+                    placeholder="Enter challenge title"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Impact Level
+                  </label>
+                  <select
+                    value={addData.impact}
+                    onChange={(e) =>
+                      setAddData({ ...addData, impact: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Challenge Description
+                </label>
+                <textarea
+                  value={addData.description}
+                  onChange={(e) =>
+                    setAddData({ ...addData, description: e.target.value })
+                  }
+                  rows={3}
+                  placeholder="Describe the challenge in detail"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Solution Title
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.solution}
+                    onChange={(e) =>
+                      setAddData({ ...addData, solution: e.target.value })
+                    }
+                    placeholder="Enter solution title"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Affected Companies (%)
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.affectedCompanies}
+                    onChange={(e) =>
+                      setAddData({
+                        ...addData,
+                        affectedCompanies: e.target.value,
+                      })
+                    }
+                    placeholder="e.g., 85%"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Solution Description
+                </label>
+                <textarea
+                  value={addData.solutionDescription}
+                  onChange={(e) =>
+                    setAddData({
+                      ...addData,
+                      solutionDescription: e.target.value,
+                    })
+                  }
+                  rows={3}
+                  placeholder="Describe the solution implementation"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Implemented By (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.implementedBy}
+                    onChange={(e) =>
+                      setAddData({ ...addData, implementedBy: e.target.value })
+                    }
+                    placeholder="e.g., Amazon, Google, Microsoft"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Success Rate
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.successRate}
+                    onChange={(e) =>
+                      setAddData({ ...addData, successRate: e.target.value })
+                    }
+                    placeholder="e.g., 78%"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Time to Implement
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.timeToImplement}
+                    onChange={(e) =>
+                      setAddData({
+                        ...addData,
+                        timeToImplement: e.target.value,
+                      })
+                    }
+                    placeholder="e.g., 6-12 months"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Cost Saving
+                  </label>
+                  <input
+                    type="text"
+                    value={addData.costSaving}
+                    onChange={(e) =>
+                      setAddData({ ...addData, costSaving: e.target.value })
+                    }
+                    placeholder="e.g., 25-40%"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={addData.status}
+                    onChange={(e) =>
+                      setAddData({ ...addData, status: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Planned">Planned</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={handleAddCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAdd}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Add Challenge & Solution
               </button>
             </div>
           </div>

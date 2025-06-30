@@ -9,11 +9,13 @@ import {
   Briefcase,
   Newspaper,
   X,
+  Plus,
 } from "lucide-react";
 
 const PostNewsJobs = () => {
   const [editingId, setEditingId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [postsData, setPostsData] = useState([
     {
       id: 1,
@@ -76,6 +78,19 @@ const PostNewsJobs = () => {
     requirements: "",
   });
 
+  const [addData, setAddData] = useState({
+    type: "job",
+    title: "",
+    content: "",
+    company: "",
+    author: "",
+    location: "",
+    salary: "",
+    requirements: "",
+    tags: "",
+    eventDate: "",
+  });
+
   const handleEdit = (post) => {
     setEditingId(post.id);
     setIsModalOpen(true);
@@ -135,6 +150,68 @@ const PostNewsJobs = () => {
     });
   };
 
+  const handleAdd = () => {
+    const newId = Math.max(...postsData.map((post) => post.id)) + 1;
+    const newPost = {
+      id: newId,
+      type: addData.type,
+      title: addData.title,
+      content: addData.content,
+      company: addData.company,
+      author: addData.author,
+      location: addData.location,
+      date: "Just now",
+      likes: 0,
+      comments: 0,
+      shares: 0,
+      ...(addData.type === "job" && {
+        salary: addData.salary,
+        requirements: addData.requirements
+          ? addData.requirements.split(",").map((req) => req.trim())
+          : [],
+      }),
+      ...(addData.type === "news" && {
+        tags: addData.tags
+          ? addData.tags.split(",").map((tag) => tag.trim())
+          : [],
+      }),
+      ...(addData.type === "event" && {
+        eventDate: addData.eventDate,
+      }),
+    };
+
+    setPostsData([newPost, ...postsData]);
+    setIsAddModalOpen(false);
+    setAddData({
+      type: "job",
+      title: "",
+      content: "",
+      company: "",
+      author: "",
+      location: "",
+      salary: "",
+      requirements: "",
+      tags: "",
+      eventDate: "",
+    });
+  };
+
+  const handleAddCancel = () => {
+    setIsAddModalOpen(false);
+    setAddData({
+      type: "job",
+      title: "",
+      content: "",
+      company: "",
+      author: "",
+      location: "",
+      salary: "",
+      requirements: "",
+      tags: "",
+      eventDate: "",
+    });
+  };
+
   const getPostIcon = (type) => {
     switch (type) {
       case "job":
@@ -172,14 +249,13 @@ const PostNewsJobs = () => {
             Share updates, opportunities, and industry news
           </p>
         </div>
-        <div className="flex space-x-3">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            Create Post
-          </button>
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-            Post Job
-          </button>
-        </div>
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Post</span>
+        </button>
       </div>
 
       <div className="space-y-6">
@@ -191,7 +267,10 @@ const PostNewsJobs = () => {
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold text-gray-900">
                     Edit{" "}
-                    {postsData.find((p) => p.id === editingId)?.type.charAt(0).toUpperCase() +
+                    {postsData
+                      .find((p) => p.id === editingId)
+                      ?.type.charAt(0)
+                      .toUpperCase() +
                       postsData.find((p) => p.id === editingId)?.type.slice(1)}
                   </h2>
                   <button
@@ -276,7 +355,10 @@ const PostNewsJobs = () => {
                           type="text"
                           value={editData.location}
                           onChange={(e) =>
-                            setEditData({ ...editData, location: e.target.value })
+                            setEditData({
+                              ...editData,
+                              location: e.target.value,
+                            })
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           placeholder="Enter job location"
@@ -304,7 +386,10 @@ const PostNewsJobs = () => {
                       <textarea
                         value={editData.requirements}
                         onChange={(e) =>
-                          setEditData({ ...editData, requirements: e.target.value })
+                          setEditData({
+                            ...editData,
+                            requirements: e.target.value,
+                          })
                         }
                         rows={3}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -327,6 +412,225 @@ const PostNewsJobs = () => {
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                 >
                   Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Modal */}
+        {isAddModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Add New Post
+                  </h2>
+                  <button
+                    onClick={handleAddCancel}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Post Type
+                    </label>
+                    <select
+                      value={addData.type}
+                      onChange={(e) =>
+                        setAddData({ ...addData, type: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="job">Job Posting</option>
+                      <option value="news">News Article</option>
+                      <option value="event">Event Announcement</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Company/Organization
+                    </label>
+                    <input
+                      type="text"
+                      value={addData.company}
+                      onChange={(e) =>
+                        setAddData({ ...addData, company: e.target.value })
+                      }
+                      placeholder="Enter company name"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      value={addData.title}
+                      onChange={(e) =>
+                        setAddData({ ...addData, title: e.target.value })
+                      }
+                      placeholder="Enter post title"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Author
+                    </label>
+                    <input
+                      type="text"
+                      value={addData.author}
+                      onChange={(e) =>
+                        setAddData({ ...addData, author: e.target.value })
+                      }
+                      placeholder="Enter author name"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Content
+                  </label>
+                  <textarea
+                    value={addData.content}
+                    onChange={(e) =>
+                      setAddData({ ...addData, content: e.target.value })
+                    }
+                    rows={4}
+                    placeholder="Write your post content here..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {addData.type === "job" && (
+                  <>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Location
+                        </label>
+                        <input
+                          type="text"
+                          value={addData.location}
+                          onChange={(e) =>
+                            setAddData({ ...addData, location: e.target.value })
+                          }
+                          placeholder="Enter job location"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Salary
+                        </label>
+                        <input
+                          type="text"
+                          value={addData.salary}
+                          onChange={(e) =>
+                            setAddData({ ...addData, salary: e.target.value })
+                          }
+                          placeholder="e.g., ₹12-18 LPA"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Requirements (comma-separated)
+                      </label>
+                      <textarea
+                        value={addData.requirements}
+                        onChange={(e) =>
+                          setAddData({
+                            ...addData,
+                            requirements: e.target.value,
+                          })
+                        }
+                        rows={3}
+                        placeholder="e.g., 3+ years React experience, TypeScript knowledge, Team collaboration"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {addData.type === "news" && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tags (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={addData.tags}
+                      onChange={(e) =>
+                        setAddData({ ...addData, tags: e.target.value })
+                      }
+                      placeholder="e.g., AI, Healthcare, Innovation"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                )}
+
+                {addData.type === "event" && (
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Event Date
+                      </label>
+                      <input
+                        type="text"
+                        value={addData.eventDate}
+                        onChange={(e) =>
+                          setAddData({ ...addData, eventDate: e.target.value })
+                        }
+                        placeholder="e.g., March 15, 2024"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        value={addData.location}
+                        onChange={(e) =>
+                          setAddData({ ...addData, location: e.target.value })
+                        }
+                        placeholder="Enter event location"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                <button
+                  onClick={handleAddCancel}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAdd}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                >
+                  Add Post
                 </button>
               </div>
             </div>

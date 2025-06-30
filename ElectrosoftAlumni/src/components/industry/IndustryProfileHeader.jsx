@@ -111,7 +111,7 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions }) => {
         {/* Profile Header - Horizontal */}
         <div className="relative">
           {/* Increased height from h-24 to h-32 */}
-          <div className="h-32 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800"></div>
+          <div className="h-44 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800"></div>
           {/* Edit Button */}
           <button
             onClick={handleEditClick}

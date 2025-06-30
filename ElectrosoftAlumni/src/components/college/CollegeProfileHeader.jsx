@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Star } from "lucide-react";
 
 const NAV_OPTIONS_DEFAULT = [
   { id: "college-info", name: "College Info" },
@@ -32,6 +33,8 @@ const CollegeProfileHeader = ({
     location,
     logo,
     background,
+    universityAffiliation: "University of Excellence",
+    naacRating: 5,
     quickStats: QUICK_STATS_DEFAULT,
     navOptions: NAV_OPTIONS_DEFAULT,
   });
@@ -77,7 +80,7 @@ const CollegeProfileHeader = ({
           />
         ) : (
           <div
-            className="h-28 w-full bg-cover bg-center"
+            className="h-44 w-full bg-cover bg-center"
             style={{ backgroundImage: `url('${headerData.background}')` }}
           ></div>
         )}
@@ -131,7 +134,7 @@ const CollegeProfileHeader = ({
       </div>
       {/* Profile Info - Horizontal Layout */}
       <div className="pt-12 px-6 pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1 flex flex-col items-start gap-1">
             {editHeader ? (
               <>
@@ -159,6 +162,47 @@ const CollegeProfileHeader = ({
               </>
             )}
           </div>
+
+          {/* University Affiliation and NAAC Rating - Middle Section */}
+          <div className="flex-1 max-w-md mx-4">
+            {/* University Affiliation */}
+            {headerData.universityAffiliation && (
+              <div className="flex items-center text-sm text-blue-600 mb-3">
+                <div className="w-4 h-4 mr-2 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                </div>
+                <div>
+                  <span className="font-medium text-blue-700 block">University Affiliation</span>
+                  <span className="text-xs text-blue-500">{headerData.universityAffiliation}</span>
+                </div>
+              </div>
+            )}
+
+            {/* NAAC Accreditation */}
+            {headerData.naacRating && (
+              <div className="flex items-center text-sm text-blue-600">
+                <div className="flex items-center">
+                  <span className="font-medium text-blue-700 mr-3">NAAC Rating:</span>
+                  <div className="flex items-center space-x-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-4 h-4 ${
+                          star <= headerData.naacRating
+                            ? "text-yellow-400 fill-current"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <span className="ml-2 text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                  {headerData.naacRating}/5
+                </span>
+              </div>
+            )}
+          </div>
+
           <div className="flex gap-3">
             {editHeader && (
               <button
@@ -269,6 +313,42 @@ const CollegeProfileHeader = ({
                 onChange={(e) => handleHeaderChange("background", e.target.value)}
                 placeholder="Background Image URL"
               />
+
+              {/* University Affiliation and NAAC Rating */}
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-blue-700 mb-2">
+                    University Affiliation
+                  </label>
+                  <input
+                    type="text"
+                    value={headerData.universityAffiliation || ""}
+                    onChange={(e) =>
+                      handleHeaderChange("universityAffiliation", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="e.g., University of Excellence"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-blue-700 mb-2">
+                    NAAC Accreditation (Stars)
+                  </label>
+                  <select
+                    value={headerData.naacRating || ""}
+                    onChange={(e) => handleHeaderChange("naacRating", parseInt(e.target.value) || "")}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    <option value="">Select NAAC Rating</option>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                  </select>
+                </div>
+              </div>
+
               {/* Quick Stats Editing */}
               <div>
                 <div className="font-semibold text-blue-900 mb-1">Quick Stats</div>

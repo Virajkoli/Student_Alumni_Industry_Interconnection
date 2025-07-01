@@ -26,6 +26,7 @@ const Resources = () => {
           format: "PDF",
           link: "https://example.com/lean-startup.pdf",
           isDownloadable: true,
+          customFields: [],
         },
         {
           id: 2,
@@ -197,41 +198,28 @@ const Resources = () => {
     language: "",
     features: "",
     isDownloadable: false,
-    isFree: true,
-    isInteractive: false,
-    customFields: [], // Array to store custom fields
+    customFields: [],
   });
 
-  const quickAccessLinks = [
-    { name: "Y Combinator Startup School", link: "https://startupschool.org", description: "Free online startup course" },
-    { name: "Coursera Entrepreneurship", link: "https://coursera.org/entrepreneurship", description: "University courses on entrepreneurship" },
-    { name: "GitHub Student Pack", link: "https://education.github.com/pack", description: "Free developer tools for students" },
-    { name: "Google for Startups", link: "https://startup.google.com", description: "Resources and programs for startups" },
-    { name: "MIT OpenCourseWare", link: "https://ocw.mit.edu/entrepreneurship", description: "Free MIT entrepreneurship courses" },
+  const resourceTypes = [
+    { value: "Template", label: "Template", icon: "📄" },
+    { value: "Guide", label: "Guide", icon: "📋" },
+    { value: "Course", label: "Course", icon: "🎓" },
+    { value: "Video Course", label: "Video Course", icon: "🎥" },
+    { value: "Book", label: "Book", icon: "📚" },
+    { value: "Podcast", label: "Podcast", icon: "🎧" },
+    { value: "Newsletter", label: "Newsletter", icon: "📧" },
+    { value: "Tool", label: "Tool", icon: "🛠️" },
+    { value: "Checklist", label: "Checklist", icon: "✅" },
+    { value: "Government Guide", label: "Government Guide", icon: "🏛️" },
   ];
 
-  const getCategoryName = (categoryId) => {
-    const category = resourceCategories.find(cat => cat.id === categoryId);
-    return category ? category.category : "Unknown";
-  };
-
-  // Helper function to check if resource has custom fields
-  const hasCustomFields = (resource) => {
-    const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive'];
-    return Object.keys(resource).some(key => !standardFields.includes(key));
-  };
-
-  // Helper function to render custom fields in cards
-  const renderCustomFields = (resource) => {
-    const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive'];
-    const customFields = Object.keys(resource).filter(key => !standardFields.includes(key));
-    
-    return customFields.map(key => (
-      <div key={key} className="text-xs text-gray-500 mb-1">
-        <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span> {resource[key]}
-      </div>
-    ));
-  };
+  const categories = [
+    "Templates & Docs",
+    "Learning & Guides",
+    "Legal & Compliance",
+    "Recommended Reads",
+  ];
 
   const handleAddResource = () => {
     if (newResource.title && newResource.description && newResource.link) {
@@ -268,103 +256,68 @@ const Resources = () => {
         updatedCategories[categoryIndex].resources.push(resourceData);
         
         setResourceCategories(updatedCategories);
-        setNewResource({ 
-          title: "", 
-          description: "", 
-          link: "", 
-          categoryId: 1,
-          type: "",
-          format: "",
-          duration: "",
-          author: "",
-          language: "",
-          features: "",
-          isDownloadable: false,
-          isFree: true,
-          isInteractive: false,
-          customFields: [],
-        });
-        setIsAddModalOpen(false);
       }
+
+      setNewResource({
+        title: "",
+        description: "",
+        type: "Template",
+        format: "",
+        link: "",
+        category: "Templates & Docs",
+        isDownloadable: false,
+        customFields: [],
+      });
+      setIsAddModalOpen(false);
     }
   };
 
-  const handleEditResource = (categoryId, resourceId) => {
-    const category = resourceCategories.find(cat => cat.id === categoryId);
-    const resource = category?.resources.find(r => r.id === resourceId);
-    
-    if (resource) {
-      // Extract custom fields from the resource
-      const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive', 'categoryId'];
-      const customFields = [];
-      
-      Object.keys(resource).forEach(key => {
-        if (!standardFields.includes(key)) {
-          customFields.push({ key, value: resource[key], id: Date.now() + Math.random() });
-        }
-      });
-
-      setEditingResource({
-        ...resource,
-        categoryId: categoryId,
-        customFields: customFields || []
-      });
-      setIsEditModalOpen(true);
-    }
-  };
-
-  const handleSaveEdit = () => {
-    if (editingResource) {
-      const updatedCategories = resourceCategories.map(category => {
-        if (category.id === editingResource.categoryId) {
-          return {
-            ...category,
-            resources: category.resources.map(resource => {
-              if (resource.id === editingResource.id) {
-                // Build updated resource with custom fields
-                const updatedResource = { ...editingResource };
-                
-                // Add custom fields to the resource
-                if (editingResource.customFields) {
-                  editingResource.customFields.forEach(field => {
-                    updatedResource[field.key] = field.value;
-                  });
-                }
-                
-                // Remove the customFields array from the final resource object
-                delete updatedResource.customFields;
-                
-                return updatedResource;
-              }
-              return resource;
-            })
-          };
-        }
-        return category;
-      });
-      
-      setResourceCategories(updatedCategories);
-      setIsEditModalOpen(false);
-      setEditingResource(null);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditModalOpen(false);
-    setEditingResource(null);
-  };
-
-  const handleDeleteResource = (categoryId, resourceId) => {
-    const updatedCategories = resourceCategories.map(category => {
-      if (category.id === categoryId) {
-        return {
-          ...category,
-          resources: category.resources.filter(resource => resource.id !== resourceId)
-        };
-      }
-      return category;
+  const handleCancelAdd = () => {
+    setNewResource({
+      title: "",
+      description: "",
+      type: "Template",
+      format: "",
+      link: "",
+      category: "Templates & Docs",
+      isDownloadable: false,
+      customFields: [],
     });
-    setResourceCategories(updatedCategories);
+    setIsAddModalOpen(false);
+  };
+
+  const handleInputChange = (field, value) => {
+    setNewResource((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Custom fields handlers
+  const handleAddCustomField = () => {
+    const newField = { label: "", value: "" };
+    setNewResource((prev) => ({
+      ...prev,
+      customFields: [...(prev.customFields || []), newField],
+    }));
+  };
+
+  const handleRemoveCustomField = (index) => {
+    setNewResource((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleCustomFieldChange = (index, field, value) => {
+    setNewResource((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    }));
+  };
+
+  const getTypeIcon = (type) => {
+    const typeObj = resourceTypes.find((t) => t.value === type);
+    return typeObj ? typeObj.icon : "📄";
   };
 
   return (
@@ -430,12 +383,62 @@ const Resources = () => {
                           <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
                             Download
                           </span>
+                          <div>
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                              {resource.type}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {resource.isDownloadable && (
+                            <Download
+                              className="w-4 h-4 text-green-600"
+                              title="Downloadable"
+                            />
+                          )}
+                          <ExternalLink className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+
+                      <h4 className="font-semibold text-gray-900 mb-2">
+                        {resource.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                        {resource.description}
+                      </p>
+
+                      {/* Custom Fields Display */}
+                      {resource.customFields &&
+                        resource.customFields.length > 0 && (
+                          <div className="mb-3 pt-2 border-t border-gray-100">
+                            <h5 className="text-xs font-medium text-gray-700 mb-1">
+                              Additional Information:
+                            </h5>
+                            <div className="space-y-1">
+                              {resource.customFields.map(
+                                (field, fieldIndex) => (
+                                  <div
+                                    key={fieldIndex}
+                                    className="text-xs text-gray-600 flex items-start"
+                                  >
+                                    <span className="font-medium text-gray-700 min-w-0 mr-1">
+                                      {field.label}:
+                                    </span>
+                                    <span className="text-gray-600">
+                                      {field.value}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
                         )}
-                        {resource.isFree && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                            Free
-                          </span>
-                        )}
+
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-gray-500">
+                          <span className="font-medium">Format:</span>{" "}
+                          {resource.format}
+                        </div>
                         <a
                           href={resource.link}
                           target="_blank"
@@ -664,69 +667,49 @@ const Resources = () => {
                 </label>
               </div>
 
-              {/* Custom Fields Section */}
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-sm font-medium text-gray-700">Custom Fields</h4>
+              {/* Custom Fields */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
                   <button
                     type="button"
-                    onClick={() => {
-                      const newCustomField = { 
-                        id: Date.now(), 
-                        key: '', 
-                        value: '' 
-                      };
-                      setNewResource({
-                        ...newResource, 
-                        customFields: [...newResource.customFields, newCustomField]
-                      });
-                    }}
-                    className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
+                    onClick={handleAddCustomField}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                   >
-                    + Add Custom Field
+                    Add Field
                   </button>
                 </div>
-                
                 {newResource.customFields.map((field, index) => (
-                  <div key={field.id} className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+                  <div key={index} className="flex gap-2 mb-2">
                     <input
                       type="text"
-                      placeholder="Field Name (e.g., Price)"
-                      value={field.key}
-                      onChange={(e) => {
-                        const updatedFields = [...newResource.customFields];
-                        updatedFields[index].key = e.target.value;
-                        setNewResource({...newResource, customFields: updatedFields});
-                      }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
+                      value={field.label}
+                      onChange={(e) =>
+                        handleCustomFieldChange(index, "label", e.target.value)
+                      }
+                      placeholder="Field name"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     />
                     <input
                       type="text"
-                      placeholder="Field Value (e.g., $99)"
                       value={field.value}
-                      onChange={(e) => {
-                        const updatedFields = [...newResource.customFields];
-                        updatedFields[index].value = e.target.value;
-                        setNewResource({...newResource, customFields: updatedFields});
-                      }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
+                      onChange={(e) =>
+                        handleCustomFieldChange(index, "value", e.target.value)
+                      }
+                      placeholder="Field value"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     />
                     <button
                       type="button"
-                      onClick={() => {
-                        const updatedFields = newResource.customFields.filter((_, i) => i !== index);
-                        setNewResource({...newResource, customFields: updatedFields});
-                      }}
-                      className="px-2 py-2 text-red-600 hover:bg-red-50 rounded transition-colors text-xs"
+                      onClick={() => handleRemoveCustomField(index)}
+                      className="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
                     >
-                      Remove
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 ))}
-                
-                {newResource.customFields.length === 0 && (
-                  <p className="text-xs text-gray-500 italic">No custom fields added. Click "Add Custom Field" to create one.</p>
-                )}
               </div>
             </div>
             

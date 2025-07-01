@@ -2,6 +2,17 @@ import React, { useState } from "react";
 import CollegeProfileHeader from "../../components/college/CollegeProfileHeader";
 import CollegeNotifications from "../../components/college/CollegeNotifications";
 import Navbar from "../../components/college/sections/Navbar";
+import CollegeInformation from "../../components/college/sections/CollegeInformation";
+import Courses from "../../components/college/sections/Courses";
+import FeesReview from "../../components/college/sections/CourseFees";
+import Faculty from "../../components/college/sections/Faculty";
+import Downloads from "../../components/college/sections/Downloads";
+import Admission from "../../components/college/sections/Admission";
+import Placement from "../../components/college/sections/Placement";
+import CutoffRanking from "../../components/college/sections/CutoffRanking";
+import EventsNews from "../../components/college/sections/EventsNews";
+import Facilities from "../../components/college/sections/Facilities";
+import Alumni from "../../components/college/sections/Alumni";
 
 const NAV_OPTIONS = [
   { id: "college-info", name: "College Info" },
@@ -368,276 +379,32 @@ const CollegeProfilePage = () => {
   const renderTabContent = (activeTab) => {
     switch (activeTab) {
       case "college-info":
-        return (
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                {formData["college-info"].name}
-              </h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("college-info")}
-              >
-                Edit
-              </button>
-            </div>
-            <p className="text-gray-700 mb-6 text-lg leading-8">
-              {formData["college-info"].description}
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-6">
-              <div>
-                <h3 className="font-semibold text-blue-800 mb-3 text-lg">
-                  Key Facts
-                </h3>
-                <ul className="list-disc list-inside text-gray-700 space-y-3 text-base leading-7">
-                  <li><span className="font-semibold">Location:</span> {formData["college-info"].location}</li>
-                  <li><span className="font-semibold">Established:</span> {formData["college-info"].established}</li>
-                  <li><span className="font-semibold">Campus Area:</span> {formData["college-info"].campusArea}</li>
-                  <li><span className="font-semibold">NIRF 2024 Engineering Rank:</span> {formData["college-info"].nirfRank}</li>
-                  <li><span className="font-semibold">Accreditation:</span> {formData["college-info"].accreditation}</li>
-                  <li><span className="font-semibold">Students:</span> {formData["college-info"].students}</li>
-                  <li><span className="font-semibold">Faculty:</span> {formData["college-info"].faculty}</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold text-blue-800 mb-3 text-lg">Popular Programs</h3>
-                <ul className="list-disc list-inside text-gray-700 space-y-3 text-base leading-7">
-                  <li>{formData["college-info"].programs}</li>
-                  <li>{formData["college-info"].dualPrograms}</li>
-                </ul>
-                <h3 className="font-semibold text-blue-800 mt-6 mb-3 text-lg">Website</h3>
-                <a
-                  href={formData["college-info"].website}
-                  className="text-blue-600 underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {formData["college-info"].website.replace(/^https?:\/\//, "")}
-                </a>
-              </div>
-            </div>
-            <div className="mb-2">
-              <h3 className="font-semibold text-blue-800 mb-3 text-lg">Highlights</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-3 text-base leading-7">
-                {formData["college-info"].highlights.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        );
+        return <CollegeInformation data={formData["college-info"]} onEdit={() => openSectionForm("college-info")} />;
       case "course-details":
-        return (
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-4">Course Details</h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("course-details")}
-              >
-                Edit
-              </button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
-                <thead className="bg-blue-50">
-                  <tr>
-                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Program</th>
-                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Duration</th>
-                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Eligibility</th>
-                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Branches & Seats</th>
-                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Annual Fees</th>
-                    <th className="py-3 px-4 text-left text-blue-900 font-semibold">Total Seats</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-gray-800">
-                  {/* B.Tech */}
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-blue-800">B.Tech</td>
-                    <td className="py-3 px-4">{formData["course-details"].btechDuration || "4 Years"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].btechEligibility || "10+2 (PCM) + JEE Advanced"}</td>
-                    <td className="py-3 px-4">
-                      <ul className="list-disc list-inside space-y-1">
-                        {(formData["course-details"].btechBranches || [
-                          "Computer Science & Engineering: 120",
-                          "Electrical Engineering: 110",
-                          "Mechanical Engineering: 100",
-                          "Chemical Engineering: 80",
-                          "Civil Engineering: 80",
-                          "Aerospace Engineering: 60",
-                          "Materials Science & Engineering: 50",
-                          "Biological Sciences & Bioengineering: 30",
-                        ]).map((branch, idx) => (
-                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4">{formData["course-details"].btechFees || "₹2,00,000"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].btechTotalSeats || "800+"}</td>
-                  </tr>
-                  {/* M.Tech */}
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-blue-800">M.Tech</td>
-                    <td className="py-3 px-4">{formData["course-details"].mtechDuration || "2 Years"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].mtechEligibility || "B.E./B.Tech + GATE"}</td>
-                    <td className="py-3 px-4">
-                      <ul className="list-disc list-inside space-y-1">
-                        {(formData["course-details"].mtechBranches || [
-                          "Computer Science & Engineering: 60",
-                          "Electrical Engineering: 55",
-                          "Mechanical Engineering: 50",
-                          "Chemical Engineering: 40",
-                          "Civil Engineering: 40",
-                          "Aerospace Engineering: 30",
-                          "Environmental Engineering: 20",
-                          "Materials Science & Engineering: 20",
-                        ]).map((branch, idx) => (
-                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4">{formData["course-details"].mtechFees || "₹1,50,000"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].mtechTotalSeats || "400+"}</td>
-                  </tr>
-                  {/* B.Sc. */}
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-blue-800">B.Sc.</td>
-                    <td className="py-3 px-4">{formData["course-details"].bscDuration || "3 Years"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].bscEligibility || "10+2 (PCM/PCB) + IIT JAM"}</td>
-                    <td className="py-3 px-4">
-                      <ul className="list-disc list-inside space-y-1">
-                        {(formData["course-details"].bscBranches || [
-                          "Physics: 50",
-                          "Chemistry: 50",
-                          "Mathematics: 50",
-                          "Biology: 50",
-                        ]).map((branch, idx) => (
-                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4">{formData["course-details"].bscFees || "₹50,000"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].bscTotalSeats || "200+"}</td>
-                  </tr>
-                  {/* MSc */}
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-blue-800">MSc</td>
-                    <td className="py-3 px-4">{formData["course-details"].mscDuration || "2 Years"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].mscEligibility || "B.Sc. + JAM"}</td>
-                    <td className="py-3 px-4">
-                      <ul className="list-disc list-inside space-y-1">
-                        {(formData["course-details"].mscBranches || [
-                          "Physics: 60",
-                          "Chemistry: 50",
-                          "Mathematics & Statistics: 40",
-                        ]).map((branch, idx) => (
-                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4">{formData["course-details"].mscFees || "₹50,000"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].mscTotalSeats || "150+"}</td>
-                  </tr>
-                  {/* MBA */}
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-blue-800">MBA</td>
-                    <td className="py-3 px-4">{formData["course-details"].mbaDuration || "2 Years"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].mbaEligibility || "UG Degree + CAT"}</td>
-                    <td className="py-3 px-4">
-                      <ul className="list-disc list-inside space-y-1">
-                        {(formData["course-details"].mbaBranches || [
-                          "General Management: 40",
-                          "Analytics: 30",
-                          "Operations: 10",
-                          "Marketing: 10",
-                          "Finance: 5",
-                          "Human Resource Management: 5",
-                        ]).map((branch, idx) => (
-                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4">{formData["course-details"].mbaFees || "₹2,50,000"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].mbaTotalSeats || "100+"}</td>
-                  </tr>
-                  {/* Ph.D. */}
-                  <tr>
-                    <td className="py-3 px-4 font-bold text-blue-800">Ph.D.</td>
-                    <td className="py-3 px-4">{formData["course-details"].phdDuration || "3-5 Years"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].phdEligibility || "PG Degree + GATE/NET"}</td>
-                    <td className="py-3 px-4">
-                      <ul className="list-disc list-inside space-y-1">
-                        {(formData["course-details"].phdBranches || [
-                          "All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+",
-                        ]).map((branch, idx) => (
-                          <li key={idx} className="text-sm text-gray-700">{branch}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4">{formData["course-details"].phdFees || "₹60,000"}</td>
-                    <td className="py-3 px-4">{formData["course-details"].phdTotalSeats || "200+"}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        );
+        return <Courses data={formData["course-details"]} onEdit={() => openSectionForm("course-details")} />;
       case "course-fees":
-        return (
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                Course Fees & Scholarships
-              </h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("course-fees")}
-              >
-                Edit
-              </button>
-            </div>
-            <div className="mb-6">
-              <table className="w-full text-left border border-gray-200 rounded-lg overflow-hidden">
-                <thead className="bg-blue-100">
-                  <tr>
-                    <th className="py-2 px-4">Program</th>
-                    <th className="py-2 px-4">Annual Fees (INR)</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white">
-                  <tr><td className="py-2 px-4">B.Tech</td><td className="py-2 px-4">{formData["course-fees"].btech}</td></tr>
-                  <tr><td className="py-2 px-4">M.Tech</td><td className="py-2 px-4">{formData["course-fees"].mtech}</td></tr>
-                  <tr><td className="py-2 px-4">MSc</td><td className="py-2 px-4">{formData["course-fees"].msc}</td></tr>
-                  <tr><td className="py-2 px-4">MBA</td><td className="py-2 px-4">{formData["course-fees"].mba}</td></tr>
-                  <tr><td className="py-2 px-4">Ph.D.</td><td className="py-2 px-4">{formData["course-fees"].phd}</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="mb-4">
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Scholarships & Financial Aid</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["course-fees"].scholarships.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Hostel & Other Charges</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                <li>Hostel Fees: {formData["course-fees"].hostel}</li>
-                <li>Mess Charges: {formData["course-fees"].mess}</li>
-                <li>Other Charges: {formData["course-fees"].other}</li>
-              </ul>
-            </div>
-          </div>
-        );
+        return <FeesReview data={formData["course-fees"]} onEdit={() => openSectionForm("course-fees")} />;
+      case "faculty":
+        return <Faculty data={formData["faculty"]} onEdit={() => openSectionForm("faculty")} />;
+      case "downloads":
+        return <Downloads data={formData["downloads"]} onEdit={() => openSectionForm("downloads")} />;
+      case "admission":
+        return <Admission data={formData["admission"]} onEdit={() => openSectionForm("admission")} />;
+      case "placement":
+        return <Placement data={formData["placement"]} onEdit={() => openSectionForm("placement")} />;
+      case "cutoff-ranking":
+        return <CutoffRanking data={formData["cutoff-ranking"]} onEdit={() => openSectionForm("cutoff-ranking")} />;
+      case "events-news":
+        return <EventsNews data={formData["events-news"]} onEdit={() => openSectionForm("events-news")} />;
+      case "facilities":
+        return <Facilities data={formData["facilities"]} onEdit={() => openSectionForm("facilities")} />;
+      case "alumni":
+        return <Alumni data={formData["alumni"]} onEdit={() => openSectionForm("alumni")} />;
       case "review":
         return (
-          <div className="p-6">
+          <div className="bg-white rounded-xl shadow p-6 mb-6">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                Student Reviews
-              </h2>
+              <h2 className="text-2xl font-bold text-blue-900 mb-6">Student Reviews</h2>
               <button
                 className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
                 onClick={() => openSectionForm("review")}
@@ -645,416 +412,11 @@ const CollegeProfilePage = () => {
                 Edit
               </button>
             </div>
-            <div className="flex items-center gap-2 text-yellow-500 text-2xl mb-4">
-              <div className="flex flex-col">
-                <span className="w-16 bg-gray-100 border border-gray-300 rounded px-2 py-1 text-yellow-700 text-xl text-center font-bold">
-                  {externalRatings.rating}
-                </span>
-                <span className="text-sm text-gray-500 mt-1">External Rating</span>
-              </div>
-              <span>★</span>
-              <span className="text-gray-600 text-base">
-                (Based on {externalReviewResponses.length} verified reviews)
-              </span>
-            </div>
-
-            <div className="mb-6">
-              <h3 className="font-semibold text-blue-800 mb-3 text-lg">Comments & Feedback</h3>
-              {(sectionFormData.comments || []).map((comment, idx) => (
-                <textarea
-                  key={idx}
-                  className="w-full mb-4 text-base leading-7 bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
-                  value={comment}
-                  onChange={(e) => handleSectionFormArrayChange("comments", idx, e.target.value)}
-                />
+            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
+              {formData["review"].comments && formData["review"].comments.map((item, idx) => (
+                <li key={idx}>{item}</li>
               ))}
-            </div>
-
-            <div>
-              <h3 className="font-semibold text-blue-800 mb-3 text-lg">Rating Breakdown</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-                <div className="flex justify-between items-center">
-                  <span>Academics:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
-                      {externalRatings.breakdown.academics}
-                    </span>
-                    <span className="text-yellow-500">★</span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Placements:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
-                      {externalRatings.breakdown.placements}
-                    </span>
-                    <span className="text-yellow-500">★</span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Infrastructure:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
-                      {externalRatings.breakdown.infrastructure}
-                    </span>
-                    <span className="text-yellow-500">★</span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Faculty:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
-                      {externalRatings.breakdown.faculty}
-                    </span>
-                    <span className="text-yellow-500">★</span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Campus Life:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
-                      {externalRatings.breakdown.campusLife}
-                    </span>
-                    <span className="text-yellow-500">★</span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Value for Money:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-gray-100 rounded text-center w-16 font-medium">
-                      {externalRatings.breakdown.value}
-                    </span>
-                    <span className="text-yellow-500">★</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 text-gray-600 text-sm">
-              <p className="italic">* Ratings are calculated automatically from verified student and alumni reviews.</p>
-            </div>
-          </div>
-        );
-      case "admission":
-        return (
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                Admission
-              </h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("admission")}
-              >
-                Edit
-              </button>
-            </div>
-            <div className="mb-6">
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Eligibility & Entrance Exams</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["admission"].eligibility.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="mb-4">
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Application Steps</h3>
-              <ol className="list-decimal list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["admission"].steps.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ol>
-            </div>
-            <div>
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Important Dates (2025)</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["admission"].dates.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        );
-      case "placement":
-        return (
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                Placement
-              </h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("placement")}
-              >
-                Edit
-              </button>
-            </div>
-            <div className="mb-6">
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Placement Highlights (2024)</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["placement"].highlights.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="mb-4">
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Internship Opportunities</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["placement"].internships.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Placement Support</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["placement"].support.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        );
-      case "faculty":
-        return (
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                Faculty
-              </h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("faculty")}
-              >
-                Edit
-              </button>
-            </div>
-            <div className="mb-6">
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Faculty Strength</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["faculty"].strength.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="mb-4">
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Departments</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-700 text-base">
-                {formData["faculty"].departments.map((dept, idx) => (
-                  <div key={idx}>
-                    <input
-                      className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
-                      value={dept}
-                      onChange={(e) => handleSectionFormArrayChange("departments", idx, e.target.value)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold text-blue-800 mb-2 text-lg">Achievements</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-                {formData["faculty"].achievements.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        );
-      case "downloads":
-        return (
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                Downloads
-              </h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("downloads")}
-              >
-                Edit
-              </button>
-            </div>
-
-            {/* Forms Section */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-blue-800 mb-4 text-lg">Forms</h3>
-              <div className="grid gap-4">
-                {(sectionFormData.forms || []).map((doc, idx) => (
-                  <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
-                    <div className="flex-1">
-                      <input
-                        className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                        value={doc.name}
-                        onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, name: e.target.value })}
-                        placeholder="Document Name"
-                      />
-                      <input
-                        className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                        value={doc.description}
-                        onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, description: e.target.value })}
-                        placeholder="Description"
-                      />
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                          value={doc.fileSize}
-                          onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, fileSize: e.target.value })}
-                          placeholder="Size"
-                        />
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
-                          value={doc.format}
-                          onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, format: e.target.value })}
-                          placeholder="Format"
-                        />
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
-                          value={doc.url}
-                          onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, url: e.target.value })}
-                          placeholder="Download URL"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Brochures Section */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-blue-800 mb-4 text-lg">Brochures & Catalogs</h3>
-              <div className="grid gap-4">
-                {(sectionFormData.brochures || []).map((doc, idx) => (
-                  <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
-                    <div className="flex-1">
-                      <input
-                        className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                        value={doc.name}
-                        onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, name: e.target.value })}
-                        placeholder="Document Name"
-                      />
-                      <input
-                        className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                        value={doc.description}
-                        onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, description: e.target.value })}
-                        placeholder="Description"
-                      />
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                          value={doc.fileSize}
-                          onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, fileSize: e.target.value })}
-                          placeholder="Size"
-                        />
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
-                          value={doc.format}
-                          onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, format: e.target.value })}
-                          placeholder="Format"
-                        />
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
-                          value={doc.url}
-                          onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, url: e.target.value })}
-                          placeholder="Download URL"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Syllabus Section */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-blue-800 mb-4 text-lg">Course Syllabus</h3>
-              <div className="grid gap-4">
-                {(sectionFormData.syllabus || []).map((doc, idx) => (
-                  <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
-                    <div className="flex-1">
-                      <input
-                        className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                        value={doc.name}
-                        onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, name: e.target.value })}
-                        placeholder="Document Name"
-                      />
-                      <input
-                        className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                        value={doc.description}
-                        onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, description: e.target.value })}
-                        placeholder="Description"
-                      />
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                          value={doc.fileSize}
-                          onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, fileSize: e.target.value })}
-                          placeholder="Size"
-                        />
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
-                          value={doc.format}
-                          onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, format: e.target.value })}
-                          placeholder="Format"
-                        />
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
-                          value={doc.url}
-                          onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, url: e.target.value })}
-                          placeholder="Download URL"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Other Documents */}
-            <div>
-              <h3 className="font-semibold text-blue-800 mb-4 text-lg">Other Documents</h3>
-              <div className="grid gap-4">
-                {(sectionFormData.other || []).map((doc, idx) => (
-                  <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
-                    <div className="flex-1">
-                      <input
-                        className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                        value={doc.name}
-                        onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, name: e.target.value })}
-                        placeholder="Document Name"
-                      />
-                      <input
-                        className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                        value={doc.description}
-                        onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, description: e.target.value })}
-                        placeholder="Description"
-                      />
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
-                          value={doc.fileSize}
-                          onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, fileSize: e.target.value })}
-                          placeholder="Size"
-                        />
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
-                          value={doc.format}
-                          onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, format: e.target.value })}
-                          placeholder="Format"
-                        />
-                        <input
-                          className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
-                          value={doc.url}
-                          onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, url: e.target.value })}
-                          placeholder="Download URL"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            </ul>
           </div>
         );
       default:
@@ -2050,7 +1412,7 @@ const CollegeProfilePage = () => {
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
                 onClick={() => saveSectionForm(showSectionForm)}
               >
-                Save
+                Save Changes
               </button>
             </div>
           </div>
@@ -2058,6 +1420,6 @@ const CollegeProfilePage = () => {
       )}
     </div>
   );
-}
+};
 
 export default CollegeProfilePage;

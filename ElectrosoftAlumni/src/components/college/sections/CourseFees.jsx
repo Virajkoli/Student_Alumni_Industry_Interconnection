@@ -58,16 +58,7 @@ const FeesReview = ({ data, onEdit }) => {
             ))}
         </ul>
       </div>
-      <div>
-        <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-          Hostel & Other Charges
-        </h3>
-        <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-          <li>Hostel Fees: {data.hostel}</li>
-          <li>Mess Charges: {data.mess}</li>
-          <li>Other Charges: {data.other}</li>
-        </ul>
-      </div>
+      
     </div>
   );
 };

@@ -10,19 +10,22 @@ import Downloads from "../../components/college/sections/Downloads";
 import Admission from "../../components/college/sections/Admission";
 import Placement from "../../components/college/sections/Placement";
 import CutoffRanking from "../../components/college/sections/CutoffRanking";
-import EventsNews from "../../components/college/sections/EventsNews";
 import Facilities from "../../components/college/sections/Facilities";
 import Alumni from "../../components/college/sections/Alumni";
+import Hostel from "../../components/college/sections/Hostel";
+import Events from "../../components/college/sections/Events";
 
 const NAV_OPTIONS = [
   { id: "college-info", name: "College Info" },
-  { id: "course-details", name: "Course Details" }, // Added Course Details as a separate tab
+  { id: "course-details", name: "Course Details" },
   { id: "course-fees", name: "Course Fees" },
   { id: "review", name: "Review" },
   { id: "admission", name: "Admission" },
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
   { id: "downloads", name: "Downloads" },
+  { id: "hostel", name: "Hostels & Campus" }, // Added Hostel tab
+  { id: "events", name: "Events" },
 ];
 
 // Mock external review form responses (in a real app, this would come from an API/database)
@@ -332,6 +335,69 @@ const CollegeProfilePage = () => {
         },
       ],
     },
+    hostel: {
+      hostelFacilities: [
+        "Separate hostels for boys and girls with 24/7 security",
+        "Wi-Fi, laundry, mess, and recreational facilities",
+        "Single/double/triple occupancy rooms",
+        "Common rooms, TV, indoor games, and gymnasiums",
+        "Medical and emergency support available",
+      ],
+      campusInfrastructure: [
+        "1055-acre lush green campus",
+        "State-of-the-art lecture halls and labs",
+        "Central library, computer center, and innovation labs",
+        "Sports complex, swimming pool, and stadium",
+        "Cafeterias, shopping complex, and health center",
+        "Bank, post office, and other amenities on campus",
+      ],
+    },
+    alumni: {
+      notableAlumni: [
+        "Dr. Manohar B. Parrikar – Former Defence Minister of India, Ex-Chief Minister of Goa",
+        "Dr. N. R. Narayana Murthy – Founder, Infosys",
+        "Dr. Raghuram Rajan – Former RBI Governor",
+        "Dr. Ashoke Sen – Theoretical Physicist, Padma Bhushan Awardee",
+        "Dr. Satyendra Dubey – Whistleblower and IITK alumnus",
+      ],
+      alumniTestimonials: [
+        "IIT Kanpur gave me the foundation to excel in my career and life. – Narayana Murthy",
+        "The campus life and academic rigor at IITK are unmatched. – Raghuram Rajan",
+        "The alumni network helped me land my dream job. – Anonymous Alumnus",
+      ],
+      networkingOpportunities: [
+        "Annual alumni meetups and reunions",
+        "Active alumni chapters in major cities worldwide",
+        "Online alumni portal for networking and mentorship",
+        "Industry-academia connect events",
+        "Alumni guest lectures and webinars",
+      ],
+    },
+    events: {
+      annualEvents: [
+        "Convocation Ceremony",
+        "Foundation Day",
+        "Alumni Meet",
+        "Techkriti (Annual Tech Fest)",
+        "Antaragni (Annual Cultural Fest)"
+      ],
+      techCulture: [
+        "Techkriti – Asia's largest student-run technical and entrepreneurial festival",
+        "Antaragni – Renowned cultural festival with national participation",
+        "Udghosh – Annual sports festival",
+        "E-Summit – Entrepreneurship summit"
+      ],
+      seminars: [
+        "International Seminar on Artificial Intelligence",
+        "Annual Research Symposium",
+        "Industry-Academia Conclave"
+      ],
+      conferences: [
+        "IEEE International Conference on Robotics",
+        "National Conference on Sustainable Engineering",
+        "Global Alumni Conference"
+      ]
+    }
   });
 
   const openSectionForm = (tab) => {
@@ -419,6 +485,10 @@ const CollegeProfilePage = () => {
             </ul>
           </div>
         );
+      case "hostel":
+        return <Hostel data={formData["hostel"]} onEdit={() => openSectionForm("hostel")} />;
+      case "events":
+        return <Events data={formData["events"]} onEdit={() => openSectionForm("events")} />;
       default:
         return null;
     }

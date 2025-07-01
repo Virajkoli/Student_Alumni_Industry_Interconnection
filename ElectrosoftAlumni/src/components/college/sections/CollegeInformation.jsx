@@ -5,7 +5,7 @@ const CollegeInformation = ({ data, onEdit }) => {
   return (
     <div className="bg-white rounded-xl shadow p-6 mb-6">
       <div className="flex justify-between items-start mb-2">
-        <h2 className="text-xl font-bold text-blue-900 mb-4">College Information</h2>
+        <h2 className="text-xl font-bold text-blue-900 mb-4">Indian Institute of Technology Kanpur</h2>
         <button
           className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
           onClick={onEdit}

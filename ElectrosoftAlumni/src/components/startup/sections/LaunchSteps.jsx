@@ -374,7 +374,7 @@ const LaunchSteps = () => {
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-lg">
+      <div className="border border-gray-200 rounded-lg" style={{ backgroundColor: "#EEE7FF" }}>
         {/* Header with Edit Button */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
@@ -407,7 +407,10 @@ const LaunchSteps = () => {
           <div className="p-4 border-b border-gray-200 bg-gray-50">
             <button
               onClick={handleAddStep}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
+              style={{ backgroundColor: "#4D869C" }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+              onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
             >
               <Plus className="w-4 h-4" />
               Add New Step
@@ -417,7 +420,11 @@ const LaunchSteps = () => {
 
         {/* Progress Overview */}
         <div className="p-6 border-b border-gray-200">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+          <div className="rounded-lg p-4 border"
+               style={{ 
+                 background: "linear-gradient(to right, #f3f0ff, #f8f6ff)", 
+                 borderColor: "#4D869C" 
+               }}>
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-semibold text-gray-900">
                 Launch Progress
@@ -428,8 +435,9 @@ const LaunchSteps = () => {
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
+                className="h-2 rounded-full transition-all duration-300"
                 style={{
+                  background: "linear-gradient(to right, #4D869C, #6B8FA3)",
                   width: `${
                     (completedSteps.length / content.steps.length) * 100
                   }%`,
@@ -460,9 +468,10 @@ const LaunchSteps = () => {
                           isCompleted
                             ? "bg-green-600 text-white"
                             : isActive
-                            ? "bg-blue-600 text-white"
+                            ? "text-white"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
+                        style={isActive ? { backgroundColor: "#4D869C" } : {}}
                       >
                         {isCompleted ? (
                           <CheckCircle className="w-6 h-6" />
@@ -503,9 +512,10 @@ const LaunchSteps = () => {
                               isCompleted
                                 ? "bg-green-100 text-green-800"
                                 : isActive
-                                ? "bg-blue-100 text-blue-800"
+                                ? "text-white"
                                 : "bg-gray-100 text-gray-600"
                             }`}
+                            style={isActive ? { backgroundColor: "#4D869C" } : {}}
                           >
                             {step.timeframe}
                           </span>
@@ -586,17 +596,29 @@ const LaunchSteps = () => {
         </div>
 
         {/* Action Center */}
-        <div className="p-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-b-lg">
+        <div className="p-6 text-white rounded-b-lg"
+             style={{ background: "linear-gradient(to right, #4D869C, #6B8FA3)" }}>
           <h3 className="text-xl font-semibold mb-2">Ready to Launch?</h3>
           <p className="mb-4">
             Get personalized guidance and support throughout your startup
             journey.
           </p>
           <div className="flex space-x-4">
-            <button className="px-6 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+            <button className="px-6 py-2 bg-white rounded-lg font-medium transition-colors"
+                    style={{ color: "#4D869C" }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = "#f0f0f0"}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = "white"}>
               Get Mentor Support
             </button>
-            <button className="px-6 py-2 border border-white text-white rounded-lg font-medium hover:bg-white hover:text-purple-600 transition-colors">
+            <button className="px-6 py-2 border border-white text-white rounded-lg font-medium transition-colors"
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = "white";
+                      e.target.style.color = "#4D869C";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = "transparent";
+                      e.target.style.color = "white";
+                    }}>
               Download Checklist
             </button>
           </div>
@@ -764,7 +786,10 @@ const LaunchSteps = () => {
                   ))}
                   <button
                     onClick={() => handleAddCustomField()}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
+                    style={{ backgroundColor: "#4D869C" }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
                   >
                     <Plus className="w-4 h-4" />
                     Add Custom Field
@@ -784,7 +809,10 @@ const LaunchSteps = () => {
               <button
                 onClick={handleSaveStep}
                 disabled={!newStep.title.trim() || !newStep.description.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: "#4D869C" }}
+                onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = "#3a6b7a")}
+                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = "#4D869C")}
               >
                 Add Step
               </button>
@@ -964,7 +992,10 @@ const LaunchSteps = () => {
                   ))}
                   <button
                     onClick={() => handleAddCustomField(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
+                    style={{ backgroundColor: "#4D869C" }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
                   >
                     <Plus className="w-4 h-4" />
                     Add Custom Field
@@ -986,7 +1017,10 @@ const LaunchSteps = () => {
                 disabled={
                   !editStep.title.trim() || !editStep.description.trim()
                 }
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: "#4D869C" }}
+                onMouseEnter={(e) => !e.target.disabled && (e.target.style.backgroundColor = "#3a6b7a")}
+                onMouseLeave={(e) => !e.target.disabled && (e.target.style.backgroundColor = "#4D869C")}
               >
                 Save Changes
               </button>

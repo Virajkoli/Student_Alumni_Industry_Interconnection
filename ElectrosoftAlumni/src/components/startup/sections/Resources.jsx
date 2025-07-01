@@ -433,7 +433,7 @@ const Resources = () => {
 
   return (
     <>
-      <div className="w-full max-w-6xl mx-auto p-6">
+      <div className="w-full max-w-6xl mx-auto p-6" style={{ backgroundColor: "#EEE7FF" }}>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">Startup Resources</h1>
@@ -444,7 +444,10 @@ const Resources = () => {
         <div className="mb-6">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            className="text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            style={{ backgroundColor: "#4D869C" }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+            onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
           >
             <Plus size={20} />
             Add New Resource
@@ -468,7 +471,10 @@ const Resources = () => {
                       <div className="flex gap-1 ml-2">
                         <button
                           onClick={() => handleEditResource(category.id, resource.id)}
-                          className="text-gray-500 hover:text-blue-600 transition-colors"
+                          className="text-gray-500 transition-colors"
+                          style={{ color: "#4D869C" }}
+                          onMouseEnter={(e) => e.target.style.color = "#3a6b7a"}
+                          onMouseLeave={(e) => e.target.style.color = "#4D869C"}
                         >
                           <Edit size={16} />
                         </button>
@@ -496,7 +502,7 @@ const Resources = () => {
                           </span>
                         )}
                         {resource.isFree && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                          <span className="text-xs px-2 py-1 rounded text-white" style={{ backgroundColor: "#4D869C" }}>
                             Free
                           </span>
                         )}
@@ -504,7 +510,10 @@ const Resources = () => {
                           href={resource.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          className="transition-colors"
+                          style={{ color: "#4D869C" }}
+                          onMouseEnter={(e) => e.target.style.color = "#3a6b7a"}
+                          onMouseLeave={(e) => e.target.style.color = "#4D869C"}
                         >
                           <ExternalLink size={16} />
                         </a>
@@ -539,7 +548,7 @@ const Resources = () => {
         </div>
 
         {/* Quick Access Links */}
-        <div className="mt-8 bg-blue-50 rounded-lg border border-blue-200 p-6">
+        <div className="mt-8 rounded-lg border p-6" style={{ backgroundColor: "#f3f0ff", borderColor: "#4D869C" }}>
           <h2 className="text-xl font-medium text-gray-900 mb-4">Quick Access Links</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {quickAccessLinks.map((link, index) => (
@@ -548,13 +557,18 @@ const Resources = () => {
                 href={link.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-white rounded-lg p-4 border border-blue-100 hover:border-blue-300 transition-colors group"
+                className="bg-white rounded-lg p-4 border transition-colors group"
+                style={{ borderColor: "#E5E7EB" }}
+                onMouseEnter={(e) => e.target.style.borderColor = "#4D869C"}
+                onMouseLeave={(e) => e.target.style.borderColor = "#E5E7EB"}
               >
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-medium text-gray-900 text-sm group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-medium text-gray-900 text-sm transition-colors"
+                      style={{ color: "#4D869C" }}>
                     {link.name}
                   </h3>
-                  <ExternalLink size={16} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
+                  <ExternalLink size={16} className="text-gray-400 transition-colors"
+                                style={{ color: "#4D869C" }} />
                 </div>
                 <p className="text-xs text-gray-600">{link.description}</p>
               </a>
@@ -583,7 +597,7 @@ const Resources = () => {
                 <select
                   value={newResource.categoryId}
                   onChange={(e) => setNewResource({...newResource, categoryId: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                 >
                   {resourceCategories.map(category => (
                     <option key={category.id} value={category.id}>{category.category}</option>
@@ -598,7 +612,7 @@ const Resources = () => {
                     type="text"
                     value={newResource.title}
                     onChange={(e) => setNewResource({...newResource, title: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="Enter resource title"
                   />
                 </div>
@@ -609,7 +623,7 @@ const Resources = () => {
                     type="text"
                     value={newResource.type}
                     onChange={(e) => setNewResource({...newResource, type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., E-book, Video, Repository"
                   />
                 </div>
@@ -620,7 +634,7 @@ const Resources = () => {
                 <textarea
                   value={newResource.description}
                   onChange={(e) => setNewResource({...newResource, description: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                   rows="3"
                   placeholder="Enter resource description"
                 />
@@ -633,7 +647,7 @@ const Resources = () => {
                     type="text"
                     value={newResource.format}
                     onChange={(e) => setNewResource({...newResource, format: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., PDF, MP4, Web App"
                   />
                 </div>
@@ -644,7 +658,7 @@ const Resources = () => {
                     type="text"
                     value={newResource.duration}
                     onChange={(e) => setNewResource({...newResource, duration: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., 45 minutes, 10MB"
                   />
                 </div>
@@ -656,7 +670,7 @@ const Resources = () => {
                   type="url"
                   value={newResource.link}
                   onChange={(e) => setNewResource({...newResource, link: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                   placeholder="https://example.com"
                 />
               </div>
@@ -668,7 +682,7 @@ const Resources = () => {
                     type="text"
                     value={newResource.author}
                     onChange={(e) => setNewResource({...newResource, author: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., John Doe, MIT"
                   />
                 </div>
@@ -679,7 +693,7 @@ const Resources = () => {
                     type="text"
                     value={newResource.language}
                     onChange={(e) => setNewResource({...newResource, language: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., JavaScript, English"
                   />
                 </div>
@@ -691,7 +705,7 @@ const Resources = () => {
                   type="text"
                   value={newResource.features}
                   onChange={(e) => setNewResource({...newResource, features: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                   placeholder="e.g., Real-time simulation, Interactive"
                 />
               </div>
@@ -702,7 +716,8 @@ const Resources = () => {
                     type="checkbox"
                     checked={newResource.isDownloadable}
                     onChange={(e) => setNewResource({...newResource, isDownloadable: e.target.checked})}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 border-gray-300 rounded"
+                    style={{ accentColor: "#4D869C" }}
                   />
                   <span className="ml-2 text-sm text-gray-700">Downloadable</span>
                 </label>
@@ -712,7 +727,8 @@ const Resources = () => {
                     type="checkbox"
                     checked={newResource.isFree}
                     onChange={(e) => setNewResource({...newResource, isFree: e.target.checked})}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 border-gray-300 rounded"
+                    style={{ accentColor: "#4D869C" }}
                   />
                   <span className="ml-2 text-sm text-gray-700">Free</span>
                 </label>
@@ -722,7 +738,8 @@ const Resources = () => {
                     type="checkbox"
                     checked={newResource.isInteractive}
                     onChange={(e) => setNewResource({...newResource, isInteractive: e.target.checked})}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 border-gray-300 rounded"
+                    style={{ accentColor: "#4D869C" }}
                   />
                   <span className="ml-2 text-sm text-gray-700">Interactive</span>
                 </label>
@@ -737,7 +754,10 @@ const Resources = () => {
                   <button
                     type="button"
                     onClick={handleAddCustomField}
-                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                    className="px-3 py-1 text-sm text-white rounded transition-colors"
+                    style={{ backgroundColor: "#4D869C" }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
                   >
                     Add Field
                   </button>
@@ -751,7 +771,7 @@ const Resources = () => {
                         handleCustomFieldChange(index, "label", e.target.value)
                       }
                       placeholder="Field name"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     />
                     <input
                       type="text"
@@ -760,7 +780,7 @@ const Resources = () => {
                         handleCustomFieldChange(index, "value", e.target.value)
                       }
                       placeholder="Field value"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     />
                     <button
                       type="button"
@@ -777,7 +797,10 @@ const Resources = () => {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleAddResource}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                className="flex-1 text-white py-2 px-4 rounded-lg transition-colors text-sm"
+                style={{ backgroundColor: "#4D869C" }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
               >
                 Add Resource
               </button>
@@ -832,7 +855,7 @@ const Resources = () => {
                     type="text"
                     value={editingResource.title}
                     onChange={(e) => setEditingResource({...editingResource, title: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="Enter resource title"
                   />
                 </div>
@@ -843,7 +866,7 @@ const Resources = () => {
                     type="text"
                     value={editingResource.type || ""}
                     onChange={(e) => setEditingResource({...editingResource, type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., E-book, Video, Repository"
                   />
                 </div>
@@ -854,7 +877,7 @@ const Resources = () => {
                 <textarea
                   value={editingResource.description}
                   onChange={(e) => setEditingResource({...editingResource, description: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                   rows="3"
                   placeholder="Describe what this resource provides..."
                 />
@@ -867,7 +890,7 @@ const Resources = () => {
                     type="text"
                     value={editingResource.format || ""}
                     onChange={(e) => setEditingResource({...editingResource, format: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., PDF, MP4, Web App"
                   />
                 </div>
@@ -878,7 +901,7 @@ const Resources = () => {
                     type="text"
                     value={editingResource.duration || editingResource.size || ""}
                     onChange={(e) => setEditingResource({...editingResource, duration: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., 45 minutes, 10MB"
                   />
                 </div>
@@ -890,7 +913,7 @@ const Resources = () => {
                   type="url"
                   value={editingResource.link}
                   onChange={(e) => setEditingResource({...editingResource, link: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                   placeholder="https://example.com/resource"
                 />
               </div>
@@ -902,7 +925,7 @@ const Resources = () => {
                     type="text"
                     value={editingResource.author || editingResource.creator || ""}
                     onChange={(e) => setEditingResource({...editingResource, author: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., John Doe, MIT"
                   />
                 </div>
@@ -913,7 +936,7 @@ const Resources = () => {
                     type="text"
                     value={editingResource.language || editingResource.technology || ""}
                     onChange={(e) => setEditingResource({...editingResource, language: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                     placeholder="e.g., JavaScript, English"
                   />
                 </div>
@@ -925,7 +948,7 @@ const Resources = () => {
                   type="text"
                   value={editingResource.features || editingResource.tags || ""}
                   onChange={(e) => setEditingResource({...editingResource, features: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
                   placeholder="e.g., Real-time simulation, Interactive"
                 />
               </div>
@@ -936,7 +959,8 @@ const Resources = () => {
                     type="checkbox"
                     checked={editingResource.isDownloadable || false}
                     onChange={(e) => setEditingResource({...editingResource, isDownloadable: e.target.checked})}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 border-gray-300 rounded"
+                    style={{ accentColor: "#4D869C" }}
                   />
                   <span className="ml-2 text-sm text-gray-700">Downloadable</span>
                 </label>
@@ -946,7 +970,8 @@ const Resources = () => {
                     type="checkbox"
                     checked={editingResource.isFree || false}
                     onChange={(e) => setEditingResource({...editingResource, isFree: e.target.checked})}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 border-gray-300 rounded"
+                    style={{ accentColor: "#4D869C" }}
                   />
                   <span className="ml-2 text-sm text-gray-700">Free</span>
                 </label>
@@ -956,7 +981,8 @@ const Resources = () => {
                     type="checkbox"
                     checked={editingResource.isInteractive || false}
                     onChange={(e) => setEditingResource({...editingResource, isInteractive: e.target.checked})}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    className="w-4 h-4 border-gray-300 rounded"
+                    style={{ accentColor: "#4D869C" }}
                   />
                   <span className="ml-2 text-sm text-gray-700">Interactive</span>
                 </label>
@@ -979,7 +1005,10 @@ const Resources = () => {
                         customFields: [...(editingResource.customFields || []), newCustomField]
                       });
                     }}
-                    className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
+                    className="text-xs px-2 py-1 rounded transition-colors text-white"
+                    style={{ backgroundColor: "#4D869C" }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
                   >
                     + Add Custom Field
                   </button>
@@ -996,7 +1025,7 @@ const Resources = () => {
                         updatedFields[index].key = e.target.value;
                         setEditingResource({...editingResource, customFields: updatedFields});
                       }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4D869C] text-xs"
                     />
                     <input
                       type="text"
@@ -1007,7 +1036,7 @@ const Resources = () => {
                         updatedFields[index].value = e.target.value;
                         setEditingResource({...editingResource, customFields: updatedFields});
                       }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4D869C] text-xs"
                     />
                     <button
                       type="button"
@@ -1031,7 +1060,10 @@ const Resources = () => {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleSaveEdit}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                className="flex-1 text-white py-2 px-4 rounded-lg transition-colors text-sm"
+                style={{ backgroundColor: "#4D869C" }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
               >
                 Save Changes
               </button>

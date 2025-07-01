@@ -214,7 +214,8 @@ const PostCreator = () => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
       <div className="flex items-start space-x-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+             style={{ backgroundColor: "#4D869C" }}>
           P
         </div>
 
@@ -223,7 +224,8 @@ const PostCreator = () => {
             value={postText}
             onChange={(e) => setPostText(e.target.value)}
             placeholder="Start a post..."
-            className="w-full min-h-[60px] p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="w-full min-h-[60px] p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+            style={{ "--tw-ring-color": "#4D869C" }}
             rows="3"
           />
 
@@ -351,9 +353,20 @@ const PostCreator = () => {
               disabled={!postText.trim() && attachedFiles.length === 0}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
                 postText.trim() || attachedFiles.length > 0
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  ? "text-white"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
+              style={postText.trim() || attachedFiles.length > 0 ? { backgroundColor: "#4D869C" } : {}}
+              onMouseEnter={(e) => {
+                if (postText.trim() || attachedFiles.length > 0) {
+                  e.target.style.backgroundColor = "#3a6b7a";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (postText.trim() || attachedFiles.length > 0) {
+                  e.target.style.backgroundColor = "#4D869C";
+                }
+              }}
             >
               Post
             </button>

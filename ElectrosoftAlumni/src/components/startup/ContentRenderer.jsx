@@ -75,11 +75,13 @@ const FormContent = ({ data }) => {
             {field.type === "textarea" ? (
               <textarea
                 placeholder={field.placeholder}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 outline-none"
+                style={{ "--tw-ring-color": "#4D869C" }}
                 rows={3}
               />
             ) : field.type === "select" ? (
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 outline-none"
+                      style={{ "--tw-ring-color": "#4D869C" }}>
                 <option value="">{field.placeholder || "Select an option"}</option>
                 {field.options && field.options.map((option, idx) => (
                   <option key={idx} value={option}>{option}</option>
@@ -89,14 +91,18 @@ const FormContent = ({ data }) => {
               <input
                 type={field.type || "text"}
                 placeholder={field.placeholder}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 outline-none"
+                style={{ "--tw-ring-color": "#4D869C" }}
               />
             )}
           </div>
         ))}
         <button
           type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="text-white px-6 py-2 rounded-lg transition-colors"
+          style={{ backgroundColor: "#4D869C" }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+          onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
         >
           Submit
         </button>
@@ -147,7 +153,7 @@ const TimelineContent = ({ data }) => {
         {data.events.map((event, index) => (
           <div key={index} className="flex">
             <div className="flex flex-col items-center mr-4">
-              <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#4D869C" }}></div>
               {index < data.events.length - 1 && <div className="w-0.5 h-16 bg-gray-300 mt-2"></div>}
             </div>
             <div className="flex-1">
@@ -253,12 +259,13 @@ const CustomContent = ({ contentType, content, title, onEdit = null }) => {
           <div className="p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">{title}</h2>
             <div className="flex items-center space-x-3">
-              <Link className="w-6 h-6 text-blue-600" />
+              <Link className="w-6 h-6" style={{ color: "#4D869C" }} />
               <a
                 href={parsedContent}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-lg"
+                className="hover:underline text-lg"
+                style={{ color: "#4D869C" }}
               >
                 {parsedContent}
               </a>
@@ -314,7 +321,8 @@ const CustomContent = ({ contentType, content, title, onEdit = null }) => {
                 href={parsedContent}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-lg"
+                className="hover:underline text-lg"
+                style={{ color: "#4D869C" }}
               >
                 {parsedContent}
               </a>

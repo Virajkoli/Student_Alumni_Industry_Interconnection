@@ -247,9 +247,10 @@ const FeedArea = () => {
   };
 
   const PostCard = ({ post }) => (
-    <div className="border-b border-gray-200 last:border-b-0 p-4 hover:bg-gray-50 transition-colors">
+    <div className="border-b border-gray-200 last:border-b-0 p-4 transition-colors" style={{ backgroundColor: "#EEE7FF" }}>
       <div className="flex items-start space-x-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+             style={{ background: "linear-gradient(to bottom right, #4D869C, #6B8FA3)" }}>
           {post.author.avatar}
         </div>
 
@@ -261,7 +262,8 @@ const FeedArea = () => {
                   {post.author.name}
                 </h4>
                 {post.author.verified && (
-                  <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-4 h-4 rounded-full flex items-center justify-center"
+                       style={{ backgroundColor: "#4D869C" }}>
                     <span className="text-white text-xs">✓</span>
                   </div>
                 )}
@@ -274,7 +276,8 @@ const FeedArea = () => {
                 <div className="flex items-center space-x-1">
                   <button
                     onClick={() => handleSaveEdit(post.id)}
-                    className="p-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                    className="p-1.5 text-white rounded-lg transition-all duration-200 shadow-sm border"
+                    style={{ backgroundColor: "#4D869C", borderColor: "#4D869C" }}
                     title="Save changes"
                   >
                     <Save className="w-4 h-4" />

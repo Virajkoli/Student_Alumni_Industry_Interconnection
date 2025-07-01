@@ -218,11 +218,13 @@ const navigationItems = [
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+      <div className="rounded-xl shadow-sm border border-gray-900 overflow-hidden mb-6"
+           style={{ backgroundColor: "#EEE7FF" }}>
         {/* Profile Header - Horizontal */}
         <div className="relative">
           {/* Increased height from h-24 to h-32 */}
-          <div className="h-44 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+          <div className="h-44"
+               style={{ backgroundColor: "#CDE8E5" }}></div>
           {/* Edit Button */}
           <button
             onClick={handleEditClick}
@@ -264,7 +266,10 @@ const navigationItems = [
               </div>
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
-              <button className="py-2 px-5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors duration-200">
+              <button className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200"
+                      style={{ backgroundColor: "#4D869C" }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}>
                 Connect
               </button>
             </div>
@@ -288,7 +293,7 @@ const navigationItems = [
         </div>
 
         {/* Navigation Items - Horizontal LinkedIn Style */}
-        <div className="bg-white border-b border-gray-200">
+        <div className="border-b border-gray-200" style={{ backgroundColor: "#EEE7FF" }}>
           <div className="flex overflow-x-auto">
             {allNavigationItems.map((item) => (
               <button
@@ -296,9 +301,13 @@ const navigationItems = [
                 onClick={() => handleItemClick(item)}
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
                   activeItem === item.id
-                    ? "border-blue-500 text-blue-600 bg-blue-50"
+                    ? "text-white"
                     : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
                 }`}
+                style={activeItem === item.id ? { 
+                  borderBottomColor: "#4D869C", 
+                  backgroundColor: "#4D869C" 
+                } : {}}
               >
                 {item.shortName}
               </button>
@@ -347,7 +356,10 @@ const navigationItems = [
                       }}
                     />
                   </div>
-                  <button className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                  <button className="absolute -bottom-1 -right-1 p-1.5 text-white rounded-full transition-colors"
+                          style={{ backgroundColor: "#4D869C" }}
+                          onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                          onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}>
                     <Camera className="w-3 h-3" />
                   </button>
                 </div>
@@ -373,7 +385,7 @@ const navigationItems = [
                     onChange={(e) =>
                       handleInputChange("firstName", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     placeholder="Enter first name"
                   />
                 </div>
@@ -387,7 +399,7 @@ const navigationItems = [
                     onChange={(e) =>
                       handleInputChange("lastName", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     placeholder="Enter last name"
                   />
                 </div>
@@ -404,7 +416,7 @@ const navigationItems = [
                   onChange={(e) =>
                     handleInputChange("headline", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                   placeholder="Enter your professional headline"
                 />
               </div>
@@ -421,7 +433,7 @@ const navigationItems = [
                     onChange={(e) =>
                       handleInputChange("location", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     placeholder="Enter city"
                   />
                 </div>
@@ -433,7 +445,7 @@ const navigationItems = [
                     type="text"
                     value={editData.city}
                     onChange={(e) => handleInputChange("city", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     placeholder="Enter state or region"
                   />
                 </div>
@@ -457,7 +469,7 @@ const navigationItems = [
                       onChange={(e) =>
                         handleInputChange("email", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                       placeholder="Enter email address"
                     />
                   </div>
@@ -472,7 +484,7 @@ const navigationItems = [
                       onChange={(e) =>
                         handleInputChange("phone", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                       placeholder="Enter phone number"
                     />
                   </div>
@@ -489,7 +501,7 @@ const navigationItems = [
                     onChange={(e) =>
                       handleInputChange("website", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     placeholder="Enter website URL"
                   />
                 </div>
@@ -504,7 +516,7 @@ const navigationItems = [
                   value={editData.about || ""}
                   onChange={(e) => handleInputChange("about", e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                   placeholder="Write a brief description about yourself and your startup journey..."
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -523,7 +535,10 @@ const navigationItems = [
               </button>
               <button
                 onClick={handleSaveProfile}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
+                style={{ backgroundColor: "#4D869C" }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
               >
                 Save Changes
               </button>
@@ -560,7 +575,7 @@ const navigationItems = [
                   type="text"
                   value={newNavData.name}
                   onChange={(e) => handleNewNavInputChange("name", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                   placeholder="Enter navigation name"
                   maxLength={50}
                 />
@@ -577,7 +592,7 @@ const navigationItems = [
                 <select
                   value={newNavData.contentType}
                   onChange={(e) => handleNewNavInputChange("contentType", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                 >
                   <option value="text">Simple Text Content</option>
                   <option value="html">Rich Text/HTML</option>
@@ -600,7 +615,7 @@ const navigationItems = [
                   <select
                     value={newNavData.layoutStyle || "cards"}
                     onChange={(e) => handleNewNavInputChange("layoutStyle", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                   >
                     <option value="cards">Card Layout</option>
                     <option value="list">List Layout</option>
@@ -618,7 +633,7 @@ const navigationItems = [
                 <select
                   value={newNavData.bgStyle || "default"}
                   onChange={(e) => handleNewNavInputChange("bgStyle", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                 >
                   <option value="default">Default (Light)</option>
                   <option value="gradient">Gradient Background</option>
@@ -640,7 +655,7 @@ const navigationItems = [
                     value={newNavData.content}
                     onChange={(e) => handleNewNavInputChange("content", e.target.value)}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                     placeholder="Enter your text content..."
                   />
                 )}
@@ -651,7 +666,7 @@ const navigationItems = [
                     value={newNavData.content}
                     onChange={(e) => handleNewNavInputChange("content", e.target.value)}
                     rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none font-mono text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none font-mono text-sm"
                     placeholder="Enter HTML content..."
                   />
                 )}
@@ -667,7 +682,7 @@ const navigationItems = [
                         type="text"
                         value={newNavData.sectionTitle || ""}
                         onChange={(e) => handleNewNavInputChange("sectionTitle", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                         placeholder="e.g., Our Services, Features, Benefits"
                       />
                     </div>
@@ -711,7 +726,7 @@ const navigationItems = [
                             }));
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                       >
                         <option value="services">Services/Products</option>
                         <option value="features">Features/Benefits</option>
@@ -732,7 +747,7 @@ const navigationItems = [
                             <input
                               type="text"
                               placeholder="Item Name/Title"
-                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                               onChange={(e) => {
                                 const items = JSON.parse(newNavData.content || '{"items":[]}').items || [];
                                 items[num-1] = {...(items[num-1] || {}), name: e.target.value};
@@ -745,7 +760,7 @@ const navigationItems = [
                             <textarea
                               rows={2}
                               placeholder="Description/Details"
-                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                               onChange={(e) => {
                                 const items = JSON.parse(newNavData.content || '{"items":[]}').items || [];
                                 items[num-1] = {...(items[num-1] || {}), description: e.target.value};
@@ -777,7 +792,7 @@ const navigationItems = [
                         type="text"
                         value={newNavData.dashboardTitle || ""}
                         onChange={(e) => handleNewNavInputChange("dashboardTitle", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                         placeholder="e.g., Performance Dashboard"
                       />
                     </div>
@@ -822,7 +837,7 @@ const navigationItems = [
                             }));
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                       >
                         <option value="business">Business Dashboard (4 stats)</option>
                         <option value="startup">Startup Metrics (4 stats)</option>
@@ -842,7 +857,7 @@ const navigationItems = [
                             <input
                               type="text"
                               placeholder="Label (e.g., Revenue)"
-                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                               onChange={(e) => {
                                 const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
                                 stats[num-1] = {...(stats[num-1] || {}), label: e.target.value};
@@ -855,7 +870,7 @@ const navigationItems = [
                             <input
                               type="text"
                               placeholder="Value (e.g., $45K)"
-                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                               onChange={(e) => {
                                 const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
                                 stats[num-1] = {...(stats[num-1] || {}), value: e.target.value};
@@ -868,7 +883,7 @@ const navigationItems = [
                             <input
                               type="text"
                               placeholder="Trend (e.g., +12%)"
-                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                               onChange={(e) => {
                                 const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
                                 stats[num-1] = {...(stats[num-1] || {}), trend: e.target.value};
@@ -900,7 +915,7 @@ const navigationItems = [
                         type="text"
                         value={newNavData.formTitle || ""}
                         onChange={(e) => handleNewNavInputChange("formTitle", e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                         placeholder="e.g., Contact Us, Registration Form"
                       />
                     </div>
@@ -947,7 +962,7 @@ const navigationItems = [
                             }));
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                       >
                         <option value="contact">Contact Form</option>
                         <option value="registration">Registration Form</option>
@@ -970,7 +985,7 @@ const navigationItems = [
                       value={newNavData.content}
                       onChange={(e) => handleNewNavInputChange("content", e.target.value)}
                       rows={6}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                       placeholder="Enter gallery items as JSON...&#10;Example:&#10;{&#10;  'title': 'Project Gallery',&#10;  'items': [&#10;    {'type': 'image', 'url': 'https://...', 'title': 'Project 1'},&#10;    {'type': 'video', 'url': 'https://...', 'title': 'Demo Video'}&#10;  ]&#10;}"
                     />
                     <div className="text-xs text-gray-500">
@@ -986,7 +1001,7 @@ const navigationItems = [
                       value={newNavData.content}
                       onChange={(e) => handleNewNavInputChange("content", e.target.value)}
                       rows={6}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                       placeholder="Enter timeline steps as JSON...&#10;Example:&#10;{&#10;  'title': 'Product Development',&#10;  'steps': [&#10;    {'step': 1, 'title': 'Research', 'description': 'Market research phase'},&#10;    {'step': 2, 'title': 'Design', 'description': 'UI/UX design phase'}&#10;  ]&#10;}"
                     />
                     <div className="text-xs text-gray-500">
@@ -1001,7 +1016,7 @@ const navigationItems = [
                     type="url"
                     value={newNavData.content}
                     onChange={(e) => handleNewNavInputChange("content", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     placeholder={`Enter ${newNavData.contentType} URL...`}
                   />
                 )}

@@ -13,15 +13,53 @@ const Alumni = ({ data, onEdit }) => {
           Edit
         </button>
       </div>
-      {data.alumni && data.alumni.length > 0 ? (
-        <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-          {data.alumni.map((item, idx) => (
-            <li key={idx}>{item}</li>
-          ))}
-        </ul>
-      ) : (
-        <div className="text-gray-500">No alumni information available.</div>
-      )}
+      {/* Notable Alumni */}
+      <div className="mb-6">
+        <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+          Notable Alumni
+        </h3>
+        {data.notableAlumni && data.notableAlumni.length > 0 ? (
+          <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
+            {data.notableAlumni.map((item, idx) => (
+              <li key={idx}>{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-gray-500">
+            No notable alumni information available.
+          </div>
+        )}
+      </div>
+      {/* Alumni Testimonials */}
+      <div className="mb-6">
+        <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+          Alumni Testimonials
+        </h3>
+        {data.alumniTestimonials && data.alumniTestimonials.length > 0 ? (
+          <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
+            {data.alumniTestimonials.map((item, idx) => (
+              <li key={idx}>{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-gray-500">No testimonials available.</div>
+        )}
+      </div>
+      {/* Networking Opportunities */}
+      <div>
+        <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+          Networking Opportunities
+        </h3>
+        {data.networkingOpportunities && data.networkingOpportunities.length > 0 ? (
+          <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
+            {data.networkingOpportunities.map((item, idx) => (
+              <li key={idx}>{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-gray-500">No networking opportunities listed.</div>
+        )}
+      </div>
     </div>
   );
 };

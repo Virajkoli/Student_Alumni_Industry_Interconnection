@@ -9,21 +9,21 @@ import Faculty from "../../components/college/sections/Faculty";
 import Downloads from "../../components/college/sections/Downloads";
 import Admission from "../../components/college/sections/Admission";
 import Placement from "../../components/college/sections/Placement";
-import CutoffRanking from "../../components/college/sections/CutoffRanking";
-import EventsNews from "../../components/college/sections/EventsNews";
 import Facilities from "../../components/college/sections/Facilities";
 import Alumni from "../../components/college/sections/Alumni";
 import StudentReviews from "../../components/college/sections/StudentReviews";
 
 const NAV_OPTIONS = [
   { id: "college-info", name: "College Info" },
-  { id: "course-details", name: "Course Details" }, // Added Course Details as a separate tab
+  { id: "course-details", name: "Course Details" },
   { id: "course-fees", name: "Course Fees" },
   { id: "review", name: "Review" },
   { id: "admission", name: "Admission" },
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
   { id: "downloads", name: "Downloads" },
+  { id: "hostel", name: "Hostels & Campus" }, // Added Hostel tab
+  { id: "events", name: "Events" },
 ];
 
 // Mock external review form responses (in a real app, this would come from an API/database)
@@ -241,6 +241,14 @@ const CollegeProfilePage = () => {
         "JAM: February 2025",
         "Application Deadlines: Check official website",
       ],
+      
+      cutoffTable: [
+        { year: 2024, round1: "1200", round2: "1250", round3: "1300" },
+        { year: 2023, round1: "1150", round2: "1200", round3: "1250" },
+        { year: 2022, round1: "1100", round2: "1150", round3: "1200" },
+        { year: 2021, round1: "1050", round2: "1100", round3: "1150" },
+        { year: 2020, round1: "1000", round2: "1050", round3: "1100" },
+      ],
     },
     placement: {
       highlights: [
@@ -363,6 +371,69 @@ const CollegeProfilePage = () => {
         },
       ],
     },
+    hostel: {
+      hostelFacilities: [
+        "Separate hostels for boys and girls with 24/7 security",
+        "Wi-Fi, laundry, mess, and recreational facilities",
+        "Single/double/triple occupancy rooms",
+        "Common rooms, TV, indoor games, and gymnasiums",
+        "Medical and emergency support available",
+      ],
+      campusInfrastructure: [
+        "1055-acre lush green campus",
+        "State-of-the-art lecture halls and labs",
+        "Central library, computer center, and innovation labs",
+        "Sports complex, swimming pool, and stadium",
+        "Cafeterias, shopping complex, and health center",
+        "Bank, post office, and other amenities on campus",
+      ],
+    },
+    alumni: {
+      notableAlumni: [
+        "Dr. Manohar B. Parrikar – Former Defence Minister of India, Ex-Chief Minister of Goa",
+        "Dr. N. R. Narayana Murthy – Founder, Infosys",
+        "Dr. Raghuram Rajan – Former RBI Governor",
+        "Dr. Ashoke Sen – Theoretical Physicist, Padma Bhushan Awardee",
+        "Dr. Satyendra Dubey – Whistleblower and IITK alumnus",
+      ],
+      alumniTestimonials: [
+        "IIT Kanpur gave me the foundation to excel in my career and life. – Narayana Murthy",
+        "The campus life and academic rigor at IITK are unmatched. – Raghuram Rajan",
+        "The alumni network helped me land my dream job. – Anonymous Alumnus",
+      ],
+      networkingOpportunities: [
+        "Annual alumni meetups and reunions",
+        "Active alumni chapters in major cities worldwide",
+        "Online alumni portal for networking and mentorship",
+        "Industry-academia connect events",
+        "Alumni guest lectures and webinars",
+      ],
+    },
+    events: {
+      annualEvents: [
+        "Convocation Ceremony",
+        "Foundation Day",
+        "Alumni Meet",
+        "Techkriti (Annual Tech Fest)",
+        "Antaragni (Annual Cultural Fest)"
+      ],
+      techCulture: [
+        "Techkriti – Asia's largest student-run technical and entrepreneurial festival",
+        "Antaragni – Renowned cultural festival with national participation",
+        "Udghosh – Annual sports festival",
+        "E-Summit – Entrepreneurship summit"
+      ],
+      seminars: [
+        "International Seminar on Artificial Intelligence",
+        "Annual Research Symposium",
+        "Industry-Academia Conclave"
+      ],
+      conferences: [
+        "IEEE International Conference on Robotics",
+        "National Conference on Sustainable Engineering",
+        "Global Alumni Conference"
+      ]
+    }
   });
 
   const openSectionForm = (tab) => {
@@ -1302,6 +1373,31 @@ const CollegeProfilePage = () => {
                       </li>
                     ))}
                   </ul>
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Cutoff Trends (2020-2024)
+                  </h3>
+                  <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+                    <thead className="bg-blue-50">
+                      <tr>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Year</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 1</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 2</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 3</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-gray-800">
+                      {sectionFormData.cutoffTable.map((row, idx) => (
+                        <tr key={idx}>
+                          <td className="py-3 px-4 font-medium text-blue-800">{row.year}</td>
+                          <td className="py-3 px-4">{row.round1}</td>
+                          <td className="py-3 px-4">{row.round2}</td>
+                          <td className="py-3 px-4">{row.round3}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}

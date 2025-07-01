@@ -32,6 +32,7 @@ const HowItWorks = () => {
           "Industry categorization",
           "Stage identification",
         ],
+        customFields: [],
       },
       {
         id: 2,
@@ -47,6 +48,7 @@ const HowItWorks = () => {
           "Peer networking",
           "Industry events",
         ],
+        customFields: [],
       },
       {
         id: 3,
@@ -62,6 +64,7 @@ const HowItWorks = () => {
           "Expert guides",
           "Video tutorials",
         ],
+        customFields: [],
       },
       {
         id: 4,
@@ -76,6 +79,7 @@ const HowItWorks = () => {
           "Funding tracking",
           "Due diligence support",
         ],
+        customFields: [],
       },
       {
         id: 5,
@@ -91,6 +95,7 @@ const HowItWorks = () => {
           "Scale-up support",
           "Global opportunities",
         ],
+        customFields: [],
       },
     ],
   });
@@ -101,6 +106,7 @@ const HowItWorks = () => {
     details: "",
     icon: "💡",
     features: [],
+    customFields: [],
   });
 
   const [editStep, setEditStep] = useState({
@@ -109,6 +115,7 @@ const HowItWorks = () => {
     details: "",
     icon: "💡",
     features: [],
+    customFields: [],
   });
 
   const handleAddStep = () => {
@@ -138,6 +145,7 @@ const HowItWorks = () => {
         details: "",
         icon: "💡",
         features: [],
+        customFields: [],
       });
       setShowAddModal(false);
     }
@@ -150,6 +158,7 @@ const HowItWorks = () => {
       details: "",
       icon: "💡",
       features: [],
+      customFields: [],
     });
     setShowAddModal(false);
   };
@@ -184,6 +193,7 @@ const HowItWorks = () => {
         details: "",
         icon: "💡",
         features: [],
+        customFields: [],
       });
     }
   };
@@ -196,6 +206,7 @@ const HowItWorks = () => {
       details: "",
       icon: "💡",
       features: [],
+      customFields: [],
     });
   };
 
@@ -207,9 +218,57 @@ const HowItWorks = () => {
     }
   };
 
+  // Custom fields handlers
+  const handleAddCustomField = (isEdit = false) => {
+    const newField = { label: "", value: "" };
+    if (isEdit) {
+      setEditStep((prev) => ({
+        ...prev,
+        customFields: [...(prev.customFields || []), newField],
+      }));
+    } else {
+      setNewStep((prev) => ({
+        ...prev,
+        customFields: [...(prev.customFields || []), newField],
+      }));
+    }
+  };
+
+  const handleRemoveCustomField = (index, isEdit = false) => {
+    if (isEdit) {
+      setEditStep((prev) => ({
+        ...prev,
+        customFields: prev.customFields.filter((_, i) => i !== index),
+      }));
+    } else {
+      setNewStep((prev) => ({
+        ...prev,
+        customFields: prev.customFields.filter((_, i) => i !== index),
+      }));
+    }
+  };
+
+  const handleCustomFieldChange = (index, field, value, isEdit = false) => {
+    if (isEdit) {
+      setEditStep((prev) => ({
+        ...prev,
+        customFields: prev.customFields.map((item, i) =>
+          i === index ? { ...item, [field]: value } : item
+        ),
+      }));
+    } else {
+      setNewStep((prev) => ({
+        ...prev,
+        customFields: prev.customFields.map((item, i) =>
+          i === index ? { ...item, [field]: value } : item
+        ),
+      }));
+    }
+  };
+
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-lg">
+      <div className="p-6 bg-white border border-gray-200 rounded-lg">
         {/* Header with Edit Button */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
@@ -308,6 +367,31 @@ const HowItWorks = () => {
                           ))}
                         </div>
                       </div>
+
+                      {/* Custom Fields Display */}
+                      {step.customFields && step.customFields.length > 0 && (
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-800 mb-2">
+                            Additional Information:
+                          </h4>
+                          <div className="space-y-1">
+                            {step.customFields.map((field, fieldIndex) => (
+                              <div
+                                key={fieldIndex}
+                                className="text-sm text-gray-600 flex items-start"
+                              >
+                                <span className="font-medium text-gray-700 min-w-0 mr-2">
+                                  {field.label}:
+                                </span>
+                                <span className="text-gray-600">
+                                  {field.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex items-end justify-end">
                         <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
                           <Play className="w-4 h-4" />
@@ -437,6 +521,61 @@ const HowItWorks = () => {
                   placeholder="Enter features separated by commas"
                 />
               </div>
+
+              {/* Custom Fields */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddCustomField(false)}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Add Field
+                  </button>
+                </div>
+                {newStep.customFields.map((field, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={field.label}
+                      onChange={(e) =>
+                        handleCustomFieldChange(
+                          index,
+                          "label",
+                          e.target.value,
+                          false
+                        )
+                      }
+                      placeholder="Field name"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={field.value}
+                      onChange={(e) =>
+                        handleCustomFieldChange(
+                          index,
+                          "value",
+                          e.target.value,
+                          false
+                        )
+                      }
+                      placeholder="Field value"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCustomField(index, false)}
+                      className="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Modal Footer */}
@@ -560,6 +699,61 @@ const HowItWorks = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
                   placeholder="Enter features separated by commas"
                 />
+              </div>
+
+              {/* Custom Fields */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddCustomField(true)}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Add Field
+                  </button>
+                </div>
+                {editStep.customFields.map((field, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={field.label}
+                      onChange={(e) =>
+                        handleCustomFieldChange(
+                          index,
+                          "label",
+                          e.target.value,
+                          true
+                        )
+                      }
+                      placeholder="Field name"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={field.value}
+                      onChange={(e) =>
+                        handleCustomFieldChange(
+                          index,
+                          "value",
+                          e.target.value,
+                          true
+                        )
+                      }
+                      placeholder="Field value"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCustomField(index, true)}
+                      className="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 

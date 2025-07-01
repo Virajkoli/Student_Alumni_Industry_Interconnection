@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import {
   Edit,
   Save,
@@ -22,14 +22,17 @@ const StartupEcosystemOverview = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditLocationsModalOpen, setIsEditLocationsModalOpen] =
     useState(false);
-  
+
   // Fix leaflet default markers
   useEffect(() => {
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      iconRetinaUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+      iconUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+      shadowUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
     });
   }, []);
 
@@ -58,6 +61,7 @@ const StartupEcosystemOverview = () => {
       "youtube",
       "software",
     ],
+    customFields: [], // Array of custom fields added by user
     locations: [
       {
         name: "Jalgaon Office",
@@ -68,9 +72,11 @@ const StartupEcosystemOverview = () => {
         ceo: "Raj Patil",
         contact: {
           phone: "+91 257 2251000",
-          email: "jalgaon@mystartup.com"
+          email: "jalgaon@mystartup.com",
         },
-        image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&h=150&fit=crop",
+        image:
+          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&h=150&fit=crop",
+        customFields: [],
       },
       {
         name: "Pune Office",
@@ -81,9 +87,11 @@ const StartupEcosystemOverview = () => {
         ceo: "Priya Sharma",
         contact: {
           phone: "+91 20 6710 5000",
-          email: "pune@mystartup.com"
+          email: "pune@mystartup.com",
         },
-        image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=200&h=150&fit=crop",
+        image:
+          "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=200&h=150&fit=crop",
+        customFields: [],
       },
       {
         name: "Nashik Office",
@@ -94,9 +102,11 @@ const StartupEcosystemOverview = () => {
         ceo: "Amit Deshmukh",
         contact: {
           phone: "+91 253 2351000",
-          email: "nashik@mystartup.com"
+          email: "nashik@mystartup.com",
         },
-        image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=200&h=150&fit=crop",
+        image:
+          "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=200&h=150&fit=crop",
+        customFields: [],
       },
     ],
   });
@@ -157,19 +167,24 @@ const StartupEcosystemOverview = () => {
       ...prev,
       locations: prev.locations.map((location, i) => {
         if (i === index) {
-          if (field.startsWith('contact.')) {
-            const contactField = field.split('.')[1];
+          if (field.startsWith("contact.")) {
+            const contactField = field.split(".")[1];
             return {
               ...location,
               contact: {
                 ...location.contact,
-                [contactField]: value
-              }
+                [contactField]: value,
+              },
             };
-          } else if (field === 'coordinates') {
+          } else if (field === "coordinates") {
             // Parse coordinates from string "lat,lng"
-            const coords = value.split(',').map(coord => parseFloat(coord.trim()));
-            return { ...location, [field]: coords.length === 2 ? coords : [0, 0] };
+            const coords = value
+              .split(",")
+              .map((coord) => parseFloat(coord.trim()));
+            return {
+              ...location,
+              [field]: coords.length === 2 ? coords : [0, 0],
+            };
           }
           return { ...location, [field]: value };
         }
@@ -192,9 +207,11 @@ const StartupEcosystemOverview = () => {
           ceo: "",
           contact: {
             phone: "",
-            email: ""
+            email: "",
           },
-          image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop",
+          image:
+            "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop",
+          customFields: [], // Array of custom fields for each location
         },
       ],
     }));
@@ -204,6 +221,88 @@ const StartupEcosystemOverview = () => {
     setEditData((prev) => ({
       ...prev,
       locations: prev.locations.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Custom fields handlers for About section
+  const handleAddCustomField = () => {
+    setEditData((prev) => ({
+      ...prev,
+      customFields: [
+        ...(prev.customFields || []),
+        { id: Date.now(), label: "", value: "" },
+      ],
+    }));
+  };
+
+  const handleCustomFieldChange = (fieldId, property, value) => {
+    setEditData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((field) =>
+        field.id === fieldId ? { ...field, [property]: value } : field
+      ),
+    }));
+  };
+
+  const handleRemoveCustomField = (fieldId) => {
+    setEditData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((field) => field.id !== fieldId),
+    }));
+  };
+
+  // Custom fields handlers for Locations
+  const handleAddLocationCustomField = (locationIndex) => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: prev.locations.map((location, i) =>
+        i === locationIndex
+          ? {
+              ...location,
+              customFields: [
+                ...(location.customFields || []),
+                { id: Date.now(), label: "", value: "" },
+              ],
+            }
+          : location
+      ),
+    }));
+  };
+
+  const handleLocationCustomFieldChange = (
+    locationIndex,
+    fieldId,
+    property,
+    value
+  ) => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: prev.locations.map((location, i) =>
+        i === locationIndex
+          ? {
+              ...location,
+              customFields: location.customFields.map((field) =>
+                field.id === fieldId ? { ...field, [property]: value } : field
+              ),
+            }
+          : location
+      ),
+    }));
+  };
+
+  const handleRemoveLocationCustomField = (locationIndex, fieldId) => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: prev.locations.map((location, i) =>
+        i === locationIndex
+          ? {
+              ...location,
+              customFields: location.customFields.filter(
+                (field) => field.id !== fieldId
+              ),
+            }
+          : location
+      ),
     }));
   };
 
@@ -311,6 +410,25 @@ const StartupEcosystemOverview = () => {
                 </div>
               </div>
             </div>
+
+            {/* Custom Fields Display */}
+            {aboutData.customFields && aboutData.customFields.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">
+                  Additional Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {aboutData.customFields.map((field, index) => (
+                    <div key={field.id || index}>
+                      <h5 className="text-sm font-medium text-gray-900 mb-1">
+                        {field.label}
+                      </h5>
+                      <p className="text-sm text-gray-700">{field.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <hr class="border-t border-gray-300 my-4" />
@@ -354,19 +472,42 @@ const StartupEcosystemOverview = () => {
                       {location.employees} employees
                     </p>
                   </div>
+
+                  {/* Display Custom Fields */}
+                  {location.customFields &&
+                    location.customFields.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        {location.customFields.map((field, fieldIndex) => (
+                          <div
+                            key={field.id || fieldIndex}
+                            className="flex items-center gap-2 mb-1"
+                          >
+                            <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                            <span className="text-xs font-medium text-gray-700">
+                              {field.label}:
+                            </span>
+                            <span className="text-xs text-gray-600">
+                              {field.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                 </div>
               ))}
             </div>
           </div>
         </div>
-        
+
         <hr className="border-t border-gray-300 my-4" />
-        
+
         {/* Interactive Map Section */}
         <div className="bg-white rounded-lg">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Global Presence Map</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Global Presence Map
+            </h2>
             <Globe className="w-6 h-6 text-gray-400" />
           </div>
 
@@ -376,7 +517,7 @@ const StartupEcosystemOverview = () => {
               <MapContainer
                 center={[19.5, 74.5]} // Center on Maharashtra, India
                 zoom={7}
-                style={{ height: '100%', width: '100%' }}
+                style={{ height: "100%", width: "100%" }}
               >
                 <TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -384,8 +525,8 @@ const StartupEcosystemOverview = () => {
                 />
                 {aboutData.locations.map((location, index) => (
                   <Marker key={index} position={location.coordinates}>
-                    <Popup 
-                      maxWidth={220} 
+                    <Popup
+                      maxWidth={220}
                       minWidth={220}
                       className="compact-popup"
                     >
@@ -397,32 +538,40 @@ const StartupEcosystemOverview = () => {
                             className="w-12 h-12 rounded object-cover flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-gray-900 text-sm truncate">{location.name}</h3>
+                            <h3 className="font-medium text-gray-900 text-sm truncate">
+                              {location.name}
+                            </h3>
                             <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
                               {location.type}
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="space-y-1 text-xs">
                           <div className="flex items-start gap-1">
                             <MapPin className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <p className="text-gray-600 leading-tight">{location.address}</p>
+                            <p className="text-gray-600 leading-tight">
+                              {location.address}
+                            </p>
                           </div>
-                          
+
                           <div className="flex items-center gap-1">
                             <Users className="w-3 h-3 text-gray-400" />
-                            <p className="text-gray-600">{location.employees} employees</p>
+                            <p className="text-gray-600">
+                              {location.employees} employees
+                            </p>
                           </div>
-                          
+
                           <div className="border-t pt-1 mt-1">
-                            <p className="font-medium text-gray-900 text-xs">CEO: {location.ceo}</p>
+                            <p className="font-medium text-gray-900 text-xs">
+                              CEO: {location.ceo}
+                            </p>
                           </div>
-                          
+
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-1">
                               <Phone className="w-3 h-3 text-gray-400" />
-                              <a 
+                              <a
                                 href={`tel:${location.contact.phone}`}
                                 className="text-blue-600 hover:text-blue-700 text-xs truncate"
                               >
@@ -431,7 +580,7 @@ const StartupEcosystemOverview = () => {
                             </div>
                             <div className="flex items-center gap-1">
                               <Mail className="w-3 h-3 text-gray-400" />
-                              <a 
+                              <a
                                 href={`mailto:${location.contact.email}`}
                                 className="text-blue-600 hover:text-blue-700 text-xs truncate"
                               >
@@ -446,7 +595,7 @@ const StartupEcosystemOverview = () => {
                 ))}
               </MapContainer>
             </div>
-            
+
             {/* Map Legend */}
             <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
               <div className="flex items-center gap-2">
@@ -623,6 +772,69 @@ const StartupEcosystemOverview = () => {
                   </div>
                 )}
               </div>
+
+              {/* Custom Fields Section */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddCustomField}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Custom Field
+                  </button>
+                </div>
+
+                {editData.customFields && editData.customFields.length > 0 && (
+                  <div className="space-y-3">
+                    {editData.customFields.map((field) => (
+                      <div key={field.id} className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={field.label}
+                            onChange={(e) =>
+                              handleCustomFieldChange(
+                                field.id,
+                                "label",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Field Label (e.g., Founded, Revenue)"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={field.value}
+                            onChange={(e) =>
+                              handleCustomFieldChange(
+                                field.id,
+                                "value",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Field Value (e.g., 2020, $50M)"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCustomField(field.id)}
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Remove field"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Modal Footer */}
@@ -758,7 +970,11 @@ const StartupEcosystemOverview = () => {
                       </label>
                       <input
                         type="text"
-                        value={location.coordinates ? location.coordinates.join(', ') : '0, 0'}
+                        value={
+                          location.coordinates
+                            ? location.coordinates.join(", ")
+                            : "0, 0"
+                        }
                         onChange={(e) =>
                           handleLocationChange(
                             index,
@@ -779,13 +995,9 @@ const StartupEcosystemOverview = () => {
                       </label>
                       <input
                         type="text"
-                        value={location.ceo || ''}
+                        value={location.ceo || ""}
                         onChange={(e) =>
-                          handleLocationChange(
-                            index,
-                            "ceo",
-                            e.target.value
-                          )
+                          handleLocationChange(index, "ceo", e.target.value)
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                         placeholder="e.g., John Doe"
@@ -798,13 +1010,9 @@ const StartupEcosystemOverview = () => {
                       </label>
                       <input
                         type="url"
-                        value={location.image || ''}
+                        value={location.image || ""}
                         onChange={(e) =>
-                          handleLocationChange(
-                            index,
-                            "image",
-                            e.target.value
-                          )
+                          handleLocationChange(index, "image", e.target.value)
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                         placeholder="https://example.com/image.jpg"
@@ -817,7 +1025,7 @@ const StartupEcosystemOverview = () => {
                       </label>
                       <input
                         type="tel"
-                        value={location.contact?.phone || ''}
+                        value={location.contact?.phone || ""}
                         onChange={(e) =>
                           handleLocationChange(
                             index,
@@ -836,7 +1044,7 @@ const StartupEcosystemOverview = () => {
                       </label>
                       <input
                         type="email"
-                        value={location.contact?.email || ''}
+                        value={location.contact?.email || ""}
                         onChange={(e) =>
                           handleLocationChange(
                             index,
@@ -848,6 +1056,80 @@ const StartupEcosystemOverview = () => {
                         placeholder="office@company.com"
                       />
                     </div>
+                  </div>
+
+                  {/* Custom Fields for Location */}
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Custom Fields for this Location
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleAddLocationCustomField(index)}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        + Add Custom Field
+                      </button>
+                    </div>
+
+                    {location.customFields &&
+                      location.customFields.length > 0 && (
+                        <div className="space-y-2">
+                          {location.customFields.map((field) => (
+                            <div
+                              key={field.id}
+                              className="flex gap-2 items-start"
+                            >
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  value={field.label}
+                                  onChange={(e) =>
+                                    handleLocationCustomFieldChange(
+                                      index,
+                                      field.id,
+                                      "label",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Label (e.g., Parking, Cafeteria)"
+                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    handleLocationCustomFieldChange(
+                                      index,
+                                      field.id,
+                                      "value",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Value (e.g., Available, Yes)"
+                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRemoveLocationCustomField(
+                                    index,
+                                    field.id
+                                  )
+                                }
+                                className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                                title="Remove field"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </div>
                 </div>
               ))}

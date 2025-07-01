@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import {
   Edit,
   Save,
@@ -14,12 +17,29 @@ import {
   Briefcase,
   ChartBar,
   Target,
-  Award
+  Award,
+  Phone,
+  Mail,
 } from "lucide-react";
 
 const IndustryOverview = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditMarketModalOpen, setIsEditMarketModalOpen] = useState(false);
+  const [isEditLocationsModalOpen, setIsEditLocationsModalOpen] =
+    useState(false);
+
+  // Fix leaflet default markers
+  useEffect(() => {
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+      iconUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+      shadowUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+    });
+  }, []);
   const [aboutData, setAboutData] = useState({
     overview:
       "Our industry leads technological innovation and digital transformation across sectors. We focus on developing cutting-edge solutions that empower businesses and improve lives. Through collaborative partnerships and continuous innovation, we're shaping the future of technology and business.",
@@ -42,6 +62,7 @@ const IndustryOverview = () => {
       "machine learning",
       "automation",
     ],
+    customFields: [], // Array of custom fields added by user
     marketData: [
       {
         name: "North America",
@@ -68,6 +89,53 @@ const IndustryOverview = () => {
         keyPlayers: "80+ Companies",
       },
     ],
+    locations: [
+      {
+        name: "Silicon Valley Hub",
+        address: "Palo Alto, CA 94301, United States",
+        type: "HQ",
+        employees: "2000+",
+        coordinates: [37.4419, -122.143], // Palo Alto, CA
+        ceo: "Sarah Johnson",
+        contact: {
+          phone: "+1 650 555 0100",
+          email: "hub@techindustry.org",
+        },
+        image:
+          "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
+        customFields: [],
+      },
+      {
+        name: "London Office",
+        address: "Canary Wharf, London E14 5AB, United Kingdom",
+        type: "Office",
+        employees: "800+",
+        coordinates: [51.5054, -0.0235], // London, UK
+        ceo: "James Mitchell",
+        contact: {
+          phone: "+44 20 7946 0958",
+          email: "london@techindustry.org",
+        },
+        image:
+          "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop",
+        customFields: [],
+      },
+      {
+        name: "Singapore Office",
+        address: "Marina Bay, Singapore 018956",
+        type: "Office",
+        employees: "600+",
+        coordinates: [1.2966, 103.8764], // Singapore
+        ceo: "Li Wei Chen",
+        contact: {
+          phone: "+65 6123 4567",
+          email: "singapore@techindustry.org",
+        },
+        image:
+          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop",
+        customFields: [],
+      },
+    ],
   });
   const [editData, setEditData] = useState({ ...aboutData });
 
@@ -87,7 +155,16 @@ const IndustryOverview = () => {
   };
 
   const handleInputChange = (field, value) => {
-    if (field === "specializations") {
+    if (field.includes(".")) {
+      const [parent, child] = field.split(".");
+      setEditData((prev) => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value,
+        },
+      }));
+    } else if (field === "specializations") {
       setEditData((prev) => ({
         ...prev,
         [field]: value.split(",").map((s) => s.trim()),
@@ -143,6 +220,166 @@ const IndustryOverview = () => {
     }));
   };
 
+  // Location handlers
+  const handleEditLocationsClick = () => {
+    setEditData({ ...aboutData });
+    setIsEditLocationsModalOpen(true);
+  };
+
+  const handleSaveLocations = () => {
+    setAboutData({ ...editData });
+    setIsEditLocationsModalOpen(false);
+  };
+
+  const handleCancelLocationsEdit = () => {
+    setEditData({ ...aboutData });
+    setIsEditLocationsModalOpen(false);
+  };
+
+  const handleLocationChange = (index, field, value) => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: prev.locations.map((location, i) => {
+        if (i === index) {
+          if (field.startsWith("contact.")) {
+            const contactField = field.split(".")[1];
+            return {
+              ...location,
+              contact: {
+                ...location.contact,
+                [contactField]: value,
+              },
+            };
+          } else if (field === "coordinates") {
+            // Parse coordinates from string "lat,lng"
+            const coords = value
+              .split(",")
+              .map((coord) => parseFloat(coord.trim()));
+            return {
+              ...location,
+              [field]: coords.length === 2 ? coords : [0, 0],
+            };
+          }
+          return { ...location, [field]: value };
+        }
+        return location;
+      }),
+    }));
+  };
+
+  const handleAddLocation = () => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: [
+        ...prev.locations,
+        {
+          name: "",
+          address: "",
+          type: "Office",
+          employees: "",
+          coordinates: [0, 0],
+          ceo: "",
+          contact: {
+            phone: "",
+            email: "",
+          },
+          image:
+            "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop",
+          customFields: [], // Array of custom fields for each location
+        },
+      ],
+    }));
+  };
+
+  const handleRemoveLocation = (index) => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: prev.locations.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Custom fields handlers for About section
+  const handleAddCustomField = () => {
+    setEditData((prev) => ({
+      ...prev,
+      customFields: [
+        ...(prev.customFields || []),
+        { id: Date.now(), label: "", value: "" },
+      ],
+    }));
+  };
+
+  const handleCustomFieldChange = (fieldId, property, value) => {
+    setEditData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((field) =>
+        field.id === fieldId ? { ...field, [property]: value } : field
+      ),
+    }));
+  };
+
+  const handleRemoveCustomField = (fieldId) => {
+    setEditData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((field) => field.id !== fieldId),
+    }));
+  };
+
+  // Custom fields handlers for Locations
+  const handleAddLocationCustomField = (locationIndex) => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: prev.locations.map((location, i) =>
+        i === locationIndex
+          ? {
+              ...location,
+              customFields: [
+                ...(location.customFields || []),
+                { id: Date.now(), label: "", value: "" },
+              ],
+            }
+          : location
+      ),
+    }));
+  };
+
+  const handleLocationCustomFieldChange = (
+    locationIndex,
+    fieldId,
+    property,
+    value
+  ) => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: prev.locations.map((location, i) =>
+        i === locationIndex
+          ? {
+              ...location,
+              customFields: location.customFields.map((field) =>
+                field.id === fieldId ? { ...field, [property]: value } : field
+              ),
+            }
+          : location
+      ),
+    }));
+  };
+
+  const handleRemoveLocationCustomField = (locationIndex, fieldId) => {
+    setEditData((prev) => ({
+      ...prev,
+      locations: prev.locations.map((location, i) =>
+        i === locationIndex
+          ? {
+              ...location,
+              customFields: location.customFields.filter(
+                (field) => field.id !== fieldId
+              ),
+            }
+          : location
+      ),
+    }));
+  };
+
   return (
     <>
       <div className="p-6 max-w-4xl mx-auto">
@@ -150,7 +387,9 @@ const IndustryOverview = () => {
         <div className="bg-white rounded-lg shadow-sm mb-6">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Industry Overview</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Industry Overview
+            </h2>
             <button
               onClick={handleEditClick}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
@@ -162,12 +401,18 @@ const IndustryOverview = () => {
 
           {/* Overview Content */}
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Overview</h3>
-            <p className="text-gray-700 leading-relaxed mb-6">{aboutData.overview}</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Overview
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              {aboutData.overview}
+            </p>
 
             {/* Website */}
             <div className="mb-6">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Industry Portal</h4>
+              <h4 className="text-sm font-medium text-gray-900 mb-2">
+                Industry Portal
+              </h4>
               <a
                 href={aboutData.website}
                 target="_blank"
@@ -183,10 +428,14 @@ const IndustryOverview = () => {
             {aboutData.verified && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-sm font-medium text-gray-900">Verified Industry Data</h4>
+                  <h4 className="text-sm font-medium text-gray-900">
+                    Verified Industry Data
+                  </h4>
                   <Shield className="w-4 h-4 text-blue-600" />
                 </div>
-                <p className="text-sm text-gray-600">Last updated: {aboutData.verifiedDate}</p>
+                <p className="text-sm text-gray-600">
+                  Last updated: {aboutData.verifiedDate}
+                </p>
               </div>
             )}
 
@@ -194,14 +443,20 @@ const IndustryOverview = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Sector */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">Sector</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-1">
+                  Sector
+                </h4>
                 <p className="text-sm text-gray-700">{aboutData.sector}</p>
               </div>
 
               {/* Industry Size */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">Industry Size</h4>
-                <p className="text-sm text-gray-700">{aboutData.industrySize}</p>
+                <h4 className="text-sm font-medium text-gray-900 mb-1">
+                  Industry Size
+                </h4>
+                <p className="text-sm text-gray-700">
+                  {aboutData.industrySize}
+                </p>
                 <p className="text-sm text-gray-600 flex items-center gap-1">
                   {aboutData.activeMembers} active professionals
                   <Users className="w-3 h-3" />
@@ -210,13 +465,19 @@ const IndustryOverview = () => {
 
               {/* Main Hub */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">Main Hub</h4>
-                <p className="text-sm text-gray-700">{aboutData.headquarters}</p>
+                <h4 className="text-sm font-medium text-gray-900 mb-1">
+                  Main Hub
+                </h4>
+                <p className="text-sm text-gray-700">
+                  {aboutData.headquarters}
+                </p>
               </div>
 
               {/* Specializations */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">Key Specializations</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-1">
+                  Key Specializations
+                </h4>
                 <div className="flex flex-wrap gap-1">
                   {aboutData.specializations.map((specialization, index) => (
                     <span
@@ -229,13 +490,218 @@ const IndustryOverview = () => {
                 </div>
               </div>
             </div>
+
+            {/* Custom Fields Display */}
+            {aboutData.customFields && aboutData.customFields.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">
+                  Additional Information
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {aboutData.customFields.map((field, index) => (
+                    <div key={field.id || index}>
+                      <h5 className="text-sm font-medium text-gray-900 mb-1">
+                        {field.label}
+                      </h5>
+                      <p className="text-sm text-gray-700">{field.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
+        <hr className="border-t border-gray-300 my-4" />
+
+        {/* Locations Section */}
+        <div className="bg-white rounded-lg shadow-sm mb-6">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Industry Locations
+            </h2>
+            <button
+              onClick={handleEditLocationsClick}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Edit locations"
+            >
+              <Edit className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Locations List */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {aboutData.locations.map((location, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-4"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-medium text-gray-900">
+                      {location.name}
+                    </h3>
+                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                      {location.type}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2 mb-2">
+                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-gray-600">{location.address}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-400" />
+                    <p className="text-sm text-gray-600">
+                      {location.employees} employees
+                    </p>
+                  </div>
+
+                  {/* Display Custom Fields */}
+                  {location.customFields &&
+                    location.customFields.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        {location.customFields.map((field, fieldIndex) => (
+                          <div
+                            key={field.id || fieldIndex}
+                            className="flex items-center gap-2 mb-1"
+                          >
+                            <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                            <span className="text-xs font-medium text-gray-700">
+                              {field.label}:
+                            </span>
+                            <span className="text-xs text-gray-600">
+                              {field.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <hr className="border-t border-gray-300 my-4" />
+
+        {/* Interactive Map Section */}
+        <div className="bg-white rounded-lg shadow-sm mb-6">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Global Industry Presence Map
+            </h2>
+            <Globe className="w-6 h-6 text-gray-400" />
+          </div>
+
+          {/* Map Container */}
+          <div className="p-6">
+            <div className="h-96 rounded-lg overflow-hidden border border-gray-200">
+              <MapContainer
+                center={[37.4419, -122.143]} // Center on Silicon Valley
+                zoom={2}
+                style={{ height: "100%", width: "100%" }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {aboutData.locations.map((location, index) => (
+                  <Marker key={index} position={location.coordinates}>
+                    <Popup
+                      maxWidth={220}
+                      minWidth={220}
+                      className="compact-popup"
+                    >
+                      <div className="p-1">
+                        <div className="flex items-start gap-2 mb-2">
+                          <img
+                            src={location.image}
+                            alt={location.name}
+                            className="w-12 h-12 rounded object-cover flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-gray-900 text-sm truncate">
+                              {location.name}
+                            </h3>
+                            <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
+                              {location.type}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1 text-xs">
+                          <div className="flex items-start gap-1">
+                            <MapPin className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                            <p className="text-gray-600 leading-tight">
+                              {location.address}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3 h-3 text-gray-400" />
+                            <p className="text-gray-600">
+                              {location.employees} employees
+                            </p>
+                          </div>
+
+                          <div className="border-t pt-1 mt-1">
+                            <p className="font-medium text-gray-900 text-xs">
+                              Regional Head: {location.ceo}
+                            </p>
+                          </div>
+
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1">
+                              <Phone className="w-3 h-3 text-gray-400" />
+                              <a
+                                href={`tel:${location.contact.phone}`}
+                                className="text-blue-600 hover:text-blue-700 text-xs truncate"
+                              >
+                                {location.contact.phone}
+                              </a>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Mail className="w-3 h-3 text-gray-400" />
+                              <a
+                                href={`mailto:${location.contact.email}`}
+                                className="text-blue-600 hover:text-blue-700 text-xs truncate"
+                              >
+                                {location.contact.email}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </div>
+
+            {/* Map Legend */}
+            <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span>Industry Locations</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-gray-400" />
+                <span>Click markers for location details</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr className="border-t border-gray-300 my-4" />
 
         {/* Market Presence Section */}
         <div className="bg-white rounded-lg shadow-sm">
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Market Presence</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Market Presence
+            </h2>
             <button
               onClick={handleEditMarketClick}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
@@ -248,7 +714,10 @@ const IndustryOverview = () => {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {aboutData.marketData.map((market, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-4"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-gray-900">{market.name}</h3>
                     <span className="text-sm font-medium text-blue-600">
@@ -258,11 +727,15 @@ const IndustryOverview = () => {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="w-4 h-4 text-green-500" />
-                      <span className="text-sm text-gray-600">{market.growth}</span>
+                      <span className="text-sm text-gray-600">
+                        {market.growth}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Building className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">{market.keyPlayers}</span>
+                      <span className="text-sm text-gray-600">
+                        {market.keyPlayers}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -278,7 +751,9 @@ const IndustryOverview = () => {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">Edit Industry Overview</h2>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Edit Industry Overview
+                </h2>
                 <button
                   onClick={handleCancelEdit}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -291,10 +766,14 @@ const IndustryOverview = () => {
             <div className="p-6 space-y-6">
               {/* Overview */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Overview</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Overview
+                </label>
                 <textarea
                   value={editData.overview}
-                  onChange={(e) => handleInputChange("overview", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("overview", e.target.value)
+                  }
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter industry overview"
@@ -303,7 +782,9 @@ const IndustryOverview = () => {
 
               {/* Website */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Industry Portal</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Industry Portal
+                </label>
                 <input
                   type="url"
                   value={editData.website}
@@ -316,44 +797,60 @@ const IndustryOverview = () => {
               {/* Grid Layout */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Sector</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Sector
+                  </label>
                   <input
                     type="text"
                     value={editData.sector}
-                    onChange={(e) => handleInputChange("sector", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("sector", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter industry sector"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Industry Size</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Industry Size
+                  </label>
                   <input
                     type="text"
                     value={editData.industrySize}
-                    onChange={(e) => handleInputChange("industrySize", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("industrySize", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter industry size"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Active Members</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Active Members
+                  </label>
                   <input
                     type="text"
                     value={editData.activeMembers}
-                    onChange={(e) => handleInputChange("activeMembers", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("activeMembers", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter number of active members"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Main Hub</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Main Hub
+                  </label>
                   <input
                     type="text"
                     value={editData.headquarters}
-                    onChange={(e) => handleInputChange("headquarters", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("headquarters", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter main hub location"
                   />
@@ -367,7 +864,9 @@ const IndustryOverview = () => {
                 </label>
                 <textarea
                   value={editData.specializations.join(", ")}
-                  onChange={(e) => handleInputChange("specializations", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("specializations", e.target.value)
+                  }
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter specializations separated by commas"
@@ -380,10 +879,14 @@ const IndustryOverview = () => {
                   <input
                     type="checkbox"
                     checked={editData.verified}
-                    onChange={(e) => handleInputChange("verified", e.target.checked)}
+                    onChange={(e) =>
+                      handleInputChange("verified", e.target.checked)
+                    }
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm font-medium text-gray-700">Verified Industry Data</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Verified Industry Data
+                  </span>
                 </label>
 
                 {editData.verified && (
@@ -394,10 +897,75 @@ const IndustryOverview = () => {
                     <input
                       type="text"
                       value={editData.verifiedDate}
-                      onChange={(e) => handleInputChange("verifiedDate", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("verifiedDate", e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter verification date"
                     />
+                  </div>
+                )}
+              </div>
+
+              {/* Custom Fields Section */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddCustomField}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Custom Field
+                  </button>
+                </div>
+
+                {editData.customFields && editData.customFields.length > 0 && (
+                  <div className="space-y-3">
+                    {editData.customFields.map((field) => (
+                      <div key={field.id} className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={field.label}
+                            onChange={(e) =>
+                              handleCustomFieldChange(
+                                field.id,
+                                "label",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Field Label (e.g., Founded, Revenue)"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={field.value}
+                            onChange={(e) =>
+                              handleCustomFieldChange(
+                                field.id,
+                                "value",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Field Value (e.g., 2020, $50M)"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCustomField(field.id)}
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Remove field"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -427,7 +995,9 @@ const IndustryOverview = () => {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">Edit Market Presence</h2>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Edit Market Presence
+                </h2>
                 <button
                   onClick={handleCancelMarketEdit}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -439,9 +1009,14 @@ const IndustryOverview = () => {
 
             <div className="p-6 space-y-6">
               {editData.marketData.map((market, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 space-y-4">
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-4 space-y-4"
+                >
                   <div className="flex justify-between items-start">
-                    <h3 className="text-lg font-medium text-gray-900">Market Region {index + 1}</h3>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Market Region {index + 1}
+                    </h3>
                     {editData.marketData.length > 1 && (
                       <button
                         onClick={() => handleRemoveMarket(index)}
@@ -460,7 +1035,9 @@ const IndustryOverview = () => {
                       <input
                         type="text"
                         value={market.name}
-                        onChange={(e) => handleMarketChange(index, "name", e.target.value)}
+                        onChange={(e) =>
+                          handleMarketChange(index, "name", e.target.value)
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g., North America, Europe"
                       />
@@ -473,18 +1050,28 @@ const IndustryOverview = () => {
                       <input
                         type="text"
                         value={market.marketShare}
-                        onChange={(e) => handleMarketChange(index, "marketShare", e.target.value)}
+                        onChange={(e) =>
+                          handleMarketChange(
+                            index,
+                            "marketShare",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g., 35%"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Growth</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Growth
+                      </label>
                       <input
                         type="text"
                         value={market.growth}
-                        onChange={(e) => handleMarketChange(index, "growth", e.target.value)}
+                        onChange={(e) =>
+                          handleMarketChange(index, "growth", e.target.value)
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g., 12.5% YoY"
                       />
@@ -497,7 +1084,13 @@ const IndustryOverview = () => {
                       <input
                         type="text"
                         value={market.keyPlayers}
-                        onChange={(e) => handleMarketChange(index, "keyPlayers", e.target.value)}
+                        onChange={(e) =>
+                          handleMarketChange(
+                            index,
+                            "keyPlayers",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g., 150+ Companies"
                       />
@@ -526,6 +1119,313 @@ const IndustryOverview = () => {
               <button
                 onClick={handleSaveMarket}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Locations Modal */}
+      {isEditLocationsModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Edit Industry Locations
+                </h2>
+                <button
+                  onClick={handleCancelLocationsEdit}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {editData.locations.map((location, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-4 space-y-4"
+                >
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Location {index + 1}
+                    </h3>
+                    {editData.locations.length > 1 && (
+                      <button
+                        onClick={() => handleRemoveLocation(index)}
+                        className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+                        title="Remove location"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Location Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={location.name}
+                        onChange={(e) =>
+                          handleLocationChange(index, "name", e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., Headquarters, New York Office"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Type *
+                      </label>
+                      <select
+                        value={location.type}
+                        onChange={(e) =>
+                          handleLocationChange(index, "type", e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      >
+                        <option value="HQ">Headquarters</option>
+                        <option value="Office">Office</option>
+                        <option value="Branch">Branch</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Co-working">Co-working Space</option>
+                      </select>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Address *
+                      </label>
+                      <textarea
+                        value={location.address}
+                        onChange={(e) =>
+                          handleLocationChange(index, "address", e.target.value)
+                        }
+                        rows={2}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                        placeholder="Enter full address"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Number of Employees
+                      </label>
+                      <input
+                        type="text"
+                        value={location.employees}
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "employees",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., 50+, 1,000+"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Coordinates (lat, lng)
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          location.coordinates
+                            ? location.coordinates.join(", ")
+                            : "0, 0"
+                        }
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "coordinates",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., 37.4220, -122.0841"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Regional Head
+                      </label>
+                      <input
+                        type="text"
+                        value={location.ceo || ""}
+                        onChange={(e) =>
+                          handleLocationChange(index, "ceo", e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="e.g., John Doe"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Image URL
+                      </label>
+                      <input
+                        type="url"
+                        value={location.image || ""}
+                        onChange={(e) =>
+                          handleLocationChange(index, "image", e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        value={location.contact?.phone || ""}
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "contact.phone",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="+1 (555) 123-4567"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={location.contact?.email || ""}
+                        onChange={(e) =>
+                          handleLocationChange(
+                            index,
+                            "contact.email",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="office@company.com"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Custom Fields for Location */}
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Custom Fields for this Location
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleAddLocationCustomField(index)}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        + Add Custom Field
+                      </button>
+                    </div>
+
+                    {location.customFields &&
+                      location.customFields.length > 0 && (
+                        <div className="space-y-2">
+                          {location.customFields.map((field) => (
+                            <div
+                              key={field.id}
+                              className="flex gap-2 items-start"
+                            >
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  value={field.label}
+                                  onChange={(e) =>
+                                    handleLocationCustomFieldChange(
+                                      index,
+                                      field.id,
+                                      "label",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Label (e.g., Parking, Cafeteria)"
+                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    handleLocationCustomFieldChange(
+                                      index,
+                                      field.id,
+                                      "value",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder="Value (e.g., Available, Yes)"
+                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRemoveLocationCustomField(
+                                    index,
+                                    field.id
+                                  )
+                                }
+                                className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                                title="Remove field"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Add New Location Button */}
+              <button
+                onClick={handleAddLocation}
+                className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center gap-2"
+              >
+                <span className="text-xl">+</span>
+                Add New Location
+              </button>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+              <button
+                onClick={handleCancelLocationsEdit}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveLocations}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
               >
                 Save Changes
               </button>

@@ -33,6 +33,7 @@ const Experience = () => {
         "Achieved 300% YoY revenue growth",
       ],
       type: "Funding",
+      customFields: [], // Array of custom fields for this experience
     },
     {
       id: 2,
@@ -49,6 +50,7 @@ const Experience = () => {
         "Established partnerships with 5 major enterprises",
       ],
       type: "Milestone",
+      customFields: [],
     },
     {
       id: 3,
@@ -65,6 +67,7 @@ const Experience = () => {
         "Acquired first 100 paying customers",
       ],
       type: "Accelerator",
+      customFields: [],
     },
     {
       id: 4,
@@ -81,6 +84,7 @@ const Experience = () => {
         "Secured pre-seed funding of $100K",
       ],
       type: "Foundation",
+      customFields: [],
     },
   ]);
 
@@ -92,6 +96,7 @@ const Experience = () => {
     description: "",
     highlights: [""],
     type: "Milestone",
+    customFields: [], // Array of custom fields for new experience
   });
 
   const experienceTypes = [
@@ -155,6 +160,7 @@ const Experience = () => {
         description: "",
         highlights: [""],
         type: "Milestone",
+        customFields: [],
       });
       setIsAddModalOpen(false);
     }
@@ -169,6 +175,7 @@ const Experience = () => {
       description: "",
       highlights: [""],
       type: "Milestone",
+      customFields: [],
     });
     setIsAddModalOpen(false);
   };
@@ -223,6 +230,60 @@ const Experience = () => {
       );
       setNewExperience((prev) => ({ ...prev, highlights: newHighlights }));
     }
+  };
+
+  // Custom fields handlers for Add Experience
+  const handleAddCustomField = () => {
+    setNewExperience((prev) => ({
+      ...prev,
+      customFields: [
+        ...(prev.customFields || []),
+        { id: Date.now(), label: "", value: "" },
+      ],
+    }));
+  };
+
+  const handleCustomFieldChange = (fieldId, property, value) => {
+    setNewExperience((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((field) =>
+        field.id === fieldId ? { ...field, [property]: value } : field
+      ),
+    }));
+  };
+
+  const handleRemoveCustomField = (fieldId) => {
+    setNewExperience((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((field) => field.id !== fieldId),
+    }));
+  };
+
+  // Custom fields handlers for Edit Experience
+  const handleAddEditCustomField = () => {
+    setEditingExperience((prev) => ({
+      ...prev,
+      customFields: [
+        ...(prev.customFields || []),
+        { id: Date.now(), label: "", value: "" },
+      ],
+    }));
+  };
+
+  const handleEditCustomFieldChange = (fieldId, property, value) => {
+    setEditingExperience((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((field) =>
+        field.id === fieldId ? { ...field, [property]: value } : field
+      ),
+    }));
+  };
+
+  const handleRemoveEditCustomField = (fieldId) => {
+    setEditingExperience((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((field) => field.id !== fieldId),
+    }));
   };
 
   const getTypeIcon = (type) => {
@@ -371,6 +432,33 @@ const Experience = () => {
                                       )
                                     )}
                                   </ul>
+                                </div>
+                              )}
+
+                            {/* Custom Fields Display */}
+                            {experience.customFields &&
+                              experience.customFields.length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                  <h4 className="text-sm font-medium text-gray-800 mb-2">
+                                    Additional Details:
+                                  </h4>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {experience.customFields.map(
+                                      (field, fieldIndex) => (
+                                        <div
+                                          key={field.id || fieldIndex}
+                                          className="flex items-center gap-2"
+                                        >
+                                          <span className="text-sm font-medium text-gray-700">
+                                            {field.label}:
+                                          </span>
+                                          <span className="text-sm text-gray-600">
+                                            {field.value}
+                                          </span>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
                                 </div>
                               )}
                           </div>
@@ -544,6 +632,70 @@ const Experience = () => {
                     Add another highlight
                   </button>
                 </div>
+              </div>
+
+              {/* Custom Fields Section */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddCustomField}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Custom Field
+                  </button>
+                </div>
+
+                {newExperience.customFields &&
+                  newExperience.customFields.length > 0 && (
+                    <div className="space-y-2">
+                      {newExperience.customFields.map((field) => (
+                        <div key={field.id} className="flex gap-2 items-start">
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              value={field.label}
+                              onChange={(e) =>
+                                handleCustomFieldChange(
+                                  field.id,
+                                  "label",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Field Label (e.g., Funding Amount, Valuation)"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              value={field.value}
+                              onChange={(e) =>
+                                handleCustomFieldChange(
+                                  field.id,
+                                  "value",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Field Value (e.g., $5M, $25M)"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCustomField(field.id)}
+                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Remove field"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -724,6 +876,72 @@ const Experience = () => {
                     Add another highlight
                   </button>
                 </div>
+              </div>
+
+              {/* Custom Fields Section for Edit */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddEditCustomField}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Custom Field
+                  </button>
+                </div>
+
+                {editingExperience.customFields &&
+                  editingExperience.customFields.length > 0 && (
+                    <div className="space-y-2">
+                      {editingExperience.customFields.map((field) => (
+                        <div key={field.id} className="flex gap-2 items-start">
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              value={field.label}
+                              onChange={(e) =>
+                                handleEditCustomFieldChange(
+                                  field.id,
+                                  "label",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Field Label (e.g., Funding Amount, Valuation)"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              value={field.value}
+                              onChange={(e) =>
+                                handleEditCustomFieldChange(
+                                  field.id,
+                                  "value",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Field Value (e.g., $5M, $25M)"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleRemoveEditCustomField(field.id)
+                            }
+                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Remove field"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
             </div>
 

@@ -43,6 +43,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "2-4 weeks",
         status: "completed",
+        customFields: [],
       },
       {
         id: 2,
@@ -58,6 +59,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "1-2 weeks",
         status: "completed",
+        customFields: [],
       },
       {
         id: 3,
@@ -73,6 +75,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "4-8 weeks",
         status: "completed",
+        customFields: [],
       },
       {
         id: 4,
@@ -87,6 +90,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "2-4 weeks",
         status: "active",
+        customFields: [],
       },
       {
         id: 5,
@@ -102,6 +106,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "2-3 weeks",
         status: "pending",
+        customFields: [],
       },
       {
         id: 6,
@@ -117,6 +122,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "4-8 weeks",
         status: "pending",
+        customFields: [],
       },
       {
         id: 7,
@@ -132,6 +138,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "2-4 weeks",
         status: "pending",
+        customFields: [],
       },
       {
         id: 8,
@@ -147,6 +154,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "Ongoing",
         status: "pending",
+        customFields: [],
       },
       {
         id: 9,
@@ -162,6 +170,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "4-6 weeks",
         status: "pending",
+        customFields: [],
       },
       {
         id: 10,
@@ -177,6 +186,7 @@ const LaunchSteps = () => {
         ],
         timeframe: "Ongoing",
         status: "pending",
+        customFields: [],
       },
     ],
   });
@@ -187,6 +197,8 @@ const LaunchSteps = () => {
     tasks: [],
     timeframe: "",
     icon: "💡",
+    status: "pending",
+    customFields: [],
   });
 
   const [editStep, setEditStep] = useState({
@@ -194,7 +206,8 @@ const LaunchSteps = () => {
     description: "",
     tasks: [],
     timeframe: "",
-    icon: "💡",
+    status: "pending",
+    customFields: [],
   });
 
   const handleAddStep = () => {
@@ -226,6 +239,8 @@ const LaunchSteps = () => {
         tasks: [],
         timeframe: "",
         icon: "💡",
+        status: "pending",
+        customFields: [],
       });
       setShowAddModal(false);
     }
@@ -238,6 +253,8 @@ const LaunchSteps = () => {
       tasks: [],
       timeframe: "",
       icon: "💡",
+      status: "pending",
+      customFields: [],
     });
     setShowAddModal(false);
   };
@@ -272,6 +289,8 @@ const LaunchSteps = () => {
         tasks: [],
         timeframe: "",
         icon: "💡",
+        status: "pending",
+        customFields: [],
       });
     }
   };
@@ -284,6 +303,8 @@ const LaunchSteps = () => {
       tasks: [],
       timeframe: "",
       icon: "💡",
+      status: "pending",
+      customFields: [],
     });
   };
 
@@ -300,6 +321,54 @@ const LaunchSteps = () => {
       setCompletedSteps(completedSteps.filter((index) => index !== stepIndex));
     } else {
       setCompletedSteps([...completedSteps, stepIndex]);
+    }
+  };
+
+  // Custom Fields handlers
+  const handleAddCustomField = (isEdit = false) => {
+    const newField = { label: "", value: "" };
+    if (isEdit) {
+      setEditStep((prev) => ({
+        ...prev,
+        customFields: [...(prev.customFields || []), newField],
+      }));
+    } else {
+      setNewStep((prev) => ({
+        ...prev,
+        customFields: [...(prev.customFields || []), newField],
+      }));
+    }
+  };
+
+  const handleRemoveCustomField = (index, isEdit = false) => {
+    if (isEdit) {
+      setEditStep((prev) => ({
+        ...prev,
+        customFields: prev.customFields.filter((_, i) => i !== index),
+      }));
+    } else {
+      setNewStep((prev) => ({
+        ...prev,
+        customFields: prev.customFields.filter((_, i) => i !== index),
+      }));
+    }
+  };
+
+  const handleCustomFieldChange = (index, field, value, isEdit = false) => {
+    if (isEdit) {
+      setEditStep((prev) => ({
+        ...prev,
+        customFields: prev.customFields.map((item, i) =>
+          i === index ? { ...item, [field]: value } : item
+        ),
+      }));
+    } else {
+      setNewStep((prev) => ({
+        ...prev,
+        customFields: prev.customFields.map((item, i) =>
+          i === index ? { ...item, [field]: value } : item
+        ),
+      }));
     }
   };
 
@@ -478,6 +547,36 @@ const LaunchSteps = () => {
                           ))}
                         </div>
                       </div>
+
+                      {/* Custom Fields Display */}
+                      {step.customFields && step.customFields.length > 0 && (
+                        <div className="mt-4">
+                          <h4
+                            className={`text-sm font-medium mb-2 ${
+                              isCompleted ? "text-green-800" : "text-gray-800"
+                            }`}
+                          >
+                            Additional Information:
+                          </h4>
+                          <div className="space-y-2">
+                            {step.customFields.map((field, fieldIndex) => (
+                              <div
+                                key={fieldIndex}
+                                className={`text-sm ${
+                                  isCompleted
+                                    ? "text-green-700"
+                                    : "text-gray-600"
+                                }`}
+                              >
+                                <span className="font-medium">
+                                  {field.label}:
+                                </span>{" "}
+                                <span>{field.value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -599,6 +698,78 @@ const LaunchSteps = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   placeholder="e.g., 2-4 weeks"
                 />
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status *
+                </label>
+                <select
+                  value={newStep.status}
+                  onChange={(e) => handleInputChange("status", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              {/* Custom Fields */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Custom Fields
+                </label>
+                <div className="space-y-2">
+                  {newStep.customFields.map((field, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 p-3 border border-gray-300 rounded-lg"
+                    >
+                      <input
+                        type="text"
+                        value={field.label}
+                        onChange={(e) =>
+                          handleCustomFieldChange(
+                            index,
+                            "label",
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="Field label"
+                      />
+                      <input
+                        type="text"
+                        value={field.value}
+                        onChange={(e) =>
+                          handleCustomFieldChange(
+                            index,
+                            "value",
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="Field value"
+                      />
+                      <button
+                        onClick={() => handleRemoveCustomField(index)}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+                        title="Remove custom field"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => handleAddCustomField()}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Custom Field
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -723,6 +894,82 @@ const LaunchSteps = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   placeholder="e.g., 2-4 weeks"
                 />
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status *
+                </label>
+                <select
+                  value={editStep.status}
+                  onChange={(e) =>
+                    handleInputChange("status", e.target.value, true)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              {/* Custom Fields */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Custom Fields
+                </label>
+                <div className="space-y-2">
+                  {editStep.customFields.map((field, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 p-3 border border-gray-300 rounded-lg"
+                    >
+                      <input
+                        type="text"
+                        value={field.label}
+                        onChange={(e) =>
+                          handleCustomFieldChange(
+                            index,
+                            "label",
+                            e.target.value,
+                            true
+                          )
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="Field label"
+                      />
+                      <input
+                        type="text"
+                        value={field.value}
+                        onChange={(e) =>
+                          handleCustomFieldChange(
+                            index,
+                            "value",
+                            e.target.value,
+                            true
+                          )
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="Field value"
+                      />
+                      <button
+                        onClick={() => handleRemoveCustomField(index, true)}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+                        title="Remove custom field"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => handleAddCustomField(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Custom Field
+                  </button>
+                </div>
               </div>
             </div>
 

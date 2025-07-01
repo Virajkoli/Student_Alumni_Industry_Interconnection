@@ -33,6 +33,7 @@ const Resources = () => {
           format: "Google Docs",
           link: "https://docs.google.com/template/business-plan",
           isDownloadable: true,
+          customFields: [],
         },
         {
           id: 2,
@@ -216,6 +217,7 @@ const Resources = () => {
     link: "",
     category: "Templates & Docs",
     isDownloadable: false,
+    customFields: [],
   });
 
   const resourceTypes = [
@@ -266,6 +268,7 @@ const Resources = () => {
         link: "",
         category: "Templates & Docs",
         isDownloadable: false,
+        customFields: [],
       });
       setIsAddModalOpen(false);
     }
@@ -280,12 +283,38 @@ const Resources = () => {
       link: "",
       category: "Templates & Docs",
       isDownloadable: false,
+      customFields: [],
     });
     setIsAddModalOpen(false);
   };
 
   const handleInputChange = (field, value) => {
     setNewResource((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Custom fields handlers
+  const handleAddCustomField = () => {
+    const newField = { label: "", value: "" };
+    setNewResource((prev) => ({
+      ...prev,
+      customFields: [...(prev.customFields || []), newField],
+    }));
+  };
+
+  const handleRemoveCustomField = (index) => {
+    setNewResource((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleCustomFieldChange = (index, field, value) => {
+    setNewResource((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    }));
   };
 
   const getTypeIcon = (type) => {
@@ -416,6 +445,33 @@ const Resources = () => {
                       <p className="text-sm text-gray-600 mb-3 leading-relaxed">
                         {resource.description}
                       </p>
+
+                      {/* Custom Fields Display */}
+                      {resource.customFields &&
+                        resource.customFields.length > 0 && (
+                          <div className="mb-3 pt-2 border-t border-gray-100">
+                            <h5 className="text-xs font-medium text-gray-700 mb-1">
+                              Additional Information:
+                            </h5>
+                            <div className="space-y-1">
+                              {resource.customFields.map(
+                                (field, fieldIndex) => (
+                                  <div
+                                    key={fieldIndex}
+                                    className="text-xs text-gray-600 flex items-start"
+                                  >
+                                    <span className="font-medium text-gray-700 min-w-0 mr-1">
+                                      {field.label}:
+                                    </span>
+                                    <span className="text-gray-600">
+                                      {field.value}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )}
 
                       <div className="flex items-center justify-between">
                         <div className="text-xs text-gray-500">
@@ -635,6 +691,51 @@ const Resources = () => {
                     This resource is downloadable
                   </span>
                 </label>
+              </div>
+
+              {/* Custom Fields */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddCustomField}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Add Field
+                  </button>
+                </div>
+                {newResource.customFields.map((field, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={field.label}
+                      onChange={(e) =>
+                        handleCustomFieldChange(index, "label", e.target.value)
+                      }
+                      placeholder="Field name"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={field.value}
+                      onChange={(e) =>
+                        handleCustomFieldChange(index, "value", e.target.value)
+                      }
+                      placeholder="Field value"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCustomField(index)}
+                      className="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 

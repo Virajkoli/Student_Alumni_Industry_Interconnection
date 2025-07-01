@@ -38,7 +38,7 @@ const JobsSkills = () => {
   // State for editing functionality
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState({});
-  
+
   // Simplified state containing only the data needed for display
   const [content] = useState({
     title: "Jobs & Trending Skills",
@@ -50,24 +50,28 @@ const JobsSkills = () => {
         demand: "High",
         growth: "+45%",
         avgSalary: "$120K",
+        customFields: [],
       },
       {
         name: "Product Management",
         demand: "High",
         growth: "+32%",
         avgSalary: "$110K",
+        customFields: [],
       },
       {
         name: "Data Science",
         demand: "High",
         growth: "+28%",
         avgSalary: "$115K",
+        customFields: [],
       },
       {
         name: "UI/UX Design",
         demand: "High",
         growth: "+25%",
         avgSalary: "$85K",
+        customFields: [],
       },
     ],
     marketStats: [
@@ -107,7 +111,8 @@ const JobsSkills = () => {
         provider: "Coursera",
         rating: 4.9,
         videoUrl: "https://www.youtube.com/embed/i_LwzRVP7bg",
-        courseUrl: "https://www.coursera.org/search?query=artificial%20intelligence",
+        courseUrl:
+          "https://www.coursera.org/search?query=artificial%20intelligence",
       },
       "Product Management": {
         title: "Product Management Certification",
@@ -139,7 +144,8 @@ const JobsSkills = () => {
         provider: "DataCamp",
         rating: 4.8,
         videoUrl: "https://www.youtube.com/embed/ua-CiDNNj30",
-        courseUrl: "https://www.datacamp.com/tracks/data-scientist-professional",
+        courseUrl:
+          "https://www.datacamp.com/tracks/data-scientist-professional",
       },
       "UI/UX Design": {
         title: "UI/UX Design Specialization",
@@ -264,10 +270,10 @@ const JobsSkills = () => {
       title: content.title,
       description: content.description,
       trendingSkills: [...content.trendingSkills],
-      marketStats: content.marketStats.map(stat => ({
+      marketStats: content.marketStats.map((stat) => ({
         value: stat.value,
-        label: stat.label
-      }))
+        label: stat.label,
+      })),
     });
     setIsEditing(true);
   };
@@ -276,10 +282,10 @@ const JobsSkills = () => {
     try {
       // In a real application, you would update the content state and save to backend
       console.log("Content would be saved:", editContent);
-      
+
       // For demo purposes, you could update the local content:
       // setContent({...content, ...editContent});
-      
+
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving content:", error);
@@ -290,6 +296,59 @@ const JobsSkills = () => {
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditContent({});
+  };
+
+  // Custom fields handlers for skills
+  const handleAddCustomFieldToSkill = (skillIndex) => {
+    const newField = { label: "", value: "" };
+    const currentSkills = editContent.trendingSkills || content.trendingSkills;
+    const updatedSkills = [...currentSkills];
+    updatedSkills[skillIndex] = {
+      ...updatedSkills[skillIndex],
+      customFields: [
+        ...(updatedSkills[skillIndex].customFields || []),
+        newField,
+      ],
+    };
+    setEditContent((prev) => ({
+      ...prev,
+      trendingSkills: updatedSkills,
+    }));
+  };
+
+  const handleRemoveCustomFieldFromSkill = (skillIndex, fieldIndex) => {
+    const currentSkills = editContent.trendingSkills || content.trendingSkills;
+    const updatedSkills = [...currentSkills];
+    updatedSkills[skillIndex] = {
+      ...updatedSkills[skillIndex],
+      customFields: updatedSkills[skillIndex].customFields.filter(
+        (_, i) => i !== fieldIndex
+      ),
+    };
+    setEditContent((prev) => ({
+      ...prev,
+      trendingSkills: updatedSkills,
+    }));
+  };
+
+  const handleCustomFieldChangeInSkill = (
+    skillIndex,
+    fieldIndex,
+    field,
+    value
+  ) => {
+    const currentSkills = editContent.trendingSkills || content.trendingSkills;
+    const updatedSkills = [...currentSkills];
+    updatedSkills[skillIndex] = {
+      ...updatedSkills[skillIndex],
+      customFields: updatedSkills[skillIndex].customFields.map((item, i) =>
+        i === fieldIndex ? { ...item, [field]: value } : item
+      ),
+    };
+    setEditContent((prev) => ({
+      ...prev,
+      trendingSkills: updatedSkills,
+    }));
   };
 
   // A dedicated component for skill cards for better structure and readability
@@ -322,6 +381,26 @@ const JobsSkills = () => {
           <p className="text-lg font-bold text-gray-800">{skill.demand}</p>
         </div>
       </div>
+
+      {/* Custom Fields Display */}
+      {skill.customFields && skill.customFields.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <h4 className="text-sm font-medium text-gray-700 mb-2">
+            Additional Information:
+          </h4>
+          <div className="space-y-1">
+            {skill.customFields.map((field, fieldIndex) => (
+              <div key={fieldIndex} className="text-sm flex items-start">
+                <span className="font-medium text-gray-600 min-w-0 mr-2">
+                  {field.label}:
+                </span>
+                <span className="text-gray-700">{field.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mt-auto pt-6 flex items-center gap-3">
         <button
           onClick={() => onLearnClick(skill)}
@@ -524,10 +603,14 @@ const JobsSkills = () => {
             </button>
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                {iconMap[skill.name] || <Briefcase className="w-7 h-7 text-gray-500" />}
+                {iconMap[skill.name] || (
+                  <Briefcase className="w-7 h-7 text-gray-500" />
+                )}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Job Openings</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Job Openings
+                </h2>
                 <p className="text-md text-gray-600">for {skill.name}</p>
               </div>
             </div>
@@ -535,11 +618,18 @@ const JobsSkills = () => {
             <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
               {listings.length > 0 ? (
                 listings.map((job, index) => (
-                  <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div
+                    key={index}
+                    className="bg-gray-50 border border-gray-200 rounded-lg p-4"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-bold text-lg text-gray-800">{job.title}</h3>
-                        <p className="text-sm text-gray-600">{job.company} - {job.location}</p>
+                        <h3 className="font-bold text-lg text-gray-800">
+                          {job.title}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {job.company} - {job.location}
+                        </p>
                       </div>
                       <div className="flex gap-2">
                         <a
@@ -558,12 +648,18 @@ const JobsSkills = () => {
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1 font-semibold">{job.salary}</p>
-                    <p className="text-sm text-gray-700 mt-2">{job.description}</p>
+                    <p className="text-sm text-gray-500 mt-1 font-semibold">
+                      {job.salary}
+                    </p>
+                    <p className="text-sm text-gray-700 mt-2">
+                      {job.description}
+                    </p>
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-500 py-8">No current job openings for this skill.</p>
+                <p className="text-center text-gray-500 py-8">
+                  No current job openings for this skill.
+                </p>
               )}
             </div>
 
@@ -580,7 +676,9 @@ const JobsSkills = () => {
                     <input
                       type="text"
                       value={editedJob.title}
-                      onChange={(e) => setEditedJob({ ...editedJob, title: e.target.value })}
+                      onChange={(e) =>
+                        setEditedJob({ ...editedJob, title: e.target.value })
+                      }
                       className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
@@ -591,7 +689,9 @@ const JobsSkills = () => {
                     <input
                       type="text"
                       value={editedJob.company}
-                      onChange={(e) => setEditedJob({ ...editedJob, company: e.target.value })}
+                      onChange={(e) =>
+                        setEditedJob({ ...editedJob, company: e.target.value })
+                      }
                       className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
@@ -602,7 +702,9 @@ const JobsSkills = () => {
                     <input
                       type="text"
                       value={editedJob.location}
-                      onChange={(e) => setEditedJob({ ...editedJob, location: e.target.value })}
+                      onChange={(e) =>
+                        setEditedJob({ ...editedJob, location: e.target.value })
+                      }
                       className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
@@ -613,7 +715,9 @@ const JobsSkills = () => {
                     <input
                       type="text"
                       value={editedJob.salary}
-                      onChange={(e) => setEditedJob({ ...editedJob, salary: e.target.value })}
+                      onChange={(e) =>
+                        setEditedJob({ ...editedJob, salary: e.target.value })
+                      }
                       className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
@@ -623,7 +727,12 @@ const JobsSkills = () => {
                     </label>
                     <textarea
                       value={editedJob.description}
-                      onChange={(e) => setEditedJob({ ...editedJob, description: e.target.value })}
+                      onChange={(e) =>
+                        setEditedJob({
+                          ...editedJob,
+                          description: e.target.value,
+                        })
+                      }
                       className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       rows="3"
                     ></textarea>
@@ -652,7 +761,7 @@ const JobsSkills = () => {
   };
 
   return (
-    <div className="bg-gray-50/50 p-4 sm:p-6 lg:p-8">
+    <div className="p-6 bg-gray-50/50 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-12 relative">
           {/* Edit button positioned at top right */}
@@ -663,11 +772,11 @@ const JobsSkills = () => {
           >
             <Edit size={20} />
           </button>
-          
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+
+          <h1 className="text-xl font-semibold text-gray-900">
             {content.title}
           </h1>
-          <p className="mt-3 text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-sm font-medium text-gray-600 mt-1">
             {content.description}
           </p>
         </div>
@@ -706,13 +815,15 @@ const JobsSkills = () => {
         skill={selectedSkill}
         jobs={content.jobListings}
       />
-      
+
       {/* Edit Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-800">Edit Jobs & Skills Content</h2>
+              <h2 className="text-xl font-semibold text-gray-800">
+                Edit Jobs & Skills Content
+              </h2>
               <button
                 onClick={handleCancelEdit}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -720,7 +831,7 @@ const JobsSkills = () => {
                 <X size={24} />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
               <div className="space-y-6">
                 {/* Title Section */}
@@ -731,7 +842,9 @@ const JobsSkills = () => {
                   <input
                     type="text"
                     value={editContent.title || content.title}
-                    onChange={(e) => setEditContent({...editContent, title: e.target.value})}
+                    onChange={(e) =>
+                      setEditContent({ ...editContent, title: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     placeholder="Enter section title"
                   />
@@ -744,7 +857,12 @@ const JobsSkills = () => {
                   </label>
                   <textarea
                     value={editContent.description || content.description}
-                    onChange={(e) => setEditContent({...editContent, description: e.target.value})}
+                    onChange={(e) =>
+                      setEditContent({
+                        ...editContent,
+                        description: e.target.value,
+                      })
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
                     placeholder="Enter section description"
@@ -757,36 +875,63 @@ const JobsSkills = () => {
                     Market Statistics
                   </label>
                   <div className="space-y-3">
-                    {(editContent.marketStats || content.marketStats).map((stat, index) => (
-                      <div key={index} className="grid grid-cols-2 gap-3 p-3 border border-gray-200 rounded-lg">
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Value</label>
-                          <input
-                            type="text"
-                            value={stat.value}
-                            onChange={(e) => {
-                              const newStats = [...(editContent.marketStats || content.marketStats)];
-                              newStats[index] = {...newStats[index], value: e.target.value};
-                              setEditContent({...editContent, marketStats: newStats});
-                            }}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                          />
+                    {(editContent.marketStats || content.marketStats).map(
+                      (stat, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-2 gap-3 p-3 border border-gray-200 rounded-lg"
+                        >
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Value
+                            </label>
+                            <input
+                              type="text"
+                              value={stat.value}
+                              onChange={(e) => {
+                                const newStats = [
+                                  ...(editContent.marketStats ||
+                                    content.marketStats),
+                                ];
+                                newStats[index] = {
+                                  ...newStats[index],
+                                  value: e.target.value,
+                                };
+                                setEditContent({
+                                  ...editContent,
+                                  marketStats: newStats,
+                                });
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Label
+                            </label>
+                            <input
+                              type="text"
+                              value={stat.label}
+                              onChange={(e) => {
+                                const newStats = [
+                                  ...(editContent.marketStats ||
+                                    content.marketStats),
+                                ];
+                                newStats[index] = {
+                                  ...newStats[index],
+                                  label: e.target.value,
+                                };
+                                setEditContent({
+                                  ...editContent,
+                                  marketStats: newStats,
+                                });
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Label</label>
-                          <input
-                            type="text"
-                            value={stat.label}
-                            onChange={(e) => {
-                              const newStats = [...(editContent.marketStats || content.marketStats)];
-                              newStats[index] = {...newStats[index], label: e.target.value};
-                              setEditContent({...editContent, marketStats: newStats});
-                            }}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                          />
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </div>
 
@@ -796,74 +941,189 @@ const JobsSkills = () => {
                     Trending Skills
                   </label>
                   <div className="space-y-3">
-                    {(editContent.trendingSkills || content.trendingSkills).map((skill, index) => (
-                      <div key={index} className="p-3 border border-gray-200 rounded-lg">
-                        <div className="grid grid-cols-2 gap-3 mb-2">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Skill Name</label>
-                            <input
-                              type="text"
-                              value={skill.name}
-                              onChange={(e) => {
-                                const newSkills = [...(editContent.trendingSkills || content.trendingSkills)];
-                                newSkills[index] = {...newSkills[index], name: e.target.value};
-                                setEditContent({...editContent, trendingSkills: newSkills});
-                              }}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                            />
+                    {(editContent.trendingSkills || content.trendingSkills).map(
+                      (skill, index) => (
+                        <div
+                          key={index}
+                          className="p-3 border border-gray-200 rounded-lg"
+                        >
+                          <div className="grid grid-cols-2 gap-3 mb-2">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Skill Name
+                              </label>
+                              <input
+                                type="text"
+                                value={skill.name}
+                                onChange={(e) => {
+                                  const newSkills = [
+                                    ...(editContent.trendingSkills ||
+                                      content.trendingSkills),
+                                  ];
+                                  newSkills[index] = {
+                                    ...newSkills[index],
+                                    name: e.target.value,
+                                  };
+                                  setEditContent({
+                                    ...editContent,
+                                    trendingSkills: newSkills,
+                                  });
+                                }}
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Demand Level
+                              </label>
+                              <select
+                                value={skill.demand}
+                                onChange={(e) => {
+                                  const newSkills = [
+                                    ...(editContent.trendingSkills ||
+                                      content.trendingSkills),
+                                  ];
+                                  newSkills[index] = {
+                                    ...newSkills[index],
+                                    demand: e.target.value,
+                                  };
+                                  setEditContent({
+                                    ...editContent,
+                                    trendingSkills: newSkills,
+                                  });
+                                }}
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              >
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                              </select>
+                            </div>
                           </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Demand Level</label>
-                            <select
-                              value={skill.demand}
-                              onChange={(e) => {
-                                const newSkills = [...(editContent.trendingSkills || content.trendingSkills)];
-                                newSkills[index] = {...newSkills[index], demand: e.target.value};
-                                setEditContent({...editContent, trendingSkills: newSkills});
-                              }}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                            >
-                              <option value="High">High</option>
-                              <option value="Medium">Medium</option>
-                              <option value="Low">Low</option>
-                            </select>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Growth Rate
+                              </label>
+                              <input
+                                type="text"
+                                value={skill.growth}
+                                onChange={(e) => {
+                                  const newSkills = [
+                                    ...(editContent.trendingSkills ||
+                                      content.trendingSkills),
+                                  ];
+                                  newSkills[index] = {
+                                    ...newSkills[index],
+                                    growth: e.target.value,
+                                  };
+                                  setEditContent({
+                                    ...editContent,
+                                    trendingSkills: newSkills,
+                                  });
+                                }}
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Average Salary
+                              </label>
+                              <input
+                                type="text"
+                                value={skill.avgSalary}
+                                onChange={(e) => {
+                                  const newSkills = [
+                                    ...(editContent.trendingSkills ||
+                                      content.trendingSkills),
+                                  ];
+                                  newSkills[index] = {
+                                    ...newSkills[index],
+                                    avgSalary: e.target.value,
+                                  };
+                                  setEditContent({
+                                    ...editContent,
+                                    trendingSkills: newSkills,
+                                  });
+                                }}
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Custom Fields for Skills */}
+                          <div className="mt-3 pt-3 border-t border-gray-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="block text-xs font-medium text-gray-600">
+                                Custom Fields
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleAddCustomFieldToSkill(index)
+                                }
+                                className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                              >
+                                Add Field
+                              </button>
+                            </div>
+                            {skill.customFields &&
+                              skill.customFields.map((field, fieldIndex) => (
+                                <div
+                                  key={fieldIndex}
+                                  className="flex gap-2 mb-2"
+                                >
+                                  <input
+                                    type="text"
+                                    value={field.label}
+                                    onChange={(e) =>
+                                      handleCustomFieldChangeInSkill(
+                                        index,
+                                        fieldIndex,
+                                        "label",
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder="Field name"
+                                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={field.value}
+                                    onChange={(e) =>
+                                      handleCustomFieldChangeInSkill(
+                                        index,
+                                        fieldIndex,
+                                        "value",
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder="Field value"
+                                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleRemoveCustomFieldFromSkill(
+                                        index,
+                                        fieldIndex
+                                      )
+                                    }
+                                    className="px-2 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              ))}
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Growth Rate</label>
-                            <input
-                              type="text"
-                              value={skill.growth}
-                              onChange={(e) => {
-                                const newSkills = [...(editContent.trendingSkills || content.trendingSkills)];
-                                newSkills[index] = {...newSkills[index], growth: e.target.value};
-                                setEditContent({...editContent, trendingSkills: newSkills});
-                              }}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Average Salary</label>
-                            <input
-                              type="text"
-                              value={skill.avgSalary}
-                              onChange={(e) => {
-                                const newSkills = [...(editContent.trendingSkills || content.trendingSkills)];
-                                newSkills[index] = {...newSkills[index], avgSalary: e.target.value};
-                                setEditContent({...editContent, trendingSkills: newSkills});
-                              }}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
               <button
                 onClick={handleCancelEdit}

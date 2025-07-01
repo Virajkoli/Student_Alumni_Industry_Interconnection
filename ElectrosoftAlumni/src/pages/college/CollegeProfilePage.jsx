@@ -4,55 +4,83 @@ import CollegeNotifications from "../../components/college/CollegeNotifications"
 import Navbar from "../../components/college/sections/Navbar";
 import CollegeInformation from "../../components/college/sections/CollegeInformation";
 import Courses from "../../components/college/sections/Courses";
-import FeesReview from "../../components/college/sections/CourseFees";
+import CourseFees from "../../components/college/sections/CourseFees";
 import Faculty from "../../components/college/sections/Faculty";
 import Downloads from "../../components/college/sections/Downloads";
 import Admission from "../../components/college/sections/Admission";
 import Placement from "../../components/college/sections/Placement";
-import CutoffRanking from "../../components/college/sections/CutoffRanking";
-import EventsNews from "../../components/college/sections/EventsNews";
 import Facilities from "../../components/college/sections/Facilities";
 import Alumni from "../../components/college/sections/Alumni";
+import StudentReviews from "../../components/college/sections/StudentReviews";
 
 const NAV_OPTIONS = [
   { id: "college-info", name: "College Info" },
-  { id: "course-details", name: "Course Details" }, // Added Course Details as a separate tab
+  { id: "course-details", name: "Course Details" },
   { id: "course-fees", name: "Course Fees" },
   { id: "review", name: "Review" },
   { id: "admission", name: "Admission" },
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
   { id: "downloads", name: "Downloads" },
+  { id: "hostel", name: "Hostels & Campus" }, // Added Hostel tab
+  { id: "events", name: "Events" },
 ];
 
 // Mock external review form responses (in a real app, this would come from an API/database)
 const externalReviewResponses = [
-  { rating: 4.8, academics: 4.9, placements: 4.8, infrastructure: 4.7, faculty: 4.8, campusLife: 4.7, value: 4.6 },
-  { rating: 4.6, academics: 4.7, placements: 4.9, infrastructure: 4.6, faculty: 4.7, campusLife: 4.5, value: 4.4 },
-  { rating: 4.7, academics: 4.8, placements: 4.9, infrastructure: 4.7, faculty: 4.8, campusLife: 4.6, value: 4.5 },
+  {
+    rating: 4.8,
+    academics: 4.9,
+    placements: 4.8,
+    infrastructure: 4.7,
+    faculty: 4.8,
+    campusLife: 4.7,
+    value: 4.6,
+  },
+  {
+    rating: 4.6,
+    academics: 4.7,
+    placements: 4.9,
+    infrastructure: 4.6,
+    faculty: 4.7,
+    campusLife: 4.5,
+    value: 4.4,
+  },
+  {
+    rating: 4.7,
+    academics: 4.8,
+    placements: 4.9,
+    infrastructure: 4.7,
+    faculty: 4.8,
+    campusLife: 4.6,
+    value: 4.5,
+  },
   // Add more responses as needed
 ];
 
 const calculateAverageRating = (responses) => {
   if (!responses || responses.length === 0) return { rating: 0, breakdown: {} };
-  
-  const total = responses.reduce((acc, curr) => ({
-    rating: acc.rating + curr.rating,
-    academics: acc.academics + curr.academics,
-    placements: acc.placements + curr.placements,
-    infrastructure: acc.infrastructure + curr.infrastructure,
-    faculty: acc.faculty + curr.faculty,
-    campusLife: acc.campusLife + curr.campusLife,
-    value: acc.value + curr.value
-  }), {
-    rating: 0,
-    academics: 0,
-    placements: 0,
-    infrastructure: 0,
-    faculty: 0,
-    campusLife: 0,
-    value: 0
-  });
+
+  const total = responses.reduce(
+    (acc, curr) => ({
+      rating: acc.rating + curr.rating,
+      academics: acc.academics + curr.academics,
+      placements: acc.placements + curr.placements,
+      infrastructure: acc.infrastructure + curr.infrastructure,
+      faculty: acc.faculty + curr.faculty,
+      campusLife: acc.campusLife + curr.campusLife,
+      value: acc.value + curr.value,
+    }),
+    {
+      rating: 0,
+      academics: 0,
+      placements: 0,
+      infrastructure: 0,
+      faculty: 0,
+      campusLife: 0,
+      value: 0,
+    }
+  );
 
   const count = responses.length;
   return {
@@ -63,15 +91,17 @@ const calculateAverageRating = (responses) => {
       infrastructure: (total.infrastructure / count).toFixed(1) + "/5",
       faculty: (total.faculty / count).toFixed(1) + "/5",
       campusLife: (total.campusLife / count).toFixed(1) + "/5",
-      value: (total.value / count).toFixed(1) + "/5"
-    }
+      value: (total.value / count).toFixed(1) + "/5",
+    },
   };
 };
 
 const CollegeProfilePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(NAV_OPTIONS[0].id);
-  const [externalRatings, setExternalRatings] = useState(() => calculateAverageRating(externalReviewResponses));
+  const [externalRatings, setExternalRatings] = useState(() =>
+    calculateAverageRating(externalReviewResponses)
+  );
   const [showSectionForm, setShowSectionForm] = useState(null);
   const [sectionFormData, setSectionFormData] = useState({});
   const [formData, setFormData] = useState({
@@ -211,6 +241,14 @@ const CollegeProfilePage = () => {
         "JAM: February 2025",
         "Application Deadlines: Check official website",
       ],
+      
+      cutoffTable: [
+        { year: 2024, round1: "1200", round2: "1250", round3: "1300" },
+        { year: 2023, round1: "1150", round2: "1200", round3: "1250" },
+        { year: 2022, round1: "1100", round2: "1150", round3: "1200" },
+        { year: 2021, round1: "1050", round2: "1100", round3: "1150" },
+        { year: 2020, round1: "1000", round2: "1050", round3: "1100" },
+      ],
     },
     placement: {
       highlights: [
@@ -293,7 +331,8 @@ const CollegeProfilePage = () => {
         },
         {
           name: "Department Courses Catalog",
-          description: "Detailed information about courses offered by each department",
+          description:
+            "Detailed information about courses offered by each department",
           fileSize: "3.8 MB",
           format: "PDF",
           url: "/downloads/course-catalog-2025.pdf",
@@ -332,6 +371,69 @@ const CollegeProfilePage = () => {
         },
       ],
     },
+    hostel: {
+      hostelFacilities: [
+        "Separate hostels for boys and girls with 24/7 security",
+        "Wi-Fi, laundry, mess, and recreational facilities",
+        "Single/double/triple occupancy rooms",
+        "Common rooms, TV, indoor games, and gymnasiums",
+        "Medical and emergency support available",
+      ],
+      campusInfrastructure: [
+        "1055-acre lush green campus",
+        "State-of-the-art lecture halls and labs",
+        "Central library, computer center, and innovation labs",
+        "Sports complex, swimming pool, and stadium",
+        "Cafeterias, shopping complex, and health center",
+        "Bank, post office, and other amenities on campus",
+      ],
+    },
+    alumni: {
+      notableAlumni: [
+        "Dr. Manohar B. Parrikar – Former Defence Minister of India, Ex-Chief Minister of Goa",
+        "Dr. N. R. Narayana Murthy – Founder, Infosys",
+        "Dr. Raghuram Rajan – Former RBI Governor",
+        "Dr. Ashoke Sen – Theoretical Physicist, Padma Bhushan Awardee",
+        "Dr. Satyendra Dubey – Whistleblower and IITK alumnus",
+      ],
+      alumniTestimonials: [
+        "IIT Kanpur gave me the foundation to excel in my career and life. – Narayana Murthy",
+        "The campus life and academic rigor at IITK are unmatched. – Raghuram Rajan",
+        "The alumni network helped me land my dream job. – Anonymous Alumnus",
+      ],
+      networkingOpportunities: [
+        "Annual alumni meetups and reunions",
+        "Active alumni chapters in major cities worldwide",
+        "Online alumni portal for networking and mentorship",
+        "Industry-academia connect events",
+        "Alumni guest lectures and webinars",
+      ],
+    },
+    events: {
+      annualEvents: [
+        "Convocation Ceremony",
+        "Foundation Day",
+        "Alumni Meet",
+        "Techkriti (Annual Tech Fest)",
+        "Antaragni (Annual Cultural Fest)"
+      ],
+      techCulture: [
+        "Techkriti – Asia's largest student-run technical and entrepreneurial festival",
+        "Antaragni – Renowned cultural festival with national participation",
+        "Udghosh – Annual sports festival",
+        "E-Summit – Entrepreneurship summit"
+      ],
+      seminars: [
+        "International Seminar on Artificial Intelligence",
+        "Annual Research Symposium",
+        "Industry-Academia Conclave"
+      ],
+      conferences: [
+        "IEEE International Conference on Robotics",
+        "National Conference on Sustainable Engineering",
+        "Global Alumni Conference"
+      ]
+    }
   });
 
   const openSectionForm = (tab) => {
@@ -379,45 +481,88 @@ const CollegeProfilePage = () => {
   const renderTabContent = (activeTab) => {
     switch (activeTab) {
       case "college-info":
-        return <CollegeInformation data={formData["college-info"]} onEdit={() => openSectionForm("college-info")} />;
+        return (
+          <CollegeInformation
+            data={formData["college-info"]}
+            onEdit={() => openSectionForm("college-info")}
+          />
+        );
       case "course-details":
-        return <Courses data={formData["course-details"]} onEdit={() => openSectionForm("course-details")} />;
+        return (
+          <Courses
+            data={formData["course-details"]}
+            onEdit={() => openSectionForm("course-details")}
+          />
+        );
       case "course-fees":
-        return <FeesReview data={formData["course-fees"]} onEdit={() => openSectionForm("course-fees")} />;
+        return (
+          <CourseFees
+            data={formData["course-fees"]}
+            onEdit={() => openSectionForm("course-fees")}
+          />
+        );
       case "faculty":
-        return <Faculty data={formData["faculty"]} onEdit={() => openSectionForm("faculty")} />;
+        return (
+          <Faculty
+            data={formData["faculty"]}
+            onEdit={() => openSectionForm("faculty")}
+          />
+        );
       case "downloads":
-        return <Downloads data={formData["downloads"]} onEdit={() => openSectionForm("downloads")} />;
+        return (
+          <Downloads
+            data={formData["downloads"]}
+            onEdit={() => openSectionForm("downloads")}
+          />
+        );
       case "admission":
-        return <Admission data={formData["admission"]} onEdit={() => openSectionForm("admission")} />;
+        return (
+          <Admission
+            data={formData["admission"]}
+            onEdit={() => openSectionForm("admission")}
+          />
+        );
       case "placement":
-        return <Placement data={formData["placement"]} onEdit={() => openSectionForm("placement")} />;
+        return (
+          <Placement
+            data={formData["placement"]}
+            onEdit={() => openSectionForm("placement")}
+          />
+        );
       case "cutoff-ranking":
-        return <CutoffRanking data={formData["cutoff-ranking"]} onEdit={() => openSectionForm("cutoff-ranking")} />;
+        return (
+          <CutoffRanking
+            data={formData["cutoff-ranking"]}
+            onEdit={() => openSectionForm("cutoff-ranking")}
+          />
+        );
       case "events-news":
-        return <EventsNews data={formData["events-news"]} onEdit={() => openSectionForm("events-news")} />;
+        return (
+          <EventsNews
+            data={formData["events-news"]}
+            onEdit={() => openSectionForm("events-news")}
+          />
+        );
       case "facilities":
-        return <Facilities data={formData["facilities"]} onEdit={() => openSectionForm("facilities")} />;
+        return (
+          <Facilities
+            data={formData["facilities"]}
+            onEdit={() => openSectionForm("facilities")}
+          />
+        );
       case "alumni":
-        return <Alumni data={formData["alumni"]} onEdit={() => openSectionForm("alumni")} />;
+        return (
+          <Alumni
+            data={formData["alumni"]}
+            onEdit={() => openSectionForm("alumni")}
+          />
+        );
       case "review":
         return (
-          <div className="bg-white rounded-xl shadow p-6 mb-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">Student Reviews</h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("review")}
-              >
-                Edit
-              </button>
-            </div>
-            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-              {formData["review"].comments && formData["review"].comments.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          <StudentReviews
+            data={formData["review"]}
+            onEdit={() => openSectionForm("review")}
+          />
         );
       default:
         return null;
@@ -486,10 +631,10 @@ const CollegeProfilePage = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Main Content Area - 70% width */}
           <div className="w-full lg:w-[70%] flex flex-col">
-            <div className="space-y-8 w-full">
-              <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-gray-200 p-8">
-                {renderTabContent(activeTab)}
-              </div>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              {/* <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-gray-200 p-8"> */}
+              {renderTabContent(activeTab)}
+              {/* </div> */}
             </div>
           </div>
           {/* Right Sidebar - Notifications - 30% width */}
@@ -511,7 +656,10 @@ const CollegeProfilePage = () => {
               &times;
             </button>
             <h2 className="text-xl font-bold mb-4 text-blue-900">
-              Edit {showSectionForm.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              Edit{" "}
+              {showSectionForm
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, (c) => c.toUpperCase())}
             </h2>
             {showSectionForm === "college-info" && (
               <div>
@@ -551,7 +699,10 @@ const CollegeProfilePage = () => {
                           className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
                           value={sectionFormData.established}
                           onChange={(e) =>
-                            handleSectionFormChange("established", e.target.value)
+                            handleSectionFormChange(
+                              "established",
+                              e.target.value
+                            )
                           }
                         />
                       </li>
@@ -560,7 +711,10 @@ const CollegeProfilePage = () => {
                           className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
                           value={sectionFormData.campusArea}
                           onChange={(e) =>
-                            handleSectionFormChange("campusArea", e.target.value)
+                            handleSectionFormChange(
+                              "campusArea",
+                              e.target.value
+                            )
                           }
                         />
                       </li>
@@ -665,140 +819,245 @@ const CollegeProfilePage = () => {
                   <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
                     <thead className="bg-blue-50">
                       <tr>
-                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Program</th>
-                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Duration</th>
-                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Eligibility</th>
-                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Branches & Seats</th>
-                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Annual Fees</th>
-                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Total Seats</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">
+                          Program
+                        </th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">
+                          Duration
+                        </th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">
+                          Eligibility
+                        </th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">
+                          Branches & Seats
+                        </th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">
+                          Annual Fees
+                        </th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">
+                          Total Seats
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 text-gray-800">
                       {/* B.Tech */}
                       <tr>
-                        <td className="py-3 px-4 font-bold text-blue-800">B.Tech</td>
-                        <td className="py-3 px-4">{formData["course-details"].btechDuration || "4 Years"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].btechEligibility || "10+2 (PCM) + JEE Advanced"}</td>
+                        <td className="py-3 px-4 font-bold text-blue-800">
+                          B.Tech
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].btechDuration ||
+                            "4 Years"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].btechEligibility ||
+                            "10+2 (PCM) + JEE Advanced"}
+                        </td>
                         <td className="py-3 px-4">
                           <ul className="list-disc list-inside space-y-1">
-                            {(formData["course-details"].btechBranches || [
-                              "Computer Science & Engineering: 120",
-                              "Electrical Engineering: 110",
-                              "Mechanical Engineering: 100",
-                              "Chemical Engineering: 80",
-                              "Civil Engineering: 80",
-                              "Aerospace Engineering: 60",
-                              "Materials Science & Engineering: 50",
-                              "Biological Sciences & Bioengineering: 30",
-                            ]).map((branch, idx) => (
-                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            {(
+                              formData["course-details"].btechBranches || [
+                                "Computer Science & Engineering: 120",
+                                "Electrical Engineering: 110",
+                                "Mechanical Engineering: 100",
+                                "Chemical Engineering: 80",
+                                "Civil Engineering: 80",
+                                "Aerospace Engineering: 60",
+                                "Materials Science & Engineering: 50",
+                                "Biological Sciences & Bioengineering: 30",
+                              ]
+                            ).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">
+                                {branch}
+                              </li>
                             ))}
                           </ul>
                         </td>
-                        <td className="py-3 px-4">{formData["course-details"].btechFees || "₹2,00,000"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].btechTotalSeats || "800+"}</td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].btechFees || "₹2,00,000"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].btechTotalSeats || "800+"}
+                        </td>
                       </tr>
                       {/* M.Tech */}
                       <tr>
-                        <td className="py-3 px-4 font-bold text-blue-800">M.Tech</td>
-                        <td className="py-3 px-4">{formData["course-details"].mtechDuration || "2 Years"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].mtechEligibility || "B.E./B.Tech + GATE"}</td>
+                        <td className="py-3 px-4 font-bold text-blue-800">
+                          M.Tech
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mtechDuration ||
+                            "2 Years"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mtechEligibility ||
+                            "B.E./B.Tech + GATE"}
+                        </td>
                         <td className="py-3 px-4">
                           <ul className="list-disc list-inside space-y-1">
-                            {(formData["course-details"].mtechBranches || [
-                              "Computer Science & Engineering: 60",
-                              "Electrical Engineering: 55",
-                              "Mechanical Engineering: 50",
-                              "Chemical Engineering: 40",
-                              "Civil Engineering: 40",
-                              "Aerospace Engineering: 30",
-                              "Environmental Engineering: 20",
-                              "Materials Science & Engineering: 20",
-                            ]).map((branch, idx) => (
-                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            {(
+                              formData["course-details"].mtechBranches || [
+                                "Computer Science & Engineering: 60",
+                                "Electrical Engineering: 55",
+                                "Mechanical Engineering: 50",
+                                "Chemical Engineering: 40",
+                                "Civil Engineering: 40",
+                                "Aerospace Engineering: 30",
+                                "Environmental Engineering: 20",
+                                "Materials Science & Engineering: 20",
+                              ]
+                            ).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">
+                                {branch}
+                              </li>
                             ))}
                           </ul>
                         </td>
-                        <td className="py-3 px-4">{formData["course-details"].mtechFees || "₹1,50,000"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].mtechTotalSeats || "400+"}</td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mtechFees || "₹1,50,000"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mtechTotalSeats || "400+"}
+                        </td>
                       </tr>
                       {/* B.Sc. */}
                       <tr>
-                        <td className="py-3 px-4 font-bold text-blue-800">B.Sc.</td>
-                        <td className="py-3 px-4">{formData["course-details"].bscDuration || "3 Years"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].bscEligibility || "10+2 (PCM/PCB) + IIT JAM"}</td>
+                        <td className="py-3 px-4 font-bold text-blue-800">
+                          B.Sc.
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].bscDuration || "3 Years"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].bscEligibility ||
+                            "10+2 (PCM/PCB) + IIT JAM"}
+                        </td>
                         <td className="py-3 px-4">
                           <ul className="list-disc list-inside space-y-1">
-                            {(formData["course-details"].bscBranches || [
-                              "Physics: 50",
-                              "Chemistry: 50",
-                              "Mathematics: 50",
-                              "Biology: 50",
-                            ]).map((branch, idx) => (
-                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            {(
+                              formData["course-details"].bscBranches || [
+                                "Physics: 50",
+                                "Chemistry: 50",
+                                "Mathematics: 50",
+                                "Biology: 50",
+                              ]
+                            ).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">
+                                {branch}
+                              </li>
                             ))}
                           </ul>
                         </td>
-                        <td className="py-3 px-4">{formData["course-details"].bscFees || "₹50,000"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].bscTotalSeats || "200+"}</td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].bscFees || "₹50,000"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].bscTotalSeats || "200+"}
+                        </td>
                       </tr>
                       {/* MSc */}
                       <tr>
-                        <td className="py-3 px-4 font-bold text-blue-800">MSc</td>
-                        <td className="py-3 px-4">{formData["course-details"].mscDuration || "2 Years"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].mscEligibility || "B.Sc. + JAM"}</td>
+                        <td className="py-3 px-4 font-bold text-blue-800">
+                          MSc
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mscDuration || "2 Years"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mscEligibility ||
+                            "B.Sc. + JAM"}
+                        </td>
                         <td className="py-3 px-4">
                           <ul className="list-disc list-inside space-y-1">
-                            {(formData["course-details"].mscBranches || [
-                              "Physics: 60",
-                              "Chemistry: 50",
-                              "Mathematics & Statistics: 40",
-                            ]).map((branch, idx) => (
-                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            {(
+                              formData["course-details"].mscBranches || [
+                                "Physics: 60",
+                                "Chemistry: 50",
+                                "Mathematics & Statistics: 40",
+                              ]
+                            ).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">
+                                {branch}
+                              </li>
                             ))}
                           </ul>
                         </td>
-                        <td className="py-3 px-4">{formData["course-details"].mscFees || "₹50,000"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].mscTotalSeats || "150+"}</td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mscFees || "₹50,000"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mscTotalSeats || "150+"}
+                        </td>
                       </tr>
                       {/* MBA */}
                       <tr>
-                        <td className="py-3 px-4 font-bold text-blue-800">MBA</td>
-                        <td className="py-3 px-4">{formData["course-details"].mbaDuration || "2 Years"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].mbaEligibility || "UG Degree + CAT"}</td>
+                        <td className="py-3 px-4 font-bold text-blue-800">
+                          MBA
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mbaDuration || "2 Years"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mbaEligibility ||
+                            "UG Degree + CAT"}
+                        </td>
                         <td className="py-3 px-4">
                           <ul className="list-disc list-inside space-y-1">
-                            {(formData["course-details"].mbaBranches || [
-                              "General Management: 40",
-                              "Analytics: 30",
-                              "Operations: 10",
-                              "Marketing: 10",
-                              "Finance: 5",
-                              "Human Resource Management: 5",
-                            ]).map((branch, idx) => (
-                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            {(
+                              formData["course-details"].mbaBranches || [
+                                "General Management: 40",
+                                "Analytics: 30",
+                                "Operations: 10",
+                                "Marketing: 10",
+                                "Finance: 5",
+                                "Human Resource Management: 5",
+                              ]
+                            ).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">
+                                {branch}
+                              </li>
                             ))}
                           </ul>
                         </td>
-                        <td className="py-3 px-4">{formData["course-details"].mbaFees || "₹2,50,000"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].mbaTotalSeats || "100+"}</td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mbaFees || "₹2,50,000"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].mbaTotalSeats || "100+"}
+                        </td>
                       </tr>
                       {/* Ph.D. */}
                       <tr>
-                        <td className="py-3 px-4 font-bold text-blue-800">Ph.D.</td>
-                        <td className="py-3 px-4">{formData["course-details"].phdDuration || "3-5 Years"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].phdEligibility || "PG Degree + GATE/NET"}</td>
+                        <td className="py-3 px-4 font-bold text-blue-800">
+                          Ph.D.
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].phdDuration ||
+                            "3-5 Years"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].phdEligibility ||
+                            "PG Degree + GATE/NET"}
+                        </td>
                         <td className="py-3 px-4">
                           <ul className="list-disc list-inside space-y-1">
-                            {(formData["course-details"].phdBranches || [
-                              "All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+",
-                            ]).map((branch, idx) => (
-                              <li key={idx} className="text-sm text-gray-700">{branch}</li>
+                            {(
+                              formData["course-details"].phdBranches || [
+                                "All major engineering, science, and management fields (CSE, EE, ME, CE, AE, CHE, Physics, Chemistry, Mathematics, Management, Humanities, Bioengineering, etc.): 200+",
+                              ]
+                            ).map((branch, idx) => (
+                              <li key={idx} className="text-sm text-gray-700">
+                                {branch}
+                              </li>
                             ))}
                           </ul>
                         </td>
-                        <td className="py-3 px-4">{formData["course-details"].phdFees || "₹60,000"}</td>
-                        <td className="py-3 px-4">{formData["course-details"].phdTotalSeats || "200+"}</td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].phdFees || "₹60,000"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {formData["course-details"].phdTotalSeats || "200+"}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -947,7 +1206,9 @@ const CollegeProfilePage = () => {
                     <span className="w-16 bg-gray-100 border border-gray-300 rounded px-2 py-1 text-yellow-700 text-xl text-center font-bold">
                       {externalRatings.rating}
                     </span>
-                    <span className="text-sm text-gray-500 mt-1">External Rating</span>
+                    <span className="text-sm text-gray-500 mt-1">
+                      External Rating
+                    </span>
                   </div>
                   <span>★</span>
                   <span className="text-gray-600 text-base">
@@ -956,19 +1217,29 @@ const CollegeProfilePage = () => {
                 </div>
 
                 <div className="mb-6">
-                  <h3 className="font-semibold text-blue-800 mb-3 text-lg">Comments & Feedback</h3>
+                  <h3 className="font-semibold text-blue-800 mb-3 text-lg">
+                    Comments & Feedback
+                  </h3>
                   {(sectionFormData.comments || []).map((comment, idx) => (
                     <textarea
                       key={idx}
                       className="w-full mb-4 text-base leading-7 bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
                       value={comment}
-                      onChange={(e) => handleSectionFormArrayChange("comments", idx, e.target.value)}
+                      onChange={(e) =>
+                        handleSectionFormArrayChange(
+                          "comments",
+                          idx,
+                          e.target.value
+                        )
+                      }
                     />
                   ))}
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-blue-800 mb-3 text-lg">Rating Breakdown</h3>
+                  <h3 className="font-semibold text-blue-800 mb-3 text-lg">
+                    Rating Breakdown
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
                     <div className="flex justify-between items-center">
                       <span>Academics:</span>
@@ -1028,7 +1299,10 @@ const CollegeProfilePage = () => {
                 </div>
 
                 <div className="mt-6 text-gray-600 text-sm">
-                  <p className="italic">* Ratings are calculated automatically from verified student and alumni reviews.</p>
+                  <p className="italic">
+                    * Ratings are calculated automatically from verified student
+                    and alumni reviews.
+                  </p>
                 </div>
               </div>
             )}
@@ -1099,6 +1373,31 @@ const CollegeProfilePage = () => {
                       </li>
                     ))}
                   </ul>
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Cutoff Trends (2020-2024)
+                  </h3>
+                  <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+                    <thead className="bg-blue-50">
+                      <tr>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Year</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 1</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 2</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 3</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-gray-800">
+                      {sectionFormData.cutoffTable.map((row, idx) => (
+                        <tr key={idx}>
+                          <td className="py-3 px-4 font-medium text-blue-800">{row.year}</td>
+                          <td className="py-3 px-4">{row.round1}</td>
+                          <td className="py-3 px-4">{row.round2}</td>
+                          <td className="py-3 px-4">{row.round3}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
@@ -1175,42 +1474,66 @@ const CollegeProfilePage = () => {
             {showSectionForm === "faculty" && (
               <div>
                 <div className="mb-6">
-                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">Faculty Strength</h3>
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Faculty Strength
+                  </h3>
                   <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
                     {sectionFormData.strength.map((item, idx) => (
                       <li key={idx}>
                         <input
                           className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
                           value={item}
-                          onChange={(e) => handleSectionFormArrayChange("strength", idx, e.target.value)}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange(
+                              "strength",
+                              idx,
+                              e.target.value
+                            )
+                          }
                         />
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div className="mb-4">
-                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">Departments</h3>
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Departments
+                  </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-700 text-base">
                     {sectionFormData.departments.map((dept, idx) => (
                       <div key={idx}>
                         <input
                           className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
                           value={dept}
-                          onChange={(e) => handleSectionFormArrayChange("departments", idx, e.target.value)}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange(
+                              "departments",
+                              idx,
+                              e.target.value
+                            )
+                          }
                         />
                       </div>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">Achievements</h3>
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Achievements
+                  </h3>
                   <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
                     {sectionFormData.achievements.map((item, idx) => (
                       <li key={idx}>
                         <input
                           className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
                           value={item}
-                          onChange={(e) => handleSectionFormArrayChange("achievements", idx, e.target.value)}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange(
+                              "achievements",
+                              idx,
+                              e.target.value
+                            )
+                          }
                         />
                       </li>
                     ))}
@@ -1222,40 +1545,70 @@ const CollegeProfilePage = () => {
               <div>
                 {/* Forms Section */}
                 <div className="mb-8">
-                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">Forms</h3>
+                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">
+                    Forms
+                  </h3>
                   <div className="grid gap-4">
                     {(sectionFormData.forms || []).map((doc, idx) => (
-                      <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                      <div
+                        key={idx}
+                        className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200"
+                      >
                         <div className="flex-1">
                           <input
                             className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
                             value={doc.name}
-                            onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, name: e.target.value })}
+                            onChange={(e) =>
+                              handleSectionFormArrayChange("forms", idx, {
+                                ...doc,
+                                name: e.target.value,
+                              })
+                            }
                             placeholder="Document Name"
                           />
                           <input
                             className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
                             value={doc.description}
-                            onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, description: e.target.value })}
+                            onChange={(e) =>
+                              handleSectionFormArrayChange("forms", idx, {
+                                ...doc,
+                                description: e.target.value,
+                              })
+                            }
                             placeholder="Description"
                           />
                           <div className="flex gap-2 mt-1">
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
                               value={doc.fileSize}
-                              onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, fileSize: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("forms", idx, {
+                                  ...doc,
+                                  fileSize: e.target.value,
+                                })
+                              }
                               placeholder="Size"
                             />
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
                               value={doc.format}
-                              onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, format: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("forms", idx, {
+                                  ...doc,
+                                  format: e.target.value,
+                                })
+                              }
                               placeholder="Format"
                             />
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
                               value={doc.url}
-                              onChange={e => handleSectionFormArrayChange("forms", idx, { ...doc, url: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("forms", idx, {
+                                  ...doc,
+                                  url: e.target.value,
+                                })
+                              }
                               placeholder="Download URL"
                             />
                           </div>
@@ -1267,40 +1620,70 @@ const CollegeProfilePage = () => {
 
                 {/* Brochures Section */}
                 <div className="mb-8">
-                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">Brochures & Catalogs</h3>
+                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">
+                    Brochures & Catalogs
+                  </h3>
                   <div className="grid gap-4">
                     {(sectionFormData.brochures || []).map((doc, idx) => (
-                      <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                      <div
+                        key={idx}
+                        className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200"
+                      >
                         <div className="flex-1">
                           <input
                             className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
                             value={doc.name}
-                            onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, name: e.target.value })}
+                            onChange={(e) =>
+                              handleSectionFormArrayChange("brochures", idx, {
+                                ...doc,
+                                name: e.target.value,
+                              })
+                            }
                             placeholder="Document Name"
                           />
                           <input
                             className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
                             value={doc.description}
-                            onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, description: e.target.value })}
+                            onChange={(e) =>
+                              handleSectionFormArrayChange("brochures", idx, {
+                                ...doc,
+                                description: e.target.value,
+                              })
+                            }
                             placeholder="Description"
                           />
                           <div className="flex gap-2 mt-1">
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
                               value={doc.fileSize}
-                              onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, fileSize: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("brochures", idx, {
+                                  ...doc,
+                                  fileSize: e.target.value,
+                                })
+                              }
                               placeholder="Size"
                             />
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
                               value={doc.format}
-                              onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, format: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("brochures", idx, {
+                                  ...doc,
+                                  format: e.target.value,
+                                })
+                              }
                               placeholder="Format"
                             />
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
                               value={doc.url}
-                              onChange={e => handleSectionFormArrayChange("brochures", idx, { ...doc, url: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("brochures", idx, {
+                                  ...doc,
+                                  url: e.target.value,
+                                })
+                              }
                               placeholder="Download URL"
                             />
                           </div>
@@ -1312,40 +1695,70 @@ const CollegeProfilePage = () => {
 
                 {/* Syllabus Section */}
                 <div className="mb-8">
-                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">Course Syllabus</h3>
+                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">
+                    Course Syllabus
+                  </h3>
                   <div className="grid gap-4">
                     {(sectionFormData.syllabus || []).map((doc, idx) => (
-                      <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                      <div
+                        key={idx}
+                        className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200"
+                      >
                         <div className="flex-1">
                           <input
                             className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
                             value={doc.name}
-                            onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, name: e.target.value })}
+                            onChange={(e) =>
+                              handleSectionFormArrayChange("syllabus", idx, {
+                                ...doc,
+                                name: e.target.value,
+                              })
+                            }
                             placeholder="Document Name"
                           />
                           <input
                             className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
                             value={doc.description}
-                            onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, description: e.target.value })}
+                            onChange={(e) =>
+                              handleSectionFormArrayChange("syllabus", idx, {
+                                ...doc,
+                                description: e.target.value,
+                              })
+                            }
                             placeholder="Description"
                           />
                           <div className="flex gap-2 mt-1">
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
                               value={doc.fileSize}
-                              onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, fileSize: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("syllabus", idx, {
+                                  ...doc,
+                                  fileSize: e.target.value,
+                                })
+                              }
                               placeholder="Size"
                             />
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
                               value={doc.format}
-                              onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, format: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("syllabus", idx, {
+                                  ...doc,
+                                  format: e.target.value,
+                                })
+                              }
                               placeholder="Format"
                             />
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
                               value={doc.url}
-                              onChange={e => handleSectionFormArrayChange("syllabus", idx, { ...doc, url: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("syllabus", idx, {
+                                  ...doc,
+                                  url: e.target.value,
+                                })
+                              }
                               placeholder="Download URL"
                             />
                           </div>
@@ -1357,40 +1770,70 @@ const CollegeProfilePage = () => {
 
                 {/* Other Documents */}
                 <div>
-                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">Other Documents</h3>
+                  <h3 className="font-semibold text-blue-800 mb-4 text-lg">
+                    Other Documents
+                  </h3>
                   <div className="grid gap-4">
                     {(sectionFormData.other || []).map((doc, idx) => (
-                      <div key={idx} className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200">
+                      <div
+                        key={idx}
+                        className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 p-4 bg-white rounded-lg border border-gray-200"
+                      >
                         <div className="flex-1">
                           <input
                             className="font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
                             value={doc.name}
-                            onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, name: e.target.value })}
+                            onChange={(e) =>
+                              handleSectionFormArrayChange("other", idx, {
+                                ...doc,
+                                name: e.target.value,
+                              })
+                            }
                             placeholder="Document Name"
                           />
                           <input
                             className="text-sm text-gray-600 bg-white border border-gray-300 rounded px-2 py-1 mb-1 w-full"
                             value={doc.description}
-                            onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, description: e.target.value })}
+                            onChange={(e) =>
+                              handleSectionFormArrayChange("other", idx, {
+                                ...doc,
+                                description: e.target.value,
+                              })
+                            }
                             placeholder="Description"
                           />
                           <div className="flex gap-2 mt-1">
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-20"
                               value={doc.fileSize}
-                              onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, fileSize: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("other", idx, {
+                                  ...doc,
+                                  fileSize: e.target.value,
+                                })
+                              }
                               placeholder="Size"
                             />
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-16"
                               value={doc.format}
-                              onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, format: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("other", idx, {
+                                  ...doc,
+                                  format: e.target.value,
+                                })
+                              }
                               placeholder="Format"
                             />
                             <input
                               className="text-xs text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 flex-1"
                               value={doc.url}
-                              onChange={e => handleSectionFormArrayChange("other", idx, { ...doc, url: e.target.value })}
+                              onChange={(e) =>
+                                handleSectionFormArrayChange("other", idx, {
+                                  ...doc,
+                                  url: e.target.value,
+                                })
+                              }
                               placeholder="Download URL"
                             />
                           </div>

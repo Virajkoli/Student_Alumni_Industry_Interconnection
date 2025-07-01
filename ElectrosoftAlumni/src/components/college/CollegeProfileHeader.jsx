@@ -10,6 +10,9 @@ const NAV_OPTIONS_DEFAULT = [
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
   { id: "downloads", name: "Downloads" },
+  { id: "hostel", name: "Hostel/Campus" }, // Added Hostel/Campus tab
+  { id: "alumni", name: "Alumni" }, // Added Alumni tab
+  { id: "events", name: "Events" }, // Added Events tab
 ];
 
 const QUICK_STATS_DEFAULT = [

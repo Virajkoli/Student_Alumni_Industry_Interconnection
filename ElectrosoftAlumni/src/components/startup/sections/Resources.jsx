@@ -198,8 +198,18 @@ const Resources = () => {
     language: "",
     features: "",
     isDownloadable: false,
+    isFree: true,
+    isInteractive: false,
     customFields: [],
   });
+
+  const quickAccessLinks = [
+    { name: "Y Combinator Startup School", link: "https://startupschool.org", description: "Free online startup course" },
+    { name: "Coursera Entrepreneurship", link: "https://coursera.org/entrepreneurship", description: "University courses on entrepreneurship" },
+    { name: "GitHub Student Pack", link: "https://education.github.com/pack", description: "Free developer tools for students" },
+    { name: "Google for Startups", link: "https://startup.google.com", description: "Resources and programs for startups" },
+    { name: "MIT OpenCourseWare", link: "https://ocw.mit.edu/entrepreneurship", description: "Free MIT entrepreneurship courses" },
+  ];
 
   const resourceTypes = [
     { value: "Template", label: "Template", icon: "📄" },
@@ -220,6 +230,29 @@ const Resources = () => {
     "Legal & Compliance",
     "Recommended Reads",
   ];
+
+  const getCategoryName = (categoryId) => {
+    const category = resourceCategories.find(cat => cat.id === categoryId);
+    return category ? category.category : "Unknown";
+  };
+
+  // Helper function to check if resource has custom fields
+  const hasCustomFields = (resource) => {
+    const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive'];
+    return Object.keys(resource).some(key => !standardFields.includes(key));
+  };
+
+  // Helper function to render custom fields in cards
+  const renderCustomFields = (resource) => {
+    const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive'];
+    const customFields = Object.keys(resource).filter(key => !standardFields.includes(key));
+    
+    return customFields.map(key => (
+      <div key={key} className="text-xs text-gray-500 mb-1">
+        <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span> {resource[key]}
+      </div>
+    ));
+  };
 
   const handleAddResource = () => {
     if (newResource.title && newResource.description && newResource.link) {
@@ -320,6 +353,84 @@ const Resources = () => {
     return typeObj ? typeObj.icon : "📄";
   };
 
+  const handleEditResource = (categoryId, resourceId) => {
+    const category = resourceCategories.find(cat => cat.id === categoryId);
+    const resource = category?.resources.find(r => r.id === resourceId);
+    
+    if (resource) {
+      // Extract custom fields from the resource
+      const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive', 'categoryId'];
+      const customFields = [];
+      
+      Object.keys(resource).forEach(key => {
+        if (!standardFields.includes(key)) {
+          customFields.push({ key, value: resource[key], id: Date.now() + Math.random() });
+        }
+      });
+
+      setEditingResource({
+        ...resource,
+        categoryId: categoryId,
+        customFields: customFields || []
+      });
+      setIsEditModalOpen(true);
+    }
+  };
+
+  const handleSaveEdit = () => {
+    if (editingResource) {
+      const updatedCategories = resourceCategories.map(category => {
+        if (category.id === editingResource.categoryId) {
+          return {
+            ...category,
+            resources: category.resources.map(resource => {
+              if (resource.id === editingResource.id) {
+                // Build updated resource with custom fields
+                const updatedResource = { ...editingResource };
+                
+                // Add custom fields to the resource
+                if (editingResource.customFields) {
+                  editingResource.customFields.forEach(field => {
+                    updatedResource[field.key] = field.value;
+                  });
+                }
+                
+                // Remove the customFields array from the final resource object
+                delete updatedResource.customFields;
+                
+                return updatedResource;
+              }
+              return resource;
+            })
+          };
+        }
+        return category;
+      });
+      
+      setResourceCategories(updatedCategories);
+      setIsEditModalOpen(false);
+      setEditingResource(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditModalOpen(false);
+    setEditingResource(null);
+  };
+
+  const handleDeleteResource = (categoryId, resourceId) => {
+    const updatedCategories = resourceCategories.map(category => {
+      if (category.id === categoryId) {
+        return {
+          ...category,
+          resources: category.resources.filter(resource => resource.id !== resourceId)
+        };
+      }
+      return category;
+    });
+    setResourceCategories(updatedCategories);
+  };
+
   return (
     <>
       <div className="w-full max-w-6xl mx-auto p-6">
@@ -383,62 +494,12 @@ const Resources = () => {
                           <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
                             Download
                           </span>
-                          <div>
-                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
-                              {resource.type}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          {resource.isDownloadable && (
-                            <Download
-                              className="w-4 h-4 text-green-600"
-                              title="Downloadable"
-                            />
-                          )}
-                          <ExternalLink className="w-4 h-4 text-gray-400" />
-                        </div>
-                      </div>
-
-                      <h4 className="font-semibold text-gray-900 mb-2">
-                        {resource.title}
-                      </h4>
-                      <p className="text-sm text-gray-600 mb-3 leading-relaxed">
-                        {resource.description}
-                      </p>
-
-                      {/* Custom Fields Display */}
-                      {resource.customFields &&
-                        resource.customFields.length > 0 && (
-                          <div className="mb-3 pt-2 border-t border-gray-100">
-                            <h5 className="text-xs font-medium text-gray-700 mb-1">
-                              Additional Information:
-                            </h5>
-                            <div className="space-y-1">
-                              {resource.customFields.map(
-                                (field, fieldIndex) => (
-                                  <div
-                                    key={fieldIndex}
-                                    className="text-xs text-gray-600 flex items-start"
-                                  >
-                                    <span className="font-medium text-gray-700 min-w-0 mr-1">
-                                      {field.label}:
-                                    </span>
-                                    <span className="text-gray-600">
-                                      {field.value}
-                                    </span>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          </div>
                         )}
-
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs text-gray-500">
-                          <span className="font-medium">Format:</span>{" "}
-                          {resource.format}
-                        </div>
+                        {resource.isFree && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                            Free
+                          </span>
+                        )}
                         <a
                           href={resource.link}
                           target="_blank"

@@ -17,6 +17,7 @@ import {
   Eye,
 } from "lucide-react";
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const LiveProjects = () => {
   const [editingId, setEditingId] = useState(null);
@@ -415,6 +416,53 @@ const LiveProjects = () => {
         pdf.setFont(undefined, "normal");
         return y + lineHeight + 3;
       };
+
+      // Option to capture the modal content as an image using html2canvas
+      const modalElement = document.querySelector(
+        '[data-modal="project-details"]'
+      );
+      if (modalElement) {
+        try {
+          const canvas = await html2canvas(modalElement, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+            logging: false,
+            width: modalElement.scrollWidth,
+            height: modalElement.scrollHeight,
+          });
+
+          const imgData = canvas.toDataURL("image/png");
+          const imgWidth = pageWidth - 2 * margin;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+          // Add the captured image to PDF
+          if (imgHeight <= pageHeight - 2 * margin) {
+            pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight);
+            pdf.addPage();
+            currentY = margin;
+          } else {
+            // If image is too tall, add it in parts or add a note
+            pdf.addImage(
+              imgData,
+              "PNG",
+              margin,
+              margin,
+              imgWidth,
+              pageHeight - 2 * margin
+            );
+            pdf.addPage();
+            currentY = margin;
+          }
+        } catch (error) {
+          console.warn(
+            "Could not capture modal image, using text-based PDF:",
+            error
+          );
+          // Continue with text-based PDF if image capture fails
+        }
+      }
 
       // Title and company
       pdf.setFontSize(20);
@@ -883,7 +931,6 @@ const LiveProjects = () => {
                     {new Date(project.postedDate).toLocaleDateString()}
                   </div>
                   <div className="flex space-x-3">
-                    
                     <button
                       onClick={() => handleViewDetails(project)}
                       className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors flex items-center space-x-2"

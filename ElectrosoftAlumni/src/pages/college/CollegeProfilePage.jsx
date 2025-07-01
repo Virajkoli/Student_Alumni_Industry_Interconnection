@@ -9,7 +9,6 @@ import Faculty from "../../components/college/sections/Faculty";
 import Downloads from "../../components/college/sections/Downloads";
 import Admission from "../../components/college/sections/Admission";
 import Placement from "../../components/college/sections/Placement";
-import CutoffRanking from "../../components/college/sections/CutoffRanking";
 import Facilities from "../../components/college/sections/Facilities";
 import Alumni from "../../components/college/sections/Alumni";
 import Hostel from "../../components/college/sections/Hostel";
@@ -213,6 +212,14 @@ const CollegeProfilePage = () => {
         "CAT: November 2025",
         "JAM: February 2025",
         "Application Deadlines: Check official website",
+      ],
+      
+      cutoffTable: [
+        { year: 2024, round1: "1200", round2: "1250", round3: "1300" },
+        { year: 2023, round1: "1150", round2: "1200", round3: "1250" },
+        { year: 2022, round1: "1100", round2: "1150", round3: "1200" },
+        { year: 2021, round1: "1050", round2: "1100", round3: "1150" },
+        { year: 2020, round1: "1000", round2: "1050", round3: "1100" },
       ],
     },
     placement: {
@@ -1169,6 +1176,31 @@ const CollegeProfilePage = () => {
                       </li>
                     ))}
                   </ul>
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Cutoff Trends (2020-2024)
+                  </h3>
+                  <table className="min-w-full bg-white rounded-xl shadow border border-gray-200">
+                    <thead className="bg-blue-50">
+                      <tr>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Year</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 1</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 2</th>
+                        <th className="py-3 px-4 text-left text-blue-900 font-semibold">Round 3</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-gray-800">
+                      {sectionFormData.cutoffTable.map((row, idx) => (
+                        <tr key={idx}>
+                          <td className="py-3 px-4 font-medium text-blue-800">{row.year}</td>
+                          <td className="py-3 px-4">{row.round1}</td>
+                          <td className="py-3 px-4">{row.round2}</td>
+                          <td className="py-3 px-4">{row.round3}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}

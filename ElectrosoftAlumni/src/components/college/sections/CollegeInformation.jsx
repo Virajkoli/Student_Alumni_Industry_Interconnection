@@ -302,15 +302,16 @@ const CollegeInformation = () => {
 
   return (
     <>
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F7FAFC' }}>
         {/* About Section */}
-        <div className="bg-white rounded-lg mb-6">
+        <div className="rounded-lg mb-6" style={{ backgroundColor: '#FFFFFF' }}>
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">About</h2>
+          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
+            <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>About</h2>
             <button
               onClick={handleEditClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
+              style={{ color: '#6EA9C8' }}
               title="Edit about section"
             >
               <Edit className="w-5 h-5" />
@@ -318,23 +319,24 @@ const CollegeInformation = () => {
           </div>
 
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold mb-4" style={{ color: '#1F2D3D' }}>
               Overview
             </h3>
-            <p className="text-gray-700 leading-relaxed mb-6">
+            <p className="leading-relaxed mb-6" style={{ color: '#4A5568' }}>
               {collegeData.overview}
             </p>
 
             {/* Website */}
             <div className="mb-6">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">
+              <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                 Website
               </h4>
               <a
                 href={collegeData.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
+                className="hover:underline flex items-center gap-1 transition-colors"
+                style={{ color: '#6EA9C8' }}
               >
                 {collegeData.website}
                 <ExternalLink className="w-3 h-3" />
@@ -345,12 +347,12 @@ const CollegeInformation = () => {
             {collegeData.verified && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-sm font-medium text-gray-900">
+                  <h4 className="text-sm font-medium" style={{ color: '#1F2D3D' }}>
                     Verified institution
                   </h4>
-                  <Shield className="w-4 h-4 text-gray-600" />
+                  <Shield className="w-4 h-4" style={{ color: '#6EA9C8' }} />
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm" style={{ color: '#4A5568' }}>
                   {collegeData.verifiedDate}
                 </p>
               </div>
@@ -360,10 +362,10 @@ const CollegeInformation = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Establishment Year */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
+                <h4 className="text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
                   Established
                 </h4>
-                <p className="text-sm text-gray-700 flex items-center gap-1">
+                <p className="text-sm flex items-center gap-1" style={{ color: '#4A5568' }}>
                   <Calendar className="w-4 h-4" />
                   {collegeData.establishmentYear}
                 </p>

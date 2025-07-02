@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Edit, X } from "lucide-react";
+import { Edit, Plus, X, Save, BookOpen, Clock, Award, Users, DollarSign, ExternalLink } from "lucide-react";
 
 const Courses = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingSection, setEditingSection] = useState("");
 
   const [coursesData, setCoursesData] = useState({
     btechDuration: "4 years",
@@ -164,317 +165,98 @@ const Courses = () => {
   };
 
   return (
-    <>
-      <div className="p-6 max-w-4xl mx-auto">
-        {/* Courses Section */}
-        <div className="bg-white rounded-lg mb-6">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Course Details
-            </h2>
-            <button
-              onClick={handleEditClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-              title="Edit courses"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            <div className="overflow-x-auto">
-              <table className="min-w-full border border-gray-200 rounded-lg">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="py-3 px-4 text-left text-gray-900 font-semibold border-b border-gray-200">
-                      Program
-                    </th>
-                    <th className="py-3 px-4 text-left text-gray-900 font-semibold border-b border-gray-200">
-                      Duration
-                    </th>
-                    <th className="py-3 px-4 text-left text-gray-900 font-semibold border-b border-gray-200">
-                      Eligibility
-                    </th>
-                    <th className="py-3 px-4 text-left text-gray-900 font-semibold border-b border-gray-200">
-                      Branches & Seats
-                    </th>
-                    <th className="py-3 px-4 text-left text-gray-900 font-semibold border-b border-gray-200">
-                      Annual Fees
-                    </th>
-                    <th className="py-3 px-4 text-left text-gray-900 font-semibold border-b border-gray-200">
-                      Total Seats
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {/* B.Tech */}
-                  <tr className="hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium text-gray-900">
-                      B.Tech
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.btechDuration}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.btechEligibility}
-                    </td>
-                    <td className="py-3 px-4">
-                      <ul className="space-y-1">
-                        {coursesData.btechBranches &&
-                          coursesData.btechBranches.map((branch, idx) => (
-                            <li
-                              key={idx}
-                              className="text-sm text-gray-600 flex items-center gap-1"
-                            >
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
-                              {branch}
-                            </li>
-                          ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.btechFees}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.btechTotalSeats}
-                    </td>
-                  </tr>
-                  {/* M.Tech */}
-                  <tr className="hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium text-gray-900">
-                      M.Tech
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mtechDuration}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mtechEligibility}
-                    </td>
-                    <td className="py-3 px-4">
-                      <ul className="space-y-1">
-                        {coursesData.mtechBranches &&
-                          coursesData.mtechBranches.map((branch, idx) => (
-                            <li
-                              key={idx}
-                              className="text-sm text-gray-600 flex items-center gap-1"
-                            >
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
-                              {branch}
-                            </li>
-                          ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mtechFees}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mtechTotalSeats}
-                    </td>
-                  </tr>
-                  {/* B.Sc. */}
-                  <tr className="hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium text-gray-900">
-                      B.Sc.
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.bscDuration}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.bscEligibility}
-                    </td>
-                    <td className="py-3 px-4">
-                      <ul className="space-y-1">
-                        {coursesData.bscBranches &&
-                          coursesData.bscBranches.map((branch, idx) => (
-                            <li
-                              key={idx}
-                              className="text-sm text-gray-600 flex items-center gap-1"
-                            >
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
-                              {branch}
-                            </li>
-                          ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.bscFees}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.bscTotalSeats}
-                    </td>
-                  </tr>
-                  {/* MSc */}
-                  <tr className="hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium text-gray-900">MSc</td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mscDuration}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mscEligibility}
-                    </td>
-                    <td className="py-3 px-4">
-                      <ul className="space-y-1">
-                        {coursesData.mscBranches &&
-                          coursesData.mscBranches.map((branch, idx) => (
-                            <li
-                              key={idx}
-                              className="text-sm text-gray-600 flex items-center gap-1"
-                            >
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
-                              {branch}
-                            </li>
-                          ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mscFees}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mscTotalSeats}
-                    </td>
-                  </tr>
-                  {/* MBA */}
-                  <tr className="hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium text-gray-900">MBA</td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mbaDuration}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mbaEligibility}
-                    </td>
-                    <td className="py-3 px-4">
-                      <ul className="space-y-1">
-                        {coursesData.mbaBranches &&
-                          coursesData.mbaBranches.map((branch, idx) => (
-                            <li
-                              key={idx}
-                              className="text-sm text-gray-600 flex items-center gap-1"
-                            >
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
-                              {branch}
-                            </li>
-                          ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mbaFees}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.mbaTotalSeats}
-                    </td>
-                  </tr>
-                  {/* Ph.D. */}
-                  <tr className="hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium text-gray-900">
-                      Ph.D.
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.phdDuration}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.phdEligibility}
-                    </td>
-                    <td className="py-3 px-4">
-                      <ul className="space-y-1">
-                        {coursesData.phdBranches &&
-                          coursesData.phdBranches.map((branch, idx) => (
-                            <li
-                              key={idx}
-                              className="text-sm text-gray-600 flex items-center gap-1"
-                            >
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
-                              {branch}
-                            </li>
-                          ))}
-                      </ul>
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.phdFees}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">
-                      {coursesData.phdTotalSeats}
-                    </td>
-                  </tr>
-                  {/* Custom Courses */}
-                  {coursesData.customCourses &&
-                    coursesData.customCourses.map((course, index) => (
-                      <tr key={course.id || index} className="hover:bg-gray-50">
-                        <td className="py-3 px-4 font-medium text-gray-900">
-                          {course.name}
-                        </td>
-                        <td className="py-3 px-4 text-gray-700">
-                          {course.duration}
-                        </td>
-                        <td className="py-3 px-4 text-gray-700">
-                          {course.eligibility}
-                        </td>
-                        <td className="py-3 px-4">
-                          <ul className="space-y-1">
-                            {course.branches &&
-                              course.branches.map((branch, idx) => (
-                                <li
-                                  key={idx}
-                                  className="text-sm text-gray-600 flex items-center gap-1"
-                                >
-                                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0"></div>
-                                  {branch}
-                                </li>
-                              ))}
-                          </ul>
-                        </td>
-                        <td className="py-3 px-4 text-gray-700">
-                          {course.fees}
-                        </td>
-                        <td className="py-3 px-4 text-gray-700">
-                          {course.totalSeats}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+    <div className="p-6 max-w-6xl mx-auto" style={{ backgroundColor: colors.background }}>
+      <div className="rounded-lg shadow-sm" style={{ backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: '1px' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: colors.border }}>
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg" style={{ backgroundColor: colors.lightAccent }}>
+              <BookOpen className="w-6 h-6" style={{ color: colors.accent }} />
             </div>
-
-            {/* Custom Fields Display */}
-            {coursesData.customFields &&
-              coursesData.customFields.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">
-                    Additional Course Information
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {coursesData.customFields.map((field, index) => (
-                      <div key={field.id || index}>
-                        <h5 className="text-sm font-medium text-gray-900 mb-1">
-                          {field.label}
-                        </h5>
-                        <p className="text-sm text-gray-700">{field.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            <h2 className="text-2xl font-bold" style={{ color: colors.primaryText }}>Courses</h2>
           </div>
+          <button
+            onClick={() => setIsEditModalOpen(true)}
+            className="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 hover:opacity-80"
+            style={{ backgroundColor: colors.accent, color: 'white' }}
+          >
+            <Edit className="w-4 h-4" />
+            <span>Edit Courses</span>
+          </button>
+        </div>
+
+        {/* Course Categories */}
+        <div className="p-6">
+          {courseData.categories.map((category, categoryIndex) => (
+            <div key={categoryIndex} className="mb-8 last:mb-0">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primaryText }}>
+                {category.name}
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {category.courses.map((course, courseIndex) => (
+                  <div key={courseIndex} className="rounded-lg p-4 shadow-sm border transition-shadow hover:shadow-md" style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+                    <div className="flex items-start justify-between mb-3">
+                      <h4 className="font-semibold" style={{ color: colors.primaryText }}>{course.name}</h4>
+                      <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: colors.lightAccent, color: colors.accent }}>
+                        {course.degree}
+                      </span>
+                    </div>
+                    
+                    <p className="text-sm mb-3 line-clamp-2" style={{ color: colors.secondaryText }}>
+                      {course.description}
+                    </p>
+                    
+                    <div className="space-y-2 text-xs">
+                      <div className="flex items-center space-x-2">
+                        <Clock className="w-3 h-3" style={{ color: colors.accent }} />
+                        <span style={{ color: colors.secondaryText }}>Duration: {course.duration}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Users className="w-3 h-3" style={{ color: colors.accent }} />
+                        <span style={{ color: colors.secondaryText }}>Seats: {course.seats}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <DollarSign className="w-3 h-3" style={{ color: colors.accent }} />
+                        <span style={{ color: colors.secondaryText }}>Fee: ₹{course.fee.toLocaleString()}/year</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 pt-3 border-t" style={{ borderColor: colors.border }}>
+                      <div className="flex flex-wrap gap-1">
+                        {course.specializations.slice(0, 2).map((spec, idx) => (
+                          <span key={idx} className="text-xs px-2 py-1 rounded" style={{ backgroundColor: colors.hoverAccent, color: colors.primaryText }}>
+                            {spec}
+                          </span>
+                        ))}
+                        {course.specializations.length > 2 && (
+                          <span className="text-xs" style={{ color: colors.secondaryText }}>
+                            +{course.specializations.length - 2} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  Edit Course Details
-                </h2>
-                <button
-                  onClick={handleCancelEdit}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg shadow-xl" style={{ backgroundColor: colors.cardBackground }}>
+            <div className="sticky top-0 flex items-center justify-between p-6 border-b" style={{ backgroundColor: colors.cardBackground, borderColor: colors.border }}>
+              <h3 className="text-xl font-bold" style={{ color: colors.primaryText }}>Edit Courses</h3>
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-2 rounded-lg transition-colors hover:bg-opacity-10"
+                style={{ color: colors.accent }}
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="p-6 space-y-8">
@@ -1159,14 +941,16 @@ const Courses = () => {
             {/* Modal Footer */}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
               <button
-                onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsEditModalOpen(false)}
+                className="px-4 py-2 border rounded-lg font-medium transition-colors"
+                style={{ borderColor: colors.border, color: colors.secondaryText }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 rounded-lg font-medium text-white transition-colors hover:opacity-90"
+                style={{ backgroundColor: colors.accent }}
               >
                 Save Changes
               </button>
@@ -1174,7 +958,7 @@ const Courses = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

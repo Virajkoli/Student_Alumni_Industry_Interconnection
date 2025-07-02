@@ -30,26 +30,30 @@ const StartupProfilePage = () => {
   const [selectedOption, setSelectedOption] = useState(navigationOptions[0]);
   const [customNavigations, setCustomNavigations] = useState([]);
 
-  const handleNavigationChange = (contentId, contentName, customNavItem = null) => {
+  const handleNavigationChange = (
+    contentId,
+    contentName,
+    customNavItem = null
+  ) => {
     setActiveContent(contentId);
     setActiveContentName(contentName);
     setActiveCustomContent(customNavItem);
     setSelectedOption(contentName);
-    
+
     // No need to add custom navigation to local state here since it's already managed by the header component
   };
 
   const handleCustomContentUpdate = (customNavId, newContent) => {
     // Update the custom navigation content in our local state
-    setCustomNavigations(prev => 
-      prev.map(nav => 
+    setCustomNavigations((prev) =>
+      prev.map((nav) =>
         nav.id === customNavId ? { ...nav, content: newContent } : nav
       )
     );
-    
+
     // Also update the activeCustomContent if it's the currently active one
     if (activeCustomContent && activeCustomContent.id === customNavId) {
-      setActiveCustomContent(prev => ({ ...prev, content: newContent }));
+      setActiveCustomContent((prev) => ({ ...prev, content: newContent }));
     }
   };
 
@@ -57,8 +61,8 @@ const StartupProfilePage = () => {
     // Find the StartupProfileHeader and trigger its edit modal
     // This will be handled by the StartupProfileHeader component
     // We can trigger a custom event or use a ref to communicate with it
-    const event = new CustomEvent('editCustomNavigation', {
-      detail: { customNavItem }
+    const event = new CustomEvent("editCustomNavigation", {
+      detail: { customNavItem },
     });
     window.dispatchEvent(event);
   };
@@ -98,6 +102,9 @@ const StartupProfilePage = () => {
       <button className="bg-red-500 text-white px-4 py-2 rounded mb-4 ml-4">
         <a href="/college-profile">Go to College Profile</a>
       </button>
+      <button className="bg-yellow-500 text-white px-4 py-2 rounded mb-4 ml-4">
+        <a href="/student-profile">Go to Student Profile</a>
+      </button>
       <Navbar />
       {/* Search Container */}
       <div className="bg-white shadow-sm border-b border-gray-200">
@@ -134,7 +141,7 @@ const StartupProfilePage = () => {
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
         {/* Profile Header Section with integrated navigation */}
         <div className="w-full mb-6">
-          <StartupProfileHeader 
+          <StartupProfileHeader
             onNavigationChange={handleNavigationChange}
             customNavigations={customNavigations}
             onCustomNavigationUpdate={setCustomNavigations}

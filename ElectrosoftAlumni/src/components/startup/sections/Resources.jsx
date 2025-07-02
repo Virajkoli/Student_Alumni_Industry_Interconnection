@@ -4,183 +4,206 @@ import {
   Save,
   X,
   Plus,
+  FileText,
+  Download,
   ExternalLink,
-  Trash2,
+  BookOpen,
+  Scale,
+  Video,
+  Headphones,
+  Mail,
 } from "lucide-react";
 
 const Resources = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingResource, setEditingResource] = useState(null);
+  const [editingIndex, setEditingIndex] = useState(null);
   const [resourceCategories, setResourceCategories] = useState([
     {
       id: 1,
-      category: "E-books & PDFs",
-      description: "Downloadable digital books and PDF guides for startup development",
+      category: "Templates & Docs",
+      icon: "📄",
+      description: "Downloadable templates and essential startup documents",
       resources: [
         {
           id: 1,
-          title: "The Lean Startup Methodology",
-          description: "Complete guide on building sustainable businesses through validated learning",
-          type: "E-book",
-          format: "PDF",
-          link: "https://example.com/lean-startup.pdf",
+          title: "Business Plan Template",
+          description:
+            "Comprehensive business plan template with financial projections",
+          type: "Template",
+          format: "Google Docs",
+          link: "https://docs.google.com/template/business-plan",
           isDownloadable: true,
           customFields: [],
         },
         {
           id: 2,
-          title: "Business Model Canvas Guide",
-          description: "Step-by-step guide to creating effective business models",
-          type: "E-book",
-          format: "PDF",
-          link: "https://example.com/business-model-canvas.pdf",
+          title: "Pitch Deck Template",
+          description:
+            "Professional pitch deck template with investor-ready slides",
+          type: "Template",
+          format: "PPT/Google Slides",
+          link: "https://slides.google.com/template/pitch-deck",
           isDownloadable: true,
         },
         {
           id: 3,
-          title: "Startup Financial Planning",
-          description: "Financial modeling and planning for early-stage startups",
-          type: "E-book",
-          format: "PDF",
-          link: "https://example.com/financial-planning.pdf",
+          title: "Investor Outreach Email Templates",
+          description:
+            "Cold email templates for reaching out to potential investors",
+          type: "Template",
+          format: "Email Templates",
+          link: "https://startup-templates.com/investor-emails",
+          isDownloadable: true,
+        },
+        {
+          id: 4,
+          title: "Legal Document Templates",
+          description:
+            "MoUs, NDAs, founder agreements, and other legal templates",
+          type: "Template",
+          format: "PDF/Word",
+          link: "https://legal-templates.startup.com",
           isDownloadable: true,
         },
       ],
     },
     {
       id: 2,
-      category: "Video Tutorials",
-      description: "Educational video content covering startup concepts and practical skills",
+      category: "Learning & Guides",
+      icon: "🎥",
+      description: "Educational content, tutorials, and startup guides",
       resources: [
         {
-          id: 4,
-          title: "Startup Pitch Deck Fundamentals",
-          description: "How to create compelling pitch decks that attract investors",
-          type: "Video",
-          format: "MP4",
-          link: "https://example.com/pitch-deck-tutorial",
-          duration: "45 minutes",
-        },
-        {
           id: 5,
-          title: "Digital Marketing for Startups",
-          description: "Complete course on digital marketing strategies for new businesses",
-          type: "Video",
-          format: "Streaming",
-          link: "https://example.com/digital-marketing-course",
-          duration: "3 hours",
+          title: "How to Validate Your Startup Idea",
+          description:
+            "Complete guide on validating market demand and product-market fit",
+          type: "Guide",
+          format: "Blog Series",
+          link: "https://startup-guides.com/idea-validation",
+          isDownloadable: false,
         },
         {
           id: 6,
-          title: "Legal Basics for Entrepreneurs",
-          description: "Understanding legal requirements and structures for startups",
-          type: "Video",
-          format: "MP4",
-          link: "https://example.com/legal-basics",
-          duration: "30 minutes",
+          title: "Growth Hacking Tutorials",
+          description:
+            "YouTube playlist covering growth strategies and tactics",
+          type: "Video Course",
+          format: "YouTube Playlist",
+          link: "https://youtube.com/playlist/growth-hacking",
+          isDownloadable: false,
+        },
+        {
+          id: 7,
+          title: "SEO for Startups",
+          description: "Complete SEO strategy guide for early-stage startups",
+          type: "Course",
+          format: "Online Course",
+          link: "https://coursera.org/seo-startups",
+          isDownloadable: false,
+        },
+        {
+          id: 8,
+          title: "Fundraising Strategy Guide",
+          description: "Step-by-step fundraising process from seed to Series A",
+          type: "Guide",
+          format: "eBook",
+          link: "https://fundraising-guide.startup.com",
+          isDownloadable: true,
         },
       ],
     },
     {
       id: 3,
-      category: "GitHub Links",
-      description: "Open-source projects and code repositories for startup development",
+      category: "Legal & Compliance",
+      icon: "⚖️",
+      description: "Legal requirements, compliance, and government resources",
       resources: [
         {
-          id: 7,
-          title: "Startup Dashboard Template",
-          description: "React-based dashboard template for startup metrics tracking",
-          type: "Repository",
-          format: "React",
-          link: "https://github.com/example/startup-dashboard",
-          language: "JavaScript",
-        },
-        {
-          id: 8,
-          title: "Business Plan Generator",
-          description: "Automated business plan generator with customizable templates",
-          type: "Repository",
-          format: "Python",
-          link: "https://github.com/example/business-plan-generator",
-          language: "Python",
-        },
-        {
           id: 9,
-          title: "Startup Analytics Tools",
-          description: "Collection of analytics tools for tracking startup KPIs",
-          type: "Repository",
-          format: "Node.js",
-          link: "https://github.com/example/startup-analytics",
-          language: "JavaScript",
+          title: "Startup India Registration Guide",
+          description:
+            "Complete guide for registering under Startup India initiative",
+          type: "Government Guide",
+          format: "PDF Guide",
+          link: "https://startupindia.gov.in/registration-guide",
+          isDownloadable: true,
+        },
+        {
+          id: 10,
+          title: "GST & Taxation for Startups",
+          description:
+            "Tax compliance and GST registration for Indian startups",
+          type: "Compliance Guide",
+          format: "Resource Center",
+          link: "https://gst-startup-guide.gov.in",
+          isDownloadable: false,
+        },
+        {
+          id: 11,
+          title: "IP & Trademark Guide",
+          description:
+            "Intellectual property protection and trademark registration",
+          type: "Legal Guide",
+          format: "Handbook",
+          link: "https://ipindia.gov.in/startup-ip-guide",
+          isDownloadable: true,
+        },
+        {
+          id: 12,
+          title: "Compliance Checklist",
+          description: "Essential legal and regulatory compliance checklist",
+          type: "Checklist",
+          format: "Interactive Tool",
+          link: "https://compliance-checker.startup.com",
+          isDownloadable: false,
         },
       ],
     },
     {
       id: 4,
-      category: "Study Notes",
-      description: "Curated study materials and notes on entrepreneurship topics",
-      resources: [
-        {
-          id: 10,
-          title: "Venture Capital Basics",
-          description: "Comprehensive notes on VC funding processes and term sheets",
-          type: "Notes",
-          format: "PDF",
-          link: "https://example.com/vc-basics-notes.pdf",
-          author: "Industry Expert",
-        },
-        {
-          id: 11,
-          title: "Market Research Methods",
-          description: "Detailed study guide on conducting effective market research",
-          type: "Notes",
-          format: "PDF",
-          link: "https://example.com/market-research-notes.pdf",
-          author: "Marketing Professional",
-        },
-        {
-          id: 12,
-          title: "Startup Growth Strategies",
-          description: "Strategic notes on scaling startups and growth hacking",
-          type: "Notes",
-          format: "PDF",
-          link: "https://example.com/growth-strategies-notes.pdf",
-          author: "Growth Expert",
-        },
-      ],
-    },
-    {
-      id: 5,
-      category: "Practice Platforms",
-      description: "Interactive platforms for practicing entrepreneurial skills",
+      category: "Recommended Reads",
+      icon: "📚",
+      description: "Books, podcasts, and newsletters for entrepreneurs",
       resources: [
         {
           id: 13,
-          title: "Startup Simulator",
-          description: "Interactive platform for simulating startup scenarios and decisions",
-          type: "Platform",
-          format: "Web App",
-          link: "https://example.com/startup-simulator",
-          features: "Real-time simulation",
+          title: "The Lean Startup by Eric Ries",
+          description:
+            "Essential read on lean methodology and iterative product development",
+          type: "Book",
+          format: "Paperback/Kindle",
+          link: "https://amazon.com/lean-startup-eric-ries",
+          isDownloadable: false,
         },
         {
           id: 14,
-          title: "Pitch Practice Tool",
-          description: "AI-powered platform for practicing and improving pitch presentations",
-          type: "Platform",
-          format: "Web App",
-          link: "https://example.com/pitch-practice",
-          features: "AI feedback",
+          title: "Zero to One by Peter Thiel",
+          description: "Insights on building companies that create new things",
+          type: "Book",
+          format: "Paperback/Kindle",
+          link: "https://amazon.com/zero-to-one-peter-thiel",
+          isDownloadable: false,
         },
         {
           id: 15,
-          title: "Business Model Tester",
-          description: "Tool for testing and validating business model assumptions",
-          type: "Platform",
-          format: "Web App",
-          link: "https://example.com/business-model-tester",
-          features: "Validation framework",
+          title: "Indie Hackers Podcast",
+          description:
+            "Interviews with successful indie entrepreneurs and founders",
+          type: "Podcast",
+          format: "Audio/Video",
+          link: "https://indiehackers.com/podcast",
+          isDownloadable: false,
+        },
+        {
+          id: 16,
+          title: "TechCrunch Startups Newsletter",
+          description:
+            "Weekly newsletter covering startup news and fundraising",
+          type: "Newsletter",
+          format: "Email Newsletter",
+          link: "https://techcrunch.com/newsletter/startups",
+          isDownloadable: false,
         },
       ],
     },
@@ -189,27 +212,13 @@ const Resources = () => {
   const [newResource, setNewResource] = useState({
     title: "",
     description: "",
-    link: "",
-    categoryId: 1,
-    type: "",
+    type: "Template",
     format: "",
-    duration: "",
-    author: "",
-    language: "",
-    features: "",
+    link: "",
+    category: "Templates & Docs",
     isDownloadable: false,
-    isFree: true,
-    isInteractive: false,
     customFields: [],
   });
-
-  const quickAccessLinks = [
-    { name: "Y Combinator Startup School", link: "https://startupschool.org", description: "Free online startup course" },
-    { name: "Coursera Entrepreneurship", link: "https://coursera.org/entrepreneurship", description: "University courses on entrepreneurship" },
-    { name: "GitHub Student Pack", link: "https://education.github.com/pack", description: "Free developer tools for students" },
-    { name: "Google for Startups", link: "https://startup.google.com", description: "Resources and programs for startups" },
-    { name: "MIT OpenCourseWare", link: "https://ocw.mit.edu/entrepreneurship", description: "Free MIT entrepreneurship courses" },
-  ];
 
   const resourceTypes = [
     { value: "Template", label: "Template", icon: "📄" },
@@ -231,63 +240,23 @@ const Resources = () => {
     "Recommended Reads",
   ];
 
-  const getCategoryName = (categoryId) => {
-    const category = resourceCategories.find(cat => cat.id === categoryId);
-    return category ? category.category : "Unknown";
-  };
-
-  // Helper function to check if resource has custom fields
-  const hasCustomFields = (resource) => {
-    const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive'];
-    return Object.keys(resource).some(key => !standardFields.includes(key));
-  };
-
-  // Helper function to render custom fields in cards
-  const renderCustomFields = (resource) => {
-    const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive'];
-    const customFields = Object.keys(resource).filter(key => !standardFields.includes(key));
-    
-    return customFields.map(key => (
-      <div key={key} className="text-xs text-gray-500 mb-1">
-        <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span> {resource[key]}
-      </div>
-    ));
-  };
-
   const handleAddResource = () => {
-    if (newResource.title && newResource.description && newResource.link) {
+    setIsAddModalOpen(true);
+  };
+
+  const handleSaveResource = () => {
+    if (newResource.title.trim() && newResource.link.trim()) {
+      // Find the category to add to
       const categoryIndex = resourceCategories.findIndex(
-        cat => cat.id === newResource.categoryId
+        (cat) => cat.category === newResource.category
       );
-      
       if (categoryIndex !== -1) {
         const updatedCategories = [...resourceCategories];
-        const newId = Math.max(...updatedCategories.flatMap(cat => cat.resources.map(r => r.id))) + 1;
-        
-        // Build the resource object with all fields including custom fields
-        const resourceData = {
-          id: newId,
-          title: newResource.title,
-          description: newResource.description,
-          type: newResource.type || getCategoryName(newResource.categoryId).split(' ')[0],
-          format: newResource.format || "External Link",
-          link: newResource.link,
-          duration: newResource.duration,
-          author: newResource.author,
-          language: newResource.language,
-          features: newResource.features,
-          isDownloadable: newResource.isDownloadable,
-          isFree: newResource.isFree,
-          isInteractive: newResource.isInteractive,
+        const newResourceWithId = {
+          id: Date.now(), // Simple ID generation
+          ...newResource,
         };
-
-        // Add custom fields to the resource
-        newResource.customFields.forEach(field => {
-          resourceData[field.key] = field.value;
-        });
-        
-        updatedCategories[categoryIndex].resources.push(resourceData);
-        
+        updatedCategories[categoryIndex].resources.unshift(newResourceWithId);
         setResourceCategories(updatedCategories);
       }
 
@@ -353,395 +322,374 @@ const Resources = () => {
     return typeObj ? typeObj.icon : "📄";
   };
 
-  const handleEditResource = (categoryId, resourceId) => {
-    const category = resourceCategories.find(cat => cat.id === categoryId);
-    const resource = category?.resources.find(r => r.id === resourceId);
-    
-    if (resource) {
-      // Extract custom fields from the resource
-      const standardFields = ['id', 'title', 'description', 'type', 'format', 'link', 'duration', 'author', 'language', 'features', 'isDownloadable', 'isFree', 'isInteractive', 'categoryId'];
-      const customFields = [];
-      
-      Object.keys(resource).forEach(key => {
-        if (!standardFields.includes(key)) {
-          customFields.push({ key, value: resource[key], id: Date.now() + Math.random() });
-        }
-      });
-
-      setEditingResource({
-        ...resource,
-        categoryId: categoryId,
-        customFields: customFields || []
-      });
-      setIsEditModalOpen(true);
-    }
-  };
-
-  const handleSaveEdit = () => {
-    if (editingResource) {
-      const updatedCategories = resourceCategories.map(category => {
-        if (category.id === editingResource.categoryId) {
-          return {
-            ...category,
-            resources: category.resources.map(resource => {
-              if (resource.id === editingResource.id) {
-                // Build updated resource with custom fields
-                const updatedResource = { ...editingResource };
-                
-                // Add custom fields to the resource
-                if (editingResource.customFields) {
-                  editingResource.customFields.forEach(field => {
-                    updatedResource[field.key] = field.value;
-                  });
-                }
-                
-                // Remove the customFields array from the final resource object
-                delete updatedResource.customFields;
-                
-                return updatedResource;
-              }
-              return resource;
-            })
-          };
-        }
-        return category;
-      });
-      
-      setResourceCategories(updatedCategories);
-      setIsEditModalOpen(false);
-      setEditingResource(null);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditModalOpen(false);
-    setEditingResource(null);
-  };
-
-  const handleDeleteResource = (categoryId, resourceId) => {
-    const updatedCategories = resourceCategories.map(category => {
-      if (category.id === categoryId) {
-        return {
-          ...category,
-          resources: category.resources.filter(resource => resource.id !== resourceId)
-        };
-      }
-      return category;
-    });
-    setResourceCategories(updatedCategories);
-  };
-
   return (
     <>
-      <div className="w-full max-w-6xl mx-auto p-6" style={{ backgroundColor: "#EEE7FF" }}>
+      <div className="p-6 max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Startup Resources</h1>
-          <p className="text-gray-600">Access curated educational materials and tools for your entrepreneurial journey</p>
-        </div>
+        <div className="bg-white rounded-lg">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">Resources</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Templates, guides, legal resources, and essential startup tools
+              </p>
+            </div>
+            <button
+              onClick={handleAddResource}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Resource
+            </button>
+          </div>
 
-        {/* Add Resource Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
-            style={{ backgroundColor: "#4D869C" }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
-            onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
-          >
-            <Plus size={20} />
-            Add New Resource
-          </button>
-        </div>
+          {/* Education Guidelines */}
+          {/* <div className="p-6 bg-blue-50 border-b border-gray-200">
+            <h3 className="text-sm font-medium text-gray-900 mb-3">
+              🎓 Purpose of Education Section:
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Build credibility and show that the startup/founders have been
+              mentored, trained, or supported by recognized institutions or
+              startup ecosystems.
+            </p>
 
-        {/* Resource Categories */}
-        <div className="space-y-8">
-          {resourceCategories.map((category) => (
-            <div key={category.id} className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="mb-4">
-                <h2 className="text-xl font-medium text-gray-900 mb-2">{category.category}</h2>
-                <p className="text-gray-600 text-sm">{category.description}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <h4 className="font-medium text-gray-800 mb-2">
+                  🚀 Accelerator Programs
+                </h4>
+                <ul className="text-gray-600 space-y-1 text-xs">
+                  <li>• Y Combinator</li>
+                  <li>• Techstars</li>
+                  <li>• 500 Startups</li>
+                  <li>• Google for Startups</li>
+                </ul>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {category.resources.map((resource) => (
-                  <div key={resource.id} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="font-medium text-gray-900 text-sm leading-tight">{resource.title}</h3>
-                      <div className="flex gap-1 ml-2">
-                        <button
-                          onClick={() => handleEditResource(category.id, resource.id)}
-                          className="text-gray-500 transition-colors"
-                          style={{ color: "#4D869C" }}
-                          onMouseEnter={(e) => e.target.style.color = "#3a6b7a"}
-                          onMouseLeave={(e) => e.target.style.color = "#4D869C"}
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteResource(category.id, resource.id)}
-                          className="text-gray-500 hover:text-red-600 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <p className="text-gray-600 text-xs mb-3 leading-relaxed">{resource.description}</p>
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="text-xs text-gray-500">
-                        <span className="font-medium">{resource.type}</span>
-                        {resource.format && <span> • {resource.format}</span>}
-                        {resource.duration && <span> • {resource.duration}</span>}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {resource.isDownloadable && (
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                            Download
+              <div>
+                <h4 className="font-medium text-gray-800 mb-2">
+                  📜 Certifications
+                </h4>
+                <ul className="text-gray-600 space-y-1 text-xs">
+                  <li>• Lean Startup Methodology</li>
+                  <li>• Digital Marketing</li>
+                  <li>• Product Management</li>
+                  <li>• Venture Finance</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-800 mb-2">
+                  🎓 Executive Education
+                </h4>
+                <ul className="text-gray-600 space-y-1 text-xs">
+                  <li>• Stanford Entrepreneurship</li>
+                  <li>• MIT Sloan Programs</li>
+                  <li>• Wharton Executive Ed</li>
+                  <li>• Harvard Business School</li>
+                </ul>
+              </div>
+            </div>
+          </div> */}
+
+          {/* Resource Categories */}
+          <div className="divide-y divide-gray-200">
+            {resourceCategories.map((category) => (
+              <div key={category.id} className="p-6">
+                {/* Category Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <span className="text-lg">{category.icon}</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {category.category}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {category.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Category Resources */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {category.resources.map((resource) => (
+                    <div
+                      key={resource.id}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">
+                            {getTypeIcon(resource.type)}
                           </span>
+                          <div>
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                              {resource.type}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {resource.isDownloadable && (
+                            <Download
+                              className="w-4 h-4 text-green-600"
+                              title="Downloadable"
+                            />
+                          )}
+                          <ExternalLink className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+
+                      <h4 className="font-semibold text-gray-900 mb-2">
+                        {resource.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                        {resource.description}
+                      </p>
+
+                      {/* Custom Fields Display */}
+                      {resource.customFields &&
+                        resource.customFields.length > 0 && (
+                          <div className="mb-3 pt-2 border-t border-gray-100">
+                            <h5 className="text-xs font-medium text-gray-700 mb-1">
+                              Additional Information:
+                            </h5>
+                            <div className="space-y-1">
+                              {resource.customFields.map(
+                                (field, fieldIndex) => (
+                                  <div
+                                    key={fieldIndex}
+                                    className="text-xs text-gray-600 flex items-start"
+                                  >
+                                    <span className="font-medium text-gray-700 min-w-0 mr-1">
+                                      {field.label}:
+                                    </span>
+                                    <span className="text-gray-600">
+                                      {field.value}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
                         )}
-                        {resource.isFree && (
-                          <span className="text-xs px-2 py-1 rounded text-white" style={{ backgroundColor: "#4D869C" }}>
-                            Free
-                          </span>
-                        )}
+
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-gray-500">
+                          <span className="font-medium">Format:</span>{" "}
+                          {resource.format}
+                        </div>
                         <a
                           href={resource.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="transition-colors"
-                          style={{ color: "#4D869C" }}
-                          onMouseEnter={(e) => e.target.style.color = "#3a6b7a"}
-                          onMouseLeave={(e) => e.target.style.color = "#4D869C"}
+                          className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
                         >
-                          <ExternalLink size={16} />
+                          {resource.isDownloadable ? "Download" : "View"}
+                          <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
                     </div>
-                    
-                    {(resource.author || resource.language || resource.features || hasCustomFields(resource)) && (
-                      <div className="mt-2 pt-2 border-t border-gray-200">
-                        {resource.author && (
-                          <div className="text-xs text-gray-500 mb-1">
-                            <span className="font-medium">Author:</span> {resource.author}
-                          </div>
-                        )}
-                        {resource.language && (
-                          <div className="text-xs text-gray-500 mb-1">
-                            <span className="font-medium">Language/Tech:</span> {resource.language}
-                          </div>
-                        )}
-                        {resource.features && (
-                          <div className="text-xs text-gray-500 mb-1">
-                            <span className="font-medium">Features:</span> {resource.features}
-                          </div>
-                        )}
-                        {renderCustomFields(resource)}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Additional Resources */}
+          <div className="p-6 bg-gray-50 border-t border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              More Helpful Resources
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">🌐</span>
+                  <h4 className="font-medium text-gray-900">Product Hunt</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  Launch and discover new products
+                </p>
+                <a
+                  href="https://www.producthunt.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                >
+                  Explore →
+                </a>
+              </div>
+
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">�</span>
+                  <h4 className="font-medium text-gray-900">Indie Hackers</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  Community for indie entrepreneurs
+                </p>
+                <a
+                  href="https://www.indiehackers.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                >
+                  Join Community →
+                </a>
+              </div>
+
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">�️</span>
+                  <h4 className="font-medium text-gray-900">Startup India</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  Government startup initiative
+                </p>
+                <a
+                  href="https://www.startupindia.gov.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                >
+                  Learn More →
+                </a>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Quick Access Links */}
-        <div className="mt-8 rounded-lg border p-6" style={{ backgroundColor: "#f3f0ff", borderColor: "#4D869C" }}>
-          <h2 className="text-xl font-medium text-gray-900 mb-4">Quick Access Links</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {quickAccessLinks.map((link, index) => (
-              <a
-                key={index}
-                href={link.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white rounded-lg p-4 border transition-colors group"
-                style={{ borderColor: "#E5E7EB" }}
-                onMouseEnter={(e) => e.target.style.borderColor = "#4D869C"}
-                onMouseLeave={(e) => e.target.style.borderColor = "#E5E7EB"}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-medium text-gray-900 text-sm transition-colors"
-                      style={{ color: "#4D869C" }}>
-                    {link.name}
-                  </h3>
-                  <ExternalLink size={16} className="text-gray-400 transition-colors"
-                                style={{ color: "#4D869C" }} />
-                </div>
-                <p className="text-xs text-gray-600">{link.description}</p>
-              </a>
-            ))}
           </div>
         </div>
       </div>
 
       {/* Add Resource Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Add New Resource</h3>
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select
-                  value={newResource.categoryId}
-                  onChange={(e) => setNewResource({...newResource, categoryId: parseInt(e.target.value)})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Add Resource
+                </h2>
+                <button
+                  onClick={handleCancelAdd}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  {resourceCategories.map(category => (
-                    <option key={category.id} value={category.id}>{category.category}</option>
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Resource Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Resource Type *
+                </label>
+                <select
+                  value={newResource.type}
+                  onChange={(e) => handleInputChange("type", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  {resourceTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.icon} {type.label}
+                    </option>
                   ))}
                 </select>
               </div>
-              
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category *
+                </label>
+                <select
+                  value={newResource.category}
+                  onChange={(e) =>
+                    handleInputChange("category", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Title and Format */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Title *
+                  </label>
                   <input
                     type="text"
                     value={newResource.title}
-                    onChange={(e) => setNewResource({...newResource, title: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="Enter resource title"
+                    onChange={(e) => handleInputChange("title", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="e.g., Business Plan Template"
                   />
                 </div>
-                
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <input
-                    type="text"
-                    value={newResource.type}
-                    onChange={(e) => setNewResource({...newResource, type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., E-book, Video, Repository"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea
-                  value={newResource.description}
-                  onChange={(e) => setNewResource({...newResource, description: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                  rows="3"
-                  placeholder="Enter resource description"
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Format</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Format *
+                  </label>
                   <input
                     type="text"
                     value={newResource.format}
-                    onChange={(e) => setNewResource({...newResource, format: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., PDF, MP4, Web App"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Duration/Size</label>
-                  <input
-                    type="text"
-                    value={newResource.duration}
-                    onChange={(e) => setNewResource({...newResource, duration: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., 45 minutes, 10MB"
+                    onChange={(e) =>
+                      handleInputChange("format", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="e.g., PDF, Google Docs, Online Course"
                   />
                 </div>
               </div>
-              
+
+              {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Link</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  value={newResource.description}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  placeholder="Describe what this resource provides and how it helps startups..."
+                />
+              </div>
+
+              {/* Link */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Resource Link *
+                </label>
                 <input
                   type="url"
                   value={newResource.link}
-                  onChange={(e) => setNewResource({...newResource, link: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                  placeholder="https://example.com"
+                  onChange={(e) => handleInputChange("link", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="https://example.com/resource"
                 />
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Author/Creator</label>
-                  <input
-                    type="text"
-                    value={newResource.author}
-                    onChange={(e) => setNewResource({...newResource, author: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., John Doe, MIT"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Language/Tech</label>
-                  <input
-                    type="text"
-                    value={newResource.language}
-                    onChange={(e) => setNewResource({...newResource, language: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., JavaScript, English"
-                  />
-                </div>
-              </div>
-              
+
+              {/* Downloadable */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Features/Tags</label>
-                <input
-                  type="text"
-                  value={newResource.features}
-                  onChange={(e) => setNewResource({...newResource, features: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                  placeholder="e.g., Real-time simulation, Interactive"
-                />
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
+                <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={newResource.isDownloadable}
-                    onChange={(e) => setNewResource({...newResource, isDownloadable: e.target.checked})}
-                    className="w-4 h-4 border-gray-300 rounded"
-                    style={{ accentColor: "#4D869C" }}
+                    onChange={(e) =>
+                      handleInputChange("isDownloadable", e.target.checked)
+                    }
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Downloadable</span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={newResource.isFree}
-                    onChange={(e) => setNewResource({...newResource, isFree: e.target.checked})}
-                    className="w-4 h-4 border-gray-300 rounded"
-                    style={{ accentColor: "#4D869C" }}
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Free</span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={newResource.isInteractive}
-                    onChange={(e) => setNewResource({...newResource, isInteractive: e.target.checked})}
-                    className="w-4 h-4 border-gray-300 rounded"
-                    style={{ accentColor: "#4D869C" }}
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Interactive</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    This resource is downloadable
+                  </span>
                 </label>
               </div>
 
@@ -754,10 +702,7 @@ const Resources = () => {
                   <button
                     type="button"
                     onClick={handleAddCustomField}
-                    className="px-3 py-1 text-sm text-white rounded transition-colors"
-                    style={{ backgroundColor: "#4D869C" }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                   >
                     Add Field
                   </button>
@@ -771,7 +716,7 @@ const Resources = () => {
                         handleCustomFieldChange(index, "label", e.target.value)
                       }
                       placeholder="Field name"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     />
                     <input
                       type="text"
@@ -780,7 +725,7 @@ const Resources = () => {
                         handleCustomFieldChange(index, "value", e.target.value)
                       }
                       placeholder="Field value"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     />
                     <button
                       type="button"
@@ -793,285 +738,21 @@ const Resources = () => {
                 ))}
               </div>
             </div>
-            
-            <div className="flex gap-3 mt-6">
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
               <button
-                onClick={handleAddResource}
-                className="flex-1 text-white py-2 px-4 rounded-lg transition-colors text-sm"
-                style={{ backgroundColor: "#4D869C" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
+                onClick={handleCancelAdd}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveResource}
+                disabled={!newResource.title.trim() || !newResource.link.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add Resource
-              </button>
-              <button
-                onClick={() => {
-                  setNewResource({ 
-                    title: "", 
-                    description: "", 
-                    link: "", 
-                    categoryId: 1,
-                    type: "",
-                    format: "",
-                    duration: "",
-                    author: "",
-                    language: "",
-                    features: "",
-                    isDownloadable: false,
-                    isFree: true,
-                    isInteractive: false,
-                    customFields: [],
-                  });
-                  setIsAddModalOpen(false);
-                }}
-                className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors text-sm"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Resource Modal */}
-      {isEditModalOpen && editingResource && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Edit Resource</h3>
-              <button
-                onClick={handleCancelEdit}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                  <input
-                    type="text"
-                    value={editingResource.title}
-                    onChange={(e) => setEditingResource({...editingResource, title: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="Enter resource title"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <input
-                    type="text"
-                    value={editingResource.type || ""}
-                    onChange={(e) => setEditingResource({...editingResource, type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., E-book, Video, Repository"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea
-                  value={editingResource.description}
-                  onChange={(e) => setEditingResource({...editingResource, description: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                  rows="3"
-                  placeholder="Describe what this resource provides..."
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Format</label>
-                  <input
-                    type="text"
-                    value={editingResource.format || ""}
-                    onChange={(e) => setEditingResource({...editingResource, format: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., PDF, MP4, Web App"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Duration/Size</label>
-                  <input
-                    type="text"
-                    value={editingResource.duration || editingResource.size || ""}
-                    onChange={(e) => setEditingResource({...editingResource, duration: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., 45 minutes, 10MB"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Resource Link</label>
-                <input
-                  type="url"
-                  value={editingResource.link}
-                  onChange={(e) => setEditingResource({...editingResource, link: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                  placeholder="https://example.com/resource"
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Author/Creator</label>
-                  <input
-                    type="text"
-                    value={editingResource.author || editingResource.creator || ""}
-                    onChange={(e) => setEditingResource({...editingResource, author: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., John Doe, MIT"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Language/Tech</label>
-                  <input
-                    type="text"
-                    value={editingResource.language || editingResource.technology || ""}
-                    onChange={(e) => setEditingResource({...editingResource, language: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                    placeholder="e.g., JavaScript, English"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Features/Tags</label>
-                <input
-                  type="text"
-                  value={editingResource.features || editingResource.tags || ""}
-                  onChange={(e) => setEditingResource({...editingResource, features: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4D869C] text-sm"
-                  placeholder="e.g., Real-time simulation, Interactive"
-                />
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={editingResource.isDownloadable || false}
-                    onChange={(e) => setEditingResource({...editingResource, isDownloadable: e.target.checked})}
-                    className="w-4 h-4 border-gray-300 rounded"
-                    style={{ accentColor: "#4D869C" }}
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Downloadable</span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={editingResource.isFree || false}
-                    onChange={(e) => setEditingResource({...editingResource, isFree: e.target.checked})}
-                    className="w-4 h-4 border-gray-300 rounded"
-                    style={{ accentColor: "#4D869C" }}
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Free</span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={editingResource.isInteractive || false}
-                    onChange={(e) => setEditingResource({...editingResource, isInteractive: e.target.checked})}
-                    className="w-4 h-4 border-gray-300 rounded"
-                    style={{ accentColor: "#4D869C" }}
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Interactive</span>
-                </label>
-              </div>
-
-              {/* Custom Fields Section */}
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-sm font-medium text-gray-700">Custom Fields</h4>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newCustomField = { 
-                        id: Date.now(), 
-                        key: '', 
-                        value: '' 
-                      };
-                      setEditingResource({
-                        ...editingResource, 
-                        customFields: [...(editingResource.customFields || []), newCustomField]
-                      });
-                    }}
-                    className="text-xs px-2 py-1 rounded transition-colors text-white"
-                    style={{ backgroundColor: "#4D869C" }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
-                  >
-                    + Add Custom Field
-                  </button>
-                </div>
-                
-                {editingResource.customFields?.map((field, index) => (
-                  <div key={field.id} className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
-                    <input
-                      type="text"
-                      placeholder="Field Name (e.g., Price)"
-                      value={field.key}
-                      onChange={(e) => {
-                        const updatedFields = [...(editingResource.customFields || [])];
-                        updatedFields[index].key = e.target.value;
-                        setEditingResource({...editingResource, customFields: updatedFields});
-                      }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4D869C] text-xs"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Field Value (e.g., $99)"
-                      value={field.value}
-                      onChange={(e) => {
-                        const updatedFields = [...(editingResource.customFields || [])];
-                        updatedFields[index].value = e.target.value;
-                        setEditingResource({...editingResource, customFields: updatedFields});
-                      }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#4D869C] text-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updatedFields = (editingResource.customFields || []).filter((_, i) => i !== index);
-                        setEditingResource({...editingResource, customFields: updatedFields});
-                      }}
-                      className="px-2 py-2 text-red-600 hover:bg-red-50 rounded transition-colors text-xs"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                
-                {(!editingResource.customFields || editingResource.customFields.length === 0) && (
-                  <p className="text-xs text-gray-500 italic">No custom fields added. Click "Add Custom Field" to create one.</p>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={handleSaveEdit}
-                className="flex-1 text-white py-2 px-4 rounded-lg transition-colors text-sm"
-                style={{ backgroundColor: "#4D869C" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
-              >
-                Save Changes
-              </button>
-              <button
-                onClick={handleCancelEdit}
-                className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors text-sm"
-              >
-                Cancel
               </button>
             </div>
           </div>

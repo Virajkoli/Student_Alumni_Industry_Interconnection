@@ -24,7 +24,7 @@ import {
 
 // Map skill names to specific Lucide icons for a professional look
 const iconMap = {
-  "Artificial Intelligence": <Bot className="w-6 h-6 text-[#4D869C]" />,
+  "Artificial Intelligence": <Bot className="w-6 h-6 text-blue-500" />,
   "Product Management": <ClipboardList className="w-6 h-6 text-purple-500" />,
   "Data Science": <BarChart className="w-6 h-6 text-green-500" />,
   "UI/UX Design": <Palette className="w-6 h-6 text-orange-500" />,
@@ -76,7 +76,7 @@ const JobsSkills = () => {
     ],
     marketStats: [
       {
-        icon: <Briefcase className="w-8 h-8 text-[#4D869C]" />,
+        icon: <Briefcase className="w-8 h-8 text-blue-500" />,
         value: "2,500+",
         label: "Active Jobs",
       },
@@ -404,7 +404,7 @@ const JobsSkills = () => {
       <div className="mt-auto pt-6 flex items-center gap-3">
         <button
           onClick={() => onLearnClick(skill)}
-          className="w-full py-2.5 px-4 bg-[#4D869C] text-white font-semibold rounded-lg hover:bg-[#3a6b7a] transition-colors duration-300 flex items-center justify-center gap-2"
+          className="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center gap-2"
         >
           Learn Skill
         </button>
@@ -523,7 +523,7 @@ const JobsSkills = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center">
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <Clock className="w-6 h-6 text-[#4D869C] mx-auto mb-1" />
+                  <Clock className="w-6 h-6 text-blue-500 mx-auto mb-1" />
                   <p className="font-semibold">{path.duration}</p>
                   <p className="text-xs text-gray-500">Duration</p>
                 </div>
@@ -559,7 +559,7 @@ const JobsSkills = () => {
               href={path.courseUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="py-2.5 px-6 bg-[#4D869C] text-white font-semibold rounded-lg hover:bg-[#3a6b7a] transition-colors duration-300 flex items-center gap-2"
+              className="py-2.5 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center gap-2"
             >
               <PlayCircle className="w-5 h-5" />
               Start Learning Path
@@ -636,7 +636,7 @@ const JobsSkills = () => {
                           href={job.applyUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="py-2 px-4 bg-[#4D869C] text-white font-semibold rounded-lg hover:bg-[#3a6b7a] transition-colors duration-300 text-sm"
+                          className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 text-sm"
                         >
                           Apply Now
                         </a>
@@ -679,7 +679,7 @@ const JobsSkills = () => {
                       onChange={(e) =>
                         setEditedJob({ ...editedJob, title: e.target.value })
                       }
-                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:outline-none"
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -692,7 +692,7 @@ const JobsSkills = () => {
                       onChange={(e) =>
                         setEditedJob({ ...editedJob, company: e.target.value })
                       }
-                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:outline-none"
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -705,7 +705,7 @@ const JobsSkills = () => {
                       onChange={(e) =>
                         setEditedJob({ ...editedJob, location: e.target.value })
                       }
-                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:outline-none"
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -718,7 +718,7 @@ const JobsSkills = () => {
                       onChange={(e) =>
                         setEditedJob({ ...editedJob, salary: e.target.value })
                       }
-                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:outline-none"
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -733,7 +733,7 @@ const JobsSkills = () => {
                           description: e.target.value,
                         })
                       }
-                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:outline-none"
+                      className="block w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       rows="3"
                     ></textarea>
                   </div>
@@ -747,7 +747,7 @@ const JobsSkills = () => {
                   </button>
                   <button
                     onClick={handleSaveClick}
-                    className="py-2 px-4 bg-[#4D869C] text-white font-semibold rounded-lg hover:bg-[#3a6b7a] transition-colors duration-300"
+                    className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300"
                   >
                     Save Changes
                   </button>
@@ -761,22 +761,13 @@ const JobsSkills = () => {
   };
 
   return (
-    <div className="p-6 sm:p-6 lg:p-8" style={{ backgroundColor: "#EEE7FF" }}>
+    <div className="p-6 bg-gray-50/50 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-12 relative">
           {/* Edit button positioned at top right */}
           <button
             onClick={handleEditClick}
-            className="absolute top-0 right-0 p-2 text-gray-500 transition-colors duration-200 rounded-lg"
-            style={{ color: "#4D869C" }}
-            onMouseEnter={(e) => {
-              e.target.style.color = "#3a6b7a";
-              e.target.style.backgroundColor = "#f3f0ff";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.color = "#4D869C";
-              e.target.style.backgroundColor = "transparent";
-            }}
+            className="absolute top-0 right-0 p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
             title="Edit Content"
           >
             <Edit size={20} />
@@ -801,7 +792,7 @@ const JobsSkills = () => {
           ))}
         </div>
 
-        <div className="bg-gradient-to-r from-gray-100 to-[#EEE7FF] rounded-2xl p-8">
+        <div className="bg-gradient-to-r from-gray-100 to-blue-50 rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-gray-800 text-center mb-8">
             Market Statistics
           </h2>
@@ -854,7 +845,7 @@ const JobsSkills = () => {
                     onChange={(e) =>
                       setEditContent({ ...editContent, title: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     placeholder="Enter section title"
                   />
                 </div>
@@ -873,7 +864,7 @@ const JobsSkills = () => {
                       })
                     }
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
                     placeholder="Enter section description"
                   />
                 </div>
@@ -911,7 +902,7 @@ const JobsSkills = () => {
                                   marketStats: newStats,
                                 });
                               }}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                           </div>
                           <div>
@@ -935,7 +926,7 @@ const JobsSkills = () => {
                                   marketStats: newStats,
                                 });
                               }}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                           </div>
                         </div>
@@ -978,7 +969,7 @@ const JobsSkills = () => {
                                     trendingSkills: newSkills,
                                   });
                                 }}
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                               />
                             </div>
                             <div>
@@ -1001,7 +992,7 @@ const JobsSkills = () => {
                                     trendingSkills: newSkills,
                                   });
                                 }}
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                               >
                                 <option value="High">High</option>
                                 <option value="Medium">Medium</option>
@@ -1031,7 +1022,7 @@ const JobsSkills = () => {
                                     trendingSkills: newSkills,
                                   });
                                 }}
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                               />
                             </div>
                             <div>
@@ -1055,7 +1046,7 @@ const JobsSkills = () => {
                                     trendingSkills: newSkills,
                                   });
                                 }}
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                               />
                             </div>
                           </div>
@@ -1071,7 +1062,7 @@ const JobsSkills = () => {
                                 onClick={() =>
                                   handleAddCustomFieldToSkill(index)
                                 }
-                                className="px-2 py-1 text-xs bg-[#4D869C] text-white rounded hover:bg-[#3a6b7a] transition-colors"
+                                className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                               >
                                 Add Field
                               </button>
@@ -1094,7 +1085,7 @@ const JobsSkills = () => {
                                       )
                                     }
                                     placeholder="Field name"
-                                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                   />
                                   <input
                                     type="text"
@@ -1108,7 +1099,7 @@ const JobsSkills = () => {
                                       )
                                     }
                                     placeholder="Field value"
-                                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
+                                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                   />
                                   <button
                                     type="button"
@@ -1142,7 +1133,7 @@ const JobsSkills = () => {
               </button>
               <button
                 onClick={handleSaveEdit}
-                className="px-4 py-2 bg-[#4D869C] text-white rounded-lg hover:bg-[#3a6b7a] transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Save size={16} />
                 Save Changes

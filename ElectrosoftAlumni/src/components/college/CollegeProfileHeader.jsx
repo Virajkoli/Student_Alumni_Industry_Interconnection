@@ -3,19 +3,22 @@ import { Star } from "lucide-react";
 
 const NAV_OPTIONS_DEFAULT = [
   { id: "college-info", name: "College Info" },
-  { id: "course-details", name: "Course Details" }, // Added Course Details as a separate tab
+  { id: "course-details", name: "Course Details" },
   { id: "course-fees", name: "Course Fees" },
   { id: "review", name: "Review" },
   { id: "admission", name: "Admission" },
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
+  { id: "hostel", name: "Hostel/Campus" },
+  { id: "alumni", name: "Alumni" },
+  { id: "events", name: "Events" },
   { id: "downloads", name: "Downloads" },
 ];
 
 const QUICK_STATS_DEFAULT = [
   { label: "Projects", value: "120+" },
   { label: "Departments", value: "30" },
-  { label: "Alumni", value: "10,000+" },
+  { label: "Alumni", value: "50,000+" },
   { label: "Rating", value: "4.9" },
 ];
 
@@ -182,23 +185,10 @@ const CollegeProfileHeader = ({
             {headerData.naacRating && (
               <div className="flex items-center text-sm text-blue-600">
                 <div className="flex items-center">
-                  <span className="font-medium text-blue-700 mr-3">NAAC Rating:</span>
-                  <div className="flex items-center space-x-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`w-4 h-4 ${
-                          star <= headerData.naacRating
-                            ? "text-yellow-400 fill-current"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
+                  <span className="font-medium text-blue-700 mr-3">NAAC accredited A++</span>
+                  
                 </div>
-                <span className="ml-2 text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                  {headerData.naacRating}/5
-                </span>
+              
               </div>
             )}
           </div>
@@ -261,7 +251,11 @@ const CollegeProfileHeader = ({
             ) : (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setEditHeader(false);
+                  setShowFloatingForm(false);
+                }}
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
                   activeTab === item.id
                     ? "border-blue-500 text-blue-600 bg-blue-50"

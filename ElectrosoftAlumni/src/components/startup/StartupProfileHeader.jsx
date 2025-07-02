@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { Edit3, X, MapPin, Phone, Mail, Globe, Camera, Plus, Star } from "lucide-react";
+import {
+  Edit3,
+  X,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Camera,
+  Plus,
+  Star,
+} from "lucide-react";
 
-const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, customNavigations = [], onCustomNavigationUpdate }) => {
+const HorizontalProfileNavbar = ({
+  onNavigationChange,
+  navigationOptions,
+  customNavigations = [],
+  onCustomNavigationUpdate,
+}) => {
   const [activeItem, setActiveItem] = useState("posts");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isNewNavModalOpen, setIsNewNavModalOpen] = useState(false);
   const [newNavData, setNewNavData] = useState({
     name: "",
     contentType: "text",
-    content: ""
+    content: "",
   });
   const [editingCustomNav, setEditingCustomNav] = useState(null);
   const [isEditingCustomNav, setIsEditingCustomNav] = useState(false);
@@ -21,15 +36,18 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, custom
       setNewNavData({
         name: customNavItem.name,
         contentType: customNavItem.contentType,
-        content: customNavItem.content
+        content: customNavItem.content,
       });
       setIsEditingCustomNav(true);
     };
 
-    window.addEventListener('editCustomNavigation', handleEditCustomNavigation);
-    
+    window.addEventListener("editCustomNavigation", handleEditCustomNavigation);
+
     return () => {
-      window.removeEventListener('editCustomNavigation', handleEditCustomNavigation);
+      window.removeEventListener(
+        "editCustomNavigation",
+        handleEditCustomNavigation
+      );
     };
   }, []);
 
@@ -37,7 +55,7 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, custom
     firstName: "Electrosoft",
     lastName: "",
     headline: "Startup Founder, Innovator, and Entrepreneur",
-    
+
     location: "Mumbai",
     city: "Maharashtra",
     phone: "+91 98765 43210",
@@ -48,69 +66,68 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, custom
   });
   const [editData, setEditData] = useState({ ...profileData });
 
-const navigationItems = [
-  {
-    id: "posts",
-    name: "Posts",
-    shortName: "Posts",
-  },
-  {
-    id: "startup-ecosystem",
-    name: "Startup Ecosystem Overview",
-    shortName: "Overview",
-  },
-  // {
-  //   id: "growth-marketing",
-  //   name: "Growth & Marketing Strategies",
-  //   shortName: "Growth",
-  // },
-  {
-    id: "funding-investment",
-    name: "Funding and Investment",
-    shortName: "Funding",
-  },
-  {
-    id: "tools-resources",
-    name: "Tools & Resources",
-    shortName: "Resources",
-  },
-  // {
-  //   id: "faqs",
-  //   name: "FAQs",
-  //   shortName: "FAQs",
-  // },
-  // {
-  //   id: "government-policies",
-  //   name: "Government Policies & Tax Benefits",
-  //   shortName: "Policies",
-  // },
-  {
-    id: "launch-steps",
-    name: "Steps to Launch",
-    shortName: "Launch",
-  },
-  // {
-  //   id: "startup-quiz",
-  //   name: "Startup Quiz",
-  //   shortName: "Quiz",
-  // },
-  {
-    id: "how-it-works",
-    name: "How It Works",
-    shortName: "How-To",
-  },
-  // {
-  //   id: "industries",
-  //   name: "Industries",
-  //   shortName: "Sectors",
-  // },
-  {
-    id: "jobs-skills",
-    name: "Jobs & Trending Skills",
-    shortName: "Jobs",
-  },
-];
-
+  const navigationItems = [
+    {
+      id: "posts",
+      name: "Posts",
+      shortName: "Posts",
+    },
+    {
+      id: "startup-ecosystem",
+      name: "Startup Ecosystem Overview",
+      shortName: "Overview",
+    },
+    // {
+    //   id: "growth-marketing",
+    //   name: "Growth & Marketing Strategies",
+    //   shortName: "Growth",
+    // },
+    {
+      id: "funding-investment",
+      name: "Funding and Investment",
+      shortName: "Funding",
+    },
+    {
+      id: "tools-resources",
+      name: "Tools & Resources",
+      shortName: "Resources",
+    },
+    // {
+    //   id: "faqs",
+    //   name: "FAQs",
+    //   shortName: "FAQs",
+    // },
+    // {
+    //   id: "government-policies",
+    //   name: "Government Policies & Tax Benefits",
+    //   shortName: "Policies",
+    // },
+    {
+      id: "launch-steps",
+      name: "Steps to Launch",
+      shortName: "Launch",
+    },
+    // {
+    //   id: "startup-quiz",
+    //   name: "Startup Quiz",
+    //   shortName: "Quiz",
+    // },
+    {
+      id: "how-it-works",
+      name: "How It Works",
+      shortName: "How-To",
+    },
+    // {
+    //   id: "industries",
+    //   name: "Industries",
+    //   shortName: "Sectors",
+    // },
+    {
+      id: "jobs-skills",
+      name: "Jobs & Trending Skills",
+      shortName: "Jobs",
+    },
+  ];
 
   // Combine default and custom navigation items
   const allNavigationItems = [...navigationItems, ...customNavigations];
@@ -136,20 +153,23 @@ const navigationItems = [
       const newNavItem = {
         id: `custom-${Date.now()}`,
         name: newNavData.name,
-        shortName: newNavData.name.length > 15 ? newNavData.name.substring(0, 12) + "..." : newNavData.name,
+        shortName:
+          newNavData.name.length > 15
+            ? newNavData.name.substring(0, 12) + "..."
+            : newNavData.name,
         contentType: newNavData.contentType,
         content: newNavData.content,
-        isCustom: true
+        isCustom: true,
       };
-      
+
       // Update the parent component's custom navigation state
       if (onCustomNavigationUpdate) {
-        onCustomNavigationUpdate(prev => [...prev, newNavItem]);
+        onCustomNavigationUpdate((prev) => [...prev, newNavItem]);
       }
-      
+
       setNewNavData({ name: "", contentType: "text", content: "" });
       setIsNewNavModalOpen(false);
-      
+
       // Automatically switch to the new navigation
       setActiveItem(newNavItem.id);
       if (onNavigationChange) {
@@ -172,29 +192,35 @@ const navigationItems = [
         ...editingCustomNav,
         name: newNavData.name,
         contentType: newNavData.contentType,
-        content: newNavData.content
+        content: newNavData.content,
       };
 
       // Update the parent component's custom navigation state
       if (onCustomNavigationUpdate) {
-        onCustomNavigationUpdate(prev => 
-          prev.map(nav => nav.id === editingCustomNav.id ? updatedNavItem : nav)
+        onCustomNavigationUpdate((prev) =>
+          prev.map((nav) =>
+            nav.id === editingCustomNav.id ? updatedNavItem : nav
+          )
         );
       }
 
       setNewNavData({ name: "", contentType: "text", content: "" });
       setIsEditingCustomNav(false);
       setEditingCustomNav(null);
-      
+
       // Refresh the current view if this was the active navigation
       if (activeItem === editingCustomNav.id && onNavigationChange) {
-        onNavigationChange(updatedNavItem.id, updatedNavItem.name, updatedNavItem);
+        onNavigationChange(
+          updatedNavItem.id,
+          updatedNavItem.name,
+          updatedNavItem
+        );
       }
     }
   };
 
   const handleNewNavInputChange = (field, value) => {
-    setNewNavData(prev => ({ ...prev, [field]: value }));
+    setNewNavData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleEditClick = () => {
@@ -218,13 +244,14 @@ const navigationItems = [
 
   return (
     <>
-      <div className="rounded-xl shadow-sm border border-gray-900 overflow-hidden mb-6"
-           style={{ backgroundColor: "#EEE7FF" }}>
+      <div
+        className="rounded-xl shadow-sm overflow-hidden mb-6"
+        style={{ backgroundColor: "#EEE7FF" }}
+      >
         {/* Profile Header - Horizontal */}
         <div className="relative">
           {/* Increased height from h-24 to h-32 */}
-          <div className="h-44"
-               style={{ backgroundColor: "#CDE8E5" }}></div>
+          <div className="h-44" style={{ backgroundColor: "#CDE8E5" }}></div>
           {/* Edit Button */}
           <button
             onClick={handleEditClick}
@@ -266,10 +293,16 @@ const navigationItems = [
               </div>
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
-              <button className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200"
-                      style={{ backgroundColor: "#4D869C" }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}>
+              <button
+                className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200"
+                style={{ backgroundColor: "#4D869C" }}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#3a6b7a")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#4D869C")
+                }
+              >
                 Connect
               </button>
             </div>
@@ -293,7 +326,10 @@ const navigationItems = [
         </div>
 
         {/* Navigation Items - Horizontal LinkedIn Style */}
-        <div className="border-b border-gray-200" style={{ backgroundColor: "#EEE7FF" }}>
+        <div
+          className="border-b border-gray-200"
+          style={{ backgroundColor: "#EEE7FF" }}
+        >
           <div className="flex overflow-x-auto">
             {allNavigationItems.map((item) => (
               <button
@@ -304,10 +340,14 @@ const navigationItems = [
                     ? "text-white"
                     : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
                 }`}
-                style={activeItem === item.id ? { 
-                  borderBottomColor: "#4D869C", 
-                  backgroundColor: "#4D869C" 
-                } : {}}
+                style={
+                  activeItem === item.id
+                    ? {
+                        borderBottomColor: "#4D869C",
+                        backgroundColor: "#4D869C",
+                      }
+                    : {}
+                }
               >
                 {item.shortName}
               </button>
@@ -356,10 +396,16 @@ const navigationItems = [
                       }}
                     />
                   </div>
-                  <button className="absolute -bottom-1 -right-1 p-1.5 text-white rounded-full transition-colors"
-                          style={{ backgroundColor: "#4D869C" }}
-                          onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
-                          onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}>
+                  <button
+                    className="absolute -bottom-1 -right-1 p-1.5 text-white rounded-full transition-colors"
+                    style={{ backgroundColor: "#4D869C" }}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = "#3a6b7a")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = "#4D869C")
+                    }
+                  >
                     <Camera className="w-3 h-3" />
                   </button>
                 </div>
@@ -537,8 +583,12 @@ const navigationItems = [
                 onClick={handleSaveProfile}
                 className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
                 style={{ backgroundColor: "#4D869C" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#3a6b7a"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#4D869C"}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#3a6b7a")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#4D869C")
+                }
               >
                 Save Changes
               </button>
@@ -554,7 +604,9 @@ const navigationItems = [
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {isEditingCustomNav ? "Edit Navigation" : "Add New Navigation"}
+                  {isEditingCustomNav
+                    ? "Edit Navigation"
+                    : "Add New Navigation"}
                 </h2>
                 <button
                   onClick={handleCancelNewNavigation}
@@ -574,7 +626,9 @@ const navigationItems = [
                 <input
                   type="text"
                   value={newNavData.name}
-                  onChange={(e) => handleNewNavInputChange("name", e.target.value)}
+                  onChange={(e) =>
+                    handleNewNavInputChange("name", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                   placeholder="Enter navigation name"
                   maxLength={50}
@@ -591,12 +645,16 @@ const navigationItems = [
                 </label>
                 <select
                   value={newNavData.contentType}
-                  onChange={(e) => handleNewNavInputChange("contentType", e.target.value)}
+                  onChange={(e) =>
+                    handleNewNavInputChange("contentType", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                 >
                   <option value="text">Simple Text Content</option>
                   <option value="html">Rich Text/HTML</option>
-                  <option value="structured">Structured Section (Cards/Lists)</option>
+                  <option value="structured">
+                    Structured Section (Cards/Lists)
+                  </option>
                   <option value="dashboard">Dashboard with Stats</option>
                   <option value="form">Interactive Form</option>
                   <option value="gallery">Image/Video Gallery</option>
@@ -614,7 +672,9 @@ const navigationItems = [
                   </label>
                   <select
                     value={newNavData.layoutStyle || "cards"}
-                    onChange={(e) => handleNewNavInputChange("layoutStyle", e.target.value)}
+                    onChange={(e) =>
+                      handleNewNavInputChange("layoutStyle", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                   >
                     <option value="cards">Card Layout</option>
@@ -632,7 +692,9 @@ const navigationItems = [
                 </label>
                 <select
                   value={newNavData.bgStyle || "default"}
-                  onChange={(e) => handleNewNavInputChange("bgStyle", e.target.value)}
+                  onChange={(e) =>
+                    handleNewNavInputChange("bgStyle", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                 >
                   <option value="default">Default (Light)</option>
@@ -648,29 +710,33 @@ const navigationItems = [
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Content *
                 </label>
-                
+
                 {/* Simple Text Content */}
                 {newNavData.contentType === "text" && (
                   <textarea
                     value={newNavData.content}
-                    onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                    onChange={(e) =>
+                      handleNewNavInputChange("content", e.target.value)
+                    }
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                     placeholder="Enter your text content..."
                   />
                 )}
-                
+
                 {/* HTML Content */}
                 {newNavData.contentType === "html" && (
                   <textarea
                     value={newNavData.content}
-                    onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                    onChange={(e) =>
+                      handleNewNavInputChange("content", e.target.value)
+                    }
                     rows={6}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none font-mono text-sm"
                     placeholder="Enter HTML content..."
                   />
                 )}
-                
+
                 {/* Structured Section Content */}
                 {newNavData.contentType === "structured" && (
                   <div className="space-y-4">
@@ -681,7 +747,12 @@ const navigationItems = [
                       <input
                         type="text"
                         value={newNavData.sectionTitle || ""}
-                        onChange={(e) => handleNewNavInputChange("sectionTitle", e.target.value)}
+                        onChange={(e) =>
+                          handleNewNavInputChange(
+                            "sectionTitle",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                         placeholder="e.g., Our Services, Features, Benefits"
                       />
@@ -695,35 +766,74 @@ const navigationItems = [
                         value={newNavData.structuredTemplate || "services"}
                         onChange={(e) => {
                           const template = e.target.value;
-                          handleNewNavInputChange("structuredTemplate", template);
+                          handleNewNavInputChange(
+                            "structuredTemplate",
+                            template
+                          );
                           // Auto-populate with template data
                           if (template === "services") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.sectionTitle || "Our Services",
-                              items: [
-                                {name: "Web Development", description: "Custom web applications"},
-                                {name: "Mobile Apps", description: "iOS and Android development"},
-                                {name: "Consulting", description: "Strategic technology advice"}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title:
+                                  newNavData.sectionTitle || "Our Services",
+                                items: [
+                                  {
+                                    name: "Web Development",
+                                    description: "Custom web applications",
+                                  },
+                                  {
+                                    name: "Mobile Apps",
+                                    description: "iOS and Android development",
+                                  },
+                                  {
+                                    name: "Consulting",
+                                    description: "Strategic technology advice",
+                                  },
+                                ],
+                              })
+                            );
                           } else if (template === "features") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.sectionTitle || "Key Features",
-                              items: [
-                                {name: "Fast Performance", description: "Lightning-fast loading times"},
-                                {name: "Secure", description: "Bank-level security protocols"},
-                                {name: "Scalable", description: "Grows with your business"}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title:
+                                  newNavData.sectionTitle || "Key Features",
+                                items: [
+                                  {
+                                    name: "Fast Performance",
+                                    description: "Lightning-fast loading times",
+                                  },
+                                  {
+                                    name: "Secure",
+                                    description:
+                                      "Bank-level security protocols",
+                                  },
+                                  {
+                                    name: "Scalable",
+                                    description: "Grows with your business",
+                                  },
+                                ],
+                              })
+                            );
                           } else if (template === "team") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.sectionTitle || "Our Team",
-                              items: [
-                                {name: "John Doe", description: "CEO & Founder"},
-                                {name: "Jane Smith", description: "CTO"},
-                                {name: "Mike Johnson", description: "Lead Developer"}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title: newNavData.sectionTitle || "Our Team",
+                                items: [
+                                  {
+                                    name: "John Doe",
+                                    description: "CEO & Founder",
+                                  },
+                                  { name: "Jane Smith", description: "CTO" },
+                                  {
+                                    name: "Mike Johnson",
+                                    description: "Lead Developer",
+                                  },
+                                ],
+                              })
+                            );
                           }
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
@@ -743,18 +853,32 @@ const navigationItems = [
                           Add Items (up to 6)
                         </label>
                         {[1, 2, 3, 4].map((num) => (
-                          <div key={num} className="grid grid-cols-1 gap-2 p-3 border border-gray-200 rounded-lg">
+                          <div
+                            key={num}
+                            className="grid grid-cols-1 gap-2 p-3 border border-gray-200 rounded-lg"
+                          >
                             <input
                               type="text"
                               placeholder="Item Name/Title"
                               className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                               onChange={(e) => {
-                                const items = JSON.parse(newNavData.content || '{"items":[]}').items || [];
-                                items[num-1] = {...(items[num-1] || {}), name: e.target.value};
-                                handleNewNavInputChange("content", JSON.stringify({
-                                  title: newNavData.sectionTitle || "Custom Section",
-                                  items: items.filter(s => s.name)
-                                }));
+                                const items =
+                                  JSON.parse(
+                                    newNavData.content || '{"items":[]}'
+                                  ).items || [];
+                                items[num - 1] = {
+                                  ...(items[num - 1] || {}),
+                                  name: e.target.value,
+                                };
+                                handleNewNavInputChange(
+                                  "content",
+                                  JSON.stringify({
+                                    title:
+                                      newNavData.sectionTitle ||
+                                      "Custom Section",
+                                    items: items.filter((s) => s.name),
+                                  })
+                                );
                               }}
                             />
                             <textarea
@@ -762,12 +886,23 @@ const navigationItems = [
                               placeholder="Description/Details"
                               className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                               onChange={(e) => {
-                                const items = JSON.parse(newNavData.content || '{"items":[]}').items || [];
-                                items[num-1] = {...(items[num-1] || {}), description: e.target.value};
-                                handleNewNavInputChange("content", JSON.stringify({
-                                  title: newNavData.sectionTitle || "Custom Section",
-                                  items: items.filter(s => s.name)
-                                }));
+                                const items =
+                                  JSON.parse(
+                                    newNavData.content || '{"items":[]}'
+                                  ).items || [];
+                                items[num - 1] = {
+                                  ...(items[num - 1] || {}),
+                                  description: e.target.value,
+                                };
+                                handleNewNavInputChange(
+                                  "content",
+                                  JSON.stringify({
+                                    title:
+                                      newNavData.sectionTitle ||
+                                      "Custom Section",
+                                    items: items.filter((s) => s.name),
+                                  })
+                                );
                               }}
                             />
                           </div>
@@ -776,11 +911,14 @@ const navigationItems = [
                     )}
 
                     <div className="text-xs text-gray-500 bg-green-50 p-3 rounded-lg">
-                      <p>💡 <strong>Preview:</strong> Your content will display as cards with titles and descriptions</p>
+                      <p>
+                        💡 <strong>Preview:</strong> Your content will display
+                        as cards with titles and descriptions
+                      </p>
                     </div>
                   </div>
                 )}
-                
+
                 {/* Dashboard Content */}
                 {newNavData.contentType === "dashboard" && (
                   <div className="space-y-4">
@@ -791,7 +929,12 @@ const navigationItems = [
                       <input
                         type="text"
                         value={newNavData.dashboardTitle || ""}
-                        onChange={(e) => handleNewNavInputChange("dashboardTitle", e.target.value)}
+                        onChange={(e) =>
+                          handleNewNavInputChange(
+                            "dashboardTitle",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                         placeholder="e.g., Performance Dashboard"
                       />
@@ -805,42 +948,103 @@ const navigationItems = [
                         value={newNavData.dashboardTemplate || "business"}
                         onChange={(e) => {
                           const template = e.target.value;
-                          handleNewNavInputChange("dashboardTemplate", template);
+                          handleNewNavInputChange(
+                            "dashboardTemplate",
+                            template
+                          );
                           // Auto-populate with template data
                           if (template === "business") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.dashboardTitle || "Business Dashboard",
-                              stats: [
-                                {label: "Revenue", value: "$45,230", trend: "+12%"},
-                                {label: "Users", value: "1,847", trend: "+8%"},
-                                {label: "Projects", value: "23", trend: "+3"},
-                                {label: "Rating", value: "4.9/5", trend: "+0.2"}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title:
+                                  newNavData.dashboardTitle ||
+                                  "Business Dashboard",
+                                stats: [
+                                  {
+                                    label: "Revenue",
+                                    value: "$45,230",
+                                    trend: "+12%",
+                                  },
+                                  {
+                                    label: "Users",
+                                    value: "1,847",
+                                    trend: "+8%",
+                                  },
+                                  {
+                                    label: "Projects",
+                                    value: "23",
+                                    trend: "+3",
+                                  },
+                                  {
+                                    label: "Rating",
+                                    value: "4.9/5",
+                                    trend: "+0.2",
+                                  },
+                                ],
+                              })
+                            );
                           } else if (template === "startup") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.dashboardTitle || "Startup Metrics",
-                              stats: [
-                                {label: "Total Users", value: "12,847", trend: "+15.2%"},
-                                {label: "Monthly Revenue", value: "$89,234", trend: "+23.5%"},
-                                {label: "Active Projects", value: "47", trend: "+8.1%"},
-                                {label: "Team Members", value: "24", trend: "+2"}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title:
+                                  newNavData.dashboardTitle ||
+                                  "Startup Metrics",
+                                stats: [
+                                  {
+                                    label: "Total Users",
+                                    value: "12,847",
+                                    trend: "+15.2%",
+                                  },
+                                  {
+                                    label: "Monthly Revenue",
+                                    value: "$89,234",
+                                    trend: "+23.5%",
+                                  },
+                                  {
+                                    label: "Active Projects",
+                                    value: "47",
+                                    trend: "+8.1%",
+                                  },
+                                  {
+                                    label: "Team Members",
+                                    value: "24",
+                                    trend: "+2",
+                                  },
+                                ],
+                              })
+                            );
                           } else if (template === "simple") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.dashboardTitle || "Quick Stats",
-                              stats: [
-                                {label: "Total", value: "100", trend: "+5%"},
-                                {label: "Active", value: "85", trend: "+3%"}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title:
+                                  newNavData.dashboardTitle || "Quick Stats",
+                                stats: [
+                                  {
+                                    label: "Total",
+                                    value: "100",
+                                    trend: "+5%",
+                                  },
+                                  {
+                                    label: "Active",
+                                    value: "85",
+                                    trend: "+3%",
+                                  },
+                                ],
+                              })
+                            );
                           }
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                       >
-                        <option value="business">Business Dashboard (4 stats)</option>
-                        <option value="startup">Startup Metrics (4 stats)</option>
+                        <option value="business">
+                          Business Dashboard (4 stats)
+                        </option>
+                        <option value="startup">
+                          Startup Metrics (4 stats)
+                        </option>
                         <option value="simple">Simple Stats (2 stats)</option>
                         <option value="custom">Custom (manual entry)</option>
                       </select>
@@ -853,18 +1057,34 @@ const navigationItems = [
                           Add Statistics (up to 6)
                         </label>
                         {[1, 2, 3, 4].map((num) => (
-                          <div key={num} className="grid grid-cols-3 gap-2 p-3 border border-gray-200 rounded-lg">
+                          <div
+                            key={num}
+                            className="grid grid-cols-3 gap-2 p-3 border border-gray-200 rounded-lg"
+                          >
                             <input
                               type="text"
                               placeholder="Label (e.g., Revenue)"
                               className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                               onChange={(e) => {
-                                const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
-                                stats[num-1] = {...(stats[num-1] || {}), label: e.target.value};
-                                handleNewNavInputChange("content", JSON.stringify({
-                                  title: newNavData.dashboardTitle || "Custom Dashboard",
-                                  stats: stats.filter(s => s.label && s.value)
-                                }));
+                                const stats =
+                                  JSON.parse(
+                                    newNavData.content || '{"stats":[]}'
+                                  ).stats || [];
+                                stats[num - 1] = {
+                                  ...(stats[num - 1] || {}),
+                                  label: e.target.value,
+                                };
+                                handleNewNavInputChange(
+                                  "content",
+                                  JSON.stringify({
+                                    title:
+                                      newNavData.dashboardTitle ||
+                                      "Custom Dashboard",
+                                    stats: stats.filter(
+                                      (s) => s.label && s.value
+                                    ),
+                                  })
+                                );
                               }}
                             />
                             <input
@@ -872,12 +1092,25 @@ const navigationItems = [
                               placeholder="Value (e.g., $45K)"
                               className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                               onChange={(e) => {
-                                const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
-                                stats[num-1] = {...(stats[num-1] || {}), value: e.target.value};
-                                handleNewNavInputChange("content", JSON.stringify({
-                                  title: newNavData.dashboardTitle || "Custom Dashboard",
-                                  stats: stats.filter(s => s.label && s.value)
-                                }));
+                                const stats =
+                                  JSON.parse(
+                                    newNavData.content || '{"stats":[]}'
+                                  ).stats || [];
+                                stats[num - 1] = {
+                                  ...(stats[num - 1] || {}),
+                                  value: e.target.value,
+                                };
+                                handleNewNavInputChange(
+                                  "content",
+                                  JSON.stringify({
+                                    title:
+                                      newNavData.dashboardTitle ||
+                                      "Custom Dashboard",
+                                    stats: stats.filter(
+                                      (s) => s.label && s.value
+                                    ),
+                                  })
+                                );
                               }}
                             />
                             <input
@@ -885,12 +1118,25 @@ const navigationItems = [
                               placeholder="Trend (e.g., +12%)"
                               className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                               onChange={(e) => {
-                                const stats = JSON.parse(newNavData.content || '{"stats":[]}').stats || [];
-                                stats[num-1] = {...(stats[num-1] || {}), trend: e.target.value};
-                                handleNewNavInputChange("content", JSON.stringify({
-                                  title: newNavData.dashboardTitle || "Custom Dashboard",
-                                  stats: stats.filter(s => s.label && s.value)
-                                }));
+                                const stats =
+                                  JSON.parse(
+                                    newNavData.content || '{"stats":[]}'
+                                  ).stats || [];
+                                stats[num - 1] = {
+                                  ...(stats[num - 1] || {}),
+                                  trend: e.target.value,
+                                };
+                                handleNewNavInputChange(
+                                  "content",
+                                  JSON.stringify({
+                                    title:
+                                      newNavData.dashboardTitle ||
+                                      "Custom Dashboard",
+                                    stats: stats.filter(
+                                      (s) => s.label && s.value
+                                    ),
+                                  })
+                                );
                               }}
                             />
                           </div>
@@ -899,11 +1145,14 @@ const navigationItems = [
                     )}
 
                     <div className="text-xs text-gray-500 bg-blue-50 p-3 rounded-lg">
-                      <p>💡 <strong>Dashboard Preview:</strong> Your dashboard will display beautiful stat cards with the data above</p>
+                      <p>
+                        💡 <strong>Dashboard Preview:</strong> Your dashboard
+                        will display beautiful stat cards with the data above
+                      </p>
                     </div>
                   </div>
                 )}
-                
+
                 {/* Form Content */}
                 {newNavData.contentType === "form" && (
                   <div className="space-y-4">
@@ -914,7 +1163,9 @@ const navigationItems = [
                       <input
                         type="text"
                         value={newNavData.formTitle || ""}
-                        onChange={(e) => handleNewNavInputChange("formTitle", e.target.value)}
+                        onChange={(e) =>
+                          handleNewNavInputChange("formTitle", e.target.value)
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                         placeholder="e.g., Contact Us, Registration Form"
                       />
@@ -931,35 +1182,98 @@ const navigationItems = [
                           handleNewNavInputChange("formTemplate", template);
                           // Auto-populate with template data
                           if (template === "contact") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.formTitle || "Contact Us",
-                              fields: [
-                                {type: "text", label: "Full Name", required: true},
-                                {type: "email", label: "Email Address", required: true},
-                                {type: "tel", label: "Phone Number", required: false},
-                                {type: "textarea", label: "Message", required: true}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title: newNavData.formTitle || "Contact Us",
+                                fields: [
+                                  {
+                                    type: "text",
+                                    label: "Full Name",
+                                    required: true,
+                                  },
+                                  {
+                                    type: "email",
+                                    label: "Email Address",
+                                    required: true,
+                                  },
+                                  {
+                                    type: "tel",
+                                    label: "Phone Number",
+                                    required: false,
+                                  },
+                                  {
+                                    type: "textarea",
+                                    label: "Message",
+                                    required: true,
+                                  },
+                                ],
+                              })
+                            );
                           } else if (template === "registration") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.formTitle || "Registration",
-                              fields: [
-                                {type: "text", label: "First Name", required: true},
-                                {type: "text", label: "Last Name", required: true},
-                                {type: "email", label: "Email", required: true},
-                                {type: "password", label: "Password", required: true},
-                                {type: "tel", label: "Phone", required: false}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title: newNavData.formTitle || "Registration",
+                                fields: [
+                                  {
+                                    type: "text",
+                                    label: "First Name",
+                                    required: true,
+                                  },
+                                  {
+                                    type: "text",
+                                    label: "Last Name",
+                                    required: true,
+                                  },
+                                  {
+                                    type: "email",
+                                    label: "Email",
+                                    required: true,
+                                  },
+                                  {
+                                    type: "password",
+                                    label: "Password",
+                                    required: true,
+                                  },
+                                  {
+                                    type: "tel",
+                                    label: "Phone",
+                                    required: false,
+                                  },
+                                ],
+                              })
+                            );
                           } else if (template === "feedback") {
-                            handleNewNavInputChange("content", JSON.stringify({
-                              title: newNavData.formTitle || "Feedback Form",
-                              fields: [
-                                {type: "text", label: "Name", required: true},
-                                {type: "select", label: "Rating", options: ["Excellent", "Good", "Average", "Poor"], required: true},
-                                {type: "textarea", label: "Comments", required: true}
-                              ]
-                            }));
+                            handleNewNavInputChange(
+                              "content",
+                              JSON.stringify({
+                                title: newNavData.formTitle || "Feedback Form",
+                                fields: [
+                                  {
+                                    type: "text",
+                                    label: "Name",
+                                    required: true,
+                                  },
+                                  {
+                                    type: "select",
+                                    label: "Rating",
+                                    options: [
+                                      "Excellent",
+                                      "Good",
+                                      "Average",
+                                      "Poor",
+                                    ],
+                                    required: true,
+                                  },
+                                  {
+                                    type: "textarea",
+                                    label: "Comments",
+                                    required: true,
+                                  },
+                                ],
+                              })
+                            );
                           }
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
@@ -973,17 +1287,22 @@ const navigationItems = [
                     </div>
 
                     <div className="text-xs text-gray-500 bg-purple-50 p-3 rounded-lg">
-                      <p>💡 <strong>Form Preview:</strong> Creates an interactive form with the selected fields</p>
+                      <p>
+                        💡 <strong>Form Preview:</strong> Creates an interactive
+                        form with the selected fields
+                      </p>
                     </div>
                   </div>
                 )}
-                
+
                 {/* Gallery Content */}
                 {newNavData.contentType === "gallery" && (
                   <div className="space-y-4">
                     <textarea
                       value={newNavData.content}
-                      onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                      onChange={(e) =>
+                        handleNewNavInputChange("content", e.target.value)
+                      }
                       rows={6}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                       placeholder="Enter gallery items as JSON...&#10;Example:&#10;{&#10;  'title': 'Project Gallery',&#10;  'items': [&#10;    {'type': 'image', 'url': 'https://...', 'title': 'Project 1'},&#10;    {'type': 'video', 'url': 'https://...', 'title': 'Demo Video'}&#10;  ]&#10;}"
@@ -993,36 +1312,45 @@ const navigationItems = [
                     </div>
                   </div>
                 )}
-                
+
                 {/* Timeline Content */}
                 {newNavData.contentType === "timeline" && (
                   <div className="space-y-4">
                     <textarea
                       value={newNavData.content}
-                      onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                      onChange={(e) =>
+                        handleNewNavInputChange("content", e.target.value)
+                      }
                       rows={6}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none resize-none"
                       placeholder="Enter timeline steps as JSON...&#10;Example:&#10;{&#10;  'title': 'Product Development',&#10;  'steps': [&#10;    {'step': 1, 'title': 'Research', 'description': 'Market research phase'},&#10;    {'step': 2, 'title': 'Design', 'description': 'UI/UX design phase'}&#10;  ]&#10;}"
                     />
                     <div className="text-xs text-gray-500">
-                      <p>💡 Perfect for: Process flows, roadmaps, step-by-step guides</p>
+                      <p>
+                        💡 Perfect for: Process flows, roadmaps, step-by-step
+                        guides
+                      </p>
                     </div>
                   </div>
                 )}
-                
+
                 {/* Link/Document URL Input */}
-                {(newNavData.contentType === "link" || newNavData.contentType === "document") && (
+                {(newNavData.contentType === "link" ||
+                  newNavData.contentType === "document") && (
                   <input
                     type="url"
                     value={newNavData.content}
-                    onChange={(e) => handleNewNavInputChange("content", e.target.value)}
+                    onChange={(e) =>
+                      handleNewNavInputChange("content", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4D869C] focus:border-[#4D869C] outline-none"
                     placeholder={`Enter ${newNavData.contentType} URL...`}
                   />
                 )}
-                
+
                 {/* Character/Content Length Display */}
-                {(newNavData.contentType === "text" || newNavData.contentType === "html") && (
+                {(newNavData.contentType === "text" ||
+                  newNavData.contentType === "html") && (
                   <p className="text-xs text-gray-500 mt-1">
                     {newNavData.content.length}/2000 characters
                   </p>
@@ -1037,21 +1365,41 @@ const navigationItems = [
                   </label>
                   <div className="border border-gray-200 rounded-lg p-3 bg-gray-50 max-h-32 overflow-y-auto">
                     {newNavData.contentType === "text" && (
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{newNavData.content}</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                        {newNavData.content}
+                      </p>
                     )}
                     {newNavData.contentType === "html" && (
-                      <div className="text-sm" dangerouslySetInnerHTML={{ __html: newNavData.content }} />
+                      <div
+                        className="text-sm"
+                        dangerouslySetInnerHTML={{ __html: newNavData.content }}
+                      />
                     )}
                     {newNavData.contentType === "link" && (
-                      <a href={newNavData.content} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
+                      <a
+                        href={newNavData.content}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline text-sm"
+                      >
                         {newNavData.content}
                       </a>
                     )}
                     {newNavData.contentType === "image" && (
-                      <img src={newNavData.content} alt="Preview" className="max-w-full h-20 object-cover rounded" onError={(e) => {e.target.style.display = 'none'}} />
+                      <img
+                        src={newNavData.content}
+                        alt="Preview"
+                        className="max-w-full h-20 object-cover rounded"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
+                      />
                     )}
-                    {(newNavData.contentType === "video" || newNavData.contentType === "document") && (
-                      <p className="text-sm text-gray-600">{newNavData.contentType}: {newNavData.content}</p>
+                    {(newNavData.contentType === "video" ||
+                      newNavData.contentType === "document") && (
+                      <p className="text-sm text-gray-600">
+                        {newNavData.contentType}: {newNavData.content}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -1067,7 +1415,11 @@ const navigationItems = [
                 Cancel
               </button>
               <button
-                onClick={isEditingCustomNav ? handleSaveCustomNavEdit : handleSaveNewNavigation}
+                onClick={
+                  isEditingCustomNav
+                    ? handleSaveCustomNavEdit
+                    : handleSaveNewNavigation
+                }
                 disabled={!newNavData.name.trim() || !newNavData.content.trim()}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
               >

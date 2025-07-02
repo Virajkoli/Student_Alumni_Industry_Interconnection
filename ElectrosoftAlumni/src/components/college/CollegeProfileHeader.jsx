@@ -185,10 +185,10 @@ const CollegeProfileHeader = ({
             {headerData.naacRating && (
               <div className="flex items-center text-sm text-blue-600">
                 <div className="flex items-center">
-                  <span className="font-medium text-blue-700 mr-3">NAAC accredited A++</span>
-                  
+                  <span className="font-medium text-blue-700 mr-3">
+                    NAAC accredited {headerData.naacRating}
+                  </span>
                 </div>
-              
               </div>
             )}
           </div>
@@ -326,20 +326,15 @@ const CollegeProfileHeader = ({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-blue-700 mb-2">
-                    NAAC Accreditation (Stars)
+                    NAAC Accreditation
                   </label>
-                  <select
+                  <input
+                    type="text"
                     value={headerData.naacRating || ""}
-                    onChange={(e) => handleHeaderChange("naacRating", parseInt(e.target.value) || "")}
+                    onChange={(e) => handleHeaderChange("naacRating", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  >
-                    <option value="">Select NAAC Rating</option>
-                    <option value="1">1 Star</option>
-                    <option value="2">2 Stars</option>
-                    <option value="3">3 Stars</option>
-                    <option value="4">4 Stars</option>
-                    <option value="5">5 Stars</option>
-                  </select>
+                    placeholder="e.g., A++, A+, A, B++, B+"
+                  />
                 </div>
               </div>
 

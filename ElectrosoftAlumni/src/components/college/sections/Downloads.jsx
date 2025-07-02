@@ -240,10 +240,10 @@ const Downloads = () => {
                   </button>
                   <button
                     onClick={() => {
-                      const link = document.createElement("a");
+                      const link = document.createElement('a');
                       link.href = doc.url;
                       link.download = doc.name;
-                      link.target = "_blank";
+                      link.target = '_blank';
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);

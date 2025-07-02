@@ -37,7 +37,7 @@ const CollegeProfileHeader = ({
     logo,
     background,
     universityAffiliation: "University of Excellence",
-    naacRating: 5,
+    naacRating: "A++",
     quickStats: QUICK_STATS_DEFAULT,
     navOptions: NAV_OPTIONS_DEFAULT,
   });

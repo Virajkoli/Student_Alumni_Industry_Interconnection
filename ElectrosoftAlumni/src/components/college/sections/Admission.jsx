@@ -3,14 +3,14 @@ import { Edit, X, Plus, Minus } from "lucide-react";
 
 const Admission = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  
+
   const [admissionData, setAdmissionData] = useState({
     eligibility: [
       "JEE Main score required for B.Tech admission",
       "GATE score required for M.Tech admission",
       "Minimum 60% in 12th standard for undergraduate programs",
       "Bachelor's degree with 50% marks for postgraduate programs",
-      "Valid entrance exam scores as per university guidelines"
+      "Valid entrance exam scores as per university guidelines",
     ],
     steps: [
       "Register on the official admission portal",
@@ -20,7 +20,7 @@ const Admission = () => {
       "Submit the application before the deadline",
       "Attend counseling sessions as per merit list",
       "Complete document verification process",
-      "Pay admission fees to confirm seat"
+      "Pay admission fees to confirm seat",
     ],
     dates: [
       "Application Start Date: March 15, 2024",
@@ -28,436 +28,687 @@ const Admission = () => {
       "Entrance Exam Date: June 15-20, 2024",
       "Result Declaration: July 10, 2024",
       "Counseling Rounds: July 25 - August 15, 2024",
-      "Classes Commence: September 1, 2024"
+      "Classes Commence: September 1, 2024",
     ],
     cutoffTable: [
       {
         year: "2023",
         round1: "#",
         round2: "#",
-        round3: "#"
+        round3: "#",
       },
       {
         year: "2022",
         round1: "#",
         round2: "#",
-        round3: "#"
-      }
+        round3: "#",
+      },
     ],
-    customFields: []
+    customFields: [],
   });
-  
+
   const [editData, setEditData] = useState({ ...admissionData });
 
-  const openEditModal = () => {
+  const handleEditClick = () => {
     setEditData({ ...admissionData });
     setIsEditModalOpen(true);
   };
 
-  const closeEditModal = () => {
+  const handleSave = () => {
+    setAdmissionData({ ...editData });
     setIsEditModalOpen(false);
   };
 
+  const handleCancelEdit = () => {
+    setEditData({ ...admissionData });
+    setIsEditModalOpen(false);
+  };
+
+  // Eligibility handlers
+  const handleAddEligibility = () => {
+    setEditData((prev) => ({
+      ...prev,
+      eligibility: [...prev.eligibility, ""],
+    }));
+  };
+
   const handleEligibilityChange = (index, value) => {
-    const updatedEligibility = [...editData.eligibility];
-    updatedEligibility[index] = value;
-    setEditData({ ...editData, eligibility: updatedEligibility });
+    setEditData((prev) => ({
+      ...prev,
+      eligibility: prev.eligibility.map((item, i) =>
+        i === index ? value : item
+      ),
+    }));
   };
 
-  const addEligibility = () => {
-    setEditData({
-      ...editData,
-      eligibility: [...editData.eligibility, ""]
-    });
+  const handleRemoveEligibility = (index) => {
+    setEditData((prev) => ({
+      ...prev,
+      eligibility: prev.eligibility.filter((_, i) => i !== index),
+    }));
   };
 
-  const removeEligibility = (index) => {
-    const updatedEligibility = [...editData.eligibility];
-    updatedEligibility.splice(index, 1);
-    setEditData({ ...editData, eligibility: updatedEligibility });
+  // Steps handlers
+  const handleAddStep = () => {
+    setEditData((prev) => ({
+      ...prev,
+      steps: [...prev.steps, ""],
+    }));
   };
 
-  const handleStepsChange = (index, value) => {
-    const updatedSteps = [...editData.steps];
-    updatedSteps[index] = value;
-    setEditData({ ...editData, steps: updatedSteps });
+  const handleStepChange = (index, value) => {
+    setEditData((prev) => ({
+      ...prev,
+      steps: prev.steps.map((item, i) => (i === index ? value : item)),
+    }));
   };
 
-  const addStep = () => {
-    setEditData({
-      ...editData,
-      steps: [...editData.steps, ""]
-    });
+  const handleRemoveStep = (index) => {
+    setEditData((prev) => ({
+      ...prev,
+      steps: prev.steps.filter((_, i) => i !== index),
+    }));
   };
 
-  const removeStep = (index) => {
-    const updatedSteps = [...editData.steps];
-    updatedSteps.splice(index, 1);
-    setEditData({ ...editData, steps: updatedSteps });
+  // Dates handlers
+  const handleAddDate = () => {
+    setEditData((prev) => ({
+      ...prev,
+      dates: [...prev.dates, ""],
+    }));
   };
 
-  const handleDatesChange = (index, value) => {
-    const updatedDates = [...editData.dates];
-    updatedDates[index] = value;
-    setEditData({ ...editData, dates: updatedDates });
+  const handleDateChange = (index, value) => {
+    setEditData((prev) => ({
+      ...prev,
+      dates: prev.dates.map((item, i) => (i === index ? value : item)),
+    }));
   };
 
-  const addDate = () => {
-    setEditData({
-      ...editData,
-      dates: [...editData.dates, ""]
-    });
+  const handleRemoveDate = (index) => {
+    setEditData((prev) => ({
+      ...prev,
+      dates: prev.dates.filter((_, i) => i !== index),
+    }));
   };
 
-  const removeDate = (index) => {
-    const updatedDates = [...editData.dates];
-    updatedDates.splice(index, 1);
-    setEditData({ ...editData, dates: updatedDates });
+  // Cutoff table handlers
+  const handleAddCutoffRow = () => {
+    const newRow = {
+      id: Date.now(),
+      year: "",
+      round1: "",
+      round2: "",
+      round3: "",
+    };
+    setEditData((prev) => ({
+      ...prev,
+      cutoffTable: [...prev.cutoffTable, newRow],
+    }));
   };
 
   const handleCutoffChange = (index, field, value) => {
-    const updatedCutoff = [...editData.cutoffTable];
-    updatedCutoff[index] = { ...updatedCutoff[index], [field]: value };
-    setEditData({ ...editData, cutoffTable: updatedCutoff });
+    setEditData((prev) => ({
+      ...prev,
+      cutoffTable: prev.cutoffTable.map((row, i) =>
+        i === index ? { ...row, [field]: value } : row
+      ),
+    }));
   };
 
-  const addCutoffRow = () => {
-    setEditData({
-      ...editData,
-      cutoffTable: [
-        ...editData.cutoffTable,
-        { year: "", round1: "", round2: "", round3: "" }
-      ]
-    });
+  const handleRemoveCutoffRow = (index) => {
+    setEditData((prev) => ({
+      ...prev,
+      cutoffTable: prev.cutoffTable.filter((_, i) => i !== index),
+    }));
   };
 
-  const removeCutoffRow = (index) => {
-    const updatedCutoff = [...editData.cutoffTable];
-    updatedCutoff.splice(index, 1);
-    setEditData({ ...editData, cutoffTable: updatedCutoff });
+  // Custom fields handlers
+  const handleAddCustomField = () => {
+    const newField = {
+      id: Date.now(),
+      label: "",
+      value: "",
+    };
+    setEditData((prev) => ({
+      ...prev,
+      customFields: [...prev.customFields, newField],
+    }));
   };
 
-  const handleCustomFieldChange = (index, field, value) => {
-    const updatedCustomFields = [...editData.customFields];
-    updatedCustomFields[index] = { ...updatedCustomFields[index], [field]: value };
-    setEditData({ ...editData, customFields: updatedCustomFields });
+  const handleCustomFieldChange = (fieldId, property, value) => {
+    setEditData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((field) =>
+        field.id === fieldId ? { ...field, [property]: value } : field
+      ),
+    }));
   };
 
-  const addCustomField = () => {
-    setEditData({
-      ...editData,
-      customFields: [...editData.customFields, { label: "", value: "" }]
-    });
-  };
-
-  const removeCustomField = (index) => {
-    const updatedCustomFields = [...editData.customFields];
-    updatedCustomFields.splice(index, 1);
-    setEditData({ ...editData, customFields: updatedCustomFields });
-  };
-
-  const saveChanges = () => {
-    setAdmissionData({ ...editData });
-    closeEditModal();
+  const handleRemoveCustomField = (fieldId) => {
+    setEditData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((field) => field.id !== fieldId),
+    }));
   };
 
   return (
     <>
-      <div className="bg-white rounded-lg mb-6 p-6 max-w-4xl mx-auto relative">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Admission Details</h2>
-          <button
-            onClick={openEditModal}
-            className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-          >
-            <Edit size={16} /> Edit
-          </button>
-        </div>
-        
-        <div className="space-y-6">
-          {/* Eligibility Criteria */}
-          <div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Eligibility Criteria</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              {admissionData.eligibility.map((criterion, index) => (
-                <li key={index} className="text-gray-600">{criterion}</li>
-              ))}
-            </ul>
+      <div className="p-6 max-w-4xl mx-auto">
+        {/* Admission Section */}
+        <div className="bg-white rounded-lg mb-6">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">Admission</h2>
+            <button
+              onClick={handleEditClick}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Edit admission information"
+            >
+              <Edit className="w-5 h-5" />
+            </button>
           </div>
-          
-          {/* Admission Steps */}
-          <div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Admission Process</h3>
-            <ol className="list-decimal pl-5 space-y-1">
-              {admissionData.steps.map((step, index) => (
-                <li key={index} className="text-gray-600">{step}</li>
-              ))}
-            </ol>
-          </div>
-          
-          {/* Important Dates */}
-          <div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Important Dates</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              {admissionData.dates.map((date, index) => (
-                <li key={index} className="text-gray-600">{date}</li>
-              ))}
-            </ul>
-          </div>
-          
-          {/* Previous Year Cutoffs */}
-          <div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Previous Year Cutoffs</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="py-2 px-4 border-b border-r">Year</th>
-                    <th className="py-2 px-4 border-b border-r">Round 1</th>
-                    <th className="py-2 px-4 border-b border-r">Round 2</th>
-                    <th className="py-2 px-4 border-b">Round 3</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {admissionData.cutoffTable.map((row, index) => (
-                    <tr key={index}>
-                      <td className="py-2 px-4 border-b border-r">{row.year}</td>
-                      <td className="py-2 px-4 border-b border-r">{row.round1}</td>
-                      <td className="py-2 px-4 border-b border-r">{row.round2}</td>
-                      <td className="py-2 px-4 border-b">{row.round3}</td>
-                    </tr>
+
+          {/* Content */}
+          <div className="p-6">
+            {/* Eligibility & Entrance Exams */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Eligibility & Entrance Exams
+              </h3>
+              <div className="space-y-3">
+                {admissionData.eligibility &&
+                  admissionData.eligibility.map((item, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
+                      <p className="text-gray-700 leading-relaxed">{item}</p>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          
-          {/* Custom Fields */}
-          {admissionData.customFields.length > 0 && (
-            <div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Additional Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {admissionData.customFields.map((field, index) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded">
-                    <span className="font-medium text-gray-700">{field.label}: </span>
-                    <span className="text-gray-600">{field.value}</span>
-                  </div>
-                ))}
               </div>
             </div>
-          )}
+
+            {/* Application Steps */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Application Steps
+              </h3>
+              <div className="space-y-3">
+                {admissionData.steps &&
+                  admissionData.steps.map((step, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                        {index + 1}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed pt-0.5">
+                        {step}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Important Dates */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Important Dates
+              </h3>
+              <div className="space-y-3">
+                {admissionData.dates &&
+                  admissionData.dates.map((date, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
+                      <p className="text-gray-700 leading-relaxed">{date}</p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Cut Off Table */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Cut Off
+              </h3>
+              {admissionData.cutoffTable &&
+                admissionData.cutoffTable.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border border-gray-200 rounded-lg">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="py-3 px-4 text-left text-gray-900 font-semibold border-b border-gray-200">
+                            Year
+                          </th>
+                          <th className="py-3 px-4 text-center text-gray-900 font-semibold border-b border-gray-200">
+                            CAP Round 1
+                          </th>
+                          <th className="py-3 px-4 text-center text-gray-900 font-semibold border-b border-gray-200">
+                            CAP Round 2
+                          </th>
+                          <th className="py-3 px-4 text-center text-gray-900 font-semibold border-b border-gray-200">
+                            CAP Round 3
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {admissionData.cutoffTable.map((row, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="py-3 px-4 font-medium text-gray-900">
+                              {row.year}
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              {row.round1 && row.round1 !== "#" ? (
+                                <a
+                                  href={row.round1}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 underline"
+                                >
+                                  Download PDF
+                                </a>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              {row.round2 && row.round2 !== "#" ? (
+                                <a
+                                  href={row.round2}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 underline"
+                                >
+                                  Download PDF
+                                </a>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              {row.round3 && row.round3 !== "#" ? (
+                                <a
+                                  href={row.round3}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 underline"
+                                >
+                                  Download PDF
+                                </a>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+            </div>
+
+            {/* Custom Fields Display */}
+            {admissionData.customFields &&
+              admissionData.customFields.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">
+                    Additional Information
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {admissionData.customFields.map((field, index) => (
+                      <div key={field.id || index}>
+                        <h5 className="text-sm font-medium text-gray-900 mb-1">
+                          {field.label}
+                        </h5>
+                        <p className="text-sm text-gray-700">{field.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+          </div>
         </div>
       </div>
 
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">Edit Admission Details</h2>
-              <button onClick={closeEditModal} className="text-gray-500 hover:text-gray-700">
-                <X size={24} />
-              </button>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Edit Admission Information
+                </h2>
+                <button
+                  onClick={handleCancelEdit}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
             </div>
-            
-            <div className="space-y-6">
-              {/* Eligibility Criteria */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Eligibility Criteria</h3>
-                {editData.eligibility.map((criterion, index) => (
-                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={criterion}
-                      onChange={(e) => handleEligibilityChange(index, e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded"
-                    />
-                    <button
-                      onClick={() => removeEligibility(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Minus size={20} />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={addEligibility}
-                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800 mt-2"
-                >
-                  <Plus size={16} /> Add Eligibility Criterion
-                </button>
+
+            <div className="p-6 space-y-8">
+              {/* Eligibility Section */}
+              <div className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Eligibility & Entrance Exams
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={handleAddEligibility}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Eligibility
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {editData.eligibility &&
+                    editData.eligibility.map((item, index) => (
+                      <div key={index} className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <textarea
+                            value={item}
+                            onChange={(e) =>
+                              handleEligibilityChange(index, e.target.value)
+                            }
+                            rows={2}
+                            placeholder="Enter eligibility criteria..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEligibility(index)}
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Remove eligibility"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                </div>
               </div>
-              
-              {/* Admission Steps */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Admission Process</h3>
-                {editData.steps.map((step, index) => (
-                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={step}
-                      onChange={(e) => handleStepsChange(index, e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded"
-                    />
-                    <button
-                      onClick={() => removeStep(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Minus size={20} />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={addStep}
-                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800 mt-2"
-                >
-                  <Plus size={16} /> Add Step
-                </button>
+
+              {/* Application Steps */}
+              <div className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Application Steps
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={handleAddStep}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Step
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {editData.steps &&
+                    editData.steps.map((step, index) => (
+                      <div key={index} className="flex gap-3 items-start">
+                        <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium mt-1">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <textarea
+                            value={step}
+                            onChange={(e) =>
+                              handleStepChange(index, e.target.value)
+                            }
+                            rows={2}
+                            placeholder="Enter application step..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveStep(index)}
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Remove step"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                </div>
               </div>
-              
+
               {/* Important Dates */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Important Dates</h3>
-                {editData.dates.map((date, index) => (
-                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={date}
-                      onChange={(e) => handleDatesChange(index, e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded"
-                    />
-                    <button
-                      onClick={() => removeDate(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Minus size={20} />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={addDate}
-                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800 mt-2"
-                >
-                  <Plus size={16} /> Add Date
-                </button>
+              <div className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Important Dates
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={handleAddDate}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Date
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {editData.dates &&
+                    editData.dates.map((date, index) => (
+                      <div key={index} className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={date}
+                            onChange={(e) =>
+                              handleDateChange(index, e.target.value)
+                            }
+                            placeholder="Enter important date..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDate(index)}
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Remove date"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                </div>
               </div>
-              
-              {/* Previous Year Cutoffs */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Previous Year Cutoffs</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white border border-gray-300">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="py-2 px-4 border-b border-r">Year</th>
-                        <th className="py-2 px-4 border-b border-r">Round 1</th>
-                        <th className="py-2 px-4 border-b border-r">Round 2</th>
-                        <th className="py-2 px-4 border-b border-r">Round 3</th>
-                        <th className="py-2 px-4 border-b">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {editData.cutoffTable.map((row, index) => (
-                        <tr key={index}>
-                          <td className="py-2 px-4 border-b border-r">
+
+              {/* Cutoff Table */}
+              <div className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Cut Off Table
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={handleAddCutoffRow}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Year
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {editData.cutoffTable &&
+                    editData.cutoffTable.map((row, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-medium text-gray-700">
+                            Year {index + 1}
+                          </h4>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCutoffRow(index)}
+                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                            title="Remove year"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Year
+                            </label>
                             <input
                               type="text"
                               value={row.year}
-                              onChange={(e) => handleCutoffChange(index, 'year', e.target.value)}
-                              className="w-full p-1 border border-gray-300 rounded"
+                              onChange={(e) =>
+                                handleCutoffChange(
+                                  index,
+                                  "year",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="2024"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
                             />
-                          </td>
-                          <td className="py-2 px-4 border-b border-r">
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Round 1 PDF URL
+                            </label>
                             <input
                               type="text"
                               value={row.round1}
-                              onChange={(e) => handleCutoffChange(index, 'round1', e.target.value)}
-                              className="w-full p-1 border border-gray-300 rounded"
+                              onChange={(e) =>
+                                handleCutoffChange(
+                                  index,
+                                  "round1",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="PDF link or #"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
                             />
-                          </td>
-                          <td className="py-2 px-4 border-b border-r">
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Round 2 PDF URL
+                            </label>
                             <input
                               type="text"
                               value={row.round2}
-                              onChange={(e) => handleCutoffChange(index, 'round2', e.target.value)}
-                              className="w-full p-1 border border-gray-300 rounded"
+                              onChange={(e) =>
+                                handleCutoffChange(
+                                  index,
+                                  "round2",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="PDF link or #"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
                             />
-                          </td>
-                          <td className="py-2 px-4 border-b border-r">
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Round 3 PDF URL
+                            </label>
                             <input
                               type="text"
                               value={row.round3}
-                              onChange={(e) => handleCutoffChange(index, 'round3', e.target.value)}
-                              className="w-full p-1 border border-gray-300 rounded"
+                              onChange={(e) =>
+                                handleCutoffChange(
+                                  index,
+                                  "round3",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="PDF link or #"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
                             />
-                          </td>
-                          <td className="py-2 px-4 border-b text-center">
-                            <button
-                              onClick={() => removeCutoffRow(index)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Minus size={20} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                 </div>
-                <button
-                  onClick={addCutoffRow}
-                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800 mt-2"
-                >
-                  <Plus size={16} /> Add Cutoff Row
-                </button>
               </div>
-              
-              {/* Custom Fields */}
+
+              {/* Custom Fields Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Additional Information</h3>
-                {editData.customFields.map((field, index) => (
-                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={field.label}
-                      onChange={(e) => handleCustomFieldChange(index, 'label', e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded"
-                      placeholder="Field Label"
-                    />
-                    <input
-                      type="text"
-                      value={field.value}
-                      onChange={(e) => handleCustomFieldChange(index, 'value', e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded"
-                      placeholder="Field Value"
-                    />
-                    <button
-                      onClick={() => removeCustomField(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Minus size={20} />
-                    </button>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddCustomField}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Custom Field
+                  </button>
+                </div>
+
+                {editData.customFields && editData.customFields.length > 0 && (
+                  <div className="space-y-3">
+                    {editData.customFields.map((field) => (
+                      <div key={field.id} className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={field.label}
+                            onChange={(e) =>
+                              handleCustomFieldChange(
+                                field.id,
+                                "label",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Field Label (e.g., Special Requirements, Contact Info)"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={field.value}
+                            onChange={(e) =>
+                              handleCustomFieldChange(
+                                field.id,
+                                "value",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Field Value"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCustomField(field.id)}
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Remove field"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-                <button
-                  onClick={addCustomField}
-                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800 mt-2"
-                >
-                  <Plus size={16} /> Add Custom Field
-                </button>
+                )}
               </div>
             </div>
-            
-            <div className="flex justify-end gap-2 mt-6">
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
               <button
-                onClick={closeEditModal}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                onClick={handleCancelEdit}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
-                onClick={saveChanges}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={handleSave}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
               >
                 Save Changes
               </button>

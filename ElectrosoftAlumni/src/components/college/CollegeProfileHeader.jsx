@@ -270,8 +270,8 @@ const CollegeProfileHeader = ({
       </div>
       {/* Floating form modal for editing profile */}
       {showFloatingForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
             <button
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
               onClick={() => setShowFloatingForm(false)}
@@ -345,39 +345,81 @@ const CollegeProfileHeader = ({
 
               {/* Quick Stats Editing */}
               <div>
-                <div className="font-semibold text-blue-900 mb-1">Quick Stats</div>
+                <div className="font-semibold text-blue-900 mb-1 flex items-center justify-between">
+                  Quick Stats
+                  <button
+                    type="button"
+                    className="ml-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() => setHeaderData(prev => ({
+                      ...prev,
+                      quickStats: [...prev.quickStats, { label: "", value: "" }]
+                    }))}
+                  >
+                    + Add
+                  </button>
+                </div>
                 {headerData.quickStats.map((stat, idx) => (
-                  <div className="flex gap-2 mb-1" key={idx}>
+                  <div className="flex gap-2 mb-1 items-center" key={idx}>
                     <input
                       className="text-sm border border-gray-300 rounded px-2 py-1 w-20"
                       value={stat.value}
-                      onChange={(e) =>
-                        handleQuickStatChange(idx, "value", e.target.value)
-                      }
+                      onChange={(e) => handleQuickStatChange(idx, "value", e.target.value)}
                       placeholder="Value"
                     />
                     <input
                       className="text-sm border border-gray-300 rounded px-2 py-1 w-32"
                       value={stat.label}
-                      onChange={(e) =>
-                        handleQuickStatChange(idx, "label", e.target.value)
-                      }
+                      onChange={(e) => handleQuickStatChange(idx, "label", e.target.value)}
                       placeholder="Label"
                     />
+                    <button
+                      type="button"
+                      className="ml-1 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                      onClick={() => setHeaderData(prev => ({
+                        ...prev,
+                        quickStats: prev.quickStats.filter((_, i) => i !== idx)
+                      }))}
+                    >
+                      Remove
+                    </button>
                   </div>
                 ))}
               </div>
               {/* Navigation Options Editing */}
               <div>
-                <div className="font-semibold text-blue-900 mb-1">Navigation Tabs</div>
+                <div className="font-semibold text-blue-900 mb-1 flex items-center justify-between">
+                  Navigation Tabs
+                  <button
+                    type="button"
+                    className="ml-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() => setHeaderData(prev => ({
+                      ...prev,
+                      navOptions: [...prev.navOptions, { id: `custom-${Date.now()}`, name: "New Tab" }]
+                    }))}
+                  >
+                    + Add
+                  </button>
+                </div>
                 {headerData.navOptions.map((item, idx) => (
-                  <input
-                    key={item.id}
-                    className="text-sm border border-gray-300 rounded px-2 py-1 mb-1 w-full"
-                    value={item.name}
-                    onChange={(e) => handleNavOptionChange(idx, e.target.value)}
-                    placeholder="Tab Name"
-                  />
+                  <div className="flex gap-2 mb-1 items-center" key={item.id}>
+                    <input
+                      className="text-sm border border-gray-300 rounded px-2 py-1 w-full"
+                      value={item.name}
+                      onChange={(e) => handleNavOptionChange(idx, e.target.value)}
+                      placeholder="Tab Name"
+                    />
+                    <button
+                      type="button"
+                      className="ml-1 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                      onClick={() => setHeaderData(prev => ({
+                        ...prev,
+                        navOptions: prev.navOptions.filter((_, i) => i !== idx)
+                      }))}
+                      disabled={headerData.navOptions.length <= 1}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 ))}
               </div>
               <button

@@ -1926,6 +1926,639 @@ const CollegeProfilePage = () => {
                 </div>
               </div>
             )}
+            {showSectionForm === "hostel" && (
+              <div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Hostel Facilities
+                  </h3>
+                  <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
+                    {sectionFormData.hostelFacilities.map((item, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <input
+                          className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
+                          value={item}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange(
+                              "hostelFacilities",
+                              idx,
+                              e.target.value
+                            )
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              hostelFacilities: prev.hostelFacilities.filter(
+                                (_, i) => i !== idx
+                              ),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        hostelFacilities: [...prev.hostelFacilities, ""]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Campus Amenities
+                  </h3>
+                  <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
+                    {sectionFormData.campusAmenities.map((item, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <input
+                          className="bg-white border border-gray-300 rounded px-2 py-1 w-full"
+                          value={item}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange(
+                              "campusAmenities",
+                              idx,
+                              e.target.value
+                            )
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              campusAmenities: prev.campusAmenities.filter(
+                                (_, i) => i !== idx
+                              ),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        campusAmenities: [...prev.campusAmenities, ""]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Room Types
+                  </h3>
+                  <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
+                    {sectionFormData.roomTypes.map((room, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <input
+                          className="bg-white border border-gray-300 rounded px-2 py-1 w-1/3 mr-2"
+                          value={room.type}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("roomTypes", idx, {
+                              ...room,
+                              type: e.target.value,
+                            })
+                          }
+                          placeholder="Type"
+                        />
+                        <input
+                          className="bg-white border border-gray-300 rounded px-2 py-1 w-1/3 mr-2"
+                          value={room.capacity}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("roomTypes", idx, {
+                              ...room,
+                              capacity: e.target.value,
+                            })
+                          }
+                          placeholder="Capacity"
+                        />
+                        <input
+                          className="bg-white border border-gray-300 rounded px-2 py-1 w-1/3"
+                          value={room.fee}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("roomTypes", idx, {
+                              ...room,
+                              fee: e.target.value,
+                            })
+                          }
+                          placeholder="Fee"
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              roomTypes: prev.roomTypes.filter((_, i) => i !== idx),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        roomTypes: [...prev.roomTypes, { type: "", capacity: "", fee: "" }]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Mess Information
+                  </h3>
+                  <textarea
+                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
+                    value={sectionFormData.messInfo}
+                    onChange={(e) =>
+                      handleSectionFormChange("messInfo", e.target.value)
+                    }
+                    placeholder="Mess Information"
+                  />
+                </div>
+              </div>
+            )}
+            {showSectionForm === "alumni" && (
+              <div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Notable Alumni
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {sectionFormData.notableAlumni.map((alumni, idx) => (
+                      <div key={idx} className="border rounded-lg p-4 bg-gray-50 flex flex-col gap-2">
+                        <input
+                          className="font-semibold text-gray-800 mb-1 w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={alumni.name}
+                          onChange={(e) => handleSectionFormArrayChange("notableAlumni", idx, { ...alumni, name: e.target.value })}
+                          placeholder="Name"
+                        />
+                        <input
+                          className="text-sm text-gray-600 mb-2 w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={alumni.batch}
+                          onChange={(e) => handleSectionFormArrayChange("notableAlumni", idx, { ...alumni, batch: e.target.value })}
+                          placeholder="Batch"
+                        />
+                        <input
+                          className="text-gray-700 w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={alumni.achievement}
+                          onChange={(e) => handleSectionFormArrayChange("notableAlumni", idx, { ...alumni, achievement: e.target.value })}
+                          placeholder="Achievement"
+                        />
+                        <input
+                          className="text-sm text-gray-600 mt-2 w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={alumni.currentRole}
+                          onChange={(e) => handleSectionFormArrayChange("notableAlumni", idx, { ...alumni, currentRole: e.target.value })}
+                          placeholder="Current Role"
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              notableAlumni: prev.notableAlumni.filter((_, i) => i !== idx),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        notableAlumni: [...prev.notableAlumni, { name: "", batch: "", achievement: "", currentRole: "" }]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Alumni Testimonials
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {sectionFormData.testimonials.map((testimonial, idx) => (
+                      <div key={idx} className="border rounded-lg p-4 bg-blue-50 flex flex-col gap-2">
+                        <textarea
+                          className="italic text-gray-700 mb-2 w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={testimonial.quote}
+                          onChange={(e) => handleSectionFormArrayChange("testimonials", idx, { ...testimonial, quote: e.target.value })}
+                          placeholder="Testimonial Quote"
+                        />
+                        <input
+                          className="text-sm text-gray-600 font-semibold w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={testimonial.name}
+                          onChange={(e) => handleSectionFormArrayChange("testimonials", idx, { ...testimonial, name: e.target.value })}
+                          placeholder="Name"
+                        />
+                        <input
+                          className="text-sm text-gray-600 font-semibold w-full bg-white border border-gray-300 rounded px-2 py-1 mt-1"
+                          value={testimonial.batch}
+                          onChange={(e) => handleSectionFormArrayChange("testimonials", idx, { ...testimonial, batch: e.target.value })}
+                          placeholder="Batch"
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              testimonials: prev.testimonials.filter((_, i) => i !== idx),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        testimonials: [...prev.testimonials, { name: "", batch: "", quote: "" }]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Networking Opportunities
+                  </h3>
+                  <textarea
+                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
+                    value={sectionFormData.networking}
+                    onChange={(e) => handleSectionFormChange("networking", e.target.value)}
+                    placeholder="Networking Opportunities"
+                  />
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Alumni Association
+                  </h3>
+                  <textarea
+                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
+                    value={sectionFormData.associationInfo}
+                    onChange={(e) => handleSectionFormChange("associationInfo", e.target.value)}
+                    placeholder="Alumni Association Info"
+                  />
+                  <input
+                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-gray-700 mt-2"
+                    value={sectionFormData.contactInfo}
+                    onChange={(e) => handleSectionFormChange("contactInfo", e.target.value)}
+                    placeholder="Contact Information"
+                  />
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Alumni Network Stats
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {sectionFormData.statistics.map((stat, idx) => (
+                      <div key={idx} className="bg-blue-50 rounded-lg p-4 text-center flex flex-col gap-2">
+                        <input
+                          className="text-2xl font-bold text-blue-700 w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={stat.value}
+                          onChange={(e) => handleSectionFormArrayChange("statistics", idx, { ...stat, value: e.target.value })}
+                          placeholder="Value"
+                        />
+                        <input
+                          className="text-gray-600 w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={stat.label}
+                          onChange={(e) => handleSectionFormArrayChange("statistics", idx, { ...stat, label: e.target.value })}
+                          placeholder="Label"
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              statistics: prev.statistics.filter((_, i) => i !== idx),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        statistics: [...prev.statistics, { value: "", label: "" }]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+              </div>
+            )}
+            {showSectionForm === "events" && (
+              <div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Upcoming Events
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {sectionFormData.upcomingEvents.map((event, idx) => (
+                      <div key={idx} className="border rounded-lg p-4 bg-blue-50 flex flex-col gap-2">
+                        <input
+                          className="font-bold text-blue-900 text-lg w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={event.title}
+                          onChange={(e) => handleSectionFormArrayChange("upcomingEvents", idx, { ...event, title: e.target.value })}
+                          placeholder="Event Title"
+                        />
+                        <input
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={event.date}
+                          onChange={(e) => handleSectionFormArrayChange("upcomingEvents", idx, { ...event, date: e.target.value })}
+                          placeholder="Date"
+                        />
+                        <input
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={event.time}
+                          onChange={(e) => handleSectionFormArrayChange("upcomingEvents", idx, { ...event, time: e.target.value })}
+                          placeholder="Time"
+                        />
+                        <input
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={event.venue}
+                          onChange={(e) => handleSectionFormArrayChange("upcomingEvents", idx, { ...event, venue: e.target.value })}
+                          placeholder="Venue"
+                        />
+                        <textarea
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={event.description}
+                          onChange={(e) => handleSectionFormArrayChange("upcomingEvents", idx, { ...event, description: e.target.value })}
+                          placeholder="Description"
+                        />
+                        <input
+                          className="text-blue-600 underline text-sm font-medium w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={event.registrationLink || ""}
+                          onChange={(e) => handleSectionFormArrayChange("upcomingEvents", idx, { ...event, registrationLink: e.target.value })}
+                          placeholder="Registration Link"
+                        />
+                        <input
+                          className="text-xs bg-blue-200 text-blue-800 rounded px-2 py-1 ml-2 w-full border border-gray-300 mb-1"
+                          value={event.tags ? event.tags.join(", ") : ""}
+                          onChange={(e) => handleSectionFormArrayChange("upcomingEvents", idx, { ...event, tags: e.target.value.split(",").map(tag => tag.trim()) })}
+                          placeholder="Tags (comma separated)"
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              upcomingEvents: prev.upcomingEvents.filter(
+                                (_, i) => i !== idx
+                              ),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        upcomingEvents: [...prev.upcomingEvents, { title: "", date: "", time: "", venue: "", description: "", registrationLink: "", tags: [] }]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Annual Events
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {sectionFormData.annualEvents.map((event, idx) => (
+                      <div key={idx} className="border rounded-lg p-4 bg-yellow-50 flex flex-col gap-2">
+                        <input
+                          className="font-bold text-yellow-900 text-lg w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={event.name}
+                          onChange={(e) => handleSectionFormArrayChange("annualEvents", idx, { ...event, name: e.target.value })}
+                          placeholder="Event Name"
+                        />
+                        <input
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={event.month}
+                          onChange={(e) => handleSectionFormArrayChange("annualEvents", idx, { ...event, month: e.target.value })}
+                          placeholder="Month"
+                        />
+                        <textarea
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={event.description}
+                          onChange={(e) => handleSectionFormArrayChange("annualEvents", idx, { ...event, description: e.target.value })}
+                          placeholder="Description"
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              annualEvents: prev.annualEvents.filter(
+                                (_, i) => i !== idx
+                              ),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        annualEvents: [...prev.annualEvents, { name: "", month: "", description: "" }]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Seminars
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {sectionFormData.seminars.map((seminar, idx) => (
+                      <div key={idx} className="border rounded-lg p-4 bg-green-50 flex flex-col gap-2">
+                        <input
+                          className="font-bold text-green-900 text-lg w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={seminar.title}
+                          onChange={(e) => handleSectionFormArrayChange("seminars", idx, { ...seminar, title: e.target.value })}
+                          placeholder="Seminar Title"
+                        />
+                        <input
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={seminar.speaker}
+                          onChange={(e) => handleSectionFormArrayChange("seminars", idx, { ...seminar, speaker: e.target.value })}
+                          placeholder="Speaker"
+                        />
+                        <input
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={seminar.date}
+                          onChange={(e) => handleSectionFormArrayChange("seminars", idx, { ...seminar, date: e.target.value })}
+                          placeholder="Date"
+                        />
+                        <textarea
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={seminar.description}
+                          onChange={(e) => handleSectionFormArrayChange("seminars", idx, { ...seminar, description: e.target.value })}
+                          placeholder="Description"
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              seminars: prev.seminars.filter((_, i) => i !== idx),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        seminars: [...prev.seminars, { title: "", speaker: "", date: "", description: "" }]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Conferences
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {sectionFormData.conferences.map((conf, idx) => (
+                      <div key={idx} className="border rounded-lg p-4 bg-purple-50 flex flex-col gap-2">
+                        <input
+                          className="font-bold text-purple-900 text-lg w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={conf.title}
+                          onChange={(e) => handleSectionFormArrayChange("conferences", idx, { ...conf, title: e.target.value })}
+                          placeholder="Conference Title"
+                        />
+                        <input
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1 mb-1"
+                          value={conf.date}
+                          onChange={(e) => handleSectionFormArrayChange("conferences", idx, { ...conf, date: e.target.value })}
+                          placeholder="Date"
+                        />
+                        <textarea
+                          className="text-gray-700 text-sm w-full bg-white border border-gray-300 rounded px-2 py-1"
+                          value={conf.description}
+                          onChange={(e) => handleSectionFormArrayChange("conferences", idx, { ...conf, description: e.target.value })}
+                          placeholder="Description"
+                        />
+                        <button
+                          type="button"
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold border border-red-300 hover:bg-red-200"
+                          onClick={() =>
+                            setSectionFormData((prev) => ({
+                              ...prev,
+                              conferences: prev.conferences.filter((_, i) => i !== idx),
+                            }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold border border-green-300 hover:bg-green-200"
+                    onClick={() =>
+                      setSectionFormData((prev) => ({
+                        ...prev,
+                        conferences: [...prev.conferences, { title: "", date: "", description: "" }]
+                      }))
+                    }
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Event Calendar
+                  </h3>
+                  <textarea
+                    className="w-full bg-white border border-gray-300 rounded px-2 py-1 text-gray-700"
+                    value={sectionFormData.eventCalendar}
+                    onChange={(e) => handleSectionFormChange("eventCalendar", e.target.value)}
+                    placeholder="Event Calendar Info"
+                  />
+                </div>
+              </div>
+            )}
             <div className="flex justify-end gap-4 mt-6">
               <button
                 className="px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"

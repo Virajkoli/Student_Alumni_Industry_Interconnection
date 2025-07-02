@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Phone,
   Mail,
+  EyeOff,
 } from "lucide-react";
 
 const StartupEcosystemOverview = () => {
@@ -306,6 +307,19 @@ const StartupEcosystemOverview = () => {
     }));
   };
 
+  const handleHideSection = () => {
+    // Create a custom event to notify the parent component to hide this section
+    const event = new CustomEvent('hideNavigation', {
+      detail: {
+        id: 'startup-ecosystem' // This matches the id in navigationItems
+      }
+    });
+    window.dispatchEvent(event);
+    
+    // Show a feedback to the user
+    alert("This section will be hidden from the navigation bar");
+  };
+
   return (
     <>
       <div className="p-6 max-w-4xl mx-auto">
@@ -314,13 +328,22 @@ const StartupEcosystemOverview = () => {
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">About</h2>
-            <button
-              onClick={handleEditClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-              title="Edit about section"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={handleHideSection}
+                className="p-2 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded-full transition-colors"
+                title="Hide from navigation"
+              >
+                <EyeOff className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleEditClick}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                title="Edit about section"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Overview */}

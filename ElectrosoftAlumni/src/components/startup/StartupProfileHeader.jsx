@@ -5,6 +5,7 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, custom
   const [activeItem, setActiveItem] = useState("posts");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isNewNavModalOpen, setIsNewNavModalOpen] = useState(false);
+  const [hiddenNavItems, setHiddenNavItems] = useState([]);
   const [newNavData, setNewNavData] = useState({
     name: "",
     contentType: "text",
@@ -12,7 +13,7 @@ const HorizontalProfileNavbar = ({ onNavigationChange, navigationOptions, custom
   });
   const [editingCustomNav, setEditingCustomNav] = useState(null);
   const [isEditingCustomNav, setIsEditingCustomNav] = useState(false);
-
+  // State to track hidden navigation items
   // Listen for custom navigation edit events
   useEffect(() => {
     const handleEditCustomNavigation = (event) => {
@@ -112,8 +113,11 @@ const navigationItems = [
 ];
 
 
+  // Filter out hidden navigation items
+  const filteredNavigationItems = navigationItems.filter(item => !hiddenNavItems.includes(item.id));
+
   // Combine default and custom navigation items
-  const allNavigationItems = [...navigationItems, ...customNavigations];
+  const allNavigationItems = [...filteredNavigationItems, ...customNavigations];
 
   const handleItemClick = (item) => {
     setActiveItem(item.id);
@@ -216,6 +220,27 @@ const navigationItems = [
     setEditData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Listen for hide navigation events
+  useEffect(() => {
+    const handleHideNavigation = (event) => {
+      const { id } = event.detail;
+      setHiddenNavItems(prev => [...prev, id]);
+      // If the hidden item is the active one, switch to "posts"
+      if (activeItem === id) {
+        setActiveItem("posts");
+        if (onNavigationChange) {
+          onNavigationChange("posts", "Posts");
+        }
+      }
+    };
+
+    window.addEventListener('hideNavigation', handleHideNavigation);
+    
+    return () => {
+      window.removeEventListener('hideNavigation', handleHideNavigation);
+    };
+  }, [activeItem, onNavigationChange]);
+
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
@@ -290,7 +315,7 @@ const navigationItems = [
         {/* Navigation Items - Horizontal LinkedIn Style */}
         <div className="bg-white border-b border-gray-200">
           <div className="flex overflow-x-auto">
-            {allNavigationItems.map((item) => (
+            {allNavigationItems.filter(item => !hiddenNavItems.includes(item.id)).map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
@@ -311,6 +336,17 @@ const navigationItems = [
             >
               <Plus className="w-4 h-4" />
             </button>
+            
+            {/* Show Hidden Items Button (if any items are hidden) */}
+            {hiddenNavItems.length > 0 && (
+              <button
+                onClick={() => setHiddenNavItems([])}
+                className="flex-shrink-0 px-4 py-4 text-sm font-medium border-b-2 border-transparent text-blue-400 hover:text-blue-600 hover:border-blue-300 transition-colors duration-200 whitespace-nowrap"
+                title="Restore hidden navigation items"
+              >
+                <span>Show Hidden ({hiddenNavItems.length})</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

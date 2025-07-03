@@ -47,9 +47,9 @@ const NewsSidebar = () => {
     <div className="space-y-4 sticky top-20">
       {/* Trending News */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-            <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
+        <div className="p-4" style={{ backgroundColor: "#DCE8F2", borderBottom: "1px solid #B5D3E7" }}>
+          <h3 className="text-lg font-semibold flex items-center" style={{ color: "#1F2D3D" }}>
+            <TrendingUp className="w-5 h-5 mr-2" style={{ color: "#6EA9CB" }} />
             Industry News
           </h3>
         </div>
@@ -76,13 +76,16 @@ const NewsSidebar = () => {
       </div>
       {/* Suggested Connections */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Suggested Connections</h3>
+        <div className="p-4" style={{ backgroundColor: "#DCE8F2", borderBottom: "1px solid #B5D3E7" }}>
+          <h3 className="text-lg font-semibold" style={{ color: "#1F2D3D" }}>Suggested Connections</h3>
         </div>
         <div className="p-4 space-y-4">
           {suggestedConnections.map((conn) => (
             <div key={conn.id} className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+              <div 
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                style={{ background: "linear-gradient(135deg, #6EA9CB 0%, #B5D3E7 100%)" }}
+              >
                 {conn.avatar}
               </div>
               <div>

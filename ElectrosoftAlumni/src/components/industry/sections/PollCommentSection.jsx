@@ -254,8 +254,7 @@ const PollCommentSection = () => {
         {polls.map((poll) => (
           <div
             key={poll.id}
-            className="rounded-xl shadow-sm hover:shadow-md transition-shadow"
-            style={{ backgroundColor: "#DCE8F2" }}
+            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200"
           >
             {isModalOpen && editingId === poll.id && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -651,29 +650,26 @@ const PollCommentSection = () => {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-semibold" style={{ color: "#1F2D3D" }}>
+                    <h3 className="text-lg font-semibold text-gray-900">
                       {poll.question}
                     </h3>
                     <button
                       onClick={() => handleEdit(poll)}
-                      className="p-2 rounded-lg transition-colors"
-                      style={{ color: "#1F2D3D" }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Edit Poll"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <div className="flex items-center space-x-4 mb-4 text-sm" style={{ color: "#1F2D3D", opacity: 0.7 }}>
+                  <div className="flex items-center space-x-4 mb-4 text-sm text-gray-600">
                     <span
                       className="px-2 py-1 text-xs rounded-full"
                       style={getStatusColor(poll.status)}
                     >
                       {poll.status}
                     </span>
-                    <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: "#B5D3E7", color: "#1F2D3D" }}>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                       {poll.category}
                     </span>
                     <div className="flex items-center space-x-1">
@@ -696,24 +692,21 @@ const PollCommentSection = () => {
                   {poll.options.map((option) => (
                     <div
                       key={option.id}
-                      className="rounded-lg p-3 hover:shadow-sm cursor-pointer transition-colors"
-                      style={{ border: `1px solid #DCE8F2`, backgroundColor: "#F7FAFC" }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = "#F7FAFC"}
+                      className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors"
                     >
                       <div className="flex justify-between items-center mb-2">
-                        <span style={{ color: "#1F2D3D" }}>{option.text}</span>
-                        <span className="text-sm font-medium" style={{ color: "#1F2D3D", opacity: 0.7 }}>
+                        <span className="text-gray-900">{option.text}</span>
+                        <span className="text-sm font-medium text-gray-600">
                           {option.percentage}%
                         </span>
                       </div>
-                      <div className="w-full rounded-full h-2" style={{ backgroundColor: "#DCE8F2" }}>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className="h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${option.percentage}%`, backgroundColor: "#6EA9CB" }}
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${option.percentage}%` }}
                         ></div>
                       </div>
-                      <div className="mt-1 text-xs" style={{ color: "#1F2D3D", opacity: 0.6 }}>
+                      <div className="mt-1 text-xs text-gray-500">
                         {option.votes} votes
                       </div>
                     </div>
@@ -721,12 +714,7 @@ const PollCommentSection = () => {
                 </div>
 
                 <div className="mt-4 text-center">
-                  <button 
-                    className="text-white px-6 py-2 rounded-lg transition-colors"
-                    style={{ backgroundColor: "#6EA9CB" }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = "#5A8FAD"}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
-                  >
+                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     Vote Now
                   </button>
                 </div>
@@ -734,10 +722,10 @@ const PollCommentSection = () => {
 
               {/* Comments Section */}
               {poll.allowComments && (
-                <div className="pt-4" style={{ borderTop: `1px solid #DCE8F2` }}>
+                <div className="border-t border-gray-200 pt-4">
                   <div className="flex items-center space-x-2 mb-4">
-                    <MessageCircle className="w-5 h-5" style={{ color: "#1F2D3D", opacity: 0.7 }} />
-                    <span className="font-medium" style={{ color: "#1F2D3D" }}>
+                    <MessageCircle className="w-5 h-5 text-gray-600" />
+                    <span className="font-medium text-gray-900">
                       Comments (
                       {comments.filter((c) => c.pollId === poll.id).length})
                     </span>
@@ -749,47 +737,31 @@ const PollCommentSection = () => {
                       .map((comment) => (
                         <div
                           key={comment.id}
-                          className="rounded-lg p-4"
-                          style={{ backgroundColor: "#DCE8F2" }}
+                          className="bg-gray-50 rounded-lg p-4"
                         >
                           <div className="flex justify-between items-start mb-2">
-                            <span className="font-medium" style={{ color: "#1F2D3D" }}>
+                            <span className="font-medium text-gray-900">
                               {comment.author}
                             </span>
-                            <span className="text-xs" style={{ color: "#1F2D3D", opacity: 0.6 }}>
+                            <span className="text-xs text-gray-500">
                               {comment.timestamp}
                             </span>
                           </div>
-                          <p className="mb-3 leading-relaxed" style={{ color: "#1F2D3D", opacity: 0.8 }}>
+                          <p className="text-gray-700 mb-3 leading-relaxed">
                             {comment.content}
                           </p>
                           <div className="flex items-center space-x-4">
-                            <button 
-                              className="flex items-center space-x-1 transition-colors"
-                              style={{ color: "#6EA9CB" }}
-                              onMouseEnter={(e) => e.target.style.color = "#5A8FAD"}
-                              onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
-                            >
+                            <button className="flex items-center space-x-1 text-green-600 hover:text-green-700">
                               <ThumbsUp className="w-4 h-4" />
                               <span className="text-sm">{comment.likes}</span>
                             </button>
-                            <button 
-                              className="flex items-center space-x-1 transition-colors"
-                              style={{ color: "#6EA9CB" }}
-                              onMouseEnter={(e) => e.target.style.color = "#5A8FAD"}
-                              onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
-                            >
+                            <button className="flex items-center space-x-1 text-red-600 hover:text-red-700">
                               <ThumbsDown className="w-4 h-4" />
                               <span className="text-sm">
                                 {comment.dislikes}
                               </span>
                             </button>
-                            <button 
-                              className="text-sm transition-colors"
-                              style={{ color: "#6EA9CB" }}
-                              onMouseEnter={(e) => e.target.style.color = "#5A8FAD"}
-                              onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
-                            >
+                            <button className="text-blue-600 hover:text-blue-700 text-sm">
                               Reply
                             </button>
                           </div>
@@ -801,21 +773,10 @@ const PollCommentSection = () => {
                     <textarea
                       placeholder="Share your thoughts..."
                       rows={3}
-                      className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
-                      style={{ 
-                        backgroundColor: "#F7FAFC", 
-                        border: "1px solid #DCE8F2",
-                        color: "#1F2D3D",
-                        focusRingColor: "#6EA9CB"
-                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <div className="mt-2 flex justify-end">
-                      <button 
-                        className="text-white px-4 py-2 rounded-lg transition-colors"
-                        style={{ backgroundColor: "#6EA9CB" }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = "#5A8FAD"}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
-                      >
+                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                         Post Comment
                       </button>
                     </div>

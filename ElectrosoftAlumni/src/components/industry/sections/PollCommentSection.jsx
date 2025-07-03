@@ -216,31 +216,34 @@ const PollCommentSection = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Active":
-        return "bg-green-100 text-green-800";
+        return { backgroundColor: "#B5D3E7", color: "#1F2D3D" };
       case "Ended":
-        return "bg-gray-100 text-gray-800";
+        return { backgroundColor: "#DCE8F2", color: "#1F2D3D" };
       case "Draft":
-        return "bg-yellow-100 text-yellow-800";
+        return { backgroundColor: "#B5D3E7", color: "#1F2D3D" };
       default:
-        return "bg-gray-100 text-gray-800";
+        return { backgroundColor: "#DCE8F2", color: "#1F2D3D" };
     }
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6" style={{ backgroundColor: '#F7FAFC' }}>
       {/* Header Section */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold" style={{ color: '#1F2D3D' }}>
             Polls & Community Discussion
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="mt-1" style={{ color: '#1F2D3D' }}>
             Voice your opinion and engage with industry professionals
           </p>
         </div>
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          className="text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+          style={{ backgroundColor: '#6EA9CB' }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#5A8FAD'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#6EA9CB'}
         >
           <Plus className="w-4 h-4" />
           <span>Create Poll</span>
@@ -251,21 +254,25 @@ const PollCommentSection = () => {
         {polls.map((poll) => (
           <div
             key={poll.id}
-            className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+            className="rounded-xl shadow-sm hover:shadow-md transition-shadow"
+            style={{ backgroundColor: "#DCE8F2" }}
           >
             {isModalOpen && editingId === poll.id && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-                  <div className="p-6 border-b border-gray-200">
+                <div className="rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#F7FAFC" }}>
+                  <div className="p-6" style={{ borderBottom: "1px solid #DCE8F2" }}>
                     <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold text-gray-900">
+                      <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
                         Edit Poll
                       </h2>
                       <button
                         onClick={handleCancel}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
+                        style={{ backgroundColor: "transparent" }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                       >
-                        <X className="w-5 h-5 text-gray-500" />
+                        <X className="w-5 h-5" style={{ color: "#1F2D3D" }} />
                       </button>
                     </div>
                   </div>
@@ -273,7 +280,7 @@ const PollCommentSection = () => {
                   <div className="p-6 space-y-6">
                     {/* Poll Question */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                         Poll Question
                       </label>
                       <input
@@ -282,7 +289,13 @@ const PollCommentSection = () => {
                         onChange={(e) =>
                           setEditData({ ...editData, question: e.target.value })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                        style={{ 
+                          backgroundColor: "#F7FAFC", 
+                          border: "1px solid #DCE8F2",
+                          color: "#1F2D3D",
+                          focusRingColor: "#6EA9CB"
+                        }}
                         placeholder="Enter your question"
                       />
                     </div>
@@ -290,7 +303,7 @@ const PollCommentSection = () => {
                     {/* Grid Layout */}
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                           Poll Type
                         </label>
                         <select
@@ -298,7 +311,13 @@ const PollCommentSection = () => {
                           onChange={(e) =>
                             setEditData({ ...editData, type: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                          style={{ 
+                            backgroundColor: "#F7FAFC", 
+                            border: "1px solid #DCE8F2",
+                            color: "#1F2D3D",
+                            focusRingColor: "#6EA9CB"
+                          }}
                         >
                           <option value="multiple">Multiple Choice</option>
                           <option value="binary">Yes/No</option>
@@ -307,7 +326,7 @@ const PollCommentSection = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                           Category
                         </label>
                         <select
@@ -318,7 +337,13 @@ const PollCommentSection = () => {
                               category: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                          style={{ 
+                            backgroundColor: "#F7FAFC", 
+                            border: "1px solid #DCE8F2",
+                            color: "#1F2D3D",
+                            focusRingColor: "#6EA9CB"
+                          }}
                         >
                           <option value="Technology">Technology</option>
                           <option value="Workplace">Workplace</option>
@@ -328,7 +353,7 @@ const PollCommentSection = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                           End Date
                         </label>
                         <input
@@ -340,14 +365,20 @@ const PollCommentSection = () => {
                               endDate: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                          style={{ 
+                            backgroundColor: "#F7FAFC", 
+                            border: "1px solid #DCE8F2",
+                            color: "#1F2D3D",
+                            focusRingColor: "#6EA9CB"
+                          }}
                         />
                       </div>
                     </div>
 
                     {/* Poll Options */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                         Poll Options (one per line)
                       </label>
                       <textarea
@@ -357,7 +388,13 @@ const PollCommentSection = () => {
                         }
                         rows={4}
                         placeholder="Option 1&#10;Option 2&#10;Option 3"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                        style={{ 
+                          backgroundColor: "#F7FAFC", 
+                          border: "1px solid #DCE8F2",
+                          color: "#1F2D3D",
+                          focusRingColor: "#6EA9CB"
+                        }}
                       />
                     </div>
 
@@ -373,27 +410,42 @@ const PollCommentSection = () => {
                             allowComments: e.target.checked,
                           })
                         }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded text-blue-600 focus:ring-blue-500"
+                        style={{ 
+                          border: "1px solid #DCE8F2",
+                          backgroundColor: "#F7FAFC"
+                        }}
                       />
                       <label
                         htmlFor="allowComments"
-                        className="text-sm font-medium text-gray-700"
+                        className="text-sm font-medium"
+                        style={{ color: "#1F2D3D" }}
                       >
                         Allow comments on this poll
                       </label>
                     </div>
                   </div>
 
-                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                  <div className="px-6 py-4 flex justify-end gap-3" style={{ backgroundColor: "#DCE8F2", borderTop: "1px solid #B5D3E7" }}>
                     <button
                       onClick={handleCancel}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                      className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+                      style={{ 
+                        color: "#1F2D3D", 
+                        backgroundColor: "#F7FAFC", 
+                        border: "1px solid #DCE8F2" 
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = "#F7FAFC"}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSave}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                      className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+                      style={{ backgroundColor: "#6EA9CB" }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = "#5A8EAF"}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
                     >
                       Save Changes
                     </button>
@@ -405,17 +457,20 @@ const PollCommentSection = () => {
             {/* Add Modal */}
             {isAddModalOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-                  <div className="p-6 border-b border-gray-200">
+                <div className="rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#F7FAFC" }}>
+                  <div className="p-6" style={{ borderBottom: "1px solid #DCE8F2" }}>
                     <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold text-gray-900">
+                      <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
                         Create New Poll
                       </h2>
                       <button
                         onClick={handleAddCancel}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
+                        style={{ backgroundColor: "transparent" }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                       >
-                        <X className="w-5 h-5 text-gray-500" />
+                        <X className="w-5 h-5" style={{ color: "#1F2D3D" }} />
                       </button>
                     </div>
                   </div>
@@ -423,7 +478,7 @@ const PollCommentSection = () => {
                   <div className="p-6 space-y-6">
                     {/* Poll Question */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                         Poll Question
                       </label>
                       <input
@@ -432,7 +487,13 @@ const PollCommentSection = () => {
                         onChange={(e) =>
                           setAddData({ ...addData, question: e.target.value })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                        style={{ 
+                          backgroundColor: "#F7FAFC", 
+                          border: "1px solid #DCE8F2",
+                          color: "#1F2D3D",
+                          focusRingColor: "#6EA9CB"
+                        }}
                         placeholder="Enter your question"
                       />
                     </div>
@@ -440,7 +501,7 @@ const PollCommentSection = () => {
                     {/* Grid Layout */}
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                           Poll Type
                         </label>
                         <select
@@ -448,7 +509,13 @@ const PollCommentSection = () => {
                           onChange={(e) =>
                             setAddData({ ...addData, type: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                          style={{ 
+                            backgroundColor: "#F7FAFC", 
+                            border: "1px solid #DCE8F2",
+                            color: "#1F2D3D",
+                            focusRingColor: "#6EA9CB"
+                          }}
                         >
                           <option value="multiple">Multiple Choice</option>
                           <option value="binary">Yes/No</option>
@@ -457,7 +524,7 @@ const PollCommentSection = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                           Category
                         </label>
                         <select
@@ -465,7 +532,13 @@ const PollCommentSection = () => {
                           onChange={(e) =>
                             setAddData({ ...addData, category: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                          style={{ 
+                            backgroundColor: "#F7FAFC", 
+                            border: "1px solid #DCE8F2",
+                            color: "#1F2D3D",
+                            focusRingColor: "#6EA9CB"
+                          }}
                         >
                           <option value="Technology">Technology</option>
                           <option value="Workplace">Workplace</option>
@@ -475,7 +548,7 @@ const PollCommentSection = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                           End Date
                         </label>
                         <input
@@ -484,14 +557,20 @@ const PollCommentSection = () => {
                           onChange={(e) =>
                             setAddData({ ...addData, endDate: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                          style={{ 
+                            backgroundColor: "#F7FAFC", 
+                            border: "1px solid #DCE8F2",
+                            color: "#1F2D3D",
+                            focusRingColor: "#6EA9CB"
+                          }}
                         />
                       </div>
                     </div>
 
                     {/* Poll Options */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                         Poll Options (one per line)
                       </label>
                       <textarea
@@ -501,7 +580,13 @@ const PollCommentSection = () => {
                         }
                         rows={4}
                         placeholder="Option 1&#10;Option 2&#10;Option 3"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                        style={{ 
+                          backgroundColor: "#F7FAFC", 
+                          border: "1px solid #DCE8F2",
+                          color: "#1F2D3D",
+                          focusRingColor: "#6EA9CB"
+                        }}
                       />
                     </div>
 
@@ -517,27 +602,42 @@ const PollCommentSection = () => {
                             allowComments: e.target.checked,
                           })
                         }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded text-blue-600 focus:ring-blue-500"
+                        style={{ 
+                          border: "1px solid #DCE8F2",
+                          backgroundColor: "#F7FAFC"
+                        }}
                       />
                       <label
                         htmlFor="addAllowComments"
-                        className="text-sm font-medium text-gray-700"
+                        className="text-sm font-medium"
+                        style={{ color: "#1F2D3D" }}
                       >
                         Allow comments on this poll
                       </label>
                     </div>
                   </div>
 
-                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                  <div className="px-6 py-4 flex justify-end gap-3" style={{ backgroundColor: "#DCE8F2", borderTop: "1px solid #B5D3E7" }}>
                     <button
                       onClick={handleAddCancel}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                      className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+                      style={{ 
+                        color: "#1F2D3D", 
+                        backgroundColor: "#F7FAFC", 
+                        border: "1px solid #DCE8F2" 
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = "#F7FAFC"}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleAdd}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                      className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+                      style={{ backgroundColor: "#6EA9CB" }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = "#5A8EAF"}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
                     >
                       Create Poll
                     </button>
@@ -551,27 +651,29 @@ const PollCommentSection = () => {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold" style={{ color: "#1F2D3D" }}>
                       {poll.question}
                     </h3>
                     <button
                       onClick={() => handleEdit(poll)}
-                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: "#1F2D3D" }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                       title="Edit Poll"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <div className="flex items-center space-x-4 mb-4 text-sm text-gray-600">
+                  <div className="flex items-center space-x-4 mb-4 text-sm" style={{ color: "#1F2D3D", opacity: 0.7 }}>
                     <span
-                      className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                        poll.status
-                      )}`}
+                      className="px-2 py-1 text-xs rounded-full"
+                      style={getStatusColor(poll.status)}
                     >
                       {poll.status}
                     </span>
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: "#B5D3E7", color: "#1F2D3D" }}>
                       {poll.category}
                     </span>
                     <div className="flex items-center space-x-1">
@@ -594,21 +696,24 @@ const PollCommentSection = () => {
                   {poll.options.map((option) => (
                     <div
                       key={option.id}
-                      className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="rounded-lg p-3 hover:shadow-sm cursor-pointer transition-colors"
+                      style={{ border: `1px solid #DCE8F2`, backgroundColor: "#F7FAFC" }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = "#F7FAFC"}
                     >
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-900">{option.text}</span>
-                        <span className="text-sm font-medium text-gray-600">
+                        <span style={{ color: "#1F2D3D" }}>{option.text}</span>
+                        <span className="text-sm font-medium" style={{ color: "#1F2D3D", opacity: 0.7 }}>
                           {option.percentage}%
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full rounded-full h-2" style={{ backgroundColor: "#DCE8F2" }}>
                         <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${option.percentage}%` }}
+                          className="h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${option.percentage}%`, backgroundColor: "#6EA9CB" }}
                         ></div>
                       </div>
-                      <div className="mt-1 text-xs text-gray-500">
+                      <div className="mt-1 text-xs" style={{ color: "#1F2D3D", opacity: 0.6 }}>
                         {option.votes} votes
                       </div>
                     </div>
@@ -616,7 +721,12 @@ const PollCommentSection = () => {
                 </div>
 
                 <div className="mt-4 text-center">
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  <button 
+                    className="text-white px-6 py-2 rounded-lg transition-colors"
+                    style={{ backgroundColor: "#6EA9CB" }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = "#5A8FAD"}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                  >
                     Vote Now
                   </button>
                 </div>
@@ -624,10 +734,10 @@ const PollCommentSection = () => {
 
               {/* Comments Section */}
               {poll.allowComments && (
-                <div className="border-t border-gray-200 pt-4">
+                <div className="pt-4" style={{ borderTop: `1px solid #DCE8F2` }}>
                   <div className="flex items-center space-x-2 mb-4">
-                    <MessageCircle className="w-5 h-5 text-gray-600" />
-                    <span className="font-medium text-gray-900">
+                    <MessageCircle className="w-5 h-5" style={{ color: "#1F2D3D", opacity: 0.7 }} />
+                    <span className="font-medium" style={{ color: "#1F2D3D" }}>
                       Comments (
                       {comments.filter((c) => c.pollId === poll.id).length})
                     </span>
@@ -639,31 +749,47 @@ const PollCommentSection = () => {
                       .map((comment) => (
                         <div
                           key={comment.id}
-                          className="bg-gray-50 rounded-lg p-4"
+                          className="rounded-lg p-4"
+                          style={{ backgroundColor: "#DCE8F2" }}
                         >
                           <div className="flex justify-between items-start mb-2">
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium" style={{ color: "#1F2D3D" }}>
                               {comment.author}
                             </span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs" style={{ color: "#1F2D3D", opacity: 0.6 }}>
                               {comment.timestamp}
                             </span>
                           </div>
-                          <p className="text-gray-700 mb-3 leading-relaxed">
+                          <p className="mb-3 leading-relaxed" style={{ color: "#1F2D3D", opacity: 0.8 }}>
                             {comment.content}
                           </p>
                           <div className="flex items-center space-x-4">
-                            <button className="flex items-center space-x-1 text-green-600 hover:text-green-700">
+                            <button 
+                              className="flex items-center space-x-1 transition-colors"
+                              style={{ color: "#6EA9CB" }}
+                              onMouseEnter={(e) => e.target.style.color = "#5A8FAD"}
+                              onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
+                            >
                               <ThumbsUp className="w-4 h-4" />
                               <span className="text-sm">{comment.likes}</span>
                             </button>
-                            <button className="flex items-center space-x-1 text-red-600 hover:text-red-700">
+                            <button 
+                              className="flex items-center space-x-1 transition-colors"
+                              style={{ color: "#6EA9CB" }}
+                              onMouseEnter={(e) => e.target.style.color = "#5A8FAD"}
+                              onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
+                            >
                               <ThumbsDown className="w-4 h-4" />
                               <span className="text-sm">
                                 {comment.dislikes}
                               </span>
                             </button>
-                            <button className="text-blue-600 hover:text-blue-700 text-sm">
+                            <button 
+                              className="text-sm transition-colors"
+                              style={{ color: "#6EA9CB" }}
+                              onMouseEnter={(e) => e.target.style.color = "#5A8FAD"}
+                              onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
+                            >
                               Reply
                             </button>
                           </div>
@@ -675,10 +801,21 @@ const PollCommentSection = () => {
                     <textarea
                       placeholder="Share your thoughts..."
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors"
+                      style={{ 
+                        backgroundColor: "#F7FAFC", 
+                        border: "1px solid #DCE8F2",
+                        color: "#1F2D3D",
+                        focusRingColor: "#6EA9CB"
+                      }}
                     />
                     <div className="mt-2 flex justify-end">
-                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                      <button 
+                        className="text-white px-4 py-2 rounded-lg transition-colors"
+                        style={{ backgroundColor: "#6EA9CB" }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = "#5A8FAD"}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                      >
                         Post Comment
                       </button>
                     </div>
@@ -691,46 +828,46 @@ const PollCommentSection = () => {
       </div>
 
       {/* Poll Statistics */}
-      <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="mt-8 rounded-xl p-6" style={{ background: "linear-gradient(135deg, #DCE8F2 0%, #B5D3E7 100%)" }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: "#1F2D3D" }}>
           Community Engagement
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
-              <BarChart3 className="w-6 h-6 text-blue-600 mr-2" />
-              <span className="text-2xl font-bold text-blue-600">
+              <BarChart3 className="w-6 h-6 mr-2" style={{ color: "#6EA9CB" }} />
+              <span className="text-2xl font-bold" style={{ color: "#6EA9CB" }}>
                 {polls.length}
               </span>
             </div>
-            <p className="text-sm text-gray-600">Active Polls</p>
+            <p className="text-sm" style={{ color: "#1F2D3D", opacity: 0.7 }}>Active Polls</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
-              <Users className="w-6 h-6 text-green-600 mr-2" />
-              <span className="text-2xl font-bold text-green-600">
+              <Users className="w-6 h-6 mr-2" style={{ color: "#6EA9CB" }} />
+              <span className="text-2xl font-bold" style={{ color: "#6EA9CB" }}>
                 {polls.reduce((sum, poll) => sum + poll.totalVotes, 0)}
               </span>
             </div>
-            <p className="text-sm text-gray-600">Total Votes</p>
+            <p className="text-sm" style={{ color: "#1F2D3D", opacity: 0.7 }}>Total Votes</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
-              <MessageCircle className="w-6 h-6 text-purple-600 mr-2" />
-              <span className="text-2xl font-bold text-purple-600">
+              <MessageCircle className="w-6 h-6 mr-2" style={{ color: "#6EA9CB" }} />
+              <span className="text-2xl font-bold" style={{ color: "#6EA9CB" }}>
                 {comments.length}
               </span>
             </div>
-            <p className="text-sm text-gray-600">Comments</p>
+            <p className="text-sm" style={{ color: "#1F2D3D", opacity: 0.7 }}>Comments</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
-              <Clock className="w-6 h-6 text-orange-600 mr-2" />
-              <span className="text-2xl font-bold text-orange-600">
+              <Clock className="w-6 h-6 mr-2" style={{ color: "#6EA9CB" }} />
+              <span className="text-2xl font-bold" style={{ color: "#6EA9CB" }}>
                 {polls.filter((p) => p.status === "Active").length}
               </span>
             </div>
-            <p className="text-sm text-gray-600">Ongoing</p>
+            <p className="text-sm" style={{ color: "#1F2D3D", opacity: 0.7 }}>Ongoing</p>
           </div>
         </div>
       </div>

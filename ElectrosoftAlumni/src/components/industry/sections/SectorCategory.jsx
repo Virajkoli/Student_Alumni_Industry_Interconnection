@@ -167,54 +167,6 @@ const SectorCategory = () => {
     setSelectedSector(null);
   };
 
-  const getColorClasses = (color) => {
-    const colors = {
-      blue: {
-        gradient: "from-blue-500 to-blue-600",
-        bg: "bg-blue-50",
-        text: "text-blue-600",
-        border: "border-blue-200",
-        hover: "group-hover:bg-blue-100",
-      },
-      green: {
-        gradient: "from-green-500 to-green-600",
-        bg: "bg-green-50",
-        text: "text-green-600",
-        border: "border-green-200",
-        hover: "group-hover:bg-green-100",
-      },
-      red: {
-        gradient: "from-red-500 to-red-600",
-        bg: "bg-red-50",
-        text: "text-red-600",
-        border: "border-red-200",
-        hover: "group-hover:bg-red-100",
-      },
-      purple: {
-        gradient: "from-purple-500 to-purple-600",
-        bg: "bg-purple-50",
-        text: "text-purple-600",
-        border: "border-purple-200",
-        hover: "group-hover:bg-purple-100",
-      },
-      emerald: {
-        gradient: "from-emerald-500 to-emerald-600",
-        bg: "bg-emerald-50",
-        text: "text-emerald-600",
-        border: "border-emerald-200",
-        hover: "group-hover:bg-emerald-100",
-      },
-      orange: {
-        gradient: "from-orange-500 to-orange-600",
-        bg: "bg-orange-50",
-        text: "text-orange-600",
-        border: "border-orange-200",
-        hover: "group-hover:bg-orange-100",
-      },
-    };
-    return colors[color] || colors.blue;
-  };
-
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" style={{ backgroundColor: "#F7FAFC" }}>
       {/* Header Section - Clean and Professional */}
@@ -431,19 +383,62 @@ const SectorCategory = () => {
                     placeholder="Brief description of the sector..."
                   />
                 </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Number of Companies</label>
+                    <input
+                      type="number"
+                      name="companies"
+                      value={editData.companies}
+                      onChange={(e) => setEditData({ ...editData, companies: e.target.value })}
+                      className="w-full rounded-lg shadow-sm outline-none"
+                      style={{ 
+                        backgroundColor: "white",
+                        borderColor: "#B5D3E7",
+                        color: "#1F2D3D",
+                        border: "1px solid #B5D3E7"
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      placeholder="e.g., 2500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Employment</label>
+                    <input
+                      type="text"
+                      name="employment"
+                      value={editData.employment}
+                      onChange={(e) => setEditData({ ...editData, employment: e.target.value })}
+                      className="w-full rounded-lg shadow-sm outline-none"
+                      style={{ 
+                        backgroundColor: "white",
+                        borderColor: "#B5D3E7",
+                        color: "#1F2D3D",
+                        border: "1px solid #B5D3E7"
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      placeholder="e.g., 5.2M"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Major Cities */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium text-gray-700">Major Hubs</h3>
+                <h3 className="text-sm font-medium" style={{ color: "#1F2D3D" }}>Major Hubs</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Major Cities</label>
-                  <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Major Cities</label>
+                  <div className="flex flex-wrap gap-2 p-3 rounded-lg border" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
                     {editData.majorCities.split(",").map((city, index) => (
                       <div
                         key={index}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-white border border-gray-200"
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm border"
+                        style={{ backgroundColor: "white", borderColor: "#B5D3E7", color: "#1F2D3D" }}
                       >
                         {city}
                         <button
@@ -453,7 +448,13 @@ const SectorCategory = () => {
                             cities.splice(index, 1);
                             setEditData({ ...editData, majorCities: cities.join(",") });
                           }}
-                          className="ml-2 text-gray-400 hover:text-gray-600"
+                          className="ml-2 transition-colors"
+                          style={{ color: "#1F2D3D", opacity: "0.4" }}
+                          onMouseEnter={(e) => e.target.style.color = "#dc2626"}
+                          onMouseLeave={(e) => {
+                            e.target.style.color = "#1F2D3D";
+                            e.target.style.opacity = "0.4";
+                          }}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -473,38 +474,55 @@ const SectorCategory = () => {
                           e.preventDefault();
                         }
                       }}
-                      className="flex-1 min-w-[150px] bg-transparent border-0 focus:ring-0 text-sm p-0"
+                      className="flex-1 min-w-[150px] bg-transparent border-0 text-sm p-0 outline-none"
+                      style={{ color: "#1F2D3D" }}
                       placeholder="Type and press Enter to add..."
                     />
                   </div>
-                  <p className="mt-1 text-sm text-gray-500">Press Enter to add a new city</p>
+                  <p className="mt-1 text-sm" style={{ color: "#1F2D3D", opacity: "0.5" }}>Press Enter to add a new city</p>
                 </div>
               </div>
 
               {/* Visual */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium text-gray-700">Visual</h3>
+                <h3 className="text-sm font-medium" style={{ color: "#1F2D3D" }}>Visual</h3>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Icon</label>
                     <input
                       type="text"
                       name="icon"
                       value={editData.icon}
                       onChange={(e) => setEditData({ ...editData, icon: e.target.value })}
-                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full rounded-lg shadow-sm outline-none"
+                      style={{ 
+                        backgroundColor: "white",
+                        borderColor: "#B5D3E7",
+                        color: "#1F2D3D",
+                        border: "1px solid #B5D3E7"
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
                       placeholder="Icon emoji or symbol"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Color Theme</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Color Theme</label>
                     <select
                       name="color"
                       value={editData.color}
                       onChange={(e) => setEditData({ ...editData, color: e.target.value })}
-                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full rounded-lg shadow-sm outline-none"
+                      style={{ 
+                        backgroundColor: "white",
+                        borderColor: "#B5D3E7",
+                        color: "#1F2D3D",
+                        border: "1px solid #B5D3E7"
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
                     >
                       <option value="blue">Blue</option>
                       <option value="green">Green</option>
@@ -517,16 +535,26 @@ const SectorCategory = () => {
               </div>
             </form>
 
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t flex justify-end gap-3" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm font-medium border rounded-lg transition-colors"
+                style={{ 
+                  color: "#1F2D3D",
+                  backgroundColor: "#DCE8F2",
+                  borderColor: "#B5D3E7"
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = "0.8"}
+                onMouseLeave={(e) => e.target.style.opacity = "1"}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+                style={{ backgroundColor: "#6EA9CB" }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
               >
                 {selectedSector ? "Save Changes" : "Add Sector"}
               </button>

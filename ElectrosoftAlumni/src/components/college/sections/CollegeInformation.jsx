@@ -45,12 +45,12 @@ const CollegeInformation = () => {
     website: "https://mycollege.edu/academics",
     verified: true,
     verifiedDate: "January 15, 2020",
-    establishmentYear: "1985",
-    location: "Mumbai, Maharashtra, India",
+    establishmentYear: "1958",
+    location: "Kanpur, Uttar Pradesh, India",
     collegeType: "Public University",
     totalStudents: "15,000+ students",
     faculty: "800+ faculty members",
-    accreditation: "NAAC A+ Grade",
+    accreditation: "NAAC A++ Grade",
     nirfRank: "National Ranking: 45",
     specialties: [
       "Engineering",
@@ -68,10 +68,10 @@ const CollegeInformation = () => {
     campuses: [
       {
         name: "Main Campus",
-        address: "Andheri East, Mumbai, Maharashtra 400069, India",
+        address: "Kanpur, Uttar Pradesh - 200076, India",
         type: "Main Campus",
         students: "10,000+",
-        coordinates: [19.1136, 72.8697], // Mumbai, Andheri East
+        coordinates: [19.1136, 72.8697], 
         dean: "Dr. Rajesh Sharma",
         contact: {
           phone: "+91 22 2673 0000",
@@ -83,10 +83,10 @@ const CollegeInformation = () => {
       },
       {
         name: "Engineering Campus",
-        address: "Powai, Mumbai, Maharashtra 400076, India",
+        address: "Mirzapur, Uttar Pradesh - 200050, India",
         type: "Specialized Campus",
         students: "3,500+",
-        coordinates: [19.1197, 72.9056], // Mumbai, Powai
+        coordinates: [19.1197, 72.9056], 
         dean: "Dr. Priya Patel",
         contact: {
           phone: "+91 22 2576 7000",
@@ -98,10 +98,10 @@ const CollegeInformation = () => {
       },
       {
         name: "Medical Campus",
-        address: "Bandra West, Mumbai, Maharashtra 400050, India",
+        address: "Jaunpur, Uttar Pradesh - 200060, India",
         type: "Medical Campus",
         students: "1,500+",
-        coordinates: [19.0596, 72.8295], // Mumbai, Bandra West
+        coordinates: [19.0596, 72.8295], 
         dean: "Dr. Amit Desai",
         contact: {
           phone: "+91 22 2640 5000",

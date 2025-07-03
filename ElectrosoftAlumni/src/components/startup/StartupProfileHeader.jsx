@@ -1106,8 +1106,8 @@ const navigationItems = [
                 style={{ backgroundColor: '#6EA9CB' }}
               >
                 {isEditingCustomNav ? "Save Changes" : "Add Navigation"}
-              </button>
-            </div>
+                </button>
+    </div>
           </div>
         </div>
       )}

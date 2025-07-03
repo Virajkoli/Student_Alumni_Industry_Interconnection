@@ -26,8 +26,6 @@ const Navbar = () => {
                 StartupConnect
               </span>
             </div>
-
-
           </div>
 
           {/* Right side - Navigation Icons */}

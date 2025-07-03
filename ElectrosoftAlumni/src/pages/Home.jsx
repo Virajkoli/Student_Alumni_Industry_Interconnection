@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-green-100">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">
-        Welcome to Electrosoft Alumni Portal
+        Welcome to Electrosoft Alumni Portal - this is home
       </h1>
       <div className="flex flex-col gap-6 w-full max-w-xs">
         <Link
@@ -25,6 +25,12 @@ const Home = () => {
           className="px-8 py-4 rounded-xl bg-purple-600 text-white text-xl font-semibold shadow hover:bg-purple-700 transition-colors text-center"
         >
           Startup
+        </Link>
+        <Link
+          to="/student-profile"
+          className="px-8 py-4 rounded-xl bg-yellow-600 text-white text-xl font-semibold shadow hover:bg-yellow-700 transition-colors text-center"
+        >
+          Student
         </Link>
       </div>
     </div>

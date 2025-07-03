@@ -26,7 +26,7 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
   const handleSkillSubmit = (e) => {
     e.preventDefault();
     if (skillInput.trim() && !skills.includes(skillInput.trim())) {
-      onSkillsUpdate(prev => [...prev, skillInput.trim()]);
+      onSkillsUpdate((prev) => [...prev, skillInput.trim()]);
       setSkillInput("");
       setShowSkillModal(false);
     }
@@ -34,17 +34,17 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
 
   const handleAddSuggestedSkill = (skill) => {
     if (!skills.includes(skill)) {
-      onSkillsUpdate(prev => [...prev, skill]);
+      onSkillsUpdate((prev) => [...prev, skill]);
     }
   };
 
   const handleRemoveSkill = (skillToRemove) => {
-    onSkillsUpdate(prev => prev.filter(skill => skill !== skillToRemove));
+    onSkillsUpdate((prev) => prev.filter((skill) => skill !== skillToRemove));
   };
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+      <div className="bg-white rounded-lg mb-6">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Skills</h2>
           <button
@@ -101,7 +101,7 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {category.skills
-                        .filter(skill => !skills.includes(skill))
+                        .filter((skill) => !skills.includes(skill))
                         .map((skill, skillIndex) => (
                           <button
                             key={skillIndex}
@@ -166,7 +166,7 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {category.skills
-                          .filter(skill => !skills.includes(skill))
+                          .filter((skill) => !skills.includes(skill))
                           .map((skill, skillIndex) => (
                             <button
                               key={skillIndex}

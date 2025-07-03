@@ -3,40 +3,124 @@ import { Edit, Plus, X, Folder, ExternalLink } from "lucide-react";
 
 const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
   const [showProjectModal, setShowProjectModal] = useState(false);
-  const [newProject, setNewProject] = useState({
+  const [editingProject, setEditingProject] = useState(null);
+  const [projectData, setProjectData] = useState({
     title: "",
     description: "",
     date: "",
     url: "",
+    technologies: [],
+    customFields: [],
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProject(prev => ({
+    setProjectData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
+    }));
+  };
+
+  const handleTechnologyAdd = (technology) => {
+    if (
+      technology &&
+      technology.trim() &&
+      !projectData.technologies.includes(technology.trim())
+    ) {
+      setProjectData((prev) => ({
+        ...prev,
+        technologies: [...prev.technologies, technology.trim()],
+      }));
+    }
+  };
+
+  const handleTechnologyRemove = (technologyToRemove) => {
+    setProjectData((prev) => ({
+      ...prev,
+      technologies: prev.technologies.filter(
+        (tech) => tech !== technologyToRemove
+      ),
+    }));
+  };
+
+  const handleCustomFieldAdd = () => {
+    setProjectData((prev) => ({
+      ...prev,
+      customFields: [...prev.customFields, { label: "", value: "" }],
+    }));
+  };
+
+  const handleCustomFieldChange = (index, field, value) => {
+    setProjectData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    }));
+  };
+
+  const handleCustomFieldRemove = (index) => {
+    setProjectData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((_, i) => i !== index),
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const project = {
-      id: Date.now(),
-      ...newProject
-    };
-    onProjectsUpdate(prev => [...prev, project]);
+
+    if (editingProject) {
+      // Update existing project
+      const updatedProjects = projects.map((project) =>
+        project.id === editingProject.id
+          ? { ...projectData, id: editingProject.id }
+          : project
+      );
+      onProjectsUpdate(updatedProjects);
+    } else {
+      // Add new project
+      const newProject = {
+        id: Date.now(),
+        ...projectData,
+      };
+      onProjectsUpdate((prev) => [...prev, newProject]);
+    }
+    closeModal();
+  };
+
+  const handleEditProject = (project) => {
+    setEditingProject(project);
+    setProjectData({
+      ...project,
+      technologies: project.technologies || [],
+      customFields: project.customFields || [],
+    });
+    setShowProjectModal(true);
+  };
+
+  const handleDeleteProject = (projectId) => {
+    const updatedProjects = projects.filter(
+      (project) => project.id !== projectId
+    );
+    onProjectsUpdate(updatedProjects);
+  };
+
+  const closeModal = () => {
     setShowProjectModal(false);
-    setNewProject({
+    setEditingProject(null);
+    setProjectData({
       title: "",
       description: "",
       date: "",
       url: "",
+      technologies: [],
+      customFields: [],
     });
   };
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+      <div className="bg-white rounded-lg mb-6">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Projects</h2>
           <button
@@ -63,9 +147,14 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
           ) : (
             <div className="space-y-6">
               {projects.map((project, index) => (
-                <div key={project.id || index} className="border border-gray-200 rounded-lg p-4">
+                <div
+                  key={project.id || index}
+                  className="border border-gray-200 rounded-lg p-4"
+                >
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-900">{project.title}</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      {project.title}
+                    </h3>
                     <div className="flex gap-2">
                       {project.url && (
                         <a
@@ -78,13 +167,58 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
                           <ExternalLink className="w-4 h-4" />
                         </a>
                       )}
-                      <button className="p-1 text-gray-400 hover:text-gray-600">
+                      <button
+                        onClick={() => handleEditProject(project)}
+                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        title="Edit project"
+                      >
                         <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProject(project.id)}
+                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Delete project"
+                      >
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                   <p className="text-gray-600 mb-2">{project.description}</p>
                   <p className="text-sm text-gray-500">{project.date}</p>
+
+                  {project.technologies && project.technologies.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-sm font-medium text-gray-600 mb-1">
+                        Technologies:
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {project.technologies.map((tech, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {project.customFields && project.customFields.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {project.customFields.map((field, index) => (
+                        <div key={index} className="text-sm">
+                          <span className="font-medium text-gray-600">
+                            {field.label}:
+                          </span>
+                          <span className="text-gray-700 ml-1">
+                            {field.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   {project.url && (
                     <a
                       href={project.url}
@@ -105,14 +239,14 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
       {/* Add Project Modal */}
       {showProjectModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[85vh] overflow-y-auto my-8">
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Add Project
+                  {editingProject ? "Edit Project" : "Add Project"}
                 </h2>
                 <button
-                  onClick={() => setShowProjectModal(false)}
+                  onClick={closeModal}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
@@ -128,7 +262,7 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
                 <input
                   type="text"
                   name="title"
-                  value={newProject.title}
+                  value={projectData.title}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   placeholder="e.g. E-commerce Website"
@@ -142,7 +276,7 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
                 </label>
                 <textarea
                   name="description"
-                  value={newProject.description}
+                  value={projectData.description}
                   onChange={handleInputChange}
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
@@ -158,7 +292,7 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
                 <input
                   type="text"
                   name="date"
-                  value={newProject.date}
+                  value={projectData.date}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   placeholder="e.g. May 2024, Spring 2024"
@@ -172,26 +306,148 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
                 <input
                   type="url"
                   name="url"
-                  value={newProject.url}
+                  value={projectData.url}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   placeholder="https://github.com/username/project or live demo URL"
                 />
               </div>
 
+              {/* Technologies Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Technologies Used
+                </label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add a technology and press Enter"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleTechnologyAdd(e.target.value);
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const input = e.target.previousElementSibling;
+                        handleTechnologyAdd(input.value);
+                        input.value = "";
+                      }}
+                      className="px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {projectData.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {projectData.technologies.map((tech, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full flex items-center gap-2"
+                        >
+                          {tech}
+                          <button
+                            type="button"
+                            onClick={() => handleTechnologyRemove(tech)}
+                            className="text-green-500 hover:text-green-700"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Custom Fields Section */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleCustomFieldAdd}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Field
+                  </button>
+                </div>
+                {projectData.customFields.length > 0 && (
+                  <div className="space-y-2">
+                    {projectData.customFields.map((field, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          placeholder="Field name"
+                          value={field.label}
+                          onChange={(e) =>
+                            handleCustomFieldChange(
+                              index,
+                              "label",
+                              e.target.value
+                            )
+                          }
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Field value"
+                          value={field.value}
+                          onChange={(e) =>
+                            handleCustomFieldChange(
+                              index,
+                              "value",
+                              e.target.value
+                            )
+                          }
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleCustomFieldRemove(index)}
+                          className="p-2 text-red-500 hover:text-red-700"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowProjectModal(false)}
+                  onClick={closeModal}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
+                {editingProject && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDeleteProject(editingProject.id);
+                      closeModal();
+                    }}
+                    className="px-4 py-2 border border-red-300 rounded-lg text-sm font-medium text-red-700 hover:bg-red-50 transition-colors"
+                  >
+                    Delete
+                  </button>
+                )}
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                 >
-                  Add Project
+                  {editingProject ? "Update Project" : "Add Project"}
                 </button>
               </div>
             </form>

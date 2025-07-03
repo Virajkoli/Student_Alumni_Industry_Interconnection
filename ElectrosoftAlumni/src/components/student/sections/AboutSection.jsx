@@ -4,7 +4,8 @@ import { Edit, X } from "lucide-react";
 const AboutSection = ({ profileData, onProfileUpdate }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [aboutText, setAboutText] = useState(
-    profileData.about || "Add a summary to highlight your personality and work style."
+    profileData.about ||
+      "Add a summary to highlight your personality and work style."
   );
 
   const handleEditClick = () => {
@@ -17,13 +18,16 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
   };
 
   const handleCancel = () => {
-    setAboutText(profileData.about || "Add a summary to highlight your personality and work style.");
+    setAboutText(
+      profileData.about ||
+        "Add a summary to highlight your personality and work style."
+    );
     setIsEditModalOpen(false);
   };
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+      <div className="bg-white rounded-lg mb-6">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">About</h2>
           <button
@@ -37,7 +41,8 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
 
         <div className="p-6">
           <p className="text-gray-700 leading-relaxed">
-            {profileData.about || "Add a summary to highlight your personality and work style."}
+            {profileData.about ||
+              "Add a summary to highlight your personality and work style."}
           </p>
         </div>
       </div>

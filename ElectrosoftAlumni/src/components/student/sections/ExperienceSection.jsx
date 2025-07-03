@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit, Plus, X, Briefcase } from "lucide-react";
 
 const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
   const [showExperienceModal, setShowExperienceModal] = useState(false);
+  const [editingExperience, setEditingExperience] = useState(null);
   const [experienceData, setExperienceData] = useState({
     title: "",
     company: "",
@@ -14,32 +15,139 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
     endYear: "",
     location: "",
     description: "",
+    skills: [],
+    achievements: [],
+    customFields: [],
     notifyNetwork: true,
   });
 
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setExperienceData(prev => ({
+    setExperienceData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSkillAdd = (skill) => {
+    if (
+      skill &&
+      skill.trim() &&
+      !experienceData.skills.includes(skill.trim())
+    ) {
+      setExperienceData((prev) => ({
+        ...prev,
+        skills: [...prev.skills, skill.trim()],
+      }));
+    }
+  };
+
+  const handleSkillRemove = (skillToRemove) => {
+    setExperienceData((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((skill) => skill !== skillToRemove),
+    }));
+  };
+
+  const handleAchievementAdd = (achievement) => {
+    if (achievement && achievement.trim()) {
+      setExperienceData((prev) => ({
+        ...prev,
+        achievements: [...prev.achievements, achievement.trim()],
+      }));
+    }
+  };
+
+  const handleAchievementRemove = (index) => {
+    setExperienceData((prev) => ({
+      ...prev,
+      achievements: prev.achievements.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleCustomFieldAdd = () => {
+    setExperienceData((prev) => ({
+      ...prev,
+      customFields: [...prev.customFields, { label: "", value: "" }],
+    }));
+  };
+
+  const handleCustomFieldChange = (index, field, value) => {
+    setExperienceData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    }));
+  };
+
+  const handleCustomFieldRemove = (index) => {
+    setExperienceData((prev) => ({
+      ...prev,
+      customFields: prev.customFields.filter((_, i) => i !== index),
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newExperience = {
-      id: Date.now(),
-      ...experienceData
-    };
-    onExperienceUpdate(prev => [...prev, newExperience]);
+
+    if (editingExperience) {
+      // Update existing experience
+      const updatedExperiences = experiences.map((exp) =>
+        exp.id === editingExperience.id
+          ? { ...experienceData, id: editingExperience.id }
+          : exp
+      );
+      onExperienceUpdate(updatedExperiences);
+    } else {
+      // Add new experience
+      const newExperience = {
+        id: Date.now(),
+        ...experienceData,
+      };
+      onExperienceUpdate((prev) => [...prev, newExperience]);
+    }
+    closeModal();
+  };
+
+  const handleEditExperience = (experience) => {
+    setEditingExperience(experience);
+    setExperienceData({
+      ...experience,
+      skills: experience.skills || [],
+      achievements: experience.achievements || [],
+      customFields: experience.customFields || [],
+    });
+    setShowExperienceModal(true);
+  };
+
+  const handleDeleteExperience = (experienceId) => {
+    const updatedExperiences = experiences.filter(
+      (exp) => exp.id !== experienceId
+    );
+    onExperienceUpdate(updatedExperiences);
+  };
+
+  const closeModal = () => {
     setShowExperienceModal(false);
+    setEditingExperience(null);
     setExperienceData({
       title: "",
       company: "",
@@ -51,13 +159,16 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
       endYear: "",
       location: "",
       description: "",
+      skills: [],
+      achievements: [],
+      customFields: [],
       notifyNetwork: true,
     });
   };
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+      <div className="bg-white rounded-lg">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Experience</h2>
           <button
@@ -91,22 +202,109 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{experience.title}</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      {experience.title}
+                    </h3>
                     <p className="text-gray-600">{experience.company}</p>
                     <p className="text-sm text-gray-500">
-                      {experience.employmentType} • {experience.startMonth} {experience.startYear} - 
-                      {experience.currentlyWorking ? " Present" : ` ${experience.endMonth} ${experience.endYear}`}
+                      {experience.employmentType} • {experience.startMonth}{" "}
+                      {experience.startYear} -
+                      {experience.currentlyWorking
+                        ? " Present"
+                        : ` ${experience.endMonth} ${experience.endYear}`}
                     </p>
                     {experience.location && (
-                      <p className="text-sm text-gray-500">{experience.location}</p>
+                      <p className="text-sm text-gray-500">
+                        {experience.location}
+                      </p>
                     )}
                     {experience.description && (
-                      <p className="text-gray-700 mt-2">{experience.description}</p>
+                      <p className="text-gray-700 mt-2">
+                        {experience.description}
+                      </p>
                     )}
+                    {experience.skills && experience.skills.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-sm font-medium text-gray-600 mb-1">
+                          Skills:
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {experience.skills.map((skill, index) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {experience.achievements &&
+                      experience.achievements.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm font-medium text-gray-600 mb-1">
+                            Key Achievements:
+                          </p>
+                          <ul className="text-sm text-gray-700 list-disc list-inside">
+                            {experience.achievements.map(
+                              (achievement, index) => (
+                                <li key={index}>{achievement}</li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+                      )}
+
+                    {experience.achievements &&
+                      experience.achievements.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm font-medium text-gray-600 mb-1">
+                            Key Achievements:
+                          </p>
+                          <ul className="text-sm text-gray-700 list-disc list-inside">
+                            {experience.achievements.map(
+                              (achievement, index) => (
+                                <li key={index}>{achievement}</li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+                      )}
+
+                    {experience.customFields &&
+                      experience.customFields.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {experience.customFields.map((field, index) => (
+                            <div key={index} className="text-sm">
+                              <span className="font-medium text-gray-600">
+                                {field.label}:
+                              </span>
+                              <span className="text-gray-700 ml-1">
+                                {field.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </div>
-                  <button className="p-1 text-gray-400 hover:text-gray-600">
-                    <Edit className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditExperience(experience)}
+                      className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      title="Edit experience"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteExperience(experience.id)}
+                      className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      title="Delete experience"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -121,10 +319,10 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Add Experience
+                  {editingExperience ? "Edit Experience" : "Add Experience"}
                 </h2>
                 <button
-                  onClick={() => setShowExperienceModal(false)}
+                  onClick={closeModal}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
@@ -204,7 +402,10 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                   onChange={handleInputChange}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <label htmlFor="currentlyWorking" className="text-sm text-gray-700">
+                <label
+                  htmlFor="currentlyWorking"
+                  className="text-sm text-gray-700"
+                >
                   I am currently working in this role
                 </label>
               </div>
@@ -222,8 +423,10 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                       className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     >
                       <option value="">Month</option>
-                      {months.map(month => (
-                        <option key={month} value={month}>{month}</option>
+                      {months.map((month) => (
+                        <option key={month} value={month}>
+                          {month}
+                        </option>
                       ))}
                     </select>
                     <select
@@ -233,8 +436,10 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                       className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     >
                       <option value="">Year</option>
-                      {years.map(year => (
-                        <option key={year} value={year}>{year}</option>
+                      {years.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -253,8 +458,10 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                         className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                       >
                         <option value="">Month</option>
-                        {months.map(month => (
-                          <option key={month} value={month}>{month}</option>
+                        {months.map((month) => (
+                          <option key={month} value={month}>
+                            {month}
+                          </option>
                         ))}
                       </select>
                       <select
@@ -264,8 +471,10 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                         className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                       >
                         <option value="">Year</option>
-                        {years.map(year => (
-                          <option key={year} value={year}>{year}</option>
+                        {years.map((year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -287,6 +496,171 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                 />
               </div>
 
+              {/* Skills Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Skills Used
+                </label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add a skill and press Enter"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleSkillAdd(e.target.value);
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const input = e.target.previousElementSibling;
+                        handleSkillAdd(input.value);
+                        input.value = "";
+                      }}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {experienceData.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {experienceData.skills.map((skill, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full flex items-center gap-2"
+                        >
+                          {skill}
+                          <button
+                            type="button"
+                            onClick={() => handleSkillRemove(skill)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Achievements Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Key Achievements
+                </label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add an achievement and press Enter"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAchievementAdd(e.target.value);
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const input = e.target.previousElementSibling;
+                        handleAchievementAdd(input.value);
+                        input.value = "";
+                      }}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {experienceData.achievements.length > 0 && (
+                    <div className="space-y-1">
+                      {experienceData.achievements.map((achievement, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                        >
+                          <span className="text-sm text-gray-700">
+                            {achievement}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleAchievementRemove(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Custom Fields Section */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Custom Fields
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleCustomFieldAdd}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Field
+                  </button>
+                </div>
+                {experienceData.customFields.length > 0 && (
+                  <div className="space-y-2">
+                    {experienceData.customFields.map((field, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          placeholder="Field name"
+                          value={field.label}
+                          onChange={(e) =>
+                            handleCustomFieldChange(
+                              index,
+                              "label",
+                              e.target.value
+                            )
+                          }
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Field value"
+                          value={field.value}
+                          onChange={(e) =>
+                            handleCustomFieldChange(
+                              index,
+                              "value",
+                              e.target.value
+                            )
+                          }
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleCustomFieldRemove(index)}
+                          className="p-2 text-red-500 hover:text-red-700"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -296,7 +670,10 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                   onChange={handleInputChange}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <label htmlFor="notifyNetwork" className="text-sm text-gray-700">
+                <label
+                  htmlFor="notifyNetwork"
+                  className="text-sm text-gray-700"
+                >
                   Notify your network of key profile changes
                 </label>
               </div>
@@ -304,16 +681,28 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowExperienceModal(false)}
+                  onClick={closeModal}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
+                {editingExperience && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDeleteExperience(editingExperience.id);
+                      closeModal();
+                    }}
+                    className="px-4 py-2 border border-red-300 rounded-lg text-sm font-medium text-red-700 hover:bg-red-50 transition-colors"
+                  >
+                    Delete
+                  </button>
+                )}
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                 >
-                  Save
+                  {editingExperience ? "Update" : "Save"}
                 </button>
               </div>
             </form>

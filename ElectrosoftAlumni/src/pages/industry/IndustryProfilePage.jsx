@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Navbar from "../../components/industry/Navbar";
 import HorizontalProfileNavbar from "../../components/industry/IndustryProfileHeader";
 import PostCreator from "../../components/industry/PostCreator";
 import FeedArea from "../../components/industry/FeedArea";
@@ -59,7 +58,6 @@ const IndustryProfilePage = () => {
       <button className="bg-yellow-500 text-white px-4 py-2 rounded mb-4 ml-4">
         <a href="/student-profile">Go to Student Profile</a>
       </button>
-      <Navbar />
       {/* Search Container */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3">

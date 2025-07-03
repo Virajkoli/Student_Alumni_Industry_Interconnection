@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { Edit3 } from "lucide-react";
-import Navbar from "../../components/startup/Navbar";
 import PostCreator from "../../components/startup/PostCreator";
 import FeedArea from "../../components/startup/FeedArea";
 import StartupQuizSidebar from "../../components/startup/StartupQuizSidebar";
@@ -25,46 +23,13 @@ const navigationOptions = [
 const StartupProfilePage = () => {
   const [activeContent, setActiveContent] = useState("posts");
   const [activeContentName, setActiveContentName] = useState("Posts");
-  const [activeCustomContent, setActiveCustomContent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOption, setSelectedOption] = useState(navigationOptions[0]);
-  const [customNavigations, setCustomNavigations] = useState([]);
 
-  const handleNavigationChange = (
-    contentId,
-    contentName,
-    customNavItem = null
-  ) => {
+  const handleNavigationChange = (contentId, contentName) => {
     setActiveContent(contentId);
     setActiveContentName(contentName);
-    setActiveCustomContent(customNavItem);
     setSelectedOption(contentName);
-
-    // No need to add custom navigation to local state here since it's already managed by the header component
-  };
-
-  const handleCustomContentUpdate = (customNavId, newContent) => {
-    // Update the custom navigation content in our local state
-    setCustomNavigations((prev) =>
-      prev.map((nav) =>
-        nav.id === customNavId ? { ...nav, content: newContent } : nav
-      )
-    );
-
-    // Also update the activeCustomContent if it's the currently active one
-    if (activeCustomContent && activeCustomContent.id === customNavId) {
-      setActiveCustomContent((prev) => ({ ...prev, content: newContent }));
-    }
-  };
-
-  const handleEditCustomContent = (customNavItem) => {
-    // Find the StartupProfileHeader and trigger its edit modal
-    // This will be handled by the StartupProfileHeader component
-    // We can trigger a custom event or use a ref to communicate with it
-    const event = new CustomEvent("editCustomNavigation", {
-      detail: { customNavItem },
-    });
-    window.dispatchEvent(event);
   };
 
   const handleOptionSelect = (option) => {
@@ -102,10 +67,6 @@ const StartupProfilePage = () => {
       <button className="bg-red-500 text-white px-4 py-2 rounded mb-4 ml-4">
         <a href="/college-profile">Go to College Profile</a>
       </button>
-      <button className="bg-yellow-500 text-white px-4 py-2 rounded mb-4 ml-4">
-        <a href="/student-profile">Go to Student Profile</a>
-      </button>
-      <Navbar />
       {/* Search Container */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3">
@@ -139,15 +100,12 @@ const StartupProfilePage = () => {
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
-        {/* Profile Header Section with integrated navigation */}
         <div className="w-full mb-6">
           <StartupProfileHeader
             onNavigationChange={handleNavigationChange}
-            customNavigations={customNavigations}
-            onCustomNavigationUpdate={setCustomNavigations}
+            navigationOptions={navigationOptions}
           />
         </div>
-
         <div className="flex gap-6">
           {/* Main Content Area - 70% width */}
           <div className="w-full lg:w-[70%] flex flex-col">
@@ -162,8 +120,6 @@ const StartupProfilePage = () => {
                   <ContentRenderer
                     activeContent={activeContent}
                     activeContentName={activeContentName}
-                    customNavItem={activeCustomContent}
-                    onEditCustomContent={handleEditCustomContent}
                   />
                 )}
               </div>

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import CollegeProfileHeader from "../../components/college/CollegeProfileHeader";
 import CollegeNotifications from "../../components/college/CollegeNotifications";
-import Navbar from "../../components/college/sections/Navbar";
 import CollegeInformation from "../../components/college/sections/CollegeInformation";
 import Courses from "../../components/college/sections/Courses";
 import FeesReview from "../../components/college/sections/CourseFees";
@@ -519,7 +518,6 @@ const CollegeProfilePage = () => {
       <button className="bg-red-500 text-white px-4 py-2 rounded mb-4 ml-4">
         <a href="/college-profile">Go to College Profile</a>
       </button>
-      <Navbar />
       {/* Search Container */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3">

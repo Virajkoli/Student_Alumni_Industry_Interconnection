@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Navbar from "../../components/student/Navbar";
 import StudentProfileHeader from "../../components/student/StudentProfileHeader";
 import AboutSection from "../../components/student/sections/AboutSection";
 import ExperienceSection from "../../components/student/sections/ExperienceSection";
@@ -26,7 +25,8 @@ const StudentProfilePage = () => {
     showSchool: true,
     country: "India",
     city: "Jalgaon, Maharashtra",
-    about: "Passionate computer engineering student with a strong foundation in web development and software engineering. Eager to apply theoretical knowledge in real-world projects and contribute to innovative solutions.",
+    about:
+      "Passionate computer engineering student with a strong foundation in web development and software engineering. Eager to apply theoretical knowledge in real-world projects and contribute to innovative solutions.",
   });
 
   // State for experiences
@@ -43,8 +43,9 @@ const StudentProfilePage = () => {
       endYear: "2025",
       grade: "8.5 CGPA",
       activities: "Programming Club, Technical Events",
-      description: "Focused on software development, data structures, and web technologies."
-    }
+      description:
+        "Focused on software development, data structures, and web technologies.",
+    },
   ]);
 
   // State for skills
@@ -60,7 +61,8 @@ const StudentProfilePage = () => {
     {
       id: 1,
       title: "E-commerce Website",
-      description: "Developed a full-stack e-commerce platform with React and Node.js",
+      description:
+        "Developed a full-stack e-commerce platform with React and Node.js",
       date: "May 2024",
       url: "https://github.com/username/ecommerce",
     },
@@ -106,24 +108,30 @@ const StudentProfilePage = () => {
         <h1 className="text-3xl font-bold text-center my-8">
           Electrosoft Alumni Platform
         </h1>
-        
+
         {/* Navigation Buttons */}
         <div className="flex justify-center gap-4 mb-4">
           <button className="bg-blue-500 text-white px-4 py-2 rounded">
-            <a href="/startup-profile" className="text-white no-underline">Go to Startup Profile</a>
+            <a href="/startup-profile" className="text-white no-underline">
+              Go to Startup Profile
+            </a>
           </button>
           <button className="bg-green-500 text-white px-4 py-2 rounded">
-            <a href="/industry-profile" className="text-white no-underline">Go to Industry Profile</a>
+            <a href="/industry-profile" className="text-white no-underline">
+              Go to Industry Profile
+            </a>
           </button>
           <button className="bg-red-500 text-white px-4 py-2 rounded">
-            <a href="/college-profile" className="text-white no-underline">Go to College Profile</a>
+            <a href="/college-profile" className="text-white no-underline">
+              Go to College Profile
+            </a>
           </button>
           <button className="bg-yellow-500 text-white px-4 py-2 rounded">
-            <a href="/student-profile" className="text-white no-underline">Go to Student Profile</a>
+            <a href="/student-profile" className="text-white no-underline">
+              Go to Student Profile
+            </a>
           </button>
         </div>
-
-        <Navbar />
 
         {/* Search Container */}
         <div className="bg-white shadow-sm border-b border-gray-200">
@@ -160,57 +168,48 @@ const StudentProfilePage = () => {
         {/* Main Content */}
         <div className="max-w-4xl mx-auto px-4 py-8">
           {/* Profile Header */}
-          <StudentProfileHeader 
-            profileData={profileData} 
-            onProfileUpdate={setProfileData} 
+          <StudentProfileHeader
+            profileData={profileData}
+            onProfileUpdate={setProfileData}
           />
 
           {/* About Section */}
-          <AboutSection 
-            profileData={profileData} 
-            onProfileUpdate={setProfileData} 
+          <AboutSection
+            profileData={profileData}
+            onProfileUpdate={setProfileData}
           />
 
           {/* Experience Section */}
-          <ExperienceSection 
-            experiences={experiences} 
-            onExperienceUpdate={setExperiences} 
+          <ExperienceSection
+            experiences={experiences}
+            onExperienceUpdate={setExperiences}
           />
 
           {/* Education Section */}
-          <EducationSection 
-            education={education} 
-            onEducationUpdate={setEducation} 
+          <EducationSection
+            education={education}
+            onEducationUpdate={setEducation}
           />
 
           {/* Skills Section */}
-          <SkillsSection 
-            skills={skills} 
-            onSkillsUpdate={setSkills} 
-          />
+          <SkillsSection skills={skills} onSkillsUpdate={setSkills} />
 
           {/* Projects Section */}
-          <ProjectsSection 
-            projects={projects} 
-            onProjectsUpdate={setProjects} 
-          />
+          <ProjectsSection projects={projects} onProjectsUpdate={setProjects} />
 
           {/* Courses Section */}
-          <CoursesSection 
-            courses={courses} 
-            onCoursesUpdate={setCourses} 
-          />
+          <CoursesSection courses={courses} onCoursesUpdate={setCourses} />
 
           {/* Certifications Section */}
-          <CertificationsSection 
-            certifications={certifications} 
-            onCertificationsUpdate={setCertifications} 
+          <CertificationsSection
+            certifications={certifications}
+            onCertificationsUpdate={setCertifications}
           />
 
           {/* Recommendations Section */}
-          <RecommendationsSection 
-            recommendations={recommendations} 
-            onRecommendationsUpdate={setRecommendations} 
+          <RecommendationsSection
+            recommendations={recommendations}
+            onRecommendationsUpdate={setRecommendations}
           />
         </div>
       </div>

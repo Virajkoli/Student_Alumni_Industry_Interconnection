@@ -292,36 +292,39 @@ const SectorCategory = () => {
               {/* Stats */}
               <div className="flex items-center gap-8">
                 <div className="flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-gray-400" />
+                  <Building2 className="w-5 h-5" style={{ color: "#1F2D3D", opacity: "0.4" }} />
                   <div>
-                    <div className="text-lg font-semibold text-gray-900">
+                    <div className="text-lg font-semibold" style={{ color: "#1F2D3D" }}>
                       {sector.companies.toLocaleString()}
                     </div>
-                    <div className="text-xs text-gray-500">Companies</div>
+                    <div className="text-xs" style={{ color: "#1F2D3D", opacity: "0.5" }}>Companies</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-gray-400" />
+                  <Users className="w-5 h-5" style={{ color: "#1F2D3D", opacity: "0.4" }} />
                   <div>
-                    <div className="text-lg font-semibold text-gray-900">
+                    <div className="text-lg font-semibold" style={{ color: "#1F2D3D" }}>
                       {sector.employment}
                     </div>
-                    <div className="text-xs text-gray-500">Employees</div>
+                    <div className="text-xs" style={{ color: "#1F2D3D", opacity: "0.5" }}>Employees</div>
                   </div>
                 </div>
               </div>
 
               {/* Major Cities */}
-              <div className="border-t border-gray-100 pt-4">
+              <div className="border-t pt-4" style={{ borderColor: "#DCE8F2" }}>
                 <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700">Major Hubs</span>
+                  <MapPin className="w-4 h-4" style={{ color: "#1F2D3D", opacity: "0.4" }} />
+                  <span className="text-sm font-medium" style={{ color: "#1F2D3D" }}>Major Hubs</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {sector.majorCities.map((city, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 rounded-full bg-gray-50 text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200"
+                      className="px-3 py-1 rounded-full text-sm transition-colors duration-200"
+                      style={{ backgroundColor: "#DCE8F2", color: "#1F2D3D" }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = "#B5D3E7"}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = "#DCE8F2"}
                     >
                       {city}
                     </span>
@@ -336,15 +339,25 @@ const SectorCategory = () => {
       {/* Modal - Keep existing modal code but update styling */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-100">
+          <div className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "white" }}>
+            <div className="p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
                   {selectedSector ? "Edit Sector" : "Add New Sector"}
                 </h2>
                 <button
                   onClick={handleCancel}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-full transition-colors"
+                  style={{ color: "#1F2D3D", opacity: "0.4" }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#6EA9CB";
+                    e.target.style.backgroundColor = "#DCE8F2";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#1F2D3D";
+                    e.target.style.opacity = "0.4";
+                    e.target.style.backgroundColor = "transparent";
+                  }}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -355,42 +368,66 @@ const SectorCategory = () => {
             <form className="p-6 space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium text-gray-700">Basic Information</h3>
+                <h3 className="text-sm font-medium" style={{ color: "#1F2D3D" }}>Basic Information</h3>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Sector Name</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Sector Name</label>
                     <input
                       type="text"
                       name="name"
                       value={editData.name}
                       onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full rounded-lg shadow-sm outline-none"
+                      style={{ 
+                        backgroundColor: "white",
+                        borderColor: "#B5D3E7",
+                        color: "#1F2D3D",
+                        border: "1px solid #B5D3E7"
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
                       placeholder="e.g., Technology"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Growth Rate</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Growth Rate</label>
                     <input
                       type="text"
                       name="growth"
                       value={editData.growth}
                       onChange={(e) => setEditData({ ...editData, growth: e.target.value })}
-                      className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full rounded-lg shadow-sm outline-none"
+                      style={{ 
+                        backgroundColor: "white",
+                        borderColor: "#B5D3E7",
+                        color: "#1F2D3D",
+                        border: "1px solid #B5D3E7"
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
                       placeholder="e.g., 12.5%"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Description</label>
                   <textarea
                     name="description"
                     value={editData.description}
                     onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                     rows={3}
-                    className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="w-full rounded-lg shadow-sm outline-none"
+                    style={{ 
+                      backgroundColor: "white",
+                      borderColor: "#B5D3E7",
+                      color: "#1F2D3D",
+                      border: "1px solid #B5D3E7"
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                    onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
                     placeholder="Brief description of the sector..."
                   />
                 </div>

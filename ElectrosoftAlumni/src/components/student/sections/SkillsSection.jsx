@@ -44,12 +44,21 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg mb-6">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Skills</h2>
+      <div className="bg-white rounded-lg mb-6 shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between p-6" style={{ backgroundColor: "#DCE8F2", borderBottom: "1px solid #B5D3E7" }}>
+          <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>Skills</h2>
           <button
             onClick={() => setShowSkillModal(true)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 rounded-full transition-colors"
+            style={{ color: "#1F2D3D", opacity: 0.7 }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#B5D3E7";
+              e.target.style.opacity = "1";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "transparent";
+              e.target.style.opacity = "0.7";
+            }}
             title="Add skill"
           >
             <Plus className="w-5 h-5" />
@@ -63,7 +72,7 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
               <p className="text-gray-500 mb-4">No skills added yet</p>
               <button
                 onClick={() => setShowSkillModal(true)}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
               >
                 Add your skills
               </button>
@@ -78,7 +87,7 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
                   {skill}
                   <button
                     onClick={() => handleRemoveSkill(skill)}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-600 hover:text-blue-800 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -123,31 +132,41 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
       {/* Add Skill Modal */}
       {showSkillModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="p-6 border-b border-gray-200">
+          <div className="rounded-xl shadow-xl w-full max-w-md" style={{ backgroundColor: "#F7FAFC" }}>
+            <div className="p-6" style={{ borderBottom: "1px solid #DCE8F2" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
                   Add Skill
                 </h2>
                 <button
                   onClick={() => setShowSkillModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 rounded-full transition-colors"
+                  style={{ backgroundColor: "transparent" }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: "#1F2D3D" }} />
                 </button>
               </div>
             </div>
 
             <form onSubmit={handleSkillSubmit} className="p-6">
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                   Skill *
                 </label>
                 <input
                   type="text"
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 outline-none transition-colors"
+                  style={{ 
+                    backgroundColor: "#F7FAFC", 
+                    border: "1px solid #DCE8F2",
+                    color: "#1F2D3D"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                  onBlur={(e) => e.target.style.borderColor = "#DCE8F2"}
                   placeholder="e.g. JavaScript, React, Python"
                   required
                 />

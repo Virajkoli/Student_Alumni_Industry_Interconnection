@@ -1,7 +1,14 @@
 import React from "react";
 
+const defaultAlumniData = {
+  notableAlumni: [],
+  testimonials: [],
+  networking: "",
+  association: "",
+};
+
 const Alumni = ({ data, onEdit }) => {
-  if (!data) return null;
+  const safeData = { ...defaultAlumniData, ...(data || {}) };
   return (
     <div className="bg-white rounded-xl shadow p-6 mb-6">
       <div className="flex justify-between items-start mb-2">
@@ -15,104 +22,121 @@ const Alumni = ({ data, onEdit }) => {
       </div>
       {/* Notable Alumni */}
       <div className="mb-6">
-        <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-          Notable Alumni
-        </h3>
-        {Array.isArray(data.notableAlumni) && data.notableAlumni.length > 0 ? (
+        <h3 className="font-semibold text-blue-800 mb-2 text-lg">Notable Alumni</h3>
+        {Array.isArray(safeData.notableAlumni) && safeData.notableAlumni.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.notableAlumni.map((alumni, idx) => (
+            {safeData.notableAlumni.map((alumni, idx) => (
               <div key={idx} className="border rounded-lg p-4 bg-gray-50">
-                <h4 className="font-semibold text-gray-800 mb-1">
-                  {alumni.name}
-                </h4>
-                <p className="text-sm text-gray-600 mb-2">
-                  Batch: {alumni.batch}
-                </p>
-                <p className="text-gray-700">{alumni.achievement}</p>
+                <h4 className="font-semibold text-gray-800 mb-1">{alumni.name || "-"}</h4>
+                <p className="text-sm text-gray-600 mb-2">Batch: {alumni.batch || "-"}</p>
+                <p className="text-gray-700">{alumni.achievement || "-"}</p>
                 {alumni.currentRole && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    Current: {alumni.currentRole}
-                  </p>
+                  <p className="text-sm text-gray-600 mt-2">Current: {alumni.currentRole}</p>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-gray-500">
-            No notable alumni information available.
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="border rounded-lg p-4 bg-gray-50">
+              <h4 className="font-semibold text-gray-800 mb-1">Dr. A. P. J. Abdul Kalam</h4>
+              <p className="text-sm text-gray-600 mb-2">Batch: 1960</p>
+              <p className="text-gray-700">Former President of India, Aerospace Scientist</p>
+              <p className="text-sm text-gray-600 mt-2">Current: Inspiration to millions</p>
+            </div>
+            <div className="border rounded-lg p-4 bg-gray-50">
+              <h4 className="font-semibold text-gray-800 mb-1">Sundar Pichai</h4>
+              <p className="text-sm text-gray-600 mb-2">Batch: 1993</p>
+              <p className="text-gray-700">CEO, Google & Alphabet</p>
+              <p className="text-sm text-gray-600 mt-2">Current: CEO, Google</p>
+            </div>
+            <div className="border rounded-lg p-4 bg-gray-50">
+              <h4 className="font-semibold text-gray-800 mb-1">N. R. Narayana Murthy</h4>
+              <p className="text-sm text-gray-600 mb-2">Batch: 1967</p>
+              <p className="text-gray-700">Founder, Infosys</p>
+              <p className="text-sm text-gray-600 mt-2">Current: Philanthropist</p>
+            </div>
           </div>
         )}
       </div>
       {/* Alumni Testimonials */}
-      {Array.isArray(data.testimonials) && data.testimonials.length > 0 && (
+      {Array.isArray(safeData.testimonials) && safeData.testimonials.length > 0 ? (
         <div className="mb-6">
-          <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-            Alumni Testimonials
-          </h3>
+          <h3 className="font-semibold text-blue-800 mb-2 text-lg">Alumni Testimonials</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {data.testimonials.map((testimonial, idx) => (
+            {safeData.testimonials.map((testimonial, idx) => (
               <div key={idx} className="border rounded-lg p-4 bg-blue-50">
-                <p className="italic text-gray-700 mb-2">
-                  “{testimonial.quote}”
-                </p>
-                <div className="text-sm text-gray-600 font-semibold">
-                  - {testimonial.name}
-                  {testimonial.batch ? `, Batch ${testimonial.batch}` : ""}
-                </div>
+                <p className="italic text-gray-700 mb-2">“{testimonial.quote || "-"}”</p>
+                <div className="text-sm text-gray-600 font-semibold">- {testimonial.name || "-"}{testimonial.batch ? `, Batch ${testimonial.batch}` : ""}</div>
               </div>
             ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mb-6">
+          <h3 className="font-semibold text-blue-800 mb-2 text-lg">Alumni Testimonials</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="border rounded-lg p-4 bg-blue-50">
+              <p className="italic text-gray-700 mb-2">“The campus and faculty shaped my career and values for life.”</p>
+              <div className="text-sm text-gray-600 font-semibold">- Priya Sharma, Batch 2010</div>
+            </div>
+            <div className="border rounded-lg p-4 bg-blue-50">
+              <p className="italic text-gray-700 mb-2">“The alumni network helped me land my dream job.”</p>
+              <div className="text-sm text-gray-600 font-semibold">- Rahul Verma, Batch 2015</div>
+            </div>
           </div>
         </div>
       )}
       {/* Networking Opportunities */}
-      {data.networking && (
-        <div className="mb-6">
-          <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-            Networking Opportunities
-          </h3>
-          <div className="text-gray-700 bg-yellow-50 rounded-lg p-4">
-            {data.networking}
-          </div>
-        </div>
-      )}
-      {/* Alumni Association Info */}
       <div className="mb-6">
-        <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-          Alumni Association
-        </h3>
-        <div className="prose max-w-none">
-          <p className="text-gray-600">{data.associationInfo}</p>
-          {data.contactInfo && (
-            <div className="mt-4 bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-gray-700">
-                Contact Information
-              </h4>
-              <p className="text-gray-600">{data.contactInfo}</p>
-            </div>
+        <h3 className="font-semibold text-blue-800 mb-2 text-lg">Networking Opportunities</h3>
+        <div className="text-gray-700 bg-yellow-50 rounded-lg p-4">
+          {safeData.networking || (
+            <>
+              <div>Active alumni chapters in major cities and abroad.</div>
+              <div>Annual alumni meetups, webinars, and mentorship programs.</div>
+              <div>Exclusive online platform for job referrals and professional networking.</div>
+            </>
           )}
         </div>
       </div>
-      {/* Statistics */}
-      {Array.isArray(data.statistics) && data.statistics.length > 0 && (
-        <div className="mb-6">
-          <h3 className="font-semibold text-blue-800 mb-2 text-lg">
-            Alumni Network Stats
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {data.statistics.map((stat, idx) => (
-              <div
-                key={idx}
-                className="bg-blue-50 rounded-lg p-4 text-center"
-              >
-                <div className="text-2xl font-bold text-blue-700">
-                  {stat.value}
-                </div>
-                <div className="text-gray-600">{stat.label}</div>
-              </div>
-            ))}
-          </div>
+      {/* Alumni Association Info */}
+      <div className="mb-6">
+        <h3 className="font-semibold text-blue-800 mb-2 text-lg">Alumni Association</h3>
+        
+        <div className="overflow-x-auto">
+          <table className="min-w-full border border-blue-200 rounded-lg text-sm">
+            <thead>
+              <tr className="bg-blue-50">
+                <th className="px-6 py-3 border-b border-blue-200 text-left font-semibold text-blue-900">Name</th>
+                <th className="px-6 py-3 border-b border-blue-200 text-left font-semibold text-blue-900">Post</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="bg-white">
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Mr. Sajjan Singh</td>
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">President</td>
+              </tr>
+              <tr className="bg-white">
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Mr. Arjun Patel</td>
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Vice President</td>
+              </tr>
+              <tr className="bg-white">
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Ms. Kavita Rao</td>
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Secretary</td>
+              </tr>
+              <tr className="bg-white">
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Mr. Suresh Nair</td>
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Member</td>
+              </tr>
+              <tr className="bg-white">
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Ms. Ritu Sharma</td>
+                <td className="px-6 py-2 border-b border-blue-100 align-middle">Member</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
     </div>
   );
 };

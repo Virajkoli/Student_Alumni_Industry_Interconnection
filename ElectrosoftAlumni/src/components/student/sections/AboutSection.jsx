@@ -27,12 +27,21 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg mb-6">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">About</h2>
+      <div className="bg-white rounded-lg mb-6 shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between p-6" style={{ backgroundColor: "#DCE8F2", borderBottom: "1px solid #B5D3E7" }}>
+          <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>About</h2>
           <button
             onClick={handleEditClick}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 rounded-full transition-colors"
+            style={{ color: "#1F2D3D", opacity: 0.7 }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#B5D3E7";
+              e.target.style.opacity = "1";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "transparent";
+              e.target.style.opacity = "0.7";
+            }}
             title="Edit about section"
           >
             <Edit className="w-5 h-5" />
@@ -50,50 +59,70 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
       {/* Edit About Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl">
-            <div className="p-6 border-b border-gray-200">
+          <div className="rounded-xl shadow-xl w-full max-w-2xl" style={{ backgroundColor: "#F7FAFC" }}>
+            <div className="p-6" style={{ borderBottom: "1px solid #DCE8F2" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
                   Edit About
                 </h2>
                 <button
                   onClick={handleCancel}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 rounded-full transition-colors"
+                  style={{ backgroundColor: "transparent" }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: "#1F2D3D" }} />
                 </button>
               </div>
             </div>
 
             <div className="p-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
                   Summary
                 </label>
                 <textarea
                   value={aboutText}
                   onChange={(e) => setAboutText(e.target.value)}
                   rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 outline-none resize-none transition-colors"
+                  style={{ 
+                    backgroundColor: "#F7FAFC", 
+                    border: "1px solid #DCE8F2",
+                    color: "#1F2D3D"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
+                  onBlur={(e) => e.target.style.borderColor = "#DCE8F2"}
                   placeholder="Write a brief description about yourself, your goals, and what you're passionate about..."
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1" style={{ color: "#1F2D3D", opacity: 0.6 }}>
                   {aboutText.length}/2000 characters
                 </p>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: "#DCE8F2", borderTop: "1px solid #B5D3E7" }}>
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                style={{ 
+                  color: "#1F2D3D", 
+                  backgroundColor: "#F7FAFC", 
+                  border: "1px solid #DCE8F2" 
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#F7FAFC"}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
+                style={{ backgroundColor: "#6EA9CB" }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#5A8FAD"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
               >
                 Save
               </button>

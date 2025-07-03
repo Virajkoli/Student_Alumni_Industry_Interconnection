@@ -326,17 +326,18 @@ const Resources = () => {
     <>
       <div className="p-6 max-w-4xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="rounded-lg" style={{ backgroundColor: '#F7FAFC' }}>
+          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">Resources</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>Resources</h1>
+              <p className="text-sm mt-1" style={{ color: '#1F2D3D', opacity: 0.7 }}>
                 Templates, guides, legal resources, and essential startup tools
               </p>
             </div>
             <button
               onClick={handleAddResource}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
+              style={{ backgroundColor: '#6EA9CB' }}
             >
               <Plus className="w-4 h-4" />
               Add Resource
@@ -392,19 +393,19 @@ const Resources = () => {
           </div> */}
 
           {/* Resource Categories */}
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y" style={{ borderColor: '#DCE8F2' }}>
             {resourceCategories.map((category) => (
               <div key={category.id} className="p-6">
                 {/* Category Header */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#B5D3E7' }}>
                     <span className="text-lg">{category.icon}</span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold" style={{ color: '#1F2D3D' }}>
                       {category.category}
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm" style={{ color: '#1F2D3D', opacity: 0.7 }}>
                       {category.description}
                     </p>
                   </div>
@@ -415,7 +416,8 @@ const Resources = () => {
                   {category.resources.map((resource) => (
                     <div
                       key={resource.id}
-                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                      style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC' }}
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">
@@ -423,7 +425,7 @@ const Resources = () => {
                             {getTypeIcon(resource.type)}
                           </span>
                           <div>
-                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                            <span className="text-xs px-2 py-1 rounded-full font-medium" style={{ backgroundColor: '#B5D3E7', color: '#1F2D3D' }}>
                               {resource.type}
                             </span>
                           </div>
@@ -431,26 +433,27 @@ const Resources = () => {
                         <div className="flex items-center gap-1">
                           {resource.isDownloadable && (
                             <Download
-                              className="w-4 h-4 text-green-600"
+                              className="w-4 h-4"
+                              style={{ color: '#6EA9CB' }}
                               title="Downloadable"
                             />
                           )}
-                          <ExternalLink className="w-4 h-4 text-gray-400" />
+                          <ExternalLink className="w-4 h-4" style={{ color: '#1F2D3D', opacity: 0.5 }} />
                         </div>
                       </div>
 
-                      <h4 className="font-semibold text-gray-900 mb-2">
+                      <h4 className="font-semibold mb-2" style={{ color: '#1F2D3D' }}>
                         {resource.title}
                       </h4>
-                      <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                      <p className="text-sm mb-3 leading-relaxed" style={{ color: '#1F2D3D', opacity: 0.7 }}>
                         {resource.description}
                       </p>
 
                       {/* Custom Fields Display */}
                       {resource.customFields &&
                         resource.customFields.length > 0 && (
-                          <div className="mb-3 pt-2 border-t border-gray-100">
-                            <h5 className="text-xs font-medium text-gray-700 mb-1">
+                          <div className="mb-3 pt-2 border-t" style={{ borderColor: '#DCE8F2' }}>
+                            <h5 className="text-xs font-medium mb-1" style={{ color: '#1F2D3D', opacity: 0.8 }}>
                               Additional Information:
                             </h5>
                             <div className="space-y-1">
@@ -458,12 +461,13 @@ const Resources = () => {
                                 (field, fieldIndex) => (
                                   <div
                                     key={fieldIndex}
-                                    className="text-xs text-gray-600 flex items-start"
+                                    className="text-xs flex items-start"
+                                    style={{ color: '#1F2D3D', opacity: 0.7 }}
                                   >
-                                    <span className="font-medium text-gray-700 min-w-0 mr-1">
+                                    <span className="font-medium min-w-0 mr-1" style={{ color: '#1F2D3D', opacity: 0.8 }}>
                                       {field.label}:
                                     </span>
-                                    <span className="text-gray-600">
+                                    <span style={{ color: '#1F2D3D', opacity: 0.7 }}>
                                       {field.value}
                                     </span>
                                   </div>
@@ -474,7 +478,7 @@ const Resources = () => {
                         )}
 
                       <div className="flex items-center justify-between">
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs" style={{ color: '#1F2D3D', opacity: 0.6 }}>
                           <span className="font-medium">Format:</span>{" "}
                           {resource.format}
                         </div>
@@ -482,7 +486,8 @@ const Resources = () => {
                           href={resource.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          className="flex items-center gap-1 text-sm font-medium hover:opacity-80"
+                          style={{ color: '#6EA9CB' }}
                         >
                           {resource.isDownloadable ? "Download" : "View"}
                           <ExternalLink className="w-3 h-3" />
@@ -496,60 +501,63 @@ const Resources = () => {
           </div>
 
           {/* Additional Resources */}
-          <div className="p-6 bg-gray-50 border-t border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <div className="p-6 border-t" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
+            <h3 className="text-lg font-medium mb-4" style={{ color: '#1F2D3D' }}>
               More Helpful Resources
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <div className="rounded-lg p-4 border" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-lg">🌐</span>
-                  <h4 className="font-medium text-gray-900">Product Hunt</h4>
+                  <h4 className="font-medium" style={{ color: '#1F2D3D' }}>Product Hunt</h4>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm mb-2" style={{ color: '#1F2D3D', opacity: 0.7 }}>
                   Launch and discover new products
                 </p>
                 <a
                   href="https://www.producthunt.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                  className="text-sm font-medium hover:opacity-80"
+                  style={{ color: '#6EA9CB' }}
                 >
                   Explore →
                 </a>
               </div>
 
-              <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <div className="rounded-lg p-4 border" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">�</span>
-                  <h4 className="font-medium text-gray-900">Indie Hackers</h4>
+                  <span className="text-lg">👥</span>
+                  <h4 className="font-medium" style={{ color: '#1F2D3D' }}>Indie Hackers</h4>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm mb-2" style={{ color: '#1F2D3D', opacity: 0.7 }}>
                   Community for indie entrepreneurs
                 </p>
                 <a
                   href="https://www.indiehackers.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                  className="text-sm font-medium hover:opacity-80"
+                  style={{ color: '#6EA9CB' }}
                 >
                   Join Community →
                 </a>
               </div>
 
-              <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <div className="rounded-lg p-4 border" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">�️</span>
-                  <h4 className="font-medium text-gray-900">Startup India</h4>
+                  <span className="text-lg">🏛️</span>
+                  <h4 className="font-medium" style={{ color: '#1F2D3D' }}>Startup India</h4>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm mb-2" style={{ color: '#1F2D3D', opacity: 0.7 }}>
                   Government startup initiative
                 </p>
                 <a
                   href="https://www.startupindia.gov.in/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                  className="text-sm font-medium hover:opacity-80"
+                  style={{ color: '#6EA9CB' }}
                 >
                   Learn More →
                 </a>
@@ -562,17 +570,18 @@ const Resources = () => {
       {/* Add Resource Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                   Add Resource
                 </h2>
                 <button
                   onClick={handleCancelAdd}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-opacity-80 rounded-full transition-colors"
+                  style={{ backgroundColor: '#DCE8F2' }}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
                 </button>
               </div>
             </div>
@@ -580,13 +589,14 @@ const Resources = () => {
             <div className="p-6 space-y-6">
               {/* Resource Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Resource Type *
                 </label>
                 <select
                   value={newResource.type}
                   onChange={(e) => handleInputChange("type", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                 >
                   {resourceTypes.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -598,7 +608,7 @@ const Resources = () => {
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Category *
                 </label>
                 <select
@@ -606,7 +616,8 @@ const Resources = () => {
                   onChange={(e) =>
                     handleInputChange("category", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -626,7 +637,7 @@ const Resources = () => {
                     type="text"
                     value={newResource.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                     placeholder="e.g., Business Plan Template"
                   />
                 </div>
@@ -640,7 +651,7 @@ const Resources = () => {
                     onChange={(e) =>
                       handleInputChange("format", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                     placeholder="e.g., PDF, Google Docs, Online Course"
                   />
                 </div>
@@ -657,7 +668,7 @@ const Resources = () => {
                     handleInputChange("description", e.target.value)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none resize-none"
                   placeholder="Describe what this resource provides and how it helps startups..."
                 />
               </div>
@@ -671,7 +682,7 @@ const Resources = () => {
                   type="url"
                   value={newResource.link}
                   onChange={(e) => handleInputChange("link", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                   placeholder="https://example.com/resource"
                 />
               </div>
@@ -716,7 +727,7 @@ const Resources = () => {
                         handleCustomFieldChange(index, "label", e.target.value)
                       }
                       placeholder="Field name"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                     />
                     <input
                       type="text"
@@ -725,7 +736,7 @@ const Resources = () => {
                         handleCustomFieldChange(index, "value", e.target.value)
                       }
                       placeholder="Field value"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                     />
                     <button
                       type="button"
@@ -740,17 +751,19 @@ const Resources = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleCancelAdd}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-opacity-80 transition-colors"
+                style={{ borderColor: '#B5D3E7', color: '#1F2D3D', backgroundColor: '#F7FAFC' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveResource}
                 disabled={!newResource.title.trim() || !newResource.link.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Add Resource
               </button>

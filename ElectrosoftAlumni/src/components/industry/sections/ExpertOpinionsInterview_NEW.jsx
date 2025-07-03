@@ -244,11 +244,7 @@ const ExpertOpinionsInterview = () => {
         <div className="flex space-x-1 rounded-lg p-1" style={{ backgroundColor: "#DCE8F2" }}>
           <button
             onClick={() => setActiveTab("interviews")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === "interviews" 
-                ? "text-white" 
-                : ""
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors`}
             style={{ 
               backgroundColor: activeTab === "interviews" ? "#6EA9CB" : "transparent",
               color: activeTab === "interviews" ? "white" : "#1F2D3D"
@@ -258,11 +254,7 @@ const ExpertOpinionsInterview = () => {
           </button>
           <button
             onClick={() => setActiveTab("resources")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === "resources" 
-                ? "text-white" 
-                : ""
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors`}
             style={{ 
               backgroundColor: activeTab === "resources" ? "#6EA9CB" : "transparent",
               color: activeTab === "resources" ? "white" : "#1F2D3D"
@@ -653,7 +645,6 @@ const ExpertOpinionsInterview = () => {
               className="border rounded-xl shadow-sm hover:shadow-md transition-shadow"
               style={{ backgroundColor: "white", borderColor: "#B5D3E7" }}
             >
-              {/* View Mode */}
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">

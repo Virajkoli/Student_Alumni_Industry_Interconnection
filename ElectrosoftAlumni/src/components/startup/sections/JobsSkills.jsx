@@ -24,14 +24,14 @@ import {
 
 // Map skill names to specific Lucide icons for a professional look
 const iconMap = {
-  "Artificial Intelligence": <Bot className="w-6 h-6 text-blue-500" />,
-  "Product Management": <ClipboardList className="w-6 h-6 text-purple-500" />,
-  "Data Science": <BarChart className="w-6 h-6 text-green-500" />,
-  "UI/UX Design": <Palette className="w-6 h-6 text-orange-500" />,
-  "DevOps Engineering": <Settings className="w-6 h-6 text-red-500" />,
-  "Digital Marketing": <Megaphone className="w-6 h-6 text-yellow-500" />,
-  Cybersecurity: <ShieldCheck className="w-6 h-6 text-indigo-500" />,
-  "Blockchain Development": <LinkIcon className="w-6 h-6 text-gray-500" />,
+  "Artificial Intelligence": <Bot className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
+  "Product Management": <ClipboardList className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
+  "Data Science": <BarChart className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
+  "UI/UX Design": <Palette className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
+  "DevOps Engineering": <Settings className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
+  "Digital Marketing": <Megaphone className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
+  Cybersecurity: <ShieldCheck className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
+  "Blockchain Development": <LinkIcon className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
 };
 
 const JobsSkills = () => {
@@ -76,22 +76,22 @@ const JobsSkills = () => {
     ],
     marketStats: [
       {
-        icon: <Briefcase className="w-8 h-8 text-blue-500" />,
+        icon: <Briefcase className="w-8 h-8" style={{ color: '#6EA9CB' }} />,
         value: "2,500+",
         label: "Active Jobs",
       },
       {
-        icon: <TrendingUp className="w-8 h-8 text-green-500" />,
+        icon: <TrendingUp className="w-8 h-8" style={{ color: '#6EA9CB' }} />,
         value: "85%",
         label: "Placement Rate",
       },
       {
-        icon: <Star className="w-8 h-8 text-purple-500" />,
+        icon: <Star className="w-8 h-8" style={{ color: '#6EA9CB' }} />,
         value: "4.8/5",
         label: "Avg Rating",
       },
       {
-        icon: <MapPin className="w-8 h-8 text-orange-500" />,
+        icon: <MapPin className="w-8 h-8" style={{ color: '#6EA9CB' }} />,
         value: "50+",
         label: "Cities",
       },
@@ -353,48 +353,48 @@ const JobsSkills = () => {
 
   // A dedicated component for skill cards for better structure and readability
   const SkillCard = ({ skill, onLearnClick, onViewJobsClick }) => (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
+    <div className="bg-white border border-[#DCE8F2] rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-            {iconMap[skill.name] || <Zap className="w-6 h-6 text-gray-500" />}
+          <div className="w-12 h-12 bg-[#DCE8F2] rounded-lg flex items-center justify-center">
+            {iconMap[skill.name] || <Zap className="w-6 h-6 text-[#6EA9CB]" />}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800">{skill.name}</h3>
+          <h3 className="text-lg font-semibold text-[#1F2D3D]">{skill.name}</h3>
         </div>
         {skill.demand === "High" && (
-          <span className="bg-red-100 text-red-600 text-xs font-semibold px-3 py-1 rounded-full">
+          <span className="bg-[#B5D3E7] text-[#1F2D3D] text-xs font-semibold px-3 py-1 rounded-full">
             {skill.demand}
           </span>
         )}
       </div>
       <div className="grid grid-cols-3 gap-4 mt-6 text-center">
         <div>
-          <p className="text-sm text-gray-500 mb-1">Growth Rate</p>
-          <p className="text-lg font-bold text-green-500">{skill.growth}</p>
+          <p className="text-sm text-[#1F2D3D]/70 mb-1">Growth Rate</p>
+          <p className="text-lg font-bold text-[#6EA9CB]">{skill.growth}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500 mb-1">Avg Salary</p>
-          <p className="text-lg font-bold text-gray-800">{skill.avgSalary}</p>
+          <p className="text-sm text-[#1F2D3D]/70 mb-1">Avg Salary</p>
+          <p className="text-lg font-bold text-[#1F2D3D]">{skill.avgSalary}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500 mb-1">Demand</p>
-          <p className="text-lg font-bold text-gray-800">{skill.demand}</p>
+          <p className="text-sm text-[#1F2D3D]/70 mb-1">Demand</p>
+          <p className="text-lg font-bold text-[#1F2D3D]">{skill.demand}</p>
         </div>
       </div>
 
       {/* Custom Fields Display */}
       {skill.customFields && skill.customFields.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">
+        <div className="mt-4 pt-4 border-t border-[#DCE8F2]">
+          <h4 className="text-sm font-medium text-[#1F2D3D] mb-2">
             Additional Information:
           </h4>
           <div className="space-y-1">
             {skill.customFields.map((field, fieldIndex) => (
               <div key={fieldIndex} className="text-sm flex items-start">
-                <span className="font-medium text-gray-600 min-w-0 mr-2">
+                <span className="font-medium text-[#1F2D3D] min-w-0 mr-2">
                   {field.label}:
                 </span>
-                <span className="text-gray-700">{field.value}</span>
+                <span className="text-[#1F2D3D]">{field.value}</span>
               </div>
             ))}
           </div>
@@ -404,13 +404,13 @@ const JobsSkills = () => {
       <div className="mt-auto pt-6 flex items-center gap-3">
         <button
           onClick={() => onLearnClick(skill)}
-          className="w-full py-2.5 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center gap-2"
+          className="w-full py-2.5 px-4 bg-[#6EA9CB] text-white font-semibold rounded-lg hover:opacity-90 transition-colors duration-300 flex items-center justify-center gap-2"
         >
           Learn Skill
         </button>
         <button
           onClick={() => onViewJobsClick(skill)}
-          className="w-full py-2.5 px-4 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors duration-300"
+          className="w-full py-2.5 px-4 bg-[#DCE8F2] border border-[#B5D3E7] text-[#1F2D3D] font-semibold rounded-lg hover:opacity-90 transition-colors duration-300"
         >
           View Jobs
         </button>
@@ -421,11 +421,11 @@ const JobsSkills = () => {
   // A dedicated component for statistic cards
   const StatCard = ({ stat }) => (
     <div className="flex flex-col items-center text-center">
-      <div className="w-16 h-16 rounded-full bg-white/80 flex items-center justify-center mb-3 shadow-md">
+      <div className="w-16 h-16 rounded-full bg-[#DCE8F2] flex items-center justify-center mb-3 shadow-md">
         {stat.icon}
       </div>
-      <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
-      <p className="text-sm text-gray-600 mt-1">{stat.label}</p>
+      <p className="text-3xl font-bold text-[#1F2D3D]">{stat.value}</p>
+      <p className="text-sm text-[#1F2D3D]/70 mt-1">{stat.label}</p>
     </div>
   );
 
@@ -443,11 +443,11 @@ const JobsSkills = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all duration-300">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all duration-300" style={{ backgroundColor: '#F7FAFC' }}>
           <div className="p-6 relative">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors z-10"
+              className="absolute top-4 right-4 p-2 text-[#1F2D3D] hover:text-[#6EA9CB] hover:bg-[#DCE8F2] rounded-full transition-colors z-10"
             >
               <X className="w-6 h-6" />
             </button>
@@ -468,16 +468,16 @@ const JobsSkills = () => {
               </div>
             ) : (
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-gray-100 rounded-xl flex-shrink-0 items-center justify-center hidden sm:flex">
+                <div className="w-16 h-16 bg-[#DCE8F2] rounded-xl flex-shrink-0 items-center justify-center hidden sm:flex">
                   {iconMap[skill.name] || (
-                    <Zap className="w-8 h-8 text-gray-500" />
+                    <Zap className="w-8 h-8" style={{ color: '#6EA9CB' }} />
                   )}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-[#1F2D3D]">
                     {path.title}
                   </h2>
-                  <p className="text-md text-gray-600">for {skill.name}</p>
+                  <p className="text-md text-[#1F2D3D]/70">for {skill.name}</p>
                 </div>
               </div>
             )}
@@ -499,43 +499,43 @@ const JobsSkills = () => {
               <div className="flex items-center gap-4 mb-4">
                 {!path.videoUrl || videoError ? ( // Show header if no video or video error
                   <>
-                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex-shrink-0 items-center justify-center hidden sm:flex">
+                    <div className="w-12 h-12 bg-[#DCE8F2] rounded-xl flex-shrink-0 items-center justify-center hidden sm:flex">
                       {iconMap[skill.name] || (
-                        <Zap className="w-7 h-7 text-gray-500" />
+                        <Zap className="w-7 h-7" style={{ color: '#6EA9CB' }} />
                       )}
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">
+                      <h2 className="text-2xl font-bold text-[#1F2D3D]">
                         {path.title}
                       </h2>
-                      <p className="text-md text-gray-600">for {skill.name}</p>
+                      <p className="text-md text-[#1F2D3D]/70">for {skill.name}</p>
                     </div>
                   </>
                 ) : (
                   <div className="w-full">
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-2xl font-bold text-[#1F2D3D]">
                       {path.title}
                     </h2>
-                    <p className="text-md text-gray-600">for {skill.name}</p>
+                    <p className="text-md text-[#1F2D3D]/70">for {skill.name}</p>
                   </div>
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <Clock className="w-6 h-6 text-blue-500 mx-auto mb-1" />
-                  <p className="font-semibold">{path.duration}</p>
-                  <p className="text-xs text-gray-500">Duration</p>
+                <div className="bg-[#DCE8F2] p-3 rounded-lg">
+                  <Clock className="w-6 h-6 mx-auto mb-1" style={{ color: '#6EA9CB' }} />
+                  <p className="font-semibold" style={{ color: '#1F2D3D' }}>{path.duration}</p>
+                  <p className="text-xs" style={{ color: '#1F2D3D' }}>Duration</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <BarChart2 className="w-6 h-6 text-green-500 mx-auto mb-1" />
-                  <p className="font-semibold">{path.level}</p>
-                  <p className="text-xs text-gray-500">Level</p>
+                <div className="bg-[#DCE8F2] p-3 rounded-lg">
+                  <BarChart2 className="w-6 h-6 mx-auto mb-1" style={{ color: '#6EA9CB' }} />
+                  <p className="font-semibold" style={{ color: '#1F2D3D' }}>{path.level}</p>
+                  <p className="text-xs" style={{ color: '#1F2D3D' }}>Level</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <Star className="w-6 h-6 text-yellow-500 mx-auto mb-1" />
-                  <p className="font-semibold">{path.rating}/5</p>
-                  <p className="text-xs text-gray-500">by {path.provider}</p>
+                <div className="bg-[#DCE8F2] p-3 rounded-lg">
+                  <Star className="w-6 h-6 mx-auto mb-1" style={{ color: '#6EA9CB' }} />
+                  <p className="font-semibold" style={{ color: '#1F2D3D' }}>{path.rating}/5</p>
+                  <p className="text-xs" style={{ color: '#1F2D3D' }}>by {path.provider}</p>
                 </div>
               </div>
 
@@ -554,12 +554,12 @@ const JobsSkills = () => {
               </div>
             </div>
           </div>
-          <div className="bg-gray-50 px-6 py-4 rounded-b-2xl flex justify-end">
+          <div className="bg-[#DCE8F2] px-6 py-4 rounded-b-2xl flex justify-end">
             <a
               href={path.courseUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="py-2.5 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center gap-2"
+              className="py-2.5 px-6 bg-[#6EA9CB] text-white font-semibold rounded-lg hover:opacity-90 transition-colors duration-300 flex items-center gap-2"
             >
               <PlayCircle className="w-5 h-5" />
               Start Learning Path
@@ -593,25 +593,25 @@ const JobsSkills = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all duration-300">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all duration-300" style={{ backgroundColor: '#F7FAFC' }}>
           <div className="p-6 relative">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors z-10"
+              className="absolute top-4 right-4 p-2 text-[#1F2D3D] hover:text-[#6EA9CB] hover:bg-[#DCE8F2] rounded-full transition-colors z-10"
             >
               <X className="w-6 h-6" />
             </button>
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#DCE8F2] rounded-lg flex items-center justify-center">
                 {iconMap[skill.name] || (
-                  <Briefcase className="w-7 h-7 text-gray-500" />
+                  <Briefcase className="w-7 h-7" style={{ color: '#6EA9CB' }} />
                 )}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-[#1F2D3D]">
                   Job Openings
                 </h2>
-                <p className="text-md text-gray-600">for {skill.name}</p>
+                <p className="text-md text-[#1F2D3D]/70">for {skill.name}</p>
               </div>
             </div>
 
@@ -620,14 +620,14 @@ const JobsSkills = () => {
                 listings.map((job, index) => (
                   <div
                     key={index}
-                    className="bg-gray-50 border border-gray-200 rounded-lg p-4"
+                    className="bg-[#DCE8F2] border border-[#B5D3E7] rounded-lg p-4"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-bold text-lg text-gray-800">
+                        <h3 className="font-bold text-lg text-[#1F2D3D]">
                           {job.title}
                         </h3>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-[#1F2D3D]/70">
                           {job.company} - {job.location}
                         </p>
                       </div>
@@ -636,36 +636,36 @@ const JobsSkills = () => {
                           href={job.applyUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 text-sm"
+                          className="py-2 px-4 bg-[#6EA9CB] text-white font-semibold rounded-lg hover:opacity-90 transition-colors duration-300 text-sm"
                         >
                           Apply Now
                         </a>
                         <button
                           onClick={() => handleEditClick(job)}
-                          className="py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-300 text-sm"
+                          className="py-2 px-4 bg-[#B5D3E7] text-[#1F2D3D] font-semibold rounded-lg hover:opacity-90 transition-colors duration-300 text-sm"
                         >
                           Edit
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1 font-semibold">
+                    <p className="text-sm text-[#1F2D3D] mt-1 font-semibold">
                       {job.salary}
                     </p>
-                    <p className="text-sm text-gray-700 mt-2">
+                    <p className="text-sm text-[#1F2D3D]/80 mt-2">
                       {job.description}
                     </p>
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-500 py-8">
+                <p className="text-center text-[#1F2D3D]/70 py-8">
                   No current job openings for this skill.
                 </p>
               )}
             </div>
 
             {isEditingJob && editedJob && (
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              <div className="mt-6 p-4 bg-[#DCE8F2] rounded-lg border border-[#B5D3E7]">
+                <h3 className="text-lg font-semibold text-[#1F2D3D] mb-4">
                   Edit Job Listing
                 </h3>
                 <div className="grid grid-cols-1 gap-4">
@@ -741,13 +741,13 @@ const JobsSkills = () => {
                 <div className="mt-4 flex justify-end gap-2">
                   <button
                     onClick={() => setIsEditingJob(false)}
-                    className="py-2 px-4 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 transition-colors duration-300"
+                    className="py-2 px-4 bg-[#DCE8F2] text-[#1F2D3D] font-semibold rounded-lg hover:opacity-90 transition-colors duration-300 border border-[#B5D3E7]"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveClick}
-                    className="py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                    className="py-2 px-4 bg-[#6EA9CB] text-white font-semibold rounded-lg hover:opacity-90 transition-colors duration-300"
                   >
                     Save Changes
                   </button>
@@ -761,22 +761,22 @@ const JobsSkills = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50/50 sm:p-6 lg:p-8">
+    <div className="p-6 sm:p-6 lg:p-8" style={{ backgroundColor: '#F7FAFC' }}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-12 relative">
           {/* Edit button positioned at top right */}
           <button
             onClick={handleEditClick}
-            className="absolute top-0 right-0 p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+            className="absolute top-0 right-0 p-2 text-[#1F2D3D] hover:text-[#6EA9CB] hover:bg-[#DCE8F2] rounded-lg transition-colors duration-200"
             title="Edit Content"
           >
             <Edit size={20} />
           </button>
 
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-xl font-semibold text-[#1F2D3D]">
             {content.title}
           </h1>
-          <p className="text-sm font-medium text-gray-600 mt-1">
+          <p className="text-sm font-medium text-[#1F2D3D]/70 mt-1">
             {content.description}
           </p>
         </div>
@@ -792,8 +792,8 @@ const JobsSkills = () => {
           ))}
         </div>
 
-        <div className="bg-gradient-to-r from-gray-100 to-blue-50 rounded-2xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 text-center mb-8">
+        <div className="bg-gradient-to-r from-[#DCE8F2] to-[#B5D3E7] rounded-2xl p-8">
+          <h2 className="text-2xl font-bold text-[#1F2D3D] text-center mb-8">
             Market Statistics
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -819,14 +819,14 @@ const JobsSkills = () => {
       {/* Edit Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-800">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden" style={{ backgroundColor: '#F7FAFC' }}>
+            <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
+              <h2 className="text-xl font-semibold text-[#1F2D3D]">
                 Edit Jobs & Skills Content
               </h2>
               <button
                 onClick={handleCancelEdit}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-[#1F2D3D] hover:text-[#6EA9CB] transition-colors"
               >
                 <X size={24} />
               </button>
@@ -1124,16 +1124,16 @@ const JobsSkills = () => {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
+            <div className="flex justify-end gap-3 p-6 border-t bg-[#DCE8F2]">
               <button
                 onClick={handleCancelEdit}
-                className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-[#1F2D3D] bg-white border border-[#B5D3E7] rounded-lg hover:opacity-90 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveEdit}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-[#6EA9CB] text-white rounded-lg hover:opacity-90 transition-colors flex items-center gap-2"
               >
                 <Save size={16} />
                 Save Changes

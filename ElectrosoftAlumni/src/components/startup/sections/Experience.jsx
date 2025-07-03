@@ -293,21 +293,22 @@ const Experience = () => {
 
   return (
     <>
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F7FAFC' }}>
         {/* Header */}
-        <div className="bg-white rounded-lg">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="bg-white rounded-lg" style={{ backgroundColor: '#F7FAFC' }}>
+          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                 Experience
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm mt-1" style={{ color: '#1F2D3D' }}>
                 Track your startup journey, milestones, and key achievements
               </p>
             </div>
             <button
               onClick={handleAddExperience}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors"
+              style={{ backgroundColor: '#6EA9CB' }}
             >
               <Plus className="w-4 h-4" />
               Add Experience
@@ -360,14 +361,14 @@ const Experience = () => {
           <div className="p-6">
             <div className="relative">
               {/* Timeline Line */}
-              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+              <div className="absolute left-6 top-0 bottom-0 w-0.5" style={{ backgroundColor: '#DCE8F2' }}></div>
 
               <div className="space-y-8">
                 {experiences.map((experience, index) => (
                   <div key={experience.id} className="relative flex gap-6">
                     {/* Timeline Icon */}
                     <div className="flex-shrink-0 relative">
-                      <div className="w-12 h-12 bg-blue-100 border-4 border-white shadow-sm rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 border-4 border-white shadow-sm rounded-full flex items-center justify-center" style={{ backgroundColor: '#B5D3E7' }}>
                         <span className="text-lg">
                           {getTypeIcon(experience.type)}
                         </span>
@@ -376,24 +377,24 @@ const Experience = () => {
 
                     {/* Experience Content */}
                     <div className="flex-1 min-w-0 pb-8">
-                      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="bg-white border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                              <span className="text-xs px-2 py-1 rounded-full font-medium" style={{ backgroundColor: '#B5D3E7', color: '#1F2D3D' }}>
                                 {experience.type}
                               </span>
-                              <div className="flex items-center text-xs text-gray-500 gap-1">
+                              <div className="flex items-center text-xs gap-1" style={{ color: '#1F2D3D' }}>
                                 <Calendar className="w-3 h-3" />
                                 {experience.duration}
                               </div>
                             </div>
 
-                            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                            <h3 className="text-lg font-semibold mb-1" style={{ color: '#1F2D3D' }}>
                               {experience.title}
                             </h3>
 
-                            <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                            <div className="flex items-center gap-4 text-sm mb-3" style={{ color: '#1F2D3D' }}>
                               <div className="flex items-center gap-1">
                                 <Building className="w-4 h-4" />
                                 {experience.company}
@@ -406,7 +407,7 @@ const Experience = () => {
                               )}
                             </div>
 
-                            <p className="text-gray-700 mb-4 leading-relaxed">
+                            <p className="mb-4 leading-relaxed" style={{ color: '#1F2D3D' }}>
                               {experience.description}
                             </p>
 
@@ -414,7 +415,7 @@ const Experience = () => {
                             {experience.highlights &&
                               experience.highlights.length > 0 && (
                                 <div>
-                                  <h4 className="text-sm font-medium text-gray-800 mb-2">
+                                  <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                                     Key Highlights:
                                   </h4>
                                   <ul className="space-y-1">
@@ -422,9 +423,10 @@ const Experience = () => {
                                       (highlight, idx) => (
                                         <li
                                           key={idx}
-                                          className="flex items-start gap-2 text-sm text-gray-600"
+                                          className="flex items-start gap-2 text-sm"
+                                          style={{ color: '#1F2D3D' }}
                                         >
-                                          <span className="text-blue-500 mt-1">
+                                          <span className="mt-1" style={{ color: '#6EA9CB' }}>
                                             •
                                           </span>
                                           <span>{highlight}</span>
@@ -438,8 +440,8 @@ const Experience = () => {
                             {/* Custom Fields Display */}
                             {experience.customFields &&
                               experience.customFields.length > 0 && (
-                                <div className="mt-4 pt-4 border-t border-gray-100">
-                                  <h4 className="text-sm font-medium text-gray-800 mb-2">
+                                <div className="mt-4 pt-4 border-t" style={{ borderColor: '#DCE8F2' }}>
+                                  <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                                     Additional Details:
                                   </h4>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -449,10 +451,10 @@ const Experience = () => {
                                           key={field.id || fieldIndex}
                                           className="flex items-center gap-2"
                                         >
-                                          <span className="text-sm font-medium text-gray-700">
+                                          <span className="text-sm font-medium" style={{ color: '#1F2D3D' }}>
                                             {field.label}:
                                           </span>
-                                          <span className="text-sm text-gray-600">
+                                          <span className="text-sm" style={{ color: '#1F2D3D' }}>
                                             {field.value}
                                           </span>
                                         </div>
@@ -466,8 +468,9 @@ const Experience = () => {
                           {/* Edit Button */}
                           <button
                             onClick={() => handleEditExperience(index)}
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors ml-4"
+                            className="p-2 hover:opacity-75 rounded-full transition-colors ml-4"
                             title="Edit experience"
+                            style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2' }}
                           >
                             <Edit className="w-4 h-4" />
                           </button>
@@ -485,17 +488,18 @@ const Experience = () => {
       {/* Add Experience Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                   Add Experience
                 </h2>
                 <button
                   onClick={handleCancelAdd}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:opacity-75 rounded-full transition-colors"
+                  style={{ backgroundColor: '#DCE8F2' }}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
                 </button>
               </div>
             </div>
@@ -503,13 +507,14 @@ const Experience = () => {
             <div className="p-6 space-y-6">
               {/* Experience Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Experience Type *
                 </label>
                 <select
                   value={newExperience.type}
                   onChange={(e) => handleInputChange("type", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D', focusRingColor: '#6EA9CB' }}
                 >
                   {experienceTypes.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -522,19 +527,20 @@ const Experience = () => {
               {/* Title and Company */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Title/Role *
                   </label>
                   <input
                     type="text"
                     value={newExperience.title}
                     onChange={(e) => handleInputChange("title", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     placeholder="e.g., Series A Funding Round"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Company/Organization
                   </label>
                   <input
@@ -543,7 +549,8 @@ const Experience = () => {
                     onChange={(e) =>
                       handleInputChange("company", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     placeholder="e.g., Your Startup Inc."
                   />
                 </div>
@@ -552,7 +559,7 @@ const Experience = () => {
               {/* Duration and Location */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Duration *
                   </label>
                   <input
@@ -561,12 +568,13 @@ const Experience = () => {
                     onChange={(e) =>
                       handleInputChange("duration", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     placeholder="e.g., Jan 2024 – Present"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Location
                   </label>
                   <input
@@ -575,7 +583,8 @@ const Experience = () => {
                     onChange={(e) =>
                       handleInputChange("location", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     placeholder="e.g., San Francisco, CA"
                   />
                 </div>
@@ -583,7 +592,7 @@ const Experience = () => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Description *
                 </label>
                 <textarea
@@ -592,14 +601,15 @@ const Experience = () => {
                     handleInputChange("description", e.target.value)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none resize-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   placeholder="Describe what happened during this stage of your startup journey..."
                 />
               </div>
 
               {/* Key Highlights */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Key Highlights
                 </label>
                 <div className="space-y-2">
@@ -611,13 +621,15 @@ const Experience = () => {
                         onChange={(e) =>
                           handleHighlightChange(index, e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                        style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                         placeholder="Enter a key achievement or highlight"
                       />
                       {newExperience.highlights.length > 1 && (
                         <button
                           onClick={() => removeHighlight(index)}
-                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 hover:opacity-75 rounded-lg transition-colors"
+                          style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2' }}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -626,7 +638,8 @@ const Experience = () => {
                   ))}
                   <button
                     onClick={addHighlight}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                    className="text-sm font-medium flex items-center gap-1 hover:opacity-75 transition-colors"
+                    style={{ color: '#6EA9CB' }}
                   >
                     <Plus className="w-4 h-4" />
                     Add another highlight
@@ -637,13 +650,14 @@ const Experience = () => {
               {/* Custom Fields Section */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium" style={{ color: '#1F2D3D' }}>
                     Custom Fields
                   </label>
                   <button
                     type="button"
                     onClick={handleAddCustomField}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-sm font-medium hover:opacity-75 transition-colors"
+                    style={{ color: '#6EA9CB' }}
                   >
                     + Add Custom Field
                   </button>
@@ -666,7 +680,8 @@ const Experience = () => {
                                 )
                               }
                               placeholder="Field Label (e.g., Funding Amount, Valuation)"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none text-sm"
+                              style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                             />
                           </div>
                           <div className="flex-1">
@@ -681,14 +696,16 @@ const Experience = () => {
                                 )
                               }
                               placeholder="Field Value (e.g., $5M, $25M)"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none text-sm"
+                              style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                             />
                           </div>
                           <button
                             type="button"
                             onClick={() => handleRemoveCustomField(field.id)}
-                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 hover:opacity-75 rounded-lg transition-colors"
                             title="Remove field"
+                            style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2' }}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -700,10 +717,11 @@ const Experience = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleCancelAdd}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:opacity-75 transition-colors"
+                style={{ borderColor: '#B5D3E7', color: '#1F2D3D', backgroundColor: '#F7FAFC' }}
               >
                 Cancel
               </button>
@@ -713,7 +731,8 @@ const Experience = () => {
                   !newExperience.title.trim() ||
                   !newExperience.description.trim()
                 }
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Add Experience
               </button>
@@ -725,33 +744,34 @@ const Experience = () => {
       {/* Edit Experience Modal */}
       {isEditModalOpen && editingExperience && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                   Edit Experience
                 </h2>
                 <button
                   onClick={handleCancelEdit}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:opacity-75 rounded-full transition-colors"
+                  style={{ backgroundColor: '#DCE8F2' }}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
                 </button>
               </div>
             </div>
 
             <div className="p-6 space-y-6">
               {/* Experience Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Experience Type *
-                </label>
+              <div>                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                    Experience Type *
+                  </label>
                 <select
                   value={editingExperience.type}
                   onChange={(e) =>
                     handleEditInputChange("type", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                 >
                   {experienceTypes.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -764,7 +784,7 @@ const Experience = () => {
               {/* Title and Company */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Title/Role *
                   </label>
                   <input
@@ -773,12 +793,13 @@ const Experience = () => {
                     onChange={(e) =>
                       handleEditInputChange("title", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     placeholder="e.g., Series A Funding Round"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Company/Organization
                   </label>
                   <input
@@ -787,7 +808,8 @@ const Experience = () => {
                     onChange={(e) =>
                       handleEditInputChange("company", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     placeholder="e.g., Your Startup Inc."
                   />
                 </div>
@@ -796,7 +818,7 @@ const Experience = () => {
               {/* Duration and Location */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Duration *
                   </label>
                   <input
@@ -805,12 +827,13 @@ const Experience = () => {
                     onChange={(e) =>
                       handleEditInputChange("duration", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     placeholder="e.g., Jan 2024 – Present"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Location
                   </label>
                   <input
@@ -819,7 +842,8 @@ const Experience = () => {
                     onChange={(e) =>
                       handleEditInputChange("location", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     placeholder="e.g., San Francisco, CA"
                   />
                 </div>
@@ -827,7 +851,7 @@ const Experience = () => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Description *
                 </label>
                 <textarea
@@ -836,14 +860,15 @@ const Experience = () => {
                     handleEditInputChange("description", e.target.value)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none resize-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   placeholder="Describe what happened during this stage of your startup journey..."
                 />
               </div>
 
               {/* Key Highlights */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Key Highlights
                 </label>
                 <div className="space-y-2">
@@ -855,13 +880,15 @@ const Experience = () => {
                         onChange={(e) =>
                           handleEditHighlightChange(index, e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                        style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                         placeholder="Enter a key achievement or highlight"
                       />
                       {editingExperience.highlights.length > 1 && (
                         <button
                           onClick={() => removeEditHighlight(index)}
-                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 hover:opacity-75 rounded-lg transition-colors"
+                          style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2' }}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -870,7 +897,8 @@ const Experience = () => {
                   ))}
                   <button
                     onClick={addEditHighlight}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                    className="text-sm font-medium flex items-center gap-1 hover:opacity-75 transition-colors"
+                    style={{ color: '#6EA9CB' }}
                   >
                     <Plus className="w-4 h-4" />
                     Add another highlight
@@ -881,13 +909,14 @@ const Experience = () => {
               {/* Custom Fields Section for Edit */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium" style={{ color: '#1F2D3D' }}>
                     Custom Fields
                   </label>
                   <button
                     type="button"
                     onClick={handleAddEditCustomField}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-sm font-medium hover:opacity-75 transition-colors"
+                    style={{ color: '#6EA9CB' }}
                   >
                     + Add Custom Field
                   </button>
@@ -910,7 +939,8 @@ const Experience = () => {
                                 )
                               }
                               placeholder="Field Label (e.g., Funding Amount, Valuation)"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none text-sm"
+                              style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                             />
                           </div>
                           <div className="flex-1">
@@ -925,7 +955,8 @@ const Experience = () => {
                                 )
                               }
                               placeholder="Field Value (e.g., $5M, $25M)"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none text-sm"
+                              style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                             />
                           </div>
                           <button
@@ -933,8 +964,9 @@ const Experience = () => {
                             onClick={() =>
                               handleRemoveEditCustomField(field.id)
                             }
-                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 hover:opacity-75 rounded-lg transition-colors"
                             title="Remove field"
+                            style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2' }}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -946,10 +978,11 @@ const Experience = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:opacity-75 transition-colors"
+                style={{ borderColor: '#B5D3E7', color: '#1F2D3D', backgroundColor: '#F7FAFC' }}
               >
                 Cancel
               </button>
@@ -959,7 +992,8 @@ const Experience = () => {
                   !editingExperience.title.trim() ||
                   !editingExperience.description.trim()
                 }
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Save Changes
               </button>

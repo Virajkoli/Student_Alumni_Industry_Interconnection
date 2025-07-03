@@ -240,16 +240,16 @@ const FeedArea = () => {
   };
 
   const getFileIcon = (fileType) => {
-    if (fileType === 'photo') return <Image className="w-6 h-6" />;
-    if (fileType === 'video') return <Video className="w-6 h-6" />;
-    if (fileType === 'document') return <FileText className="w-6 h-6" />;
-    return <FileText className="w-6 h-6" />;
+    if (fileType === 'photo') return <Image className="w-6 h-6" style={{ color: '#1F2D3D' }} />;
+    if (fileType === 'video') return <Video className="w-6 h-6" style={{ color: '#1F2D3D' }} />;
+    if (fileType === 'document') return <FileText className="w-6 h-6" style={{ color: '#1F2D3D' }} />;
+    return <FileText className="w-6 h-6" style={{ color: '#1F2D3D' }} />;
   };
 
   const PostCard = ({ post }) => (
-    <div className="border-b border-gray-200 last:border-b-0 p-4 hover:bg-gray-50 transition-colors">
+    <div className="border-b last:border-b-0 p-4 hover:opacity-95 transition-colors" style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC' }}>
       <div className="flex items-start space-x-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style={{ background: 'linear-gradient(to bottom right, #6EA9CB, #B5D3E7)' }}>
           {post.author.avatar}
         </div>
 
@@ -257,31 +257,33 @@ const FeedArea = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center space-x-1">
-                <h4 className="font-semibold text-gray-900 text-sm">
+                <h4 className="font-semibold text-sm" style={{ color: '#1F2D3D' }}>
                   {post.author.name}
                 </h4>
                 {post.author.verified && (
-                  <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#6EA9CB' }}>
                     <span className="text-white text-xs">✓</span>
                   </div>
                 )}
               </div>
-              <p className="text-xs text-gray-600">{post.author.title}</p>
-              <p className="text-xs text-gray-500">{post.timestamp} ago</p>
+              <p className="text-xs" style={{ color: '#1F2D3D', opacity: '0.7' }}>{post.author.title}</p>
+              <p className="text-xs" style={{ color: '#1F2D3D', opacity: '0.5' }}>{post.timestamp} ago</p>
             </div>
             <div className="flex items-center space-x-2">
               {editingPostId === post.id ? (
                 <div className="flex items-center space-x-1">
                   <button
                     onClick={() => handleSaveEdit(post.id)}
-                    className="p-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                    className="p-1.5 text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-sm border"
+                    style={{ backgroundColor: '#6EA9CB', borderColor: '#6EA9CB' }}
                     title="Save changes"
                   >
                     <Save className="w-4 h-4" />
                   </button>
                   <button
                     onClick={handleCancelEdit}
-                    className="p-1.5 text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 hover:text-gray-700 transition-all duration-200 shadow-sm border border-gray-200"
+                    className="p-1.5 rounded-lg hover:opacity-90 transition-all duration-200 shadow-sm border"
+                    style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2', borderColor: '#DCE8F2' }}
                     title="Cancel editing"
                   >
                     <X className="w-4 h-4" />
@@ -290,7 +292,8 @@ const FeedArea = () => {
               ) : (
                 <button
                   onClick={() => handleEditPost(post.id, post.content)}
-                  className="p-1.5 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"
+                  className="p-1.5 text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-sm border"
+                  style={{ backgroundColor: '#6EA9CB', borderColor: '#6EA9CB' }}
                   title="Edit this post"
                 >
                   <Edit className="w-4 h-4" />
@@ -299,16 +302,20 @@ const FeedArea = () => {
               <div className="relative dropdown-container">
                 <button 
                   onClick={() => setShowDropdownId(showDropdownId === post.id ? null : post.id)}
-                  className="p-1 hover:bg-gray-200 rounded-full"
+                  className="p-1 hover:opacity-75 rounded-full"
+                  style={{ backgroundColor: '#DCE8F2' }}
                 >
-                  <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                  <MoreHorizontal className="w-4 h-4" style={{ color: '#1F2D3D' }} />
                 </button>
                 
                 {showDropdownId === post.id && (
-                  <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                  <div className="absolute right-0 top-8 border rounded-lg shadow-lg z-10 min-w-[120px]" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
                     <button
                       onClick={() => handleDeletePost(post.id)}
-                      className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 rounded-lg text-sm transition-colors"
+                      className="w-full px-4 py-2 text-left rounded-lg text-sm transition-colors"
+                      style={{ color: '#1F2D3D' }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                     >
                       Delete Post
                     </button>
@@ -325,27 +332,32 @@ const FeedArea = () => {
                 value={editedContent}
                 onChange={(e) => setEditedContent(e.target.value)}
                 rows="4"
-                className="w-full p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm leading-relaxed"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent resize-none text-sm leading-relaxed"
+                style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D', '--tw-ring-color': '#6EA9CB' }}
                 placeholder="What's on your mind?"
                 autoFocus
               />
               <div className="flex items-center justify-end space-x-2">
                 <button
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                  className="px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                  style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2' }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#B5D3E7'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#DCE8F2'}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleSaveEdit(post.id)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors text-sm font-medium"
+                  style={{ backgroundColor: '#6EA9CB' }}
                 >
                   Save Changes
                 </button>
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-800 leading-relaxed">
+            <p className="text-sm leading-relaxed" style={{ color: '#1F2D3D' }}>
               {post.content}
             </p>
           )}
@@ -366,10 +378,10 @@ const FeedArea = () => {
           {/* Display Attachments */}
           {post.attachments && post.attachments.length > 0 && editingPostId !== post.id && (
             <div className="mt-3 space-y-2">
-              <h4 className="text-sm font-medium text-gray-700">Attachments:</h4>
+              <h4 className="text-sm font-medium" style={{ color: '#1F2D3D' }}>Attachments:</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {post.attachments.map((attachment, index) => (
-                  <div key={attachment.id || index} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                  <div key={attachment.id || index} className="border rounded-lg p-3 hover:opacity-95 transition-colors" style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC' }}>
                     {attachment.type === 'photo' && (
                       <div className="space-y-2">
                         <img
@@ -380,12 +392,15 @@ const FeedArea = () => {
                         />
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-900 truncate">{attachment.name}</p>
-                            <p className="text-xs text-gray-500">{formatFileSize(attachment.size)}</p>
+                            <p className="text-xs font-medium truncate" style={{ color: '#1F2D3D' }}>{attachment.name}</p>
+                            <p className="text-xs" style={{ color: '#1F2D3D', opacity: '0.6' }}>{formatFileSize(attachment.size)}</p>
                           </div>
                           <button
                             onClick={() => handleDownload(attachment)}
-                            className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                            className="p-1 rounded transition-colors"
+                            style={{ color: '#6EA9CB' }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             title="Download"
                           >
                             <Download className="w-4 h-4" />
@@ -405,21 +420,24 @@ const FeedArea = () => {
                             Your browser does not support video playback.
                           </video>
                         ) : (
-                          <div className="w-full h-32 bg-gray-100 rounded flex items-center justify-center">
+                          <div className="w-full h-32 rounded flex items-center justify-center" style={{ backgroundColor: '#DCE8F2' }}>
                             <div className="text-center">
-                              <Video className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                              <p className="text-xs text-gray-600">{attachment.previewText || 'Video file'}</p>
+                              <Video className="w-8 h-8 mx-auto mb-2" style={{ color: '#1F2D3D' }} />
+                              <p className="text-xs" style={{ color: '#1F2D3D' }}>{attachment.previewText || 'Video file'}</p>
                             </div>
                           </div>
                         )}
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-medium text-gray-900 truncate">{attachment.name}</p>
-                            <p className="text-xs text-gray-500">{formatFileSize(attachment.size)}</p>
+                            <p className="text-xs font-medium truncate" style={{ color: '#1F2D3D' }}>{attachment.name}</p>
+                            <p className="text-xs" style={{ color: '#1F2D3D', opacity: '0.6' }}>{formatFileSize(attachment.size)}</p>
                           </div>
                           <button
                             onClick={() => handleDownload(attachment)}
-                            className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                            className="p-1 rounded transition-colors"
+                            style={{ color: '#6EA9CB' }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             title="Download"
                           >
                             <Download className="w-4 h-4" />
@@ -430,21 +448,24 @@ const FeedArea = () => {
                     
                     {attachment.type === 'document' && (
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#DCE8F2' }}>
                           {getFileIcon(attachment.type)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-gray-900 truncate">{attachment.name}</p>
-                          <p className="text-xs text-gray-500">{formatFileSize(attachment.size)}</p>
+                          <p className="text-xs font-medium truncate" style={{ color: '#1F2D3D' }}>{attachment.name}</p>
+                          <p className="text-xs" style={{ color: '#1F2D3D', opacity: '0.6' }}>{formatFileSize(attachment.size)}</p>
                           {attachment.previewText && (
-                            <p className="text-xs text-blue-500">{attachment.previewText}</p>
+                            <p className="text-xs" style={{ color: '#6EA9CB' }}>{attachment.previewText}</p>
                           )}
                         </div>
                         <div className="flex space-x-1">
                           {attachment.fileData && (
                             <button
                               onClick={() => window.open(attachment.fileData, '_blank')}
-                              className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors"
+                              className="p-1 rounded transition-colors"
+                              style={{ color: '#6EA9CB' }}
+                              onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                               title="Open"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -454,7 +475,10 @@ const FeedArea = () => {
                           )}
                           <button
                             onClick={() => handleDownload(attachment)}
-                            className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                            className="p-1 rounded transition-colors"
+                            style={{ color: '#6EA9CB' }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                             title="Download"
                           >
                             <Download className="w-4 h-4" />
@@ -474,7 +498,7 @@ const FeedArea = () => {
 );
 
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7FAFC' }}>
       <div className="space-y-4">
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />

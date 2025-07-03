@@ -243,11 +243,11 @@ const navigationItems = [
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+      <div className="rounded-xl shadow-sm border overflow-hidden mb-6" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
         {/* Profile Header - Horizontal */}
         <div className="relative">
           {/* Increased height from h-24 to h-32 */}
-          <div className="h-44 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+          <div className="h-44" style={{ background: 'linear-gradient(135deg, #B5D3E7 0%, #6EA9CB 100%)' }}></div>
           {/* Edit Button */}
           <button
             onClick={handleEditClick}
@@ -274,46 +274,49 @@ const navigationItems = [
         </div>
         {/* Profile Info - Horizontal Layout */}
         {/* Increased top padding from pt-10 to pt-16 to accommodate larger image */}
-        <div className="pt-16 px-8 pb-6 border-b border-gray-200">
+        <div className="pt-16 px-8 pb-6 border-b" style={{ borderColor: '#DCE8F2' }}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex-1">
-              <h3 className="text-2xl font-bold text-gray-900">
+              <h3 className="text-2xl font-bold" style={{ color: '#1F2D3D' }}>
                 {profileData.firstName} {profileData.lastName}
               </h3>
-              <p className="text-md text-gray-600 mt-1">
+              <p className="text-md mt-1" style={{ color: '#1F2D3D', opacity: 0.8 }}>
                 {profileData.headline}
               </p>
-              <div className="flex items-center text-sm text-gray-500 mt-2">
+              <div className="flex items-center text-sm mt-2" style={{ color: '#1F2D3D', opacity: 0.7 }}>
                 <MapPin className="w-4 h-4 mr-1.5" />
                 {profileData.location}, {profileData.city}
               </div>
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
-              <button className="py-2 px-5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors duration-200">
+              <button 
+                className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90"
+                style={{ backgroundColor: '#6EA9CB' }}
+              >
                 Connect
               </button>
             </div>
           </div>
 
           {/* Quick Stats - Simplified Layout */}
-          <div className="flex items-center gap-x-8 mt-6 pt-4 border-t border-gray-200">
+          <div className="flex items-center gap-x-8 mt-6 pt-4 border-t" style={{ borderColor: '#DCE8F2' }}>
             <div className="text-left">
-              <span className="font-bold text-gray-800">250+</span>
-              <span className="text-sm text-gray-600 ml-1.5">Projects</span>
+              <span className="font-bold" style={{ color: '#1F2D3D' }}>250+</span>
+              <span className="text-sm ml-1.5" style={{ color: '#1F2D3D', opacity: 0.7 }}>Projects</span>
             </div>
             <div className="text-left">
-              <span className="font-bold text-gray-800">500+</span>
-              <span className="text-sm text-gray-600 ml-1.5">Connections</span>
+              <span className="font-bold" style={{ color: '#1F2D3D' }}>500+</span>
+              <span className="text-sm ml-1.5" style={{ color: '#1F2D3D', opacity: 0.7 }}>Connections</span>
             </div>
             <div className="text-left">
-              <span className="font-bold text-gray-800">4.8</span>
-              <span className="text-sm text-gray-600 ml-1.5">Rating</span>
+              <span className="font-bold" style={{ color: '#1F2D3D' }}>4.8</span>
+              <span className="text-sm ml-1.5" style={{ color: '#1F2D3D', opacity: 0.7 }}>Rating</span>
             </div>
           </div>
         </div>
 
         {/* Navigation Items - Horizontal LinkedIn Style */}
-        <div className="bg-white border-b border-gray-200">
+        <div className="border-b" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
           <div className="flex overflow-x-auto">
             {allNavigationItems.filter(item => !hiddenNavItems.includes(item.id)).map((item) => (
               <button
@@ -321,9 +324,13 @@ const navigationItems = [
                 onClick={() => handleItemClick(item)}
                 className={`flex-shrink-0 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
                   activeItem === item.id
-                    ? "border-blue-500 text-blue-600 bg-blue-50"
-                    : "border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300"
+                    ? "text-white"
+                    : "border-transparent hover:border-gray-300"
                 }`}
+                style={activeItem === item.id 
+                  ? { borderColor: '#6EA9CB', backgroundColor: '#6EA9CB' }
+                  : { color: '#1F2D3D' }
+                }
               >
                 {item.shortName}
               </button>
@@ -331,7 +338,8 @@ const navigationItems = [
             {/* Add New Navigation Button */}
             <button
               onClick={handleAddNewNavigation}
-              className="flex-shrink-0 px-4 py-4 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors duration-200 whitespace-nowrap"
+              className="flex-shrink-0 px-4 py-4 text-sm font-medium border-b-2 border-transparent hover:border-gray-300 transition-colors duration-200 whitespace-nowrap"
+              style={{ color: '#1F2D3D', opacity: 0.6 }}
               title="Add new navigation"
             >
               <Plus className="w-4 h-4" />
@@ -341,7 +349,8 @@ const navigationItems = [
             {hiddenNavItems.length > 0 && (
               <button
                 onClick={() => setHiddenNavItems([])}
-                className="flex-shrink-0 px-4 py-4 text-sm font-medium border-b-2 border-transparent text-blue-400 hover:text-blue-600 hover:border-blue-300 transition-colors duration-200 whitespace-nowrap"
+                className="flex-shrink-0 px-4 py-4 text-sm font-medium border-b-2 border-transparent hover:border-gray-300 transition-colors duration-200 whitespace-nowrap"
+                style={{ color: '#6EA9CB' }}
                 title="Restore hidden navigation items"
               >
                 <span>Show Hidden ({hiddenNavItems.length})</span>
@@ -383,7 +392,7 @@ const navigationItems = [
                       }}
                     />
                   </div>
-                  <button className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                  <button className="absolute -bottom-1 -right-1 p-1.5 text-white rounded-full hover:bg-opacity-90 transition-colors" style={{ backgroundColor: '#6EA9CB' }}>
                     <Camera className="w-3 h-3" />
                   </button>
                 </div>
@@ -409,7 +418,7 @@ const navigationItems = [
                     onChange={(e) =>
                       handleInputChange("firstName", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                     placeholder="Enter first name"
                   />
                 </div>
@@ -550,16 +559,18 @@ const navigationItems = [
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-opacity-80 transition-colors"
+                style={{ borderColor: '#B5D3E7', color: '#1F2D3D', backgroundColor: '#F7FAFC' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveProfile}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Save Changes
               </button>
@@ -1080,17 +1091,19 @@ const navigationItems = [
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleCancelNewNavigation}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-opacity-80 transition-colors"
+                style={{ borderColor: '#B5D3E7', color: '#1F2D3D', backgroundColor: '#F7FAFC' }}
               >
                 Cancel
               </button>
               <button
                 onClick={isEditingCustomNav ? handleSaveCustomNavEdit : handleSaveNewNavigation}
                 disabled={!newNavData.name.trim() || !newNavData.content.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 {isEditingCustomNav ? "Save Changes" : "Add Navigation"}
               </button>

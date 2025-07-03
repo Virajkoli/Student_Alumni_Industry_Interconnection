@@ -93,7 +93,7 @@ const StartupQuizSidebar = () => {
   const getScoreMessage = (score) => {
     const percentage = (score / quizData.questions.length) * 100;
     if (percentage >= 80) return { message: "Excellent! 🚀", color: "text-green-600" };
-    if (percentage >= 60) return { message: "Good! 📚", color: "text-[#4D869C]" };
+    if (percentage >= 60) return { message: "Good! 📚", color: "text-[#6EA9CB]" };
     if (percentage >= 40) return { message: "Getting there! 💪", color: "text-yellow-600" };
     return { message: "Keep learning! 📖", color: "text-red-600" };
   };
@@ -111,7 +111,7 @@ const StartupQuizSidebar = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-            <Brain className="w-5 h-5 mr-2 text-[#4D869C]" />
+            <Brain className="w-5 h-5 mr-2 text-[#6EA9CB]" />
             {quizData.title}
           </h3>
         </div>
@@ -120,7 +120,7 @@ const StartupQuizSidebar = () => {
           {!quizStarted ? (
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-[#f0f9ff] rounded-full flex items-center justify-center mx-auto">
-                <Brain className="w-8 h-8 text-[#4D869C]" />
+                <Brain className="w-8 h-8 text-[#6EA9CB]" />
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-gray-900 mb-2">
@@ -142,7 +142,7 @@ const StartupQuizSidebar = () => {
               </div>
               <button
                 onClick={startQuiz}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-[#4D869C] text-white rounded-lg hover:bg-[#3a6b7a] transition-colors text-sm font-medium"
+                className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-[#6EA9CB] text-white rounded-lg hover:bg-[#5a8fa8] transition-colors text-sm font-medium"
               >
                 <Play className="w-4 h-4" />
                 <span>Start Quiz</span>
@@ -167,7 +167,7 @@ const StartupQuizSidebar = () => {
               <div className="space-y-2">
                 <button
                   onClick={resetQuiz}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-[#4D869C] text-white rounded-lg hover:bg-[#3a6b7a] transition-colors text-sm font-medium"
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-[#6EA9CB] text-white rounded-lg hover:bg-[#5a8fa8] transition-colors text-sm font-medium"
                 >
                   <RotateCcw className="w-4 h-4" />
                   <span>Try Again</span>
@@ -191,7 +191,7 @@ const StartupQuizSidebar = () => {
                     <div
                       key={index}
                       className={`w-2 h-2 rounded-full ${
-                        index <= currentQuestion ? "bg-[#4D869C]" : "bg-gray-300"
+                        index <= currentQuestion ? "bg-[#6EA9CB]" : "bg-gray-300"
                       }`}
                     />
                   ))}
@@ -209,7 +209,7 @@ const StartupQuizSidebar = () => {
                       onClick={() => handleAnswer(index)}
                       className={`w-full text-left p-3 border rounded-lg text-sm transition-colors ${
                         answers[currentQuestion] === index
-                          ? "bg-[#f0f9ff] border-[#4D869C] text-[#4D869C]"
+                          ? "bg-[#DCE8F2] border-[#6EA9CB] text-[#1F2D3D]"
                           : "border-gray-200 hover:bg-gray-50 text-gray-700"
                       }`}
                     >
@@ -230,14 +230,14 @@ const StartupQuizSidebar = () => {
         </div>
 
         <div className="p-4 space-y-3">
-          <div className="flex items-center justify-between p-3 bg-[#f0f9ff] rounded-lg">
+          <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: "#DCE8F2" }}>
             <div className="flex items-center">
-              <Brain className="w-4 h-4 text-[#4D869C] mr-2" />
-              <span className="text-sm font-medium text-gray-700">
+              <Brain className="w-4 h-4 text-[#6EA9CB] mr-2" />
+              <span className="text-sm font-medium" style={{ color: "#1F2D3D" }}>
                 Knowledge Level
               </span>
             </div>
-            <span className="text-sm font-bold text-[#4D869C]">Beginner</span>
+            <span className="text-sm font-bold text-[#6EA9CB]">Beginner</span>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">

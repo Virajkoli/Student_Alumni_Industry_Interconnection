@@ -268,20 +268,21 @@ const ChallengesSolutions = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6" style={{ backgroundColor: '#F7FAFC' }}>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold" style={{ color: '#1F2D3D' }}>
             Industry Challenges & Solutions
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="mt-1" style={{ color: '#1F2D3D' }}>
             Identifying key challenges and innovative solutions driving industry
             transformation
           </p>
         </div>
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          className="text-white px-4 py-2 rounded-lg hover:opacity-90 transition-colors flex items-center space-x-2"
+          style={{ backgroundColor: '#6EA9CB' }}
         >
           <Plus className="w-4 h-4" />
           <span>Add Challenge</span>
@@ -291,17 +292,18 @@ const ChallengesSolutions = () => {
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                   Edit Challenge & Solution
                 </h2>
                 <button
                   onClick={handleCancel}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:opacity-75 rounded-full transition-colors"
+                  style={{ backgroundColor: '#DCE8F2' }}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
                 </button>
               </div>
             </div>
@@ -309,12 +311,12 @@ const ChallengesSolutions = () => {
             <div className="p-6 space-y-6">
               {/* Challenge Section */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <h3 className="text-lg font-medium mb-4" style={{ color: '#1F2D3D' }}>
                   Challenge Details
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
                       Challenge Title
                     </label>
                     <input
@@ -323,11 +325,12 @@ const ChallengesSolutions = () => {
                       onChange={(e) =>
                         setEditData({ ...editData, challenge: e.target.value })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                      style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
                       Challenge Description
                     </label>
                     <textarea
@@ -339,7 +342,8 @@ const ChallengesSolutions = () => {
                         })
                       }
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                      style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-4">
@@ -399,7 +403,7 @@ const ChallengesSolutions = () => {
 
               {/* Solution Section */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <h3 className="text-lg font-medium mb-4" style={{ color: '#1F2D3D' }}>
                   Solution Details
                 </h3>
                 <div className="space-y-4">
@@ -506,16 +510,18 @@ const ChallengesSolutions = () => {
               </div>
             </div>
 
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t flex justify-end gap-3" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 text-sm font-medium border rounded-lg hover:opacity-90"
+                style={{ color: '#1F2D3D', backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Save Changes
               </button>
@@ -527,17 +533,18 @@ const ChallengesSolutions = () => {
       {/* Add Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                   Add New Challenge & Solution
                 </h2>
                 <button
                   onClick={handleAddCancel}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:opacity-75 rounded-full transition-colors"
+                  style={{ backgroundColor: '#DCE8F2' }}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
                 </button>
               </div>
             </div>
@@ -545,7 +552,7 @@ const ChallengesSolutions = () => {
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Challenge Title
                   </label>
                   <input
@@ -555,11 +562,12 @@ const ChallengesSolutions = () => {
                       setAddData({ ...addData, challenge: e.target.value })
                     }
                     placeholder="Enter challenge title"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Impact Level
                   </label>
                   <select
@@ -567,7 +575,8 @@ const ChallengesSolutions = () => {
                     onChange={(e) =>
                       setAddData({ ...addData, impact: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   >
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -578,7 +587,7 @@ const ChallengesSolutions = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Challenge Description
                 </label>
                 <textarea
@@ -588,13 +597,14 @@ const ChallengesSolutions = () => {
                   }
                   rows={3}
                   placeholder="Describe the challenge in detail"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Solution Title
                   </label>
                   <input
@@ -604,11 +614,12 @@ const ChallengesSolutions = () => {
                       setAddData({ ...addData, solution: e.target.value })
                     }
                     placeholder="Enter solution title"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Affected Companies (%)
                   </label>
                   <input
@@ -621,13 +632,14 @@ const ChallengesSolutions = () => {
                       })
                     }
                     placeholder="e.g., 85%"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Solution Description
                 </label>
                 <textarea
@@ -640,13 +652,14 @@ const ChallengesSolutions = () => {
                   }
                   rows={3}
                   placeholder="Describe the solution implementation"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Implemented By (comma-separated)
                   </label>
                   <input
@@ -656,11 +669,12 @@ const ChallengesSolutions = () => {
                       setAddData({ ...addData, implementedBy: e.target.value })
                     }
                     placeholder="e.g., Amazon, Google, Microsoft"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Success Rate
                   </label>
                   <input
@@ -670,14 +684,15 @@ const ChallengesSolutions = () => {
                       setAddData({ ...addData, successRate: e.target.value })
                     }
                     placeholder="e.g., 78%"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Time to Implement
                   </label>
                   <input
@@ -690,11 +705,12 @@ const ChallengesSolutions = () => {
                       })
                     }
                     placeholder="e.g., 6-12 months"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Cost Saving
                   </label>
                   <input
@@ -704,11 +720,12 @@ const ChallengesSolutions = () => {
                       setAddData({ ...addData, costSaving: e.target.value })
                     }
                     placeholder="e.g., 25-40%"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                     Status
                   </label>
                   <select
@@ -716,7 +733,8 @@ const ChallengesSolutions = () => {
                     onChange={(e) =>
                       setAddData({ ...addData, status: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent outline-none"
+                    style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   >
                     <option value="Active">Active</option>
                     <option value="In Progress">In Progress</option>
@@ -727,16 +745,18 @@ const ChallengesSolutions = () => {
               </div>
             </div>
 
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t flex justify-end gap-3" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleAddCancel}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 text-sm font-medium border rounded-lg hover:opacity-90"
+                style={{ color: '#1F2D3D', backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleAdd}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Add Challenge & Solution
               </button>
@@ -749,7 +769,8 @@ const ChallengesSolutions = () => {
         {challengeSolutions.map((item) => (
           <div
             key={item.id}
-            className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+            className="border rounded-xl shadow-sm hover:shadow-md transition-shadow"
+            style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}
           >
             {editingId === item.id ? (
               // Edit Mode
@@ -938,13 +959,15 @@ const ChallengesSolutions = () => {
                   <div className="flex space-x-3 pt-2">
                     <button
                       onClick={handleSave}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                      className="text-white px-4 py-2 rounded-lg hover:opacity-90 transition-colors"
+                      style={{ backgroundColor: '#6EA9CB' }}
                     >
                       Save Changes
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                      className="text-white px-4 py-2 rounded-lg hover:opacity-90 transition-colors"
+                      style={{ backgroundColor: '#DCE8F2', color: '#1F2D3D' }}
                     >
                       Cancel
                     </button>
@@ -957,13 +980,16 @@ const ChallengesSolutions = () => {
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-xl font-semibold text-gray-900">
+                      <h3 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                         🚨 {item.challenge}
                       </h3>
                       <button
                         onClick={() => handleEdit(item)}
-                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 rounded-lg transition-colors"
                         title="Edit Challenge/Solution"
+                        style={{ color: '#6EA9CB', backgroundColor: '#DCE8F2' }}
+                        onMouseOver={(e) => e.target.style.opacity = '0.8'}
+                        onMouseOut={(e) => e.target.style.opacity = '1'}
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
@@ -983,70 +1009,71 @@ const ChallengesSolutions = () => {
                       >
                         {item.status}
                       </span>
-                      <div className="flex items-center space-x-1 text-sm text-gray-600">
+                      <div className="flex items-center space-x-1 text-sm" style={{ color: '#1F2D3D', opacity: '0.8' }}>
                         <Users className="w-4 h-4" />
                         <span>{item.affectedCompanies} affected</span>
                       </div>
                     </div>
-                    <p className="text-gray-700 mb-6 leading-relaxed">
+                    <p className="mb-6 leading-relaxed" style={{ color: '#1F2D3D' }}>
                       {item.description}
                     </p>
                   </div>
                 </div>
 
                 {/* Solution Section */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div className="border rounded-lg p-4 mb-4" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
                   <div className="flex items-center space-x-2 mb-3">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <h4 className="text-lg font-semibold text-green-800">
+                    <CheckCircle className="w-5 h-5" style={{ color: '#6EA9CB' }} />
+                    <h4 className="text-lg font-semibold" style={{ color: '#1F2D3D' }}>
                       {item.solution}
                     </h4>
                   </div>
-                  <p className="text-green-700 mb-4 leading-relaxed">
+                  <p className="mb-4 leading-relaxed" style={{ color: '#1F2D3D' }}>
                     {item.solutionDescription}
                   </p>
 
                   {/* Solution Stats */}
                   <div className="grid grid-cols-3 gap-4 mb-4">
-                    <div className="text-center bg-white p-3 rounded">
+                    <div className="text-center p-3 rounded" style={{ backgroundColor: '#F7FAFC' }}>
                       <div className="flex items-center justify-center space-x-1 mb-1">
-                        <TrendingUp className="w-4 h-4 text-green-600" />
-                        <span className="text-lg font-bold text-green-600">
+                        <TrendingUp className="w-4 h-4" style={{ color: '#6EA9CB' }} />
+                        <span className="text-lg font-bold" style={{ color: '#6EA9CB' }}>
                           {item.successRate}
                         </span>
                       </div>
-                      <p className="text-xs text-green-700">Success Rate</p>
+                      <p className="text-xs" style={{ color: '#1F2D3D' }}>Success Rate</p>
                     </div>
-                    <div className="text-center bg-white p-3 rounded">
+                    <div className="text-center p-3 rounded" style={{ backgroundColor: '#F7FAFC' }}>
                       <div className="flex items-center justify-center space-x-1 mb-1">
-                        <Clock className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm font-bold text-blue-600">
+                        <Clock className="w-4 h-4" style={{ color: '#6EA9CB' }} />
+                        <span className="text-sm font-bold" style={{ color: '#6EA9CB' }}>
                           {item.timeToImplement}
                         </span>
                       </div>
-                      <p className="text-xs text-blue-700">Implementation</p>
+                      <p className="text-xs" style={{ color: '#1F2D3D' }}>Implementation</p>
                     </div>
-                    <div className="text-center bg-white p-3 rounded">
+                    <div className="text-center p-3 rounded" style={{ backgroundColor: '#F7FAFC' }}>
                       <div className="flex items-center justify-center space-x-1 mb-1">
-                        <Lightbulb className="w-4 h-4 text-orange-600" />
-                        <span className="text-lg font-bold text-orange-600">
+                        <Lightbulb className="w-4 h-4" style={{ color: '#6EA9CB' }} />
+                        <span className="text-lg font-bold" style={{ color: '#6EA9CB' }}>
                           {item.costSaving}
                         </span>
                       </div>
-                      <p className="text-xs text-orange-700">Cost Saving</p>
+                      <p className="text-xs" style={{ color: '#1F2D3D' }}>Cost Saving</p>
                     </div>
                   </div>
 
                   {/* Implemented By */}
                   <div>
-                    <p className="text-sm font-medium text-green-800 mb-2">
+                    <p className="text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                       Successfully Implemented By:
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {item.implementedBy.map((company, index) => (
                         <span
                           key={index}
-                          className="px-3 py-1 bg-white text-green-700 text-sm rounded-full border border-green-200"
+                          className="px-3 py-1 text-sm rounded-full border"
+                          style={{ backgroundColor: '#F7FAFC', color: '#1F2D3D', borderColor: '#DCE8F2' }}
                         >
                           {company}
                         </span>
@@ -1055,15 +1082,15 @@ const ChallengesSolutions = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                <div className="flex justify-between items-center pt-4 border-t" style={{ borderColor: '#DCE8F2' }}>
+                  <button className="text-sm font-medium hover:opacity-80" style={{ color: '#6EA9CB' }}>
                     View Implementation Guide →
                   </button>
                   <div className="flex space-x-3">
-                    <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                    <button className="px-4 py-2 border rounded-lg transition-colors text-sm" style={{ borderColor: '#DCE8F2', color: '#1F2D3D', backgroundColor: '#F7FAFC' }}>
                       Case Studies
                     </button>
-                    <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
+                    <button className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors text-sm" style={{ backgroundColor: '#6EA9CB' }}>
                       Get Solution
                     </button>
                   </div>
@@ -1075,41 +1102,41 @@ const ChallengesSolutions = () => {
       </div>
 
       {/* Summary Statistics */}
-      <div className="mt-8 bg-gradient-to-r from-red-50 to-green-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="mt-8 rounded-xl p-6" style={{ background: 'linear-gradient(to right, #DCE8F2, #B5D3E7)' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#1F2D3D' }}>
           Challenge Resolution Overview
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex items-center space-x-2">
-            <AlertTriangle className="w-6 h-6 text-red-500" />
+            <AlertTriangle className="w-6 h-6" style={{ color: '#6EA9CB' }} />
             <div>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-2xl font-bold" style={{ color: '#6EA9CB' }}>
                 {challengeSolutions.length}
               </p>
-              <p className="text-sm text-gray-600">Active Challenges</p>
+              <p className="text-sm" style={{ color: '#1F2D3D' }}>Active Challenges</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <CheckCircle className="w-6 h-6 text-green-500" />
+            <CheckCircle className="w-6 h-6" style={{ color: '#6EA9CB' }} />
             <div>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold" style={{ color: '#6EA9CB' }}>
                 {challengeSolutions.length}
               </p>
-              <p className="text-sm text-gray-600">Solutions Available</p>
+              <p className="text-sm" style={{ color: '#1F2D3D' }}>Solutions Available</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <TrendingUp className="w-6 h-6 text-blue-500" />
+            <TrendingUp className="w-6 h-6" style={{ color: '#6EA9CB' }} />
             <div>
-              <p className="text-2xl font-bold text-blue-600">76%</p>
-              <p className="text-sm text-gray-600">Avg Success Rate</p>
+              <p className="text-2xl font-bold" style={{ color: '#6EA9CB' }}>76%</p>
+              <p className="text-sm" style={{ color: '#1F2D3D' }}>Avg Success Rate</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Lightbulb className="w-6 h-6 text-orange-500" />
+            <Lightbulb className="w-6 h-6" style={{ color: '#6EA9CB' }} />
             <div>
-              <p className="text-2xl font-bold text-orange-600">35%</p>
-              <p className="text-sm text-gray-600">Avg Cost Saving</p>
+              <p className="text-2xl font-bold" style={{ color: '#6EA9CB' }}>35%</p>
+              <p className="text-sm" style={{ color: '#1F2D3D' }}>Avg Cost Saving</p>
             </div>
           </div>
         </div>

@@ -194,11 +194,11 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+      <div className="rounded-xl shadow-sm border overflow-hidden mb-6" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
         {/* Profile Header */}
         <div className="relative">
           {/* Cover Photo */}
-          <div className="h-44 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+          <div className="h-44 bg-gradient-to-r from-blue-400 to-indigo-500" style={{ background: 'linear-gradient(135deg, #B5D3E7 0%, #6EA9CB 100%)' }}></div>
           
           {/* Edit Button */}
           <button
@@ -247,7 +247,10 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
               )}
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
-              <button className="py-2 px-5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors duration-200">
+              <button 
+                className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90"
+                style={{ backgroundColor: '#6EA9CB' }}
+              >
                 Connect
               </button>
               <button className="py-2 px-5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors duration-200">
@@ -257,24 +260,24 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
           </div>
 
           {/* Quick Stats */}
-          <div className="flex items-center gap-x-8 mt-6 pt-4 border-t border-gray-200">
+          <div className="flex items-center gap-x-8 mt-6 pt-4 border-t" style={{ borderColor: '#DCE8F2' }}>
             <div className="text-left">
-              <span className="font-bold text-gray-800">12</span>
-              <span className="text-sm text-gray-600 ml-1.5">Projects</span>
+              <span className="font-bold" style={{ color: '#1F2D3D' }}>12</span>
+              <span className="text-sm ml-1.5" style={{ color: '#1F2D3D', opacity: 0.7 }}>Projects</span>
             </div>
             <div className="text-left">
-              <span className="font-bold text-gray-800">150+</span>
-              <span className="text-sm text-gray-600 ml-1.5">Connections</span>
+              <span className="font-bold" style={{ color: '#1F2D3D' }}>150+</span>
+              <span className="text-sm ml-1.5" style={{ color: '#1F2D3D', opacity: 0.7 }}>Connections</span>
             </div>
             <div className="text-left">
-              <span className="font-bold text-gray-800">4.9</span>
-              <span className="text-sm text-gray-600 ml-1.5">Rating</span>
+              <span className="font-bold" style={{ color: '#1F2D3D' }}>4.9</span>
+              <span className="text-sm ml-1.5" style={{ color: '#1F2D3D', opacity: 0.7 }}>Rating</span>
             </div>
           </div>
         </div>
 
         {/* Navigation Items - Horizontal LinkedIn Style */}
-        <div className="bg-white border-b border-gray-200">
+        <div className="border-b" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
           <div className="flex items-center justify-between px-6 py-3">
             <div className="flex items-center space-x-1 overflow-x-auto">
               {/* Regular Navigation Items */}
@@ -284,9 +287,24 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
                   onClick={() => handleItemClick(item)}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap ${
                     activeItem === item.id
-                      ? "bg-blue-100 text-blue-700 border border-blue-200"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      ? "border border-opacity-50 text-white"
+                      : "hover:bg-opacity-70 transition-colors"
                   }`}
+                  style={{
+                    backgroundColor: activeItem === item.id ? '#6EA9CB' : 'transparent',
+                    borderColor: activeItem === item.id ? '#B5D3E7' : 'transparent',
+                    color: activeItem === item.id ? 'white' : '#1F2D3D'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeItem !== item.id) {
+                      e.target.style.backgroundColor = '#DCE8F2';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeItem !== item.id) {
+                      e.target.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   {item.shortName}
                 </button>
@@ -299,9 +317,24 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
                     onClick={() => handleCustomNavClick(customNav)}
                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap ${
                       activeItem === customNav.id
-                        ? "bg-green-100 text-green-700 border border-green-200"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                        ? "border border-opacity-50 text-white"
+                        : "hover:bg-opacity-70 transition-colors"
                     }`}
+                    style={{
+                      backgroundColor: activeItem === customNav.id ? '#6EA9CB' : 'transparent',
+                      borderColor: activeItem === customNav.id ? '#B5D3E7' : 'transparent',
+                      color: activeItem === customNav.id ? 'white' : '#1F2D3D'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeItem !== customNav.id) {
+                        e.target.style.backgroundColor = '#DCE8F2';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeItem !== customNav.id) {
+                        e.target.style.backgroundColor = 'transparent';
+                      }
+                    }}
                   >
                     {customNav.name}
                     <Star className="w-3 h-3 inline ml-1 text-yellow-500" />
@@ -326,7 +359,14 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
               {/* Add Custom Navigation Button */}
               <button
                 onClick={() => setIsNewNavModalOpen(true)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-70"
+                style={{ color: '#1F2D3D' }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#DCE8F2';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
                 title="Add Custom Section"
               >
                 <Plus className="w-4 h-4" />
@@ -335,7 +375,14 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
               {/* Settings Button */}
               <button
                 onClick={() => setIsNavEditModalOpen(true)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-70"
+                style={{ color: '#1F2D3D' }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#DCE8F2';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
                 title="Navigation Settings"
               >
                 <Edit3 className="w-4 h-4" />
@@ -503,16 +550,24 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
               <button
                 onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:opacity-80"
+                style={{ borderColor: '#DCE8F2', color: '#1F2D3D' }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#DCE8F2';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveProfile}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Save Changes
               </button>

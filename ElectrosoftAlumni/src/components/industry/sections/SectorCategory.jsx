@@ -216,17 +216,20 @@ const SectorCategory = () => {
   };
 
   return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" style={{ backgroundColor: "#F7FAFC" }}>
       {/* Header Section - Clean and Professional */}
       <div className="mb-10">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Industry Sectors</h2>
+            <h2 className="text-2xl font-bold tracking-tight" style={{ color: "#1F2D3D" }}>Industry Sectors</h2>
             
           </div>
           <button
             onClick={handleAddNew}
-            className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow"
+            className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors duration-200 shadow-sm hover:shadow"
+            style={{ backgroundColor: "#6EA9CB" }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
+            onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add Sector
@@ -241,18 +244,24 @@ const SectorCategory = () => {
         {sectors.map((sector) => (
           <div
             key={sector.id}
-            className="bg-white rounded-xl border border-gray-200 hover:border-indigo-500 transition-all duration-200 group"
+            className="rounded-xl border transition-all duration-200 group"
+            style={{ 
+              backgroundColor: "white",
+              borderColor: "#B5D3E7"
+            }}
+            onMouseEnter={(e) => e.target.style.borderColor = "#6EA9CB"}
+            onMouseLeave={(e) => e.target.style.borderColor = "#B5D3E7"}
           >
             {/* Card Header */}
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-4">
-                  <div className="text-3xl bg-gray-50 p-3 rounded-lg">{sector.icon}</div>
+                  <div className="text-3xl p-3 rounded-lg" style={{ backgroundColor: "#DCE8F2" }}>{sector.icon}</div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">
+                    <h3 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
                       {sector.name}
                     </h3>
-                    <div className="inline-flex items-center mt-2 text-sm text-emerald-600 font-medium bg-emerald-50 px-2.5 py-1 rounded-full">
+                    <div className="inline-flex items-center mt-2 text-sm font-medium px-2.5 py-1 rounded-full" style={{ color: "#1F2D3D", backgroundColor: "#DCE8F2" }}>
                       <TrendingUp className="w-4 h-4 mr-1.5" />
                       {sector.growth} Growth
                     </div>
@@ -260,13 +269,23 @@ const SectorCategory = () => {
                 </div>
                 <button
                   onClick={() => handleEditClick(sector)}
-                  className="p-2 text-gray-400 hover:text-indigo-600 rounded-full hover:bg-gray-50"
+                  className="p-2 rounded-full transition-colors"
+                  style={{ color: "#1F2D3D", opacity: "0.6" }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#6EA9CB";
+                    e.target.style.backgroundColor = "#DCE8F2";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#1F2D3D";
+                    e.target.style.opacity = "0.6";
+                    e.target.style.backgroundColor = "transparent";
+                  }}
                 >
                   <Edit3 className="w-4 h-4" />
                 </button>
               </div>
 
-              <p className="text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-4">
+              <p className="text-sm leading-relaxed border-t pt-4" style={{ color: "#1F2D3D", opacity: "0.7", borderColor: "#DCE8F2" }}>
                 {sector.description}
               </p>
 

@@ -374,18 +374,19 @@ const LaunchSteps = () => {
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-lg">
+      <div className="border rounded-lg" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
         {/* Header with Edit Button */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
               {content.title}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">{content.description}</p>
+            <p className="text-sm mt-1" style={{ color: '#1F2D3D', opacity: 0.7 }}>{content.description}</p>
           </div>
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-2 hover:bg-opacity-80 rounded-lg transition-colors"
+            style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2' }}
             title={isEditing ? "Done editing" : "Edit Steps"}
           >
             {isEditing ? (
@@ -404,10 +405,11 @@ const LaunchSteps = () => {
 
         {/* Add Step Button (when editing) */}
         {isEditing && (
-          <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <div className="p-4 border-b" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
             <button
               onClick={handleAddStep}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
+              style={{ backgroundColor: '#6EA9CB' }}
             >
               <Plus className="w-4 h-4" />
               Add New Step
@@ -416,20 +418,21 @@ const LaunchSteps = () => {
         )}
 
         {/* Progress Overview */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+        <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
+          <div className="rounded-lg p-4 border" style={{ background: 'linear-gradient(to right, #B5D3E7, #DCE8F2)', borderColor: '#B5D3E7' }}>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold" style={{ color: '#1F2D3D' }}>
                 Launch Progress
               </h3>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm" style={{ color: '#1F2D3D', opacity: 0.7 }}>
                 {completedSteps.length}/{content.steps.length} steps completed
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full rounded-full h-2" style={{ backgroundColor: '#DCE8F2' }}>
               <div
-                className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
+                className="h-2 rounded-full transition-all duration-300"
                 style={{
+                  background: 'linear-gradient(to right, #6EA9CB, #B5D3E7)',
                   width: `${
                     (completedSteps.length / content.steps.length) * 100
                   }%`,
@@ -440,7 +443,7 @@ const LaunchSteps = () => {
         </div>
 
         {/* Launch Steps */}
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y" style={{ borderColor: '#DCE8F2' }}>
           {content.steps.map((step, index) => {
             const isCompleted = completedSteps.includes(index);
             const isActive = index === completedSteps.length && !isCompleted;
@@ -458,11 +461,19 @@ const LaunchSteps = () => {
                         }
                         className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors text-xl ${
                           isCompleted
-                            ? "bg-green-600 text-white"
+                            ? "text-white"
                             : isActive
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            ? "text-white"
+                            : "hover:bg-opacity-80"
                         }`}
+                        style={{
+                          backgroundColor: isCompleted 
+                            ? '#6EA9CB' 
+                            : isActive 
+                            ? '#B5D3E7' 
+                            : '#DCE8F2',
+                          color: isCompleted || isActive ? 'white' : '#1F2D3D'
+                        }}
                       >
                         {isCompleted ? (
                           <CheckCircle className="w-6 h-6" />
@@ -472,9 +483,8 @@ const LaunchSteps = () => {
                       </button>
                       {index < content.steps.length - 1 && (
                         <div
-                          className={`w-0.5 h-12 mt-2 ${
-                            isCompleted ? "bg-green-300" : "bg-gray-300"
-                          }`}
+                          className={`w-0.5 h-12 mt-2`}
+                          style={{ backgroundColor: isCompleted ? '#B5D3E7' : '#DCE8F2' }}
                         ></div>
                       )}
                     </div>
@@ -483,36 +493,37 @@ const LaunchSteps = () => {
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <h3
-                            className={`text-lg font-semibold ${
-                              isCompleted ? "text-green-800" : "text-gray-900"
-                            }`}
+                            className={`text-lg font-semibold`}
+                            style={{ color: isCompleted ? '#6EA9CB' : '#1F2D3D' }}
                           >
                             {step.title}
                           </h3>
                           <p
-                            className={`text-sm ${
-                              isCompleted ? "text-green-700" : "text-gray-600"
-                            }`}
+                            className={`text-sm`}
+                            style={{ color: isCompleted ? '#6EA9CB' : '#1F2D3D', opacity: 0.8 }}
                           >
                             {step.description}
                           </p>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
                           <span
-                            className={`px-2 py-1 text-xs rounded-full ${
-                              isCompleted
-                                ? "bg-green-100 text-green-800"
-                                : isActive
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
+                            className={`px-2 py-1 text-xs rounded-full`}
+                            style={{
+                              backgroundColor: isCompleted 
+                                ? '#B5D3E7' 
+                                : isActive 
+                                ? '#DCE8F2' 
+                                : '#F7FAFC',
+                              color: '#1F2D3D'
+                            }}
                           >
                             {step.timeframe}
                           </span>
                           {isEditing && (
                             <button
                               onClick={() => handleEditClick(index)}
-                              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+                              className="p-2 hover:bg-opacity-80 rounded-full transition-all"
+                              style={{ color: '#1F2D3D', backgroundColor: '#DCE8F2' }}
                               title="Edit step"
                             >
                               <Edit className="w-4 h-4" />
@@ -523,9 +534,8 @@ const LaunchSteps = () => {
 
                       <div className="mt-3">
                         <h4
-                          className={`text-sm font-medium mb-2 ${
-                            isCompleted ? "text-green-800" : "text-gray-800"
-                          }`}
+                          className={`text-sm font-medium mb-2`}
+                          style={{ color: isCompleted ? '#6EA9CB' : '#1F2D3D' }}
                         >
                           Key Tasks:
                         </h4>
@@ -533,14 +543,12 @@ const LaunchSteps = () => {
                           {step.tasks.map((task, taskIndex) => (
                             <div
                               key={taskIndex}
-                              className={`text-sm flex items-start ${
-                                isCompleted ? "text-green-700" : "text-gray-600"
-                              }`}
+                              className={`text-sm flex items-start`}
+                              style={{ color: isCompleted ? '#6EA9CB' : '#1F2D3D', opacity: 0.8 }}
                             >
                               <span
-                                className={`w-1.5 h-1.5 rounded-full mr-2 mt-2 flex-shrink-0 ${
-                                  isCompleted ? "bg-green-500" : "bg-gray-400"
-                                }`}
+                                className={`w-1.5 h-1.5 rounded-full mr-2 mt-2 flex-shrink-0`}
+                                style={{ backgroundColor: isCompleted ? '#6EA9CB' : '#B5D3E7' }}
                               ></span>
                               <span>{task}</span>
                             </div>
@@ -552,9 +560,8 @@ const LaunchSteps = () => {
                       {step.customFields && step.customFields.length > 0 && (
                         <div className="mt-4">
                           <h4
-                            className={`text-sm font-medium mb-2 ${
-                              isCompleted ? "text-green-800" : "text-gray-800"
-                            }`}
+                            className={`text-sm font-medium mb-2`}
+                            style={{ color: isCompleted ? '#6EA9CB' : '#1F2D3D' }}
                           >
                             Additional Information:
                           </h4>
@@ -562,11 +569,8 @@ const LaunchSteps = () => {
                             {step.customFields.map((field, fieldIndex) => (
                               <div
                                 key={fieldIndex}
-                                className={`text-sm ${
-                                  isCompleted
-                                    ? "text-green-700"
-                                    : "text-gray-600"
-                                }`}
+                                className={`text-sm`}
+                                style={{ color: isCompleted ? '#6EA9CB' : '#1F2D3D', opacity: 0.8 }}
                               >
                                 <span className="font-medium">
                                   {field.label}:
@@ -586,17 +590,17 @@ const LaunchSteps = () => {
         </div>
 
         {/* Action Center */}
-        <div className="p-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-b-lg">
+        <div className="p-6 text-white rounded-b-lg" style={{ background: 'linear-gradient(to right, #6EA9CB, #B5D3E7)' }}>
           <h3 className="text-xl font-semibold mb-2">Ready to Launch?</h3>
           <p className="mb-4">
             Get personalized guidance and support throughout your startup
             journey.
           </p>
           <div className="flex space-x-4">
-            <button className="px-6 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+            <button className="px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors" style={{ backgroundColor: '#F7FAFC', color: '#1F2D3D' }}>
               Get Mentor Support
             </button>
-            <button className="px-6 py-2 border border-white text-white rounded-lg font-medium hover:bg-white hover:text-purple-600 transition-colors">
+            <button className="px-6 py-2 border border-white text-white rounded-lg font-medium hover:bg-white transition-colors" style={{ '--hover-color': '#1F2D3D' }} onMouseEnter={(e) => e.target.style.color = '#1F2D3D'} onMouseLeave={(e) => e.target.style.color = 'white'}>
               Download Checklist
             </button>
           </div>
@@ -606,17 +610,18 @@ const LaunchSteps = () => {
       {/* Add Step Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                   Add New Step
                 </h2>
                 <button
                   onClick={handleCancelAdd}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-opacity-80 rounded-full transition-colors"
+                  style={{ backgroundColor: '#DCE8F2' }}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
                 </button>
               </div>
             </div>
@@ -624,14 +629,15 @@ const LaunchSteps = () => {
             <div className="p-6 space-y-6">
               {/* Icon */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
                   Icon *
                 </label>
                 <input
                   type="text"
                   value={newStep.icon}
                   onChange={(e) => handleInputChange("icon", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
+                  style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D' }}
                   placeholder="Enter emoji (e.g., 💡)"
                 />
               </div>
@@ -645,7 +651,7 @@ const LaunchSteps = () => {
                   type="text"
                   value={newStep.title}
                   onChange={(e) => handleInputChange("title", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                   placeholder="Enter step title"
                 />
               </div>
@@ -661,7 +667,7 @@ const LaunchSteps = () => {
                     handleInputChange("description", e.target.value)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none resize-none"
                   placeholder="Describe what this step involves"
                 />
               </div>
@@ -679,7 +685,7 @@ const LaunchSteps = () => {
                   }
                   onChange={(e) => handleInputChange("tasks", e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none resize-none"
                   placeholder="Enter tasks separated by commas"
                 />
               </div>
@@ -695,7 +701,7 @@ const LaunchSteps = () => {
                   onChange={(e) =>
                     handleInputChange("timeframe", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                   placeholder="e.g., 2-4 weeks"
                 />
               </div>
@@ -708,7 +714,7 @@ const LaunchSteps = () => {
                 <select
                   value={newStep.status}
                   onChange={(e) => handleInputChange("status", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                 >
                   <option value="pending">Pending</option>
                   <option value="active">Active</option>
@@ -737,7 +743,7 @@ const LaunchSteps = () => {
                             e.target.value
                           )
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                         placeholder="Field label"
                       />
                       <input
@@ -750,7 +756,7 @@ const LaunchSteps = () => {
                             e.target.value
                           )
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                         placeholder="Field value"
                       />
                       <button
@@ -764,7 +770,8 @@ const LaunchSteps = () => {
                   ))}
                   <button
                     onClick={() => handleAddCustomField()}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
+                    style={{ backgroundColor: '#6EA9CB' }}
                   >
                     <Plus className="w-4 h-4" />
                     Add Custom Field
@@ -774,17 +781,19 @@ const LaunchSteps = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleCancelAdd}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-opacity-80 transition-colors"
+                style={{ borderColor: '#B5D3E7', color: '#1F2D3D', backgroundColor: '#F7FAFC' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveStep}
                 disabled={!newStep.title.trim() || !newStep.description.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Add Step
               </button>
@@ -796,17 +805,18 @@ const LaunchSteps = () => {
       {/* Edit Step Modal */}
       {editingStepIndex !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
+            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
                   Edit Step
                 </h2>
                 <button
                   onClick={handleCancelEdit}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-opacity-80 rounded-full transition-colors"
+                  style={{ backgroundColor: '#DCE8F2' }}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
                 </button>
               </div>
             </div>
@@ -823,7 +833,7 @@ const LaunchSteps = () => {
                   onChange={(e) =>
                     handleInputChange("icon", e.target.value, true)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                   placeholder="Enter emoji (e.g., 💡)"
                 />
               </div>
@@ -839,7 +849,7 @@ const LaunchSteps = () => {
                   onChange={(e) =>
                     handleInputChange("title", e.target.value, true)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                   placeholder="Enter step title"
                 />
               </div>
@@ -855,7 +865,7 @@ const LaunchSteps = () => {
                     handleInputChange("description", e.target.value, true)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none resize-none"
                   placeholder="Describe what this step involves"
                 />
               </div>
@@ -875,7 +885,7 @@ const LaunchSteps = () => {
                     handleInputChange("tasks", e.target.value, true)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none resize-none"
                   placeholder="Enter tasks separated by commas"
                 />
               </div>
@@ -891,7 +901,7 @@ const LaunchSteps = () => {
                   onChange={(e) =>
                     handleInputChange("timeframe", e.target.value, true)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                   placeholder="e.g., 2-4 weeks"
                 />
               </div>
@@ -906,7 +916,7 @@ const LaunchSteps = () => {
                   onChange={(e) =>
                     handleInputChange("status", e.target.value, true)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                 >
                   <option value="pending">Pending</option>
                   <option value="active">Active</option>
@@ -936,7 +946,7 @@ const LaunchSteps = () => {
                             true
                           )
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                         placeholder="Field label"
                       />
                       <input
@@ -950,7 +960,7 @@ const LaunchSteps = () => {
                             true
                           )
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B5D3E7] focus:border-[#6EA9CB] outline-none"
                         placeholder="Field value"
                       />
                       <button
@@ -964,7 +974,8 @@ const LaunchSteps = () => {
                   ))}
                   <button
                     onClick={() => handleAddCustomField(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
+                    style={{ backgroundColor: '#6EA9CB' }}
                   >
                     <Plus className="w-4 h-4" />
                     Add Custom Field
@@ -974,10 +985,11 @@ const LaunchSteps = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
+            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
               <button
                 onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-opacity-80 transition-colors"
+                style={{ borderColor: '#B5D3E7', color: '#1F2D3D', backgroundColor: '#F7FAFC' }}
               >
                 Cancel
               </button>
@@ -986,7 +998,8 @@ const LaunchSteps = () => {
                 disabled={
                   !editStep.title.trim() || !editStep.description.trim()
                 }
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#6EA9CB' }}
               >
                 Save Changes
               </button>

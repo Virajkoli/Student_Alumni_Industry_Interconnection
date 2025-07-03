@@ -12,17 +12,17 @@ import {
 
 const Navbar = () => {
   return (
-    <nav className="border-b border-gray-200 sticky top-0 z-50" style={{ backgroundColor: "#EEE7FF" }}>
+    <nav className="border-b sticky top-0 z-50" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
         <div className="flex items-center justify-between h-14">
           {/* Left side - Logo and Search */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded text-white flex items-center justify-center font-bold text-sm"
-                   style={{ backgroundColor: "#4D869C" }}>
+                   style={{ backgroundColor: "#6EA9CB" }}>
                 S
               </div>
-              <span className="ml-2 font-semibold text-gray-900 hidden sm:block">
+              <span className="ml-2 font-semibold hidden sm:block" style={{ color: "#1F2D3D" }}>
                 StartupConnect
               </span>
             </div>
@@ -34,55 +34,55 @@ const Navbar = () => {
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
               <div className="flex flex-col items-center cursor-pointer group">
-                <Home className="w-5 h-5 text-gray-600 transition-colors"
-                      style={{ color: "#4D869C" }} />
-                <span className="text-xs text-gray-600 transition-colors"
-                      style={{ color: "#4D869C" }}>
+                <Home className="w-5 h-5 transition-colors"
+                      style={{ color: "#6EA9CB" }} />
+                <span className="text-xs transition-colors"
+                      style={{ color: "#6EA9CB" }}>
                   Home
                 </span>
               </div>
               <div className="flex flex-col items-center cursor-pointer group">
-                <Users className="w-5 h-5 text-gray-600 transition-colors"
-                       style={{ color: "#4D869C" }} />
-                <span className="text-xs text-gray-600 transition-colors"
-                      style={{ color: "#4D869C" }}>
+                <Users className="w-5 h-5 transition-colors"
+                       style={{ color: "#6EA9CB" }} />
+                <span className="text-xs transition-colors"
+                      style={{ color: "#6EA9CB" }}>
                   Network
                 </span>
               </div>
               <div className="flex flex-col items-center cursor-pointer group">
-                <Briefcase className="w-5 h-5 text-gray-600 transition-colors"
-                           style={{ color: "#4D869C" }} />
-                <span className="text-xs text-gray-600 transition-colors"
-                      style={{ color: "#4D869C" }}>
+                <Briefcase className="w-5 h-5 transition-colors"
+                           style={{ color: "#6EA9CB" }} />
+                <span className="text-xs transition-colors"
+                      style={{ color: "#6EA9CB" }}>
                   Jobs
                 </span>
               </div>
               <div className="flex flex-col items-center cursor-pointer group">
-                <MessageCircle className="w-5 h-5 text-gray-600 transition-colors"
-                               style={{ color: "#4D869C" }} />
-                <span className="text-xs text-gray-600 transition-colors"
-                      style={{ color: "#4D869C" }}>
+                <MessageCircle className="w-5 h-5 transition-colors"
+                               style={{ color: "#6EA9CB" }} />
+                <span className="text-xs transition-colors"
+                      style={{ color: "#6EA9CB" }}>
                   Messaging
                 </span>
               </div>
               <div className="flex flex-col items-center cursor-pointer group relative">
-                <Bell className="w-5 h-5 text-gray-600 transition-colors"
-                      style={{ color: "#4D869C" }} />
-                <span className="text-xs text-gray-600 transition-colors"
-                      style={{ color: "#4D869C" }}>
+                <Bell className="w-5 h-5 transition-colors"
+                      style={{ color: "#6EA9CB" }} />
+                <span className="text-xs transition-colors"
+                      style={{ color: "#6EA9CB" }}>
                   Notifications
                 </span>
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
               </div>
             </div>
 
-            <div className="border-l border-gray-200 pl-4">
+            <div className="border-l pl-4" style={{ borderColor: "#B5D3E7" }}>
               <div className="flex items-center cursor-pointer group">
-                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-gray-600" />
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "#DCE8F2" }}>
+                  <User className="w-4 h-4" style={{ color: "#1F2D3D" }} />
                 </div>
-                <span className="ml-2 text-sm text-gray-700 transition-colors hidden sm:block"
-                      style={{ color: "#4D869C" }}>
+                <span className="ml-2 text-sm transition-colors hidden sm:block"
+                      style={{ color: "#6EA9CB" }}>
                   Me
                 </span>
               </div>

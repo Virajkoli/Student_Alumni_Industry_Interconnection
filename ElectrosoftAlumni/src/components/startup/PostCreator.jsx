@@ -212,10 +212,10 @@ const PostCreator = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+    <div className="rounded-xl shadow-sm border p-4" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
       <div className="flex items-start space-x-3">
         <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-             style={{ backgroundColor: "#4D869C" }}>
+             style={{ backgroundColor: "#6EA9CB" }}>
           P
         </div>
 
@@ -224,8 +224,8 @@ const PostCreator = () => {
             value={postText}
             onChange={(e) => setPostText(e.target.value)}
             placeholder="Start a post..."
-            className="w-full min-h-[60px] p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent text-sm"
-            style={{ "--tw-ring-color": "#4D869C" }}
+            className="w-full min-h-[60px] p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+            style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC', color: '#1F2D3D', '--tw-ring-color': '#6EA9CB' }}
             rows="3"
           />
 
@@ -233,12 +233,15 @@ const PostCreator = () => {
           {attachedFiles.length > 0 && (
             <div className="mt-3 space-y-2">
               {attachedFiles.map((file) => (
-                <div key={file.id} className="relative border border-gray-200 rounded-lg p-3">
+                <div key={file.id} className="relative border rounded-lg p-3" style={{ borderColor: '#DCE8F2', backgroundColor: '#F7FAFC' }}>
                   <button
                     onClick={() => removeFile(file.id)}
-                    className="absolute top-2 right-2 p-1 bg-red-100 hover:bg-red-200 rounded-full transition-colors"
+                    className="absolute top-2 right-2 p-1 rounded-full transition-colors"
+                    style={{ backgroundColor: '#DCE8F2' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#B5D3E7'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#DCE8F2'}
                   >
-                    <X className="w-4 h-4 text-red-600" />
+                    <X className="w-4 h-4" style={{ color: '#1F2D3D' }} />
                   </button>
                   
                   {file.type === 'photo' && (
@@ -249,12 +252,12 @@ const PostCreator = () => {
                         className="w-16 h-16 object-cover rounded-lg"
                       />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                        <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                        <p className="text-sm font-medium" style={{ color: '#1F2D3D' }}>{file.name}</p>
+                        <p className="text-xs" style={{ color: '#1F2D3D', opacity: '0.6' }}>{formatFileSize(file.size)}</p>
                         {file.storedLocally ? (
-                          <p className="text-xs text-green-500">Stored locally</p>
+                          <p className="text-xs" style={{ color: '#6EA9CB' }}>Stored locally</p>
                         ) : (
-                          <p className="text-xs text-orange-500">Preview only (session)</p>
+                          <p className="text-xs" style={{ color: '#6EA9CB', opacity: '0.8' }}>Preview only (session)</p>
                         )}
                       </div>
                     </div>
@@ -262,29 +265,29 @@ const PostCreator = () => {
                   
                   {file.type === 'video' && (
                     <div className="flex items-center space-x-3">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <Video className="w-8 h-8 text-gray-600" />
+                      <div className="w-16 h-16 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#DCE8F2' }}>
+                        <Video className="w-8 h-8" style={{ color: '#1F2D3D' }} />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                        <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
-                        <p className="text-xs text-orange-500">Preview only (session)</p>
+                        <p className="text-sm font-medium" style={{ color: '#1F2D3D' }}>{file.name}</p>
+                        <p className="text-xs" style={{ color: '#1F2D3D', opacity: '0.6' }}>{formatFileSize(file.size)}</p>
+                        <p className="text-xs" style={{ color: '#6EA9CB', opacity: '0.8' }}>Preview only (session)</p>
                       </div>
                     </div>
                   )}
                   
                   {file.type === 'document' && (
                     <div className="flex items-center space-x-3">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <FileText className="w-8 h-8 text-gray-600" />
+                      <div className="w-16 h-16 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#DCE8F2' }}>
+                        <FileText className="w-8 h-8" style={{ color: '#1F2D3D' }} />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                        <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                        <p className="text-sm font-medium" style={{ color: '#1F2D3D' }}>{file.name}</p>
+                        <p className="text-xs" style={{ color: '#1F2D3D', opacity: '0.6' }}>{formatFileSize(file.size)}</p>
                         {file.storedLocally ? (
-                          <p className="text-xs text-green-500">Will be stored and downloadable</p>
+                          <p className="text-xs" style={{ color: '#6EA9CB' }}>Will be stored and downloadable</p>
                         ) : (
-                          <p className="text-xs text-orange-500">Metadata only (not downloadable)</p>
+                          <p className="text-xs" style={{ color: '#6EA9CB', opacity: '0.8' }}>Metadata only (not downloadable)</p>
                         )}
                       </div>
                     </div>
@@ -324,26 +327,40 @@ const PostCreator = () => {
             <div className="flex items-center space-x-4">
               <button 
                 onClick={() => photoInputRef.current?.click()}
-                className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-colors"
+                style={{ color: '#1F2D3D' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
               >
                 <Camera className="w-4 h-4" />
                 <span className="text-sm hidden sm:inline">Photo</span>
               </button>
               <button 
                 onClick={() => videoInputRef.current?.click()}
-                className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-colors"
+                style={{ color: '#1F2D3D' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
               >
                 <Video className="w-4 h-4" />
                 <span className="text-sm hidden sm:inline">Video</span>
               </button>
               <button 
                 onClick={() => documentInputRef.current?.click()}
-                className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-colors"
+                style={{ color: '#1F2D3D' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
               >
                 <FileText className="w-4 h-4" />
                 <span className="text-sm hidden sm:inline">Document</span>
               </button>
-              <button className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <button 
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-colors"
+                style={{ color: '#1F2D3D' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+              >
                 <Smile className="w-4 h-4" />
               </button>
             </div>
@@ -354,17 +371,20 @@ const PostCreator = () => {
               className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
                 postText.trim() || attachedFiles.length > 0
                   ? "text-white"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "cursor-not-allowed"
               }`}
-              style={postText.trim() || attachedFiles.length > 0 ? { backgroundColor: "#4D869C" } : {}}
+              style={postText.trim() || attachedFiles.length > 0 ? 
+                { backgroundColor: "#6EA9CB" } : 
+                { backgroundColor: "#DCE8F2", color: "#1F2D3D", opacity: "0.5" }
+              }
               onMouseEnter={(e) => {
                 if (postText.trim() || attachedFiles.length > 0) {
-                  e.target.style.backgroundColor = "#3a6b7a";
+                  e.target.style.backgroundColor = "#5A8FB3";
                 }
               }}
               onMouseLeave={(e) => {
                 if (postText.trim() || attachedFiles.length > 0) {
-                  e.target.style.backgroundColor = "#4D869C";
+                  e.target.style.backgroundColor = "#6EA9CB";
                 }
               }}
             >
@@ -373,7 +393,7 @@ const PostCreator = () => {
           </div>
           
           {/* Storage Information */}
-          <div className="mt-2 text-xs text-gray-500 text-center">
+          <div className="mt-2 text-xs text-center" style={{ color: '#1F2D3D', opacity: '0.6' }}>
             💡 Small files (photos ≤1MB, documents ≤500KB) stored locally. Larger files shown as previews only.
           </div>
         </div>

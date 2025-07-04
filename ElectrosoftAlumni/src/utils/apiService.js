@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = "https://laughing-barnacle-wpvgwprrrg9fv4rw-5000.app.github.dev/api";
+const API_BASE_URL = "https://scaips-backend.onrender.com";
 // API service class
 class ApiService {
   constructor() {

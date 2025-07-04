@@ -36,11 +36,13 @@ const limiter = rateLimit({
 app.use("/api/", limiter);
 
 // CORS configuration
-app.use(cors({
-  origin: "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",  // your frontend URL
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, // Use the frontend URL from the environment variables
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
 
 // Logging middleware
 app.use(morgan("combined"));

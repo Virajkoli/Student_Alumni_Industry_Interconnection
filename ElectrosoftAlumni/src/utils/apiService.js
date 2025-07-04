@@ -42,42 +42,42 @@ class ApiService {
 
   // Authentication endpoints
   async register(userData) {
-    return this.request("/auth/register", {
+    return this.request("/api/auth/register", {
       method: "POST",
       body: JSON.stringify(userData),
     });
   }
 
   async login(credentials) {
-    return this.request("/auth/login", {
+    return this.request("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
   }
 
   async logout() {
-    return this.request("/auth/logout", {
+    return this.request("/api/auth/logout", {
       method: "POST",
     });
   }
 
   async refreshToken() {
-    return this.request("/auth/refresh", {
+    return this.request("/api/auth/refresh", {
       method: "POST",
     });
   }
 
   async getCurrentUser() {
-    return this.request("/auth/me");
+    return this.request("/api/auth/me");
   }
 
   // User endpoints
   async getUserProfile() {
-    return this.request("/users/profile");
+    return this.request("/api/users/profile");
   }
 
   async updateUserProfile(profileData) {
-    return this.request("/users/profile", {
+    return this.request("/api/users/profile", {
       method: "PUT",
       body: JSON.stringify(profileData),
     });
@@ -85,7 +85,7 @@ class ApiService {
 
   async uploadAvatar(formData) {
     const token = localStorage.getItem("authToken");
-    return fetch(`${this.baseURL}/users/avatar`, {
+    return fetch(`${this.baseURL}/api/users/avatar`, {
       method: "POST",
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),

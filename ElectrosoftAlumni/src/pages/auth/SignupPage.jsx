@@ -149,24 +149,34 @@ export default function SignupPage() {
         {/* ✅ Only show extra fields for manual register */}
         {formData.role && !isSocialLogin && (
           <>
+            {/* Full Name field for all roles */}
+            <input
+              name="fullName"
+              placeholder="Full Name"
+              value={formData.fullName}
+              onChange={handleChange}
+            />
+
             {formData.role === "student" && (
               <>
                 <input
-                  name="fullName"
-                  placeholder="Full Name"
-                  onChange={handleChange}
-                />
-                <input
                   name="collegeName"
                   placeholder="College Name"
+                  value={formData.collegeName}
                   onChange={handleChange}
                 />
                 <input
                   name="course"
                   placeholder="Course"
+                  value={formData.course}
                   onChange={handleChange}
                 />
-                <input name="year" placeholder="Year" onChange={handleChange} />
+                <input 
+                  name="year" 
+                  placeholder="Year" 
+                  value={formData.year}
+                  onChange={handleChange} 
+                />
               </>
             )}
 
@@ -175,16 +185,19 @@ export default function SignupPage() {
                 <input
                   name="collegeName"
                   placeholder="College Name"
+                  value={formData.collegeName}
                   onChange={handleChange}
                 />
                 <input
                   name="location"
                   placeholder="Location"
+                  value={formData.location}
                   onChange={handleChange}
                 />
                 <input
                   name="deanName"
                   placeholder="Dean Name"
+                  value={formData.deanName}
                   onChange={handleChange}
                 />
               </>
@@ -195,16 +208,19 @@ export default function SignupPage() {
                 <input
                   name="companyName"
                   placeholder="Company Name"
+                  value={formData.companyName}
                   onChange={handleChange}
                 />
                 <input
                   name="sector"
                   placeholder="Sector"
+                  value={formData.sector}
                   onChange={handleChange}
                 />
                 <input
                   name="contactPerson"
                   placeholder="Contact Person"
+                  value={formData.contactPerson}
                   onChange={handleChange}
                 />
               </>
@@ -215,16 +231,19 @@ export default function SignupPage() {
                 <input
                   name="startupName"
                   placeholder="Startup Name"
+                  value={formData.startupName}
                   onChange={handleChange}
                 />
                 <input
                   name="domain"
                   placeholder="Domain"
+                  value={formData.domain}
                   onChange={handleChange}
                 />
                 <input
                   name="founderName"
                   placeholder="Founder's Name"
+                  value={formData.founderName}
                   onChange={handleChange}
                 />
               </>

@@ -36,18 +36,11 @@ const limiter = rateLimit({
 app.use("/api/", limiter);
 
 // CORS configuration
-app.use(
-  cors({
-    origin: [
-      process.env.FRONTEND_URL || "http://localhost:3000",
-      "http://localhost:5173", // Vite default port
-    ],
-    credentials: true,
-    optionsSuccessStatus: 200,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
-);
+app.use(cors({
+  origin: "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",  // your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
 
 // Logging middleware
 app.use(morgan("combined"));

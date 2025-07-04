@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
-import apiService from "../../utils/apiService";
+import { useNavigate, Link } from "react-router-dom";
 import "./LoginPage.css";
 
 export default function SignupPage() {
@@ -24,118 +22,76 @@ export default function SignupPage() {
   });
 
   const [isSocialLogin, setIsSocialLogin] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
   const navigate = useNavigate();
-  const { register } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setIsSocialLogin(false); // reset if manually typing
-    setError(""); // Clear error when user types
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
+  const handleSubmit = () => {
     if (!formData.role) {
-      setError("Please select a role");
-      setIsLoading(false);
+      alert("Please select a role");
       return;
     }
 
-    if (!formData.email || !formData.password || !formData.fullName) {
-      setError("Please fill in all required fields");
-      setIsLoading(false);
-      return;
-    }
+    setIsSocialLogin(false); // manual mode
+    localStorage.setItem("userData", JSON.stringify(formData));
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      // Prepare user data for registration
-      const userData = {
-        email: formData.email,
-        password: formData.password,
-        fullName: formData.fullName,
-        role: formData.role,
-      };
-
-      // Add role-specific fields
-      if (formData.role === "student" || formData.role === "alumni") {
-        if (formData.collegeName) userData.collegeName = formData.collegeName;
-        if (formData.course) userData.course = formData.course;
-        if (formData.year) userData.year = parseInt(formData.year);
-      }
-
-      if (formData.role === "college") {
-        if (formData.deanName) userData.deanName = formData.deanName;
-      }
-
-      if (formData.role === "industry") {
-        if (formData.companyName) userData.companyName = formData.companyName;
-        if (formData.sector) userData.sector = formData.sector;
-        if (formData.contactPerson)
-          userData.contactPerson = formData.contactPerson;
-      }
-
-      if (formData.role === "startup") {
-        if (formData.startupName) userData.startupName = formData.startupName;
-        if (formData.domain) userData.domain = formData.domain;
-        if (formData.founderName) userData.founderName = formData.founderName;
-      }
-
-      if (formData.location) userData.location = formData.location;
-
-      // Register user
-      const result = await register(userData);
-
-      if (result.success) {
-        // Redirect based on role
-        const rolePage = apiService.getRoleHomePage(result.user.role);
-        navigate(rolePage, {
-          replace: true,
-          state: {
-            welcomeMessage: `Welcome to SCAIPS, ${result.user.fullName}!`,
-            newUser: true,
-          },
-        });
-      }
-    } catch (err) {
-      console.error("Signup error:", err);
-      setError(err.message || "Signup failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+    switch (formData.role) {
+      case "student":
+        navigate("/student/profile");
+        break;
+      case "college":
+        navigate("/college/profile");
+        break;
+      case "industry":
+        navigate("/industry/profile");
+        break;
+      case "startup":
+        navigate("/startup/profile");
+        break;
+      default:
+        alert("Invalid role");
+        break;
     }
   };
 
-  const handleSocialLogin = async (provider) => {
+  const handleSocialLogin = (provider) => {
     if (!formData.role) {
-      setError("Please select a role before using social login");
+      alert("Please select a role before using social login");
       return;
     }
 
-    setIsLoading(true);
-    setError("");
+    const fakeEmail =
+      provider === "google" ? "user@google.com" : "user@microsoft.com";
 
-    try {
-      // TODO: Implement actual social login with backend
-      // For now, show a message that it's not implemented
-      setError(
-        `${provider} login integration coming soon. Please use email registration.`
-      );
-    } catch (err) {
-      setError("Social login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+    const socialData = {
+      ...formData,
+      email: fakeEmail,
+      password: "social-login",
+    };
+
+    localStorage.setItem("userData", JSON.stringify(socialData));
+    setIsSocialLogin(true); // this was a social login
+
+    switch (formData.role) {
+      case "student":
+        navigate("/student/profile");
+        break;
+      case "college":
+        navigate("/college/profile");
+        break;
+      case "industry":
+        navigate("/industry/profile");
+        break;
+      case "startup":
+        navigate("/startup/profile");
+        break;
+      default:
+        alert("Invalid role");
+        break;
     }
   };
 
@@ -144,145 +100,121 @@ export default function SignupPage() {
       <div className="login-box">
         <h2>Register</h2>
 
-        {error && (
-          <div
-            className="error-message"
-            style={{
-              color: "red",
-              textAlign: "center",
-              marginBottom: "1rem",
-              padding: "0.5rem",
-              backgroundColor: "#fee",
-              borderRadius: "4px",
-            }}
-          >
-            {error}
-          </div>
+        {/* Email and Password */}
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+        />
+
+        {/* Role Selection */}
+        <select name="role" value={formData.role} onChange={handleChange}>
+          <option value="">Select your role</option>
+          <option value="student">Student</option>
+          <option value="college">College</option>
+          <option value="industry">Industry</option>
+          <option value="startup">Startup</option>
+        </select>
+
+        {/* ✅ Only show extra fields for manual register */}
+        {formData.role && !isSocialLogin && (
+          <>
+            {formData.role === "student" && (
+              <>
+                <input
+                  name="fullName"
+                  placeholder="Full Name"
+                  onChange={handleChange}
+                />
+                <input
+                  name="collegeName"
+                  placeholder="College Name"
+                  onChange={handleChange}
+                />
+                <input
+                  name="course"
+                  placeholder="Course"
+                  onChange={handleChange}
+                />
+                <input name="year" placeholder="Year" onChange={handleChange} />
+              </>
+            )}
+
+            {formData.role === "college" && (
+              <>
+                <input
+                  name="collegeName"
+                  placeholder="College Name"
+                  onChange={handleChange}
+                />
+                <input
+                  name="location"
+                  placeholder="Location"
+                  onChange={handleChange}
+                />
+                <input
+                  name="deanName"
+                  placeholder="Dean Name"
+                  onChange={handleChange}
+                />
+              </>
+            )}
+
+            {formData.role === "industry" && (
+              <>
+                <input
+                  name="companyName"
+                  placeholder="Company Name"
+                  onChange={handleChange}
+                />
+                <input
+                  name="sector"
+                  placeholder="Sector"
+                  onChange={handleChange}
+                />
+                <input
+                  name="contactPerson"
+                  placeholder="Contact Person"
+                  onChange={handleChange}
+                />
+              </>
+            )}
+
+            {formData.role === "startup" && (
+              <>
+                <input
+                  name="startupName"
+                  placeholder="Startup Name"
+                  onChange={handleChange}
+                />
+                <input
+                  name="domain"
+                  placeholder="Domain"
+                  onChange={handleChange}
+                />
+                <input
+                  name="founderName"
+                  placeholder="Founder's Name"
+                  onChange={handleChange}
+                />
+              </>
+            )}
+          </>
         )}
 
-        <form onSubmit={handleSubmit}>
-          {/* Email and Password */}
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-
-          {/* Role Selection */}
-          <select name="role" value={formData.role} onChange={handleChange}>
-            <option value="">Select your role</option>
-            <option value="student">Student</option>
-            <option value="college">College</option>
-            <option value="industry">Industry</option>
-            <option value="startup">Startup</option>
-          </select>
-
-          {/* ✅ Only show extra fields for manual register */}
-          {formData.role && !isSocialLogin && (
-            <>
-              {formData.role === "student" && (
-                <>
-                  <input
-                    name="fullName"
-                    placeholder="Full Name"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="collegeName"
-                    placeholder="College Name"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="course"
-                    placeholder="Course"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="year"
-                    placeholder="Year"
-                    onChange={handleChange}
-                  />
-                </>
-              )}
-
-              {formData.role === "college" && (
-                <>
-                  <input
-                    name="collegeName"
-                    placeholder="College Name"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="location"
-                    placeholder="Location"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="deanName"
-                    placeholder="Dean Name"
-                    onChange={handleChange}
-                  />
-                </>
-              )}
-
-              {formData.role === "industry" && (
-                <>
-                  <input
-                    name="companyName"
-                    placeholder="Company Name"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="sector"
-                    placeholder="Sector"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="contactPerson"
-                    placeholder="Contact Person"
-                    onChange={handleChange}
-                  />
-                </>
-              )}
-
-              {formData.role === "startup" && (
-                <>
-                  <input
-                    name="startupName"
-                    placeholder="Startup Name"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="domain"
-                    placeholder="Domain"
-                    onChange={handleChange}
-                  />
-                  <input
-                    name="founderName"
-                    placeholder="Founder's Name"
-                    onChange={handleChange}
-                  />
-                </>
-              )}
-            </>
-          )}
-
-          {/* Register button */}
-          <button type="submit" className="signin-btn" disabled={isLoading}>
-            {isLoading ? "Registering..." : "Register"}
-          </button>
-        </form>
+        {/* Register button */}
+        <button className="signin-btn" onClick={handleSubmit}>
+          Register
+        </button>
 
         <div className="divider">
           <span>or</span>
@@ -292,7 +224,6 @@ export default function SignupPage() {
         <button
           className="social-button google"
           onClick={() => handleSocialLogin("google")}
-          disabled={isLoading}
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -305,7 +236,6 @@ export default function SignupPage() {
         <button
           className="social-button google"
           onClick={() => handleSocialLogin("microsoft")}
-          disabled={isLoading}
         >
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg"
@@ -314,6 +244,12 @@ export default function SignupPage() {
           />
           Continue with Microsoft
         </button>
+
+        {/* Go back to Login */}
+        <p className="join-text">
+          Already have an account?{" "}
+          <Link to="/auth/login">Go back to Login</Link>
+        </p>
       </div>
     </div>
   );

@@ -15,7 +15,9 @@
     "db:drop": "npx sequelize-cli db:drop",
     "setup-render": "node scripts/setupRenderDB.js",
     "test-db": "node scripts/testDatabase.js",
-    "db:reset": "npm run migrate:undo && npm run migrate && npm run seed"
+    "db:reset": "npm run migrate:undo && npm run migrate && npm run seed",
+    "db:users": "node scripts/viewUsers.js",
+    "db:adduser": "node scripts/addUser.js"
   },
   "keywords": [
     "express",

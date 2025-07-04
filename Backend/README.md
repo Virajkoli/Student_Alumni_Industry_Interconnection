@@ -58,8 +58,11 @@ This backend has been migrated from MongoDB to PostgreSQL using Sequelize ORM.
 - `npm run migrate:undo` - Undo last migration
 - `npm run seed` - Run database seeders
 - `npm run seed:undo` - Undo all seeders
-- `npm run db:create` - Create database
-- `npm run db:drop` - Drop database
+- `npm run setup-render` - Set up and test Render database connection
+- `npm run test-db` - Test database connection
+- `npm run db:users` - View all users in database
+- `npm run db:adduser` - Add new user interactively
+- `npm run db:reset` - Reset database (undo, migrate, seed)
 
 ## API Endpoints
 
@@ -163,11 +166,58 @@ The migration includes:
 - ✅ Added profile completion tracking
 - ✅ Preserved role-based user system
 
+## Database Management
+
+### Using pgAdmin (Recommended)
+
+The project uses a shared PostgreSQL database hosted on Render. You can manage the database using pgAdmin:
+
+1. **Install pgAdmin:** Download from [pgadmin.org](https://www.pgadmin.org/download/)
+2. **Connect to Database:** Use the connection details from your `.env` file
+3. **Manage Data:** View, edit, and query your database through the web interface
+
+### Command Line Tools
+
+You can also use the built-in npm scripts for common tasks:
+
+```bash
+npm run db:users    # View all users
+npm run db:adduser  # Add new user interactively
+npm run test-db     # Test database connection
+npm run db:reset    # Reset database (caution!)
+```
+
+### SQL Queries
+
+Use the provided SQL query file for common database operations:
+
+```bash
+scripts/pgadmin_queries.sql
+```
+
 ## Support
 
 For issues or questions, please check the logs and ensure:
 
-1. PostgreSQL is running
-2. Database credentials are correct
-3. Migrations have been run
+1. PostgreSQL connection is working (run `npm run test-db`)
+2. Database credentials are correct in `.env` file
+3. Migrations have been run (`npm run migrate`)
 4. Required environment variables are set
+
+## Environment Configuration
+
+Create a `.env` file with your database credentials:
+
+```properties
+# Database Configuration (PostgreSQL) - Render Database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_DATABASE=scaips_portal
+DB_HOST=your_render_host.postgres.render.com
+DB_PORT=5432
+DB_SSL=true
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+```

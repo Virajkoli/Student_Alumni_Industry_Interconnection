@@ -1,6 +1,5 @@
 // API configuration
-const API_BASE_URL = "http://localhost:5000/api";
-
+const API_BASE_URL = "https://laughing-barnacle-wpvgwprrrg9fv4rw-5000.app.github.dev/api";
 // API service class
 class ApiService {
   constructor() {

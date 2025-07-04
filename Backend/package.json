@@ -12,7 +12,10 @@
     "seed": "npx sequelize-cli db:seed:all",
     "seed:undo": "npx sequelize-cli db:seed:undo:all",
     "db:create": "npx sequelize-cli db:create",
-    "db:drop": "npx sequelize-cli db:drop"
+    "db:drop": "npx sequelize-cli db:drop",
+    "setup-render": "node scripts/setupRenderDB.js",
+    "test-db": "node scripts/testDatabase.js",
+    "db:reset": "npm run migrate:undo && npm run migrate && npm run seed"
   },
   "keywords": [
     "express",

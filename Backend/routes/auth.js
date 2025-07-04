@@ -24,9 +24,12 @@ const generateRefreshToken = (userId) => {
 // @access  Public
 const register = async (req, res) => {
   try {
+    console.log("Registration attempt:", req.body);
+
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log("Validation errors:", errors.array());
       return res.status(400).json({
         success: false,
         message: "Validation errors",
@@ -36,9 +39,12 @@ const register = async (req, res) => {
 
     const { email, password, fullName, role } = req.body;
 
+    console.log("Processing registration for:", { email, fullName, role });
+
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
+      console.log("User already exists:", email);
       return res.status(400).json({
         success: false,
         message: "User already exists with this email",
@@ -52,6 +58,8 @@ const register = async (req, res) => {
       fullName,
       role: role || "student",
     });
+
+    console.log("User created successfully:", user.id, user.email);
 
     // Generate tokens
     const token = generateToken(user.id);
@@ -315,5 +323,15 @@ router.post("/login", loginValidation, login);
 router.post("/logout", logout);
 router.post("/refresh", refreshToken);
 router.get("/me", auth, getMe);
+
+// Debug endpoint to test if backend is working
+router.get("/test", (req, res) => {
+  res.json({
+    success: true,
+    message: "Auth routes are working",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+  });
+});
 
 module.exports = router;

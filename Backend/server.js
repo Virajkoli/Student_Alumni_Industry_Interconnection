@@ -87,6 +87,17 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Debug endpoint
+app.get("/debug", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Debug endpoint working",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    frontendUrl: process.env.FRONTEND_URL,
+  });
+});
+
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

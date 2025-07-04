@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import apiService from "../../utils/apiService";
 import "./LoginPage.css";
 
 export default function SignupPage() {
@@ -22,7 +24,10 @@ export default function SignupPage() {
   });
 
   const [isSocialLogin, setIsSocialLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,31 +35,47 @@ export default function SignupPage() {
     setIsSocialLogin(false); // reset if manually typing
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.role) {
-      alert("Please select a role");
+      setError("Please select a role");
       return;
     }
 
-    setIsSocialLogin(false); // manual mode
-    localStorage.setItem("userData", JSON.stringify(formData));
+    if (!formData.email || !formData.password || !formData.fullName) {
+      setError(
+        "Please fill in all required fields (email, password, full name)"
+      );
+      return;
+    }
 
-    switch (formData.role) {
-      case "student":
-        navigate("/student/profile");
-        break;
-      case "college":
-        navigate("/college/profile");
-        break;
-      case "industry":
-        navigate("/industry/profile");
-        break;
-      case "startup":
-        navigate("/startup/profile");
-        break;
-      default:
-        alert("Invalid role");
-        break;
+    try {
+      setIsLoading(true);
+      setError("");
+      setIsSocialLogin(false); // manual mode
+
+      // Call the AuthContext register function
+      const response = await register({
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.fullName,
+        role: formData.role,
+      });
+
+      if (response.success) {
+        // Navigate to appropriate dashboard
+        const rolePage = apiService.getRoleHomePage(response.user.role);
+        navigate(rolePage, {
+          replace: true,
+          state: {
+            welcomeMessage: `Welcome, ${response.user.fullName}! Registration successful.`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError(error.message || "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -211,9 +232,20 @@ export default function SignupPage() {
           </>
         )}
 
+        {/* Error message */}
+        {error && (
+          <div style={{ color: "red", margin: "10px 0", fontSize: "14px" }}>
+            {error}
+          </div>
+        )}
+
         {/* Register button */}
-        <button className="signin-btn" onClick={handleSubmit}>
-          Register
+        <button
+          className="signin-btn"
+          onClick={handleSubmit}
+          disabled={isLoading}
+        >
+          {isLoading ? "Registering..." : "Register"}
         </button>
 
         <div className="divider">

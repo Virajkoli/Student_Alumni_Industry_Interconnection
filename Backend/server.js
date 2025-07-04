@@ -38,7 +38,29 @@ app.use("/api/", limiter);
 // CORS configuration
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // Use the frontend URL from the environment variables
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      // List of allowed origins
+      const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        "https://scaipsfrontend.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:5173",
+      ];
+
+      // Check if origin is in allowed list or is a Vercel preview deployment
+      if (
+        allowedOrigins.includes(origin) ||
+        (origin.includes("scaipsfrontend") && origin.includes("vercel.app"))
+      ) {
+        return callback(null, true);
+      }
+
+      // If origin is not allowed
+      return callback(new Error("Not allowed by CORS"), false);
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })

@@ -11,7 +11,7 @@ CREATE TABLE students (
 );
 
 
-CREATE TABLE about (
+CREATE TABLE student_about (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   summary TEXT,
@@ -19,7 +19,7 @@ CREATE TABLE about (
 );
 
 
-CREATE TABLE experience (
+CREATE TABLE student_experience (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   title VARCHAR(150),
@@ -29,7 +29,7 @@ CREATE TABLE experience (
   description TEXT
 );
 
-CREATE TABLE education (
+CREATE TABLE student_education (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   institution VARCHAR(200),
@@ -39,13 +39,13 @@ CREATE TABLE education (
   end_year INT,
   grade VARCHAR(20)
 );
-CREATE TABLE skills (
+CREATE TABLE student_skills (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   skill_name VARCHAR(100),
   proficiency VARCHAR(50) CHECK (proficiency IN ('Beginner', 'Intermediate', 'Advanced'))
 );
-CREATE TABLE courses (
+CREATE TABLE student_courses (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   course_name VARCHAR(150),
@@ -53,7 +53,7 @@ CREATE TABLE courses (
   completion_date DATE
 );
 
-CREATE TABLE certifications (
+CREATE TABLE student_certifications (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   certificate_name VARCHAR(150),
@@ -63,7 +63,7 @@ CREATE TABLE certifications (
   credential_id VARCHAR(100),
   credential_url TEXT
 );
-CREATE TABLE recommendations (
+CREATE TABLE student_recommendations (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   recommender_name VARCHAR(100),

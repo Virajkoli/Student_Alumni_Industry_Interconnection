@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
-const { User } = require("../config/database");
+const { User, Student } = require("../config/database");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
 
@@ -37,13 +37,26 @@ const register = async (req, res) => {
       });
     }
 
-    const { email, password, fullName, role } = req.body;
+    const { email, password, role, fullName, ...otherFields } = req.body;
 
-    console.log("Processing registration for:", { email, fullName, role });
+    // Handle backward compatibility for names
+    const firstName = otherFields.first_name || (fullName ? fullName.split(' ')[0] : '');
+    const lastName = otherFields.last_name || (fullName ? fullName.split(' ').slice(1).join(' ') : '');
+    const userRole = role || "student"; // Default to student if no role specified
 
-    // Check if user already exists
+    console.log("Processing registration for:", {
+      email,
+      role: userRole,
+      firstName,
+      lastName,
+      ...otherFields,
+    });
+
+    // Check if user already exists (check both tables)
     const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
+    const existingStudent = await Student.findOne({ where: { email } });
+
+    if (existingUser || existingStudent) {
       console.log("User already exists:", email);
       return res.status(400).json({
         success: false,
@@ -51,15 +64,69 @@ const register = async (req, res) => {
       });
     }
 
-    // Create user
-    const user = await User.create({
-      email,
-      password,
-      fullName,
-      role: role || "student",
-    });
+    let user;
+    let userResponse;
 
-    console.log("User created successfully:", user.id, user.email);
+    // Handle different roles
+    if (userRole === "student") {
+      // Create student
+      user = await Student.create({
+        email,
+        password,
+        first_name: firstName,
+        last_name: lastName,
+        contact_no: otherFields.contact_no,
+        college_name: otherFields.college_name,
+        interested_field: otherFields.interested_field,
+        other_field:
+          otherFields.interested_field === "Other"
+            ? otherFields.other_field
+            : null,
+      });
+
+      userResponse = {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        contact_no: user.contact_no,
+        college_name: user.college_name,
+        interested_field: user.interested_field,
+        other_field: user.other_field,
+        role: "student",
+        isEmailVerified: user.isEmailVerified,
+        profileCompletion: user.getProfileCompletion(),
+        createdAt: user.created_at,
+      };
+    } else {
+      // Create user for other roles (college, industry, startup)
+      user = await User.create({
+        email,
+        password,
+        fullName: fullName || `${firstName} ${lastName}`.trim(),
+        role: userRole,
+        ...otherFields, // Include all other role-specific fields
+      });
+
+      userResponse = {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+        isEmailVerified: user.isEmailVerified,
+        profileCompletion: user.getProfileCompletion(),
+        createdAt: user.createdAt,
+        ...otherFields, // Include role-specific fields in response
+      };
+    }
+
+    console.log(
+      "User created successfully:",
+      user.id,
+      user.email,
+      "Role:",
+      userRole
+    );
 
     // Generate tokens
     const token = generateToken(user.id);
@@ -72,17 +139,6 @@ const register = async (req, res) => {
       sameSite: "strict",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
-
-    // Return user data (excluding password)
-    const userResponse = {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      role: user.role,
-      isEmailVerified: user.isEmailVerified,
-      profileCompletion: user.getProfileCompletion(),
-      createdAt: user.createdAt,
-    };
 
     res.status(201).json({
       success: true,
@@ -118,8 +174,15 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ where: { email } });
+    // Try to find user in both tables
+    let user = await User.findOne({ where: { email } });
+    let isStudent = false;
+
+    if (!user) {
+      user = await Student.findOne({ where: { email } });
+      isStudent = true;
+    }
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -162,20 +225,36 @@ const login = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
-    // Return user data (excluding password)
-    const userResponse = {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      role: user.role,
-      avatar: user.avatar,
-      bio: user.bio,
-      location: user.location,
-      isEmailVerified: user.isEmailVerified,
-      profileCompletion: user.getProfileCompletion(),
-      lastLogin: user.lastLogin,
-      createdAt: user.createdAt,
-    };
+    // Return user data based on table
+    let userResponse;
+    if (isStudent) {
+      userResponse = {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        contact_no: user.contact_no,
+        college_name: user.college_name,
+        interested_field: user.interested_field,
+        other_field: user.other_field,
+        role: "student",
+        isEmailVerified: user.isEmailVerified,
+        profileCompletion: user.getProfileCompletion(),
+        lastLogin: user.lastLogin,
+        createdAt: user.created_at,
+      };
+    } else {
+      userResponse = {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+        isEmailVerified: user.isEmailVerified,
+        profileCompletion: user.getProfileCompletion(),
+        lastLogin: user.lastLogin,
+        createdAt: user.createdAt,
+      };
+    }
 
     res.json({
       success: true,
@@ -288,7 +367,7 @@ const getMe = async (req, res) => {
   }
 };
 
-// Validation middleware
+// Validation middleware - More flexible for backward compatibility
 const registerValidation = [
   body("email")
     .isEmail()
@@ -297,16 +376,48 @@ const registerValidation = [
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
-  body("fullName")
-    .trim()
-    .isLength({ min: 2 })
-    .withMessage("Full name must be at least 2 characters long"),
   body("role")
     .optional()
-    .isIn(["student", "alumni", "college", "industry", "startup"])
+    .isIn(["student", "college", "industry", "startup"])
+    .withMessage("Role must be one of: student, college, industry, startup"),
+  body("first_name")
+    .optional()
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("First name must be at least 1 character long"),
+  body("last_name")
+    .optional()
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Last name must be at least 1 character long"),
+  // Backward compatibility - support old fullName field
+  body("fullName")
+    .optional()
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Full name must be at least 1 character long"),
+  // Optional fields for different roles
+  body("contact_no")
+    .optional()
+    .trim()
+    .isLength({ max: 15 })
+    .withMessage("Contact number must be 15 characters or less"),
+  body("college_name")
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage("College name must be 200 characters or less"),
+  body("interested_field")
+    .optional()
+    .isIn(["Computer", "Electronics", "Electrical", "Other"])
     .withMessage(
-      "Role must be one of: student, alumni, college, industry, startup"
+      "Interested field must be one of: Computer, Electronics, Electrical, Other"
     ),
+  body("other_field")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Other field must be 100 characters or less"),
 ];
 
 const loginValidation = [
@@ -331,6 +442,28 @@ router.get("/test", (req, res) => {
     message: "Auth routes are working",
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
+  });
+});
+
+// Debug endpoint to check what data is being sent
+router.post("/debug-register", (req, res) => {
+  console.log("=== DEBUG REGISTRATION ===");
+  console.log("Request Body:", JSON.stringify(req.body, null, 2));
+  console.log("Headers Origin:", req.headers.origin);
+  console.log("Content-Type:", req.headers['content-type']);
+  
+  res.json({
+    success: true,
+    message: "Debug data logged to server console",
+    receivedData: req.body,
+    requiredFields: {
+      role: "required - student, college, industry, startup",
+      first_name: "required",
+      last_name: "required", 
+      email: "required",
+      password: "required (min 6 chars)"
+    },
+    timestamp: new Date().toISOString()
   });
 });
 

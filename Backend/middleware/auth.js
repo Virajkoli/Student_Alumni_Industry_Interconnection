@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { User } = require("../config/database");
+const { User, Student } = require("../config/database");
 
 const auth = async (req, res, next) => {
   try {
@@ -27,10 +27,21 @@ const auth = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Get user from database
-      const user = await User.findByPk(decoded.userId, {
+      // Get user from database (check both User and Student tables)
+      let user = await User.findByPk(decoded.userId, {
         attributes: { exclude: ["password"] },
       });
+
+      // If not found in User table, check Student table
+      if (!user) {
+        user = await Student.findByPk(decoded.userId, {
+          attributes: { exclude: ["password"] },
+        });
+        // Add role for students
+        if (user) {
+          user.dataValues.role = "student";
+        }
+      }
 
       if (!user) {
         return res.status(401).json({

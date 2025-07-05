@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Edit3, X, MapPin, Phone, Mail, Globe, Camera, Plus, Star } from "lucide-react";
+import { Edit3, X, MapPin, Phone, Mail, Globe, Camera, Plus } from "lucide-react";
 
 const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange, customNavigations, onCustomNavigationUpdate }) => {
   // Profile edit state
@@ -337,7 +337,6 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
                     }}
                   >
                     {customNav.name}
-                    <Star className="w-3 h-3 inline ml-1 text-yellow-500" />
                   </button>
                   
                   {/* Delete button for custom nav (visible on hover) */}
@@ -566,6 +565,203 @@ const StudentProfileHeader = ({ profileData, onProfileUpdate, onNavigationChange
               </button>
               <button
                 onClick={handleSaveProfile}
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90"
+                style={{ backgroundColor: '#6EA9CB' }}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Custom Navigation Modal */}
+      {isNewNavModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900">Add Custom Section</h2>
+              <button onClick={() => setIsNewNavModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Section Name *</label>
+                <input
+                  type="text"
+                  value={newNavData.name}
+                  onChange={e => setNewNavData({ ...newNavData, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter section name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content Type</label>
+                <select
+                  value={newNavData.contentType}
+                  onChange={e => setNewNavData({ ...newNavData, contentType: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  <option value="text">Text</option>
+                  <option value="link">Link</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                {newNavData.contentType === 'text' ? (
+                  <textarea
+                    value={newNavData.content}
+                    onChange={e => setNewNavData({ ...newNavData, content: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                    placeholder="Enter content for this section"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={newNavData.content}
+                    onChange={e => setNewNavData({ ...newNavData, content: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="Enter link URL"
+                  />
+                )}
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
+              <button
+                onClick={() => setIsNewNavModalOpen(false)}
+                className="px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:opacity-80"
+                style={{ borderColor: '#DCE8F2', color: '#1F2D3D' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateCustomNav}
+                className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90"
+                style={{ backgroundColor: '#6EA9CB' }}
+              >
+                Add Section
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Navigation Modal */}
+      {isNavEditModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900">Navigation Settings</h2>
+              <button onClick={() => setIsNavEditModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="mb-2 text-sm text-gray-700 font-medium">Show/Hide Sections</div>
+              <div className="flex flex-col gap-2">
+                {navigationItems.map(item => (
+                  <label key={item.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!hiddenNavItems.includes(item.id)}
+                      onChange={() => handleToggleNavItem(item.id)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span>{item.name}</span>
+                  </label>
+                ))}
+                {/* Show custom navigation items too */}
+                {customNavigations.map(customNav => (
+                  <label key={customNav.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!hiddenNavItems.includes(customNav.id)}
+                      onChange={() => handleToggleNavItem(customNav.id)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span>{customNav.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
+              <button
+                onClick={() => setIsNavEditModalOpen(false)}
+                className="px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:opacity-80"
+                style={{ borderColor: '#DCE8F2', color: '#1F2D3D' }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Custom Navigation Modal */}
+      {isEditingCustomNav && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900">Edit Custom Section</h2>
+              <button onClick={() => { setIsEditingCustomNav(false); setEditingCustomNav(null); }} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Section Name *</label>
+                <input
+                  type="text"
+                  value={newNavData.name}
+                  onChange={e => setNewNavData({ ...newNavData, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter section name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content Type</label>
+                <select
+                  value={newNavData.contentType}
+                  onChange={e => setNewNavData({ ...newNavData, contentType: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                >
+                  <option value="text">Text</option>
+                  <option value="link">Link</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                {newNavData.contentType === 'text' ? (
+                  <textarea
+                    value={newNavData.content}
+                    onChange={e => setNewNavData({ ...newNavData, content: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                    placeholder="Enter content for this section"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={newNavData.content}
+                    onChange={e => setNewNavData({ ...newNavData, content: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="Enter link URL"
+                  />
+                )}
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
+              <button
+                onClick={() => { setIsEditingCustomNav(false); setEditingCustomNav(null); }}
+                className="px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:opacity-80"
+                style={{ borderColor: '#DCE8F2', color: '#1F2D3D' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateCustomNav}
                 className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90"
                 style={{ backgroundColor: '#6EA9CB' }}
               >

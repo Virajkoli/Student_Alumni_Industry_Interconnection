@@ -40,8 +40,11 @@ const register = async (req, res) => {
     const { email, password, role, fullName, ...otherFields } = req.body;
 
     // Handle backward compatibility for names
-    const firstName = otherFields.first_name || (fullName ? fullName.split(' ')[0] : '');
-    const lastName = otherFields.last_name || (fullName ? fullName.split(' ').slice(1).join(' ') : '');
+    const firstName =
+      otherFields.first_name || (fullName ? fullName.split(" ")[0] : "");
+    const lastName =
+      otherFields.last_name ||
+      (fullName ? fullName.split(" ").slice(1).join(" ") : "");
     const userRole = role || "student"; // Default to student if no role specified
 
     console.log("Processing registration for:", {
@@ -450,8 +453,8 @@ router.post("/debug-register", (req, res) => {
   console.log("=== DEBUG REGISTRATION ===");
   console.log("Request Body:", JSON.stringify(req.body, null, 2));
   console.log("Headers Origin:", req.headers.origin);
-  console.log("Content-Type:", req.headers['content-type']);
-  
+  console.log("Content-Type:", req.headers["content-type"]);
+
   res.json({
     success: true,
     message: "Debug data logged to server console",
@@ -459,11 +462,11 @@ router.post("/debug-register", (req, res) => {
     requiredFields: {
       role: "required - student, college, industry, startup",
       first_name: "required",
-      last_name: "required", 
+      last_name: "required",
       email: "required",
-      password: "required (min 6 chars)"
+      password: "required (min 6 chars)",
     },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

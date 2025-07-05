@@ -90,6 +90,8 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       setIsLoading(true);
+
+      // Determine the registration endpoint based on role
       const response = await apiService.register(userData);
 
       if (response.success) {

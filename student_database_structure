@@ -1,0 +1,86 @@
+CREATE TABLE students (
+  id SERIAL PRIMARY KEY,
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  email VARCHAR(150) UNIQUE NOT NULL,
+  contact_no VARCHAR(15),
+  college_name VARCHAR(200),
+  interested_field VARCHAR(50) CHECK (interested_field IN ('Computer', 'Electronics', 'Electrical', 'Other')),
+  other_field VARCHAR(100), -- only used if 'Other' is selected
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE about (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  summary TEXT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE experience (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  title VARCHAR(150),
+  company VARCHAR(150),
+  start_date DATE,
+  end_date DATE,
+  description TEXT
+);
+
+CREATE TABLE education (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  institution VARCHAR(200),
+  degree VARCHAR(100),
+  field_of_study VARCHAR(100),
+  start_year INT,
+  end_year INT,
+  grade VARCHAR(20)
+);
+CREATE TABLE skills (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  skill_name VARCHAR(100),
+  proficiency VARCHAR(50) CHECK (proficiency IN ('Beginner', 'Intermediate', 'Advanced'))
+);
+CREATE TABLE courses (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  course_name VARCHAR(150),
+  provider VARCHAR(150),
+  completion_date DATE
+);
+
+CREATE TABLE certifications (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  certificate_name VARCHAR(150),
+  issuing_organization VARCHAR(150),
+  issue_date DATE,
+  expiry_date DATE,
+  credential_id VARCHAR(100),
+  credential_url TEXT
+);
+CREATE TABLE recommendations (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  recommender_name VARCHAR(100),
+  relationship VARCHAR(100),
+  message TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE student_projects (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  title VARCHAR(150) NOT NULL,
+  description TEXT,
+  technologies TEXT, -- comma-separated or JSON (e.g., ["React", "Node.js"])
+  start_date DATE,
+  end_date DATE,
+  project_link TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

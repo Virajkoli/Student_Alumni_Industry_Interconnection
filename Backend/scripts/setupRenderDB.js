@@ -1,58 +1,68 @@
-#!/usr/bin/env node
+const { sequelize, Student, User } = require("../config/database");
 
-const {
-  sequelize,
-  testConnection,
-  syncDatabase,
-} = require("../config/database");
+const setupDatabase = async () => {
+  try {
+    console.log("🔄 Setting up database for production...");
 
-async function setupRenderDatabase() {
-  console.log("🚀 Setting up Render PostgreSQL Database...\n");
+    // Test database connection
+    await sequelize.authenticate();
+    console.log("✅ Database connection established successfully");
 
-  // Test connection
-  console.log("1️⃣ Testing database connection...");
-  const connectionSuccess = await testConnection();
+    // Check if models are loaded
+    console.log("📊 Available models:", Object.keys(sequelize.models));
 
-  if (!connectionSuccess) {
-    console.log("\n❌ Database connection failed!");
-    console.log(
-      "Please check your .env file and ensure you have the correct Render database credentials:"
-    );
-    console.log("- DB_USERNAME");
-    console.log("- DB_PASSWORD");
-    console.log("- DB_HOST");
-    console.log("- DB_DATABASE");
-    console.log("- DB_SSL=true");
-    process.exit(1);
+    // Sync all models (create tables if they don't exist)
+    await sequelize.sync({ alter: true });
+    console.log("✅ Database synchronized successfully");
+
+    // Test Student model specifically
+    if (Student) {
+      console.log("✅ Student model is available");
+
+      // Try to find or create a test student
+      const testData = {
+        first_name: "Test",
+        last_name: "Student",
+        email: "test@example.com",
+        password: "password123",
+        contact_no: "1234567890",
+        college_name: "Test College",
+        interested_field: "Computer",
+      };
+
+      const [student, created] = await Student.findOrCreate({
+        where: { email: testData.email },
+        defaults: testData,
+      });
+
+      if (created) {
+        console.log("✅ Test student created successfully");
+        // Clean up test data
+        await student.destroy();
+        console.log("✅ Test student cleaned up");
+      } else {
+        console.log("✅ Student table already exists");
+      }
+    } else {
+      console.error("❌ Student model not found!");
+    }
+
+    // Test User model
+    if (User) {
+      console.log("✅ User model is available");
+    } else {
+      console.error("❌ User model not found!");
+    }
+
+    console.log("🎉 Database setup completed successfully!");
+  } catch (error) {
+    console.error("❌ Database setup failed:", error);
+    console.error("Error details:", error.message);
+    console.error("Stack trace:", error.stack);
+  } finally {
+    await sequelize.close();
   }
+};
 
-  // Sync database (create tables)
-  console.log("\n2️⃣ Creating database tables...");
-  const syncSuccess = await syncDatabase(false);
-
-  if (!syncSuccess) {
-    console.log("\n❌ Database sync failed!");
-    process.exit(1);
-  }
-
-  console.log("\n✅ Database setup completed successfully!");
-  console.log(
-    "🎉 Your friends can now use the shared database for registration and login."
-  );
-
-  // Close connection
-  await sequelize.close();
-  process.exit(0);
-}
-
-// Handle errors
-process.on("unhandledRejection", (error) => {
-  console.error("\n❌ Unhandled error:", error.message);
-  process.exit(1);
-});
-
-// Run setup
-setupRenderDatabase().catch((error) => {
-  console.error("\n❌ Setup failed:", error.message);
-  process.exit(1);
-});
+// Run the setup
+setupDatabase();

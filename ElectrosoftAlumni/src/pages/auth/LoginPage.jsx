@@ -48,17 +48,12 @@ export default function LoginPage() {
       });
 
       if (result.success) {
-        // Get the display name - handle both fullName (other roles) and first_name/last_name (students)
-        const displayName = result.user.fullName || 
-          `${result.user.first_name || ''} ${result.user.last_name || ''}`.trim() || 
-          result.user.email;
-
         // Redirect based on user role
         const rolePage = apiService.getRoleHomePage(result.user.role);
         navigate(rolePage, {
           replace: true,
           state: {
-            welcomeMessage: `Welcome back, ${displayName}!`,
+            welcomeMessage: `Welcome back, ${result.user.fullName}!`,
           },
         });
       }

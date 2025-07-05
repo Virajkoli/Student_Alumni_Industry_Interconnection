@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
-const { User, Student, sequelize } = require("../config/database");
+const { Student, sequelize } = require("../config/database");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
 
@@ -19,7 +19,7 @@ const generateRefreshToken = (userId) => {
   });
 };
 
-// @desc    Register user
+// @desc    Register user (any role)
 // @route   POST /api/auth/register
 // @access  Public
 const register = async (req, res) => {
@@ -37,53 +37,65 @@ const register = async (req, res) => {
       });
     }
 
-    const { email, password, role, fullName, ...otherFields } = req.body;
-
-    // Handle backward compatibility for names
-    const firstName =
-      otherFields.first_name || (fullName ? fullName.split(" ")[0] : "");
-    const lastName =
-      otherFields.last_name ||
-      (fullName ? fullName.split(" ").slice(1).join(" ") : "");
+    const {
+      email,
+      password,
+      role,
+      first_name,
+      last_name,
+      contact_no,
+      college_name,
+      interested_field,
+      other_field,
+      ...otherFields
+    } = req.body;
     const userRole = role || "student"; // Default to student if no role specified
 
-    console.log("Processing registration for:", {
+    console.log("Processing registration for role:", userRole, {
       email,
-      role: userRole,
-      firstName,
-      lastName,
-      ...otherFields,
+      first_name,
+      last_name,
+      college_name,
+      interested_field,
     });
 
-    // Check if user already exists (check both tables)
-    let existingUser, existingStudent;
+    // Check if user already exists in any table
+    let existingUser = null;
 
+    // Check Student table
     try {
-      existingUser = await User.findOne({ where: { email } });
-    } catch (userError) {
-      console.log("Error checking User table:", userError.message);
+      existingUser = await Student.findOne({ where: { email } });
+      if (existingUser) {
+        console.log("User already exists in Student table:", email);
+        return res.status(400).json({
+          success: false,
+          message: "User already exists with this email",
+        });
+      }
+    } catch (error) {
+      console.error("Error checking Student table:", error.message);
     }
 
-    try {
-      existingStudent = await Student.findOne({ where: { email } });
-    } catch (studentError) {
-      console.log("Error checking Student table:", studentError.message);
-      console.log("Student model available:", !!Student);
-      console.log("Available models:", Object.keys(sequelize.models || {}));
-    }
+    // TODO: Add checks for other role tables when they are created
+    // if (!existingUser) {
+    //   try {
+    //     existingUser = await Alumni.findOne({ where: { email } });
+    //     if (existingUser) {
+    //       console.log("User already exists in Alumni table:", email);
+    //       return res.status(400).json({
+    //         success: false,
+    //         message: "User already exists with this email",
+    //       });
+    //     }
+    //   } catch (error) {
+    //     console.error("Error checking Alumni table:", error.message);
+    //   }
+    // }
 
-    if (existingUser || existingStudent) {
-      console.log("User already exists:", email);
-      return res.status(400).json({
-        success: false,
-        message: "User already exists with this email",
-      });
-    }
-
+    // Create user based on role
     let user;
     let userResponse;
 
-    // Handle different roles
     if (userRole === "student") {
       // Check if Student model is available
       if (!Student) {
@@ -95,67 +107,63 @@ const register = async (req, res) => {
         });
       }
 
-      try {
-        // Create student
-        user = await Student.create({
-          email,
-          password,
-          first_name: firstName,
-          last_name: lastName,
-          contact_no: otherFields.contact_no,
-          college_name: otherFields.college_name,
-          interested_field: otherFields.interested_field,
-          other_field:
-            otherFields.interested_field === "Other"
-              ? otherFields.other_field
-              : null,
-        });
-
-        userResponse = {
-          id: user.id,
-          email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          contact_no: user.contact_no,
-          college_name: user.college_name,
-          interested_field: user.interested_field,
-          other_field: user.other_field,
-          role: "student",
-          isEmailVerified: user.isEmailVerified,
-          profileCompletion: user.getProfileCompletion(),
-          createdAt: user.created_at,
-        };
-      } catch (studentCreateError) {
-        console.error("❌ Error creating student:", studentCreateError);
-        if (studentCreateError.name === "SequelizeDatabaseError") {
-          return res.status(500).json({
-            success: false,
-            message: "Database table not found. Setting up database...",
-            error: "students_table_missing",
-          });
-        }
-        throw studentCreateError;
-      }
-    } else {
-      // Create user for other roles (college, industry, startup)
-      user = await User.create({
+      // Create student
+      user = await Student.create({
         email,
         password,
-        fullName: fullName || `${firstName} ${lastName}`.trim(),
-        role: userRole,
-        ...otherFields, // Include all other role-specific fields
+        first_name,
+        last_name,
+        contact_no,
+        college_name,
+        interested_field,
+        other_field: interested_field === "Other" ? other_field : null,
       });
 
       userResponse = {
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
-        role: user.role,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        contact_no: user.contact_no,
+        college_name: user.college_name,
+        interested_field: user.interested_field,
+        other_field: user.other_field,
+        role: "student",
         isEmailVerified: user.isEmailVerified,
         profileCompletion: user.getProfileCompletion(),
-        createdAt: user.createdAt,
-        ...otherFields, // Include role-specific fields in response
+        createdAt: user.created_at,
       };
+    }
+    // TODO: Add other role creation logic when their models are created
+    // else if (userRole === "alumni") {
+    //   user = await Alumni.create({
+    //     email,
+    //     password,
+    //     first_name,
+    //     last_name,
+    //     // ... other alumni-specific fields
+    //   });
+    //   userResponse = {
+    //     // ... alumni-specific response
+    //   };
+    // }
+    // else if (userRole === "college") {
+    //   user = await College.create({
+    //     email,
+    //     password,
+    //     college_name,
+    //     // ... other college-specific fields
+    //   });
+    //   userResponse = {
+    //     // ... college-specific response
+    //   };
+    // }
+    else {
+      // For now, only support student registration
+      return res.status(400).json({
+        success: false,
+        message: `Registration for role '${userRole}' is not yet available. Currently only 'student' registration is supported.`,
+      });
     }
 
     console.log(
@@ -187,18 +195,13 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("=== REGISTRATION ERROR ===");
+    console.error("=== STUDENT REGISTRATION ERROR ===");
     console.error("Error type:", error.constructor.name);
     console.error("Error message:", error.message);
     console.error("Error stack:", error.stack);
 
-    // Log additional debugging info
-    console.error("User role:", userRole);
-    console.error("Student model available:", !!Student);
-    console.error("Available models:", Object.keys(sequelize.models || {}));
-
     // Check for specific error types
-    let errorMessage = "Server error during registration";
+    let errorMessage = "Server error during student registration";
     if (error.name === "SequelizeConnectionError") {
       errorMessage = "Database connection error";
     } else if (error.name === "SequelizeValidationError") {
@@ -224,14 +227,18 @@ const register = async (req, res) => {
   }
 };
 
-// @desc    Login user
+// @desc    Login user (any role)
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res) => {
   try {
+    console.log("=== LOGIN ATTEMPT ===");
+    console.log("Login attempt for email:", req.body.email);
+
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log("Validation errors:", errors.array());
       return res.status(400).json({
         success: false,
         message: "Validation errors",
@@ -241,24 +248,92 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Try to find user in both tables
-    let user = await User.findOne({ where: { email } });
-    let isStudent = false;
+    // Try to find user in available role tables
+    let user = null;
+    let userRole = null;
 
+    console.log("Searching for user across all role tables...");
+
+    // Check Student table
     if (!user) {
-      user = await Student.findOne({ where: { email } });
-      isStudent = true;
+      console.log("Checking Student table...");
+      try {
+        user = await Student.findOne({ where: { email } });
+        if (user) {
+          userRole = "student";
+          console.log("User found in Student table");
+        }
+      } catch (studentError) {
+        console.error("Error searching Student table:", studentError.message);
+      }
     }
 
+    // TODO: Add checks for other role tables when they are created
+    // if (!user) {
+    //   console.log("Checking Alumni table...");
+    //   try {
+    //     user = await Alumni.findOne({ where: { email } });
+    //     if (user) {
+    //       userRole = "alumni";
+    //       console.log("User found in Alumni table");
+    //     }
+    //   } catch (alumniError) {
+    //     console.error("Error searching Alumni table:", alumniError.message);
+    //   }
+    // }
+
+    // if (!user) {
+    //   console.log("Checking College table...");
+    //   try {
+    //     user = await College.findOne({ where: { email } });
+    //     if (user) {
+    //       userRole = "college";
+    //       console.log("User found in College table");
+    //     }
+    //   } catch (collegeError) {
+    //     console.error("Error searching College table:", collegeError.message);
+    //   }
+    // }
+
+    // if (!user) {
+    //   console.log("Checking Industry table...");
+    //   try {
+    //     user = await Industry.findOne({ where: { email } });
+    //     if (user) {
+    //       userRole = "industry";
+    //       console.log("User found in Industry table");
+    //     }
+    //   } catch (industryError) {
+    //     console.error("Error searching Industry table:", industryError.message);
+    //   }
+    // }
+
+    // if (!user) {
+    //   console.log("Checking Startup table...");
+    //   try {
+    //     user = await Startup.findOne({ where: { email } });
+    //     if (user) {
+    //       userRole = "startup";
+    //       console.log("User found in Startup table");
+    //     }
+    //   } catch (startupError) {
+    //     console.error("Error searching Startup table:", startupError.message);
+    //   }
+    // }
+
     if (!user) {
+      console.log("User not found in any table for email:", email);
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
     }
 
-    // Check if user is active
-    if (!user.isActive) {
+    console.log(`User found with role: ${userRole}`);
+
+    // Check if user account is active
+    if (user.isActive !== undefined && !user.isActive) {
+      console.log("User account deactivated:", email);
       return res.status(401).json({
         success: false,
         message: "Account is deactivated. Please contact support.",
@@ -266,8 +341,10 @@ const login = async (req, res) => {
     }
 
     // Check password
+    console.log("Validating password...");
     const isPasswordValid = await user.matchPassword(password);
     if (!isPasswordValid) {
+      console.log("Invalid password for user:", email);
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
@@ -275,10 +352,13 @@ const login = async (req, res) => {
     }
 
     // Update login tracking
+    console.log("Updating login tracking...");
     await user.update({
       lastLogin: new Date(),
-      loginCount: user.loginCount + 1,
+      loginCount: (user.loginCount || 0) + 1,
     });
+
+    console.log("Login successful for:", email, "Role:", userRole);
 
     // Generate tokens
     const token = generateToken(user.id);
@@ -292,9 +372,10 @@ const login = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
-    // Return user data based on table
+    // Prepare response based on user role/table
     let userResponse;
-    if (isStudent) {
+
+    if (userRole === "student") {
       userResponse = {
         id: user.id,
         email: user.email,
@@ -304,22 +385,39 @@ const login = async (req, res) => {
         college_name: user.college_name,
         interested_field: user.interested_field,
         other_field: user.other_field,
-        role: "student",
-        isEmailVerified: user.isEmailVerified,
-        profileCompletion: user.getProfileCompletion(),
+        role: userRole,
+        isEmailVerified: user.isEmailVerified || false,
+        profileCompletion:
+          typeof user.getProfileCompletion === "function"
+            ? user.getProfileCompletion()
+            : 50,
         lastLogin: user.lastLogin,
         createdAt: user.created_at,
       };
-    } else {
+    }
+    // TODO: Add response formatting for other roles when their tables are created
+    // else if (userRole === "college") {
+    //   userResponse = {
+    //     id: user.id,
+    //     email: user.email,
+    //     college_name: user.college_name,
+    //     // ... other college-specific fields
+    //     role: userRole,
+    //     isEmailVerified: user.isEmailVerified || false,
+    //     profileCompletion: typeof user.getProfileCompletion === 'function' ? user.getProfileCompletion() : 50,
+    //     lastLogin: user.lastLogin,
+    //     createdAt: user.created_at,
+    //   };
+    // }
+    else {
+      // Fallback for any other roles
       userResponse = {
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
-        role: user.role,
-        isEmailVerified: user.isEmailVerified,
-        profileCompletion: user.getProfileCompletion(),
+        role: userRole,
+        isEmailVerified: user.isEmailVerified || false,
         lastLogin: user.lastLogin,
-        createdAt: user.createdAt,
+        createdAt: user.created_at || user.createdAt,
       };
     }
 
@@ -332,10 +430,21 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("=== LOGIN ERROR ===");
+    console.error("Error type:", error.constructor.name);
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
+    console.error("Request email:", req.body?.email);
+
     res.status(500).json({
       success: false,
       message: "Server error during login",
+      ...(process.env.NODE_ENV === "development" && {
+        debug: {
+          error: error.message,
+          type: error.constructor.name,
+        },
+      }),
     });
   }
 };
@@ -369,9 +478,35 @@ const refreshToken = async (req, res) => {
 
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    const user = await User.findByPk(decoded.userId);
 
-    if (!user || !user.isActive) {
+    // Try to find user in available tables
+    let user = null;
+
+    // Check Student table
+    try {
+      user = await Student.findByPk(decoded.userId);
+    } catch (error) {
+      console.error("Error checking Student table:", error.message);
+    }
+
+    // TODO: Add checks for other role tables when they are created
+    // if (!user) {
+    //   try {
+    //     user = await Alumni.findByPk(decoded.userId);
+    //   } catch (error) {
+    //     console.error("Error checking Alumni table:", error.message);
+    //   }
+    // }
+
+    // if (!user) {
+    //   try {
+    //     user = await College.findByPk(decoded.userId);
+    //   } catch (error) {
+    //     console.error("Error checking College table:", error.message);
+    //   }
+    // }
+
+    if (!user || (user.isActive !== undefined && !user.isActive)) {
       return res.status(401).json({
         success: false,
         message: "Invalid refresh token",
@@ -401,11 +536,54 @@ const refreshToken = async (req, res) => {
 // @access  Private
 const getMe = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
-      attributes: {
-        exclude: ["password", "passwordResetToken", "passwordResetExpires"],
-      },
-    });
+    // Try to find user in available tables
+    let user = null;
+    let userRole = null;
+
+    // Check Student table
+    try {
+      user = await Student.findByPk(req.user.id, {
+        attributes: {
+          exclude: ["password"],
+        },
+      });
+      if (user) {
+        userRole = "student";
+      }
+    } catch (error) {
+      console.error("Error checking Student table:", error.message);
+    }
+
+    // TODO: Add checks for other role tables when they are created
+    // if (!user) {
+    //   try {
+    //     user = await Alumni.findByPk(req.user.id, {
+    //       attributes: {
+    //         exclude: ["password"],
+    //       },
+    //     });
+    //     if (user) {
+    //       userRole = "alumni";
+    //     }
+    //   } catch (error) {
+    //     console.error("Error checking Alumni table:", error.message);
+    //   }
+    // }
+
+    // if (!user) {
+    //   try {
+    //     user = await College.findByPk(req.user.id, {
+    //       attributes: {
+    //         exclude: ["password"],
+    //       },
+    //     });
+    //     if (user) {
+    //       userRole = "college";
+    //     }
+    //   } catch (error) {
+    //     console.error("Error checking College table:", error.message);
+    //   }
+    // }
 
     if (!user) {
       return res.status(404).json({
@@ -414,10 +592,47 @@ const getMe = async (req, res) => {
       });
     }
 
-    const userResponse = {
-      ...user.toJSON(),
-      profileCompletion: user.getProfileCompletion(),
-    };
+    // Prepare response based on user role
+    let userResponse;
+
+    if (userRole === "student") {
+      userResponse = {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        contact_no: user.contact_no,
+        college_name: user.college_name,
+        interested_field: user.interested_field,
+        other_field: user.other_field,
+        role: userRole,
+        isEmailVerified: user.isEmailVerified,
+        isActive: user.isActive,
+        lastLogin: user.lastLogin,
+        loginCount: user.loginCount,
+        profileCompletion:
+          typeof user.getProfileCompletion === "function"
+            ? user.getProfileCompletion()
+            : 50,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at,
+      };
+    }
+    // TODO: Add response formatting for other roles when their tables are created
+    else {
+      // Fallback for any other roles
+      userResponse = {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+        isEmailVerified: user.isEmailVerified,
+        isActive: user.isActive,
+        lastLogin: user.lastLogin,
+        loginCount: user.loginCount,
+        createdAt: user.created_at || user.createdAt,
+        updatedAt: user.updated_at || user.updatedAt,
+      };
+    }
 
     res.json({
       success: true,
@@ -434,7 +649,7 @@ const getMe = async (req, res) => {
   }
 };
 
-// Validation middleware - More flexible for backward compatibility
+// Validation middleware for user registration (flexible for different roles)
 const registerValidation = [
   body("email")
     .isEmail()
@@ -447,23 +662,21 @@ const registerValidation = [
     .optional()
     .isIn(["student", "college", "industry", "startup"])
     .withMessage("Role must be one of: student, college, industry, startup"),
+  // Student-specific fields
   body("first_name")
-    .optional()
+    .if(body("role").equals("student"))
     .trim()
-    .isLength({ min: 1 })
-    .withMessage("First name must be at least 1 character long"),
+    .isLength({ min: 1, max: 100 })
+    .withMessage(
+      "First name is required for students and must be between 1-100 characters"
+    ),
   body("last_name")
-    .optional()
+    .if(body("role").equals("student"))
     .trim()
-    .isLength({ min: 1 })
-    .withMessage("Last name must be at least 1 character long"),
-  // Backward compatibility - support old fullName field
-  body("fullName")
-    .optional()
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage("Full name must be at least 1 character long"),
-  // Optional fields for different roles
+    .isLength({ min: 1, max: 100 })
+    .withMessage(
+      "Last name is required for students and must be between 1-100 characters"
+    ),
   body("contact_no")
     .optional()
     .trim()
@@ -485,6 +698,7 @@ const registerValidation = [
     .trim()
     .isLength({ max: 100 })
     .withMessage("Other field must be 100 characters or less"),
+  // TODO: Add validation for other role-specific fields when their tables are created
 ];
 
 const loginValidation = [
@@ -517,8 +731,7 @@ router.get("/debug-models", async (req, res) => {
   try {
     console.log("=== DEBUG MODELS ===");
 
-    // Check if models are loaded
-    console.log("User model available:", !!User);
+    // Check if Student model is loaded
     console.log("Student model available:", !!Student);
 
     // Check sequelize models
@@ -528,7 +741,7 @@ router.get("/debug-models", async (req, res) => {
     await sequelize.authenticate();
     console.log("Database connection: OK");
 
-    // Check if students table exists
+    // Check if tables exist
     const tableExists = await sequelize.getQueryInterface().showAllTables();
     console.log("Available tables:", tableExists);
 
@@ -544,14 +757,26 @@ router.get("/debug-models", async (req, res) => {
       }
     }
 
+    // TODO: Add tests for other role tables when they are created
+    // let collegeTest = null;
+    // if (College) {
+    //   try {
+    //     const count = await College.count();
+    //     collegeTest = `College model works, count: ${count}`;
+    //   } catch (err) {
+    //     collegeTest = `College model error: ${err.message}`;
+    //   }
+    // }
+
     res.json({
       success: true,
       debug: {
-        userModelAvailable: !!User,
         studentModelAvailable: !!Student,
+        // collegeModelAvailable: !!College, // TODO: Add when College model is created
         sequelizeModels: Object.keys(sequelize.models || {}),
         tablesInDatabase: tableExists,
         studentModelTest: studentTest,
+        // collegeModelTest: collegeTest, // TODO: Add when College model is created
         timestamp: new Date().toISOString(),
       },
     });
@@ -565,24 +790,52 @@ router.get("/debug-models", async (req, res) => {
   }
 });
 
-// Debug endpoint to check what data is being sent
+// Debug endpoint to check what data is being sent for registration
 router.post("/debug-register", (req, res) => {
   console.log("=== DEBUG REGISTRATION ===");
   console.log("Request Body:", JSON.stringify(req.body, null, 2));
   console.log("Headers Origin:", req.headers.origin);
   console.log("Content-Type:", req.headers["content-type"]);
 
-  res.json({
-    success: true,
-    message: "Debug data logged to server console",
-    receivedData: req.body,
-    requiredFields: {
-      role: "required - student, college, industry, startup",
+  const { role } = req.body;
+  const userRole = role || "student";
+
+  let requiredFields = {};
+  let optionalFields = {};
+
+  if (userRole === "student") {
+    requiredFields = {
       first_name: "required",
       last_name: "required",
       email: "required",
       password: "required (min 6 chars)",
-    },
+    };
+    optionalFields = {
+      contact_no: "optional (max 15 chars)",
+      college_name: "optional (max 200 chars)",
+      interested_field: "optional (Computer, Electronics, Electrical, Other)",
+      other_field: "optional (required if interested_field is Other)",
+    };
+  }
+  // TODO: Add required/optional fields for other roles when their tables are created
+  else {
+    requiredFields = {
+      email: "required",
+      password: "required (min 6 chars)",
+      role: "required (student, college, industry, startup)",
+    };
+    optionalFields = {
+      note: "Other role registrations will be added when their tables are created",
+    };
+  }
+
+  res.json({
+    success: true,
+    message: "Debug data logged to server console",
+    receivedData: req.body,
+    detectedRole: userRole,
+    requiredFields: requiredFields,
+    optionalFields: optionalFields,
     timestamp: new Date().toISOString(),
   });
 });

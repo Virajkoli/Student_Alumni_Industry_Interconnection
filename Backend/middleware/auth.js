@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { User, Student } = require("../config/database");
+const { Student } = require("../config/database");
 
 const auth = async (req, res, next) => {
   try {
@@ -27,21 +27,38 @@ const auth = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Get user from database (check both User and Student tables)
-      let user = await User.findByPk(decoded.userId, {
-        attributes: { exclude: ["password"] },
-      });
+      // Try to find user in available tables
+      let user = null;
+      let userRole = null;
 
-      // If not found in User table, check Student table
-      if (!user) {
+      // Check Student table first
+      try {
         user = await Student.findByPk(decoded.userId, {
           attributes: { exclude: ["password"] },
         });
-        // Add role for students
         if (user) {
-          user.dataValues.role = "student";
+          userRole = "student";
         }
+      } catch (error) {
+        console.error(
+          "Error checking Student table in auth middleware:",
+          error.message
+        );
       }
+
+      // TODO: Add checks for other role tables when they are created
+      // if (!user) {
+      //   try {
+      //     user = await College.findByPk(decoded.userId, {
+      //       attributes: { exclude: ["password"] },
+      //     });
+      //     if (user) {
+      //       userRole = "college";
+      //     }
+      //   } catch (error) {
+      //     console.error("Error checking College table in auth middleware:", error.message);
+      //   }
+      // }
 
       if (!user) {
         return res.status(401).json({
@@ -50,15 +67,18 @@ const auth = async (req, res, next) => {
         });
       }
 
-      if (!user.isActive) {
+      if (user.isActive !== undefined && !user.isActive) {
         return res.status(401).json({
           success: false,
           message: "Account is deactivated",
         });
       }
 
-      // Add user to request object
-      req.user = user;
+      // Add user to request object with role
+      req.user = {
+        ...user.dataValues,
+        role: userRole,
+      };
       next();
     } catch (jwtError) {
       return res.status(401).json({
@@ -75,7 +95,7 @@ const auth = async (req, res, next) => {
   }
 };
 
-// Middleware to check if user has specific role
+// Middleware to check if user has specific role (supports role-based authorization)
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
@@ -85,10 +105,12 @@ const authorize = (...roles) => {
       });
     }
 
+    // Check if user's role is in allowed roles
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: `Access denied - ${req.user.role} role is not authorized for this route`,
+        message: `Access denied - role '${req.user.role}' not authorized for this resource`,
+        allowedRoles: roles,
       });
     }
 
@@ -96,7 +118,7 @@ const authorize = (...roles) => {
   };
 };
 
-// Optional auth middleware (doesn't fail if no token)
+// Optional auth middleware (doesn't fail if no token, supports role-based auth)
 const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.header("Authorization");
@@ -115,12 +137,45 @@ const optionalAuth = async (req, res, next) => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findByPk(decoded.userId, {
-        attributes: { exclude: ["password"] },
-      });
 
-      if (user && user.isActive) {
-        req.user = user;
+      // Try to find user in available tables
+      let user = null;
+      let userRole = null;
+
+      // Check Student table first
+      try {
+        user = await Student.findByPk(decoded.userId, {
+          attributes: { exclude: ["password"] },
+        });
+        if (user) {
+          userRole = "student";
+        }
+      } catch (error) {
+        console.error(
+          "Error checking Student table in optional auth:",
+          error.message
+        );
+      }
+
+      // TODO: Add checks for other role tables when they are created
+      // if (!user) {
+      //   try {
+      //     user = await College.findByPk(decoded.userId, {
+      //       attributes: { exclude: ["password"] },
+      //     });
+      //     if (user) {
+      //       userRole = "college";
+      //     }
+      //   } catch (error) {
+      //     console.error("Error checking College table in optional auth:", error.message);
+      //   }
+      // }
+
+      if (user && (user.isActive === undefined || user.isActive)) {
+        req.user = {
+          ...user.dataValues,
+          role: userRole,
+        };
       } else {
         req.user = null;
       }

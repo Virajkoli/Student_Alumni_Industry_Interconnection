@@ -26,10 +26,19 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("authToken");
       const userData = localStorage.getItem("userData");
 
+      console.log("🔍 Checking auth status...", {
+        hasToken: !!token,
+        hasUserData: !!userData,
+        tokenLength: token?.length,
+      });
+
       if (token && userData) {
         // Verify token with backend
         try {
+          console.log("🔄 Verifying token with backend...");
           const response = await apiService.getCurrentUser();
+          console.log("✅ Backend verification response:", response);
+
           if (response.success) {
             setIsAuthenticated(true);
             setUser(response.data.user);
@@ -38,10 +47,15 @@ export const AuthProvider = ({ children }) => {
               "userData",
               JSON.stringify(response.data.user)
             );
+            console.log(
+              "✅ User authenticated successfully",
+              response.data.user
+            );
           } else {
             throw new Error("Invalid token");
           }
         } catch (apiError) {
+          console.error("❌ Token verification failed:", apiError);
           // Token is invalid, clear storage
           localStorage.removeItem("authToken");
           localStorage.removeItem("userData");
@@ -49,11 +63,12 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
         }
       } else {
+        console.log("❌ No token or user data found");
         setIsAuthenticated(false);
         setUser(null);
       }
     } catch (error) {
-      console.error("Error checking auth status:", error);
+      console.error("❌ Error checking auth status:", error);
       setIsAuthenticated(false);
       setUser(null);
     } finally {

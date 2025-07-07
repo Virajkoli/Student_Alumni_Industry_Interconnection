@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, BookOpen } from "lucide-react";
+import { studentAPI } from "../../../utils/apiService";
 
-const CoursesSection = ({ courses = [], onCoursesUpdate }) => {
+const CoursesSection = ({ courses = [], onCoursesUpdate, studentId }) => {
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
   const [courseData, setCourseData] = useState({
@@ -59,41 +60,57 @@ const CoursesSection = ({ courses = [], onCoursesUpdate }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingCourse) {
-      // Update existing course
-      const updatedCourses = courses.map((course) =>
-        course.id === editingCourse.id
-          ? { ...courseData, id: editingCourse.id }
-          : course
-      );
-      onCoursesUpdate(updatedCourses);
-    } else {
-      // Add new course
-      const newCourse = {
-        id: Date.now(),
-        ...courseData,
+    try {
+      const coursePayload = {
+        course_name: courseData.name,
+        provider: courseData.institution,
+        completion_date: courseData.completionDate
+          ? courseData.completionDate
+          : null,
       };
-      onCoursesUpdate((prev) => [...prev, newCourse]);
+
+      if (editingCourse) {
+        // Update existing course
+        await studentAPI.updateCourse(
+          studentId,
+          editingCourse.id,
+          coursePayload
+        );
+      } else {
+        // Add new course
+        await studentAPI.addCourse(studentId, coursePayload);
+      }
+      closeModal();
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving course:", error);
     }
-    closeModal();
   };
 
   const handleEditCourse = (course) => {
     setEditingCourse(course);
     setCourseData({
-      ...course,
+      name: course.course_name || "",
+      institution: course.provider || "",
+      completionDate: course.completion_date || "",
       skills: course.skills || [],
       customFields: course.customFields || [],
     });
     setShowCourseModal(true);
   };
 
-  const handleDeleteCourse = (courseId) => {
-    const updatedCourses = courses.filter((course) => course.id !== courseId);
-    onCoursesUpdate(updatedCourses);
+  const handleDeleteCourse = async (courseId) => {
+    try {
+      await studentAPI.deleteCourse(studentId, courseId);
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
   };
 
   const closeModal = () => {
@@ -148,11 +165,16 @@ const CoursesSection = ({ courses = [], onCoursesUpdate }) => {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">
-                      {course.name}
+                      {course.course_name || course.name}
                     </h3>
-                    <p className="text-gray-600">{course.institution}</p>
+                    <p className="text-gray-600">
+                      {course.provider || course.institution}
+                    </p>
                     <p className="text-sm text-gray-500">
-                      Completed: {course.completionDate}
+                      Completed:{" "}
+                      {course.completion_date
+                        ? new Date(course.completion_date).toLocaleDateString()
+                        : course.completionDate}
                     </p>
 
                     {course.skills && course.skills.length > 0 && (

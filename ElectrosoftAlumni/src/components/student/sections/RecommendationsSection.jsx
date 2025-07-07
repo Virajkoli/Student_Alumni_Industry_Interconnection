@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, MessageCircle, Trash2 } from "lucide-react";
+import { studentAPI } from "../../../utils/apiService";
 
 const RecommendationsSection = ({
   recommendations = [],
   onRecommendationsUpdate,
+  studentId,
 }) => {
   const [showRecommendationModal, setShowRecommendationModal] = useState(false);
   const [editingRecommendation, setEditingRecommendation] = useState(null);
@@ -49,43 +51,55 @@ const RecommendationsSection = ({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingRecommendation) {
-      // Update existing recommendation
-      const updatedRecommendations = recommendations.map((recommendation) =>
-        recommendation.id === editingRecommendation.id
-          ? { ...recommendationData, id: editingRecommendation.id }
-          : recommendation
-      );
-      onRecommendationsUpdate(updatedRecommendations);
-    } else {
-      // Add new recommendation (or in real app, send request)
-      const newRecommendation = {
-        id: Date.now(),
-        ...recommendationData,
-        date: new Date().toLocaleDateString(),
+    try {
+      const recommendationPayload = {
+        recommender_name: recommendationData.name,
+        relationship: recommendationData.position,
+        message: recommendationData.message,
       };
-      onRecommendationsUpdate((prev) => [...prev, newRecommendation]);
+
+      if (editingRecommendation) {
+        // Update existing recommendation
+        await studentAPI.updateRecommendation(
+          studentId,
+          editingRecommendation.id,
+          recommendationPayload
+        );
+      } else {
+        // Add new recommendation
+        await studentAPI.addRecommendation(studentId, recommendationPayload);
+      }
+      closeModal();
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving recommendation:", error);
     }
-    closeModal();
   };
 
   const handleEditRecommendation = (recommendation) => {
     setEditingRecommendation(recommendation);
     setRecommendationData({
-      ...recommendation,
+      recipient: recommendation.recipient || "",
+      position: recommendation.relationship || "",
+      message: recommendation.message || "",
+      name: recommendation.recommender_name || "",
       customFields: recommendation.customFields || [],
     });
     setShowRecommendationModal(true);
   };
 
-  const handleDeleteRecommendation = (recommendationId) => {
-    const updatedRecommendations = recommendations.filter(
-      (recommendation) => recommendation.id !== recommendationId
-    );
-    onRecommendationsUpdate(updatedRecommendations);
+  const handleDeleteRecommendation = async (recommendationId) => {
+    try {
+      await studentAPI.deleteRecommendation(studentId, recommendationId);
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting recommendation:", error);
+    }
   };
 
   const closeModal = () => {
@@ -141,10 +155,10 @@ const RecommendationsSection = ({
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h3 className="font-semibold text-gray-900">
-                        {recommendation.name}
+                        {recommendation.recommender_name || recommendation.name}
                       </h3>
                       <p className="text-sm text-gray-600">
-                        {recommendation.position}
+                        {recommendation.relationship || recommendation.position}
                       </p>
                       <p className="text-xs text-gray-500">
                         {recommendation.relation}
@@ -173,7 +187,7 @@ const RecommendationsSection = ({
                     </div>
                   </div>
                   <blockquote className="text-gray-700 italic border-l-4 border-blue-200 pl-4">
-                    "{recommendation.text}"
+                    "{recommendation.message || recommendation.text}"
                   </blockquote>
 
                   {recommendation.customFields &&

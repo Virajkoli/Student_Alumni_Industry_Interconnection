@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Code } from "lucide-react";
+import { studentAPI } from "../../../utils/apiService";
 
-const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
+const SkillsSection = ({ skills = [], onSkillsUpdate, studentId }) => {
   const [showSkillModal, setShowSkillModal] = useState(false);
   const [skillInput, setSkillInput] = useState("");
 
@@ -23,30 +24,77 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
     { category: "Web", skills: ["Responsive Web Design", "Web Development"] },
   ];
 
-  const handleSkillSubmit = (e) => {
+  const handleSkillSubmit = async (e) => {
     e.preventDefault();
-    if (skillInput.trim() && !skills.includes(skillInput.trim())) {
-      onSkillsUpdate((prev) => [...prev, skillInput.trim()]);
-      setSkillInput("");
-      setShowSkillModal(false);
+    if (skillInput.trim()) {
+      try {
+        await studentAPI.addSkill(studentId, {
+          skill_name: skillInput.trim(),
+          proficiency: "Beginner",
+        });
+        setSkillInput("");
+        setShowSkillModal(false);
+        // Reload the page to reflect changes
+        window.location.reload();
+      } catch (error) {
+        console.error("Error adding skill:", error);
+      }
     }
   };
 
-  const handleAddSuggestedSkill = (skill) => {
-    if (!skills.includes(skill)) {
-      onSkillsUpdate((prev) => [...prev, skill]);
+  const handleAddSuggestedSkill = async (skill) => {
+    try {
+      await studentAPI.addSkill(studentId, {
+        skill_name: skill,
+        proficiency: "Beginner",
+      });
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error adding skill:", error);
     }
   };
 
-  const handleRemoveSkill = (skillToRemove) => {
-    onSkillsUpdate((prev) => prev.filter((skill) => skill !== skillToRemove));
+  const handleRemoveSkill = async (skillToRemove) => {
+    try {
+      const skillId =
+        typeof skillToRemove === "object"
+          ? skillToRemove.id
+          : skills.find((s) => (s.skill_name || s) === skillToRemove)?.id;
+
+      if (skillId) {
+        await studentAPI.deleteSkill(studentId, skillId);
+      }
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error removing skill:", error);
+    }
+  };
+
+  // Helper function to get skill name from skill object or string
+  const getSkillName = (skill) => {
+    return typeof skill === "object" ? skill.skill_name : skill;
+  };
+
+  // Helper function to get all skill names for comparison
+  const getSkillNames = () => {
+    return skills.map((skill) => getSkillName(skill));
   };
 
   return (
     <>
       <div className="bg-white rounded-lg mb-6 shadow-sm border border-gray-200">
-        <div className="flex items-center justify-between p-6" style={{ backgroundColor: "#DCE8F2", borderBottom: "1px solid #B5D3E7" }}>
-          <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>Skills</h2>
+        <div
+          className="flex items-center justify-between p-6"
+          style={{
+            backgroundColor: "#DCE8F2",
+            borderBottom: "1px solid #B5D3E7",
+          }}
+        >
+          <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+            Skills
+          </h2>
           <button
             onClick={() => setShowSkillModal(true)}
             className="p-2 rounded-full transition-colors"
@@ -81,10 +129,10 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
             <div className="flex flex-wrap gap-2">
               {skills.map((skill, index) => (
                 <span
-                  key={index}
+                  key={skill.id || index}
                   className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                 >
-                  {skill}
+                  {getSkillName(skill)}
                   <button
                     onClick={() => handleRemoveSkill(skill)}
                     className="text-blue-600 hover:text-blue-800 transition-colors"
@@ -110,7 +158,7 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {category.skills
-                        .filter((skill) => !skills.includes(skill))
+                        .filter((skill) => !getSkillNames().includes(skill))
                         .map((skill, skillIndex) => (
                           <button
                             key={skillIndex}
@@ -132,18 +180,28 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
       {/* Add Skill Modal */}
       {showSkillModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-md" style={{ backgroundColor: "#F7FAFC" }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-md"
+            style={{ backgroundColor: "#F7FAFC" }}
+          >
             <div className="p-6" style={{ borderBottom: "1px solid #DCE8F2" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Add Skill
                 </h2>
                 <button
                   onClick={() => setShowSkillModal(false)}
                   className="p-2 rounded-full transition-colors"
                   style={{ backgroundColor: "transparent" }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#DCE8F2")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "transparent")
+                  }
                 >
                   <X className="w-5 h-5" style={{ color: "#1F2D3D" }} />
                 </button>
@@ -152,7 +210,10 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
 
             <form onSubmit={handleSkillSubmit} className="p-6">
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Skill *
                 </label>
                 <input
@@ -160,13 +221,13 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 outline-none transition-colors"
-                  style={{ 
-                    backgroundColor: "#F7FAFC", 
+                  style={{
+                    backgroundColor: "#F7FAFC",
                     border: "1px solid #DCE8F2",
-                    color: "#1F2D3D"
+                    color: "#1F2D3D",
                   }}
-                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                  onBlur={(e) => e.target.style.borderColor = "#DCE8F2"}
+                  onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                  onBlur={(e) => (e.target.style.borderColor = "#DCE8F2")}
                   placeholder="e.g. JavaScript, React, Python"
                   required
                 />
@@ -185,7 +246,7 @@ const SkillsSection = ({ skills = [], onSkillsUpdate }) => {
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {category.skills
-                          .filter((skill) => !skills.includes(skill))
+                          .filter((skill) => !getSkillNames().includes(skill))
                           .map((skill, skillIndex) => (
                             <button
                               key={skillIndex}

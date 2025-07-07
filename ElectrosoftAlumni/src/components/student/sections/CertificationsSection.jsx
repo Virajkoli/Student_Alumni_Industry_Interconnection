@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Award, Upload, FileText } from "lucide-react";
+import { studentAPI } from "../../../utils/apiService";
 
 const CertificationsSection = ({
   certifications = [],
   onCertificationsUpdate,
+  studentId,
 }) => {
   const [showCertificationModal, setShowCertificationModal] = useState(false);
   const [editingCertification, setEditingCertification] = useState(null);
@@ -27,7 +29,11 @@ const CertificationsSection = ({
   };
 
   const handleSkillAdd = (skill) => {
-    if (skill && skill.trim() && !certificationData.skills.includes(skill.trim())) {
+    if (
+      skill &&
+      skill.trim() &&
+      !certificationData.skills.includes(skill.trim())
+    ) {
       setCertificationData((prev) => ({
         ...prev,
         skills: [...prev.skills, skill.trim()],
@@ -65,32 +71,45 @@ const CertificationsSection = ({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingCertification) {
-      // Update existing certification
-      const updatedCertifications = certifications.map((certification) =>
-        certification.id === editingCertification.id
-          ? { ...certificationData, id: editingCertification.id }
-          : certification
-      );
-      onCertificationsUpdate(updatedCertifications);
-    } else {
-      // Add new certification
-      const newCertification = {
-        id: Date.now(),
-        ...certificationData,
+    try {
+      const certificationPayload = {
+        certificate_name: certificationData.name,
+        issuing_organization: certificationData.issuer,
+        issue_date: certificationData.date ? certificationData.date : null,
+        credential_id: certificationData.credentialId,
+        credential_url: certificationData.url || null,
       };
-      onCertificationsUpdate((prev) => [...prev, newCertification]);
+
+      if (editingCertification) {
+        // Update existing certification
+        await studentAPI.updateCertification(
+          studentId,
+          editingCertification.id,
+          certificationPayload
+        );
+      } else {
+        // Add new certification
+        await studentAPI.addCertification(studentId, certificationPayload);
+      }
+      closeModal();
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving certification:", error);
     }
-    closeModal();
   };
 
   const handleEditCertification = (certification) => {
     setEditingCertification(certification);
     setCertificationData({
-      ...certification,
+      name: certification.certificate_name || "",
+      issuer: certification.issuing_organization || "",
+      date: certification.issue_date || "",
+      credentialId: certification.credential_id || "",
+      url: certification.credential_url || "",
       skills: certification.skills || [],
       customFields: certification.customFields || [],
       certificatePdf: certification.certificatePdf || null,
@@ -99,11 +118,14 @@ const CertificationsSection = ({
     setShowCertificationModal(true);
   };
 
-  const handleDeleteCertification = (certificationId) => {
-    const updatedCertifications = certifications.filter(
-      (certification) => certification.id !== certificationId
-    );
-    onCertificationsUpdate(updatedCertifications);
+  const handleDeleteCertification = async (certificationId) => {
+    try {
+      await studentAPI.deleteCertification(studentId, certificationId);
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting certification:", error);
+    }
   };
 
   const closeModal = () => {
@@ -149,9 +171,9 @@ const CertificationsSection = ({
 
   const handleDownloadPdf = (certification) => {
     if (certification.certificatePdf) {
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = certification.certificatePdf;
-      link.download = certification.certificatePdfName || 'certificate.pdf';
+      link.download = certification.certificatePdfName || "certificate.pdf";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -200,35 +222,61 @@ const CertificationsSection = ({
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">
-                      {certification.name}
+                      {certification.certificate_name || certification.name}
                     </h3>
-                    <p className="text-gray-600">{certification.issuer}</p>
-                    <p className="text-sm text-gray-500">
-                      Issued: {certification.date}
+                    <p className="text-gray-600">
+                      {certification.issuing_organization ||
+                        certification.issuer}
                     </p>
-                    {certification.credentialId && (
+                    <p className="text-sm text-gray-500">
+                      Issued:{" "}
+                      {certification.issue_date
+                        ? new Date(
+                            certification.issue_date
+                          ).toLocaleDateString()
+                        : certification.date}
+                    </p>
+                    {(certification.credential_id ||
+                      certification.credentialId) && (
                       <p className="text-sm text-gray-500">
-                        Credential ID: {certification.credentialId}
+                        Credential ID:{" "}
+                        {certification.credential_id ||
+                          certification.credentialId}
                       </p>
                     )}
-                    
-                    {certification.skills && certification.skills.length > 0 && (
-                      <div className="mt-2">
-                        <p className="text-sm font-medium text-gray-600 mb-1">
-                          Skills Covered:
-                        </p>
-                        <div className="flex flex-wrap gap-1">
-                          {certification.skills.map((skill, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+                    {(certification.credential_url || certification.url) && (
+                      <p className="text-sm text-gray-500">
+                        <a
+                          href={
+                            certification.credential_url || certification.url
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          View Credential
+                        </a>
+                      </p>
                     )}
+
+                    {certification.skills &&
+                      certification.skills.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm font-medium text-gray-600 mb-1">
+                            Skills Covered:
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {certification.skills.map((skill, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                     {certification.customFields &&
                       certification.customFields.length > 0 && (
@@ -267,7 +315,9 @@ const CertificationsSection = ({
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteCertification(certification.id)}
+                      onClick={() =>
+                        handleDeleteCertification(certification.id)
+                      }
                       className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Delete certification"
                     >
@@ -288,7 +338,9 @@ const CertificationsSection = ({
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {editingCertification ? "Edit Certification" : "Add Certification"}
+                  {editingCertification
+                    ? "Edit Certification"
+                    : "Add Certification"}
                 </h2>
                 <button
                   onClick={closeModal}
@@ -370,9 +422,14 @@ const CertificationsSection = ({
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <Upload className="w-8 h-8 mb-2 text-gray-400" />
                           <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">Click to upload</span> certificate PDF
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>{" "}
+                            certificate PDF
                           </p>
-                          <p className="text-xs text-gray-500">PDF files only (MAX. 10MB)</p>
+                          <p className="text-xs text-gray-500">
+                            PDF files only (MAX. 10MB)
+                          </p>
                         </div>
                         <input
                           type="file"
@@ -390,7 +447,9 @@ const CertificationsSection = ({
                           <p className="text-sm font-medium text-green-800">
                             {certificationData.certificatePdfName}
                           </p>
-                          <p className="text-xs text-green-600">PDF uploaded successfully</p>
+                          <p className="text-xs text-green-600">
+                            PDF uploaded successfully
+                          </p>
                         </div>
                       </div>
                       <button
@@ -572,7 +631,9 @@ const CertificationsSection = ({
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                 >
-                  {editingCertification ? "Update Certification" : "Add Certification"}
+                  {editingCertification
+                    ? "Update Certification"
+                    : "Add Certification"}
                 </button>
               </div>
             </form>

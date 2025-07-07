@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Folder, ExternalLink } from "lucide-react";
+import { studentAPI } from "../../../utils/apiService";
 
-const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
+const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [projectData, setProjectData] = useState({
@@ -66,43 +67,61 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingProject) {
-      // Update existing project
-      const updatedProjects = projects.map((project) =>
-        project.id === editingProject.id
-          ? { ...projectData, id: editingProject.id }
-          : project
-      );
-      onProjectsUpdate(updatedProjects);
-    } else {
-      // Add new project
-      const newProject = {
-        id: Date.now(),
-        ...projectData,
+    try {
+      const projectPayload = {
+        title: projectData.title,
+        description: projectData.description,
+        technologies: projectData.technologies.join(", "),
+        project_link: projectData.url,
+        start_date: projectData.date ? projectData.date : null,
+        end_date: null, // You might want to add an end date field
       };
-      onProjectsUpdate((prev) => [...prev, newProject]);
+
+      if (editingProject) {
+        // Update existing project
+        await studentAPI.updateProject(
+          studentId,
+          editingProject.id,
+          projectPayload
+        );
+      } else {
+        // Add new project
+        await studentAPI.addProject(studentId, projectPayload);
+      }
+      closeModal();
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving project:", error);
     }
-    closeModal();
   };
 
   const handleEditProject = (project) => {
     setEditingProject(project);
     setProjectData({
-      ...project,
-      technologies: project.technologies || [],
+      title: project.title || "",
+      description: project.description || "",
+      date: project.start_date || "",
+      url: project.project_link || "",
+      technologies: project.technologies
+        ? project.technologies.split(", ")
+        : [],
       customFields: project.customFields || [],
     });
     setShowProjectModal(true);
   };
 
-  const handleDeleteProject = (projectId) => {
-    const updatedProjects = projects.filter(
-      (project) => project.id !== projectId
-    );
-    onProjectsUpdate(updatedProjects);
+  const handleDeleteProject = async (projectId) => {
+    try {
+      await studentAPI.deleteProject(studentId, projectId);
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    }
   };
 
   const closeModal = () => {
@@ -156,9 +175,9 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
                       {project.title}
                     </h3>
                     <div className="flex gap-2">
-                      {project.url && (
+                      {(project.project_link || project.url) && (
                         <a
-                          href={project.url}
+                          href={project.project_link || project.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-1 text-gray-400 hover:text-blue-600"
@@ -184,15 +203,22 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate }) => {
                     </div>
                   </div>
                   <p className="text-gray-600 mb-2">{project.description}</p>
-                  <p className="text-sm text-gray-500">{project.date}</p>
+                  <p className="text-sm text-gray-500">
+                    {project.start_date
+                      ? new Date(project.start_date).toLocaleDateString()
+                      : project.date}
+                  </p>
 
-                  {project.technologies && project.technologies.length > 0 && (
+                  {project.technologies && (
                     <div className="mt-2">
                       <p className="text-sm font-medium text-gray-600 mb-1">
                         Technologies:
                       </p>
                       <div className="flex flex-wrap gap-1">
-                        {project.technologies.map((tech, index) => (
+                        {(typeof project.technologies === "string"
+                          ? project.technologies.split(", ")
+                          : project.technologies || []
+                        ).map((tech, index) => (
                           <span
                             key={index}
                             className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"

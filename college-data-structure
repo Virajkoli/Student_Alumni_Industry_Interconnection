@@ -1,0 +1,515 @@
+--College Table--------------------
+CREATE TABLE colleges (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    location VARCHAR(100),
+    established YEAR,
+    campusArea DECIMAL(10,2),
+    nirfRank INT,
+    accreditation VARCHAR(100),
+    totalStudents INT,
+    totalFaculty INT,
+    website VARCHAR(255),
+    logoUrl VARCHAR(255),
+    backgroundUrl VARCHAR(255),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Departments----------------------------
+CREATE TABLE college_departments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE
+);
+
+-- Academic Programs---------------------------------------
+CREATE TABLE college_rograms (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    type ENUM('UG', 'PG', 'PhD', 'Diploma', 'Certificate') NOT NULL,
+    durationYears INT,
+    eligibility TEXT,
+    fee DECIMAL(10,2),
+    totalSeats INT,
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE
+);
+
+-- Courses---------------------------------
+CREATE TABLE college_courses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    programId INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(20),
+    syllabusUrl VARCHAR(255),
+    FOREIGN KEY (programId) REFERENCES Programs(id) ON DELETE CASCADE
+);
+
+-- Faculty----------------------------------------------
+CREATE TABLE college_Faculty (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    departmentId INT,
+    name VARCHAR(100) NOT NULL,
+    designation VARCHAR(100),
+    specialization VARCHAR(100),
+    qualifications TEXT,
+    bio TEXT,
+    email VARCHAR(100),
+    profileUrl VARCHAR(255),
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE,
+    FOREIGN KEY (departmentId) REFERENCES Departments(id) ON DELETE SET NULL
+);
+
+-- Admissions--------------------------------------------
+CREATE TABLE college_admissions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    programId INT,
+    process TEXT,
+    requirements TEXT,
+    deadline DATE,
+    examRequired VARCHAR(100),
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE,
+    FOREIGN KEY (programId) REFERENCES Programs(id) ON DELETE SET NULL
+);
+
+-- Placements----------------------------------------------------
+CREATE TABLE college_placements (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    highestPackage DECIMAL(10,2),
+    averagePackage DECIMAL(10,2),
+    topRecruiters TEXT,
+    totalCompanies INT,
+    internshipOpportunities TEXT,
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE
+);
+
+-- Documents---------------------------------------
+CREATE TABLE college_documents (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    type ENUM('form', 'brochure', 'syllabus', 'other') NOT NULL,
+    description TEXT,
+    fileSize VARCHAR(20),
+    format VARCHAR(10),
+    url VARCHAR(255) NOT NULL,
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE
+);
+
+-- Reviews--------------------------------------------
+CREATE TABLE college_reviews (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    userId INT NOT NULL,
+    rating DECIMAL(2,1) NOT NULL,
+    academics DECIMAL(2,1),
+    placements DECIMAL(2,1),
+    infrastructure DECIMAL(2,1),
+    faculty DECIMAL(2,1),
+    campusLife DECIMAL(2,1),
+    value DECIMAL(2,1),
+    comment TEXT,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE
+    -- In production: FOREIGN KEY (userId) REFERENCES Users(id)
+);
+
+-- Notifications-------------------------------------------------
+CREATE TABLE college_notifications (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    isRead BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE
+);
+
+-- Alumni-------------------------------------------------------------
+CREATE TABLE college_alumni (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    userId INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    graduationYear YEAR,
+    program VARCHAR(100),
+    currentPosition VARCHAR(100),
+    company VARCHAR(100),
+    linkedinUrl VARCHAR(255),
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE
+    -- In production: FOREIGN KEY (userId) REFERENCES Users(id)
+);
+
+-- Events---------------------------------------------------------------
+CREATE TABLE college_events (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    collegeId INT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    description TEXT,
+    eventDate DATETIME,
+    location VARCHAR(255),
+    imageUrl VARCHAR(255),
+    FOREIGN KEY (collegeId) REFERENCES Colleges(id) ON DELETE CASCADE
+);
+
+
+
+
+
+Courses--------------
+-- Institution Table------------------
+CREATE TABLE courses_institutions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    type ENUM('university', 'college', 'institute') NOT NULL,
+    location VARCHAR(100),
+    accreditation VARCHAR(100),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Programs Table
+CREATE TABLE courses_programs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    institutionId INT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    level ENUM('UG', 'PG', 'Doctoral', 'Diploma') NOT NULL,
+    durationYears INT NOT NULL,
+    eligibility TEXT NOT NULL,
+    totalSeats INT,
+    FOREIGN KEY (institutionId) REFERENCES Institutions(id) ON DELETE CASCADE
+);
+
+-- Branches Table
+CREATE TABLE courses_branches (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    programId INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    seats INT,
+    description TEXT,
+    FOREIGN KEY (programId) REFERENCES Programs(id) ON DELETE CASCADE
+);
+
+-- Courses Table
+CREATE TABLE courses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    programId INT NOT NULL,
+    code VARCHAR(20) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    syllabus TEXT,
+    credits INT,
+    semester VARCHAR(20),
+    FOREIGN KEY (programId) REFERENCES Programs(id) ON DELETE CASCADE
+);
+
+-- Fee Structure Table
+CREATE TABLE coureses_feeStructures (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    programId INT NOT NULL,
+    tuitionFee DECIMAL(10,2) NOT NULL,
+    hostelFee DECIMAL(10,2),
+    otherCharges DECIMAL(10,2),
+    scholarshipInfo TEXT,
+    FOREIGN KEY (programId) REFERENCES Programs(id) ON DELETE CASCADE
+);
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hostel-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Hostel Facility---
+CREATE TABLE hostel_facilities (
+  id SERIAL PRIMARY KEY,
+  college_id INTEGER REFERENCES colleges(id),
+  facility TEXT NOT NULL
+);
+
+
+Campus Aminites----
+CREATE TABLE campus_amenities (
+  id SERIAL PRIMARY KEY,
+  college_id INTEGER REFERENCES colleges(id),
+  amenity TEXT NOT NULL
+);
+
+room types--
+CREATE TABLE room_types (
+  id SERIAL PRIMARY KEY,
+  college_id INTEGER REFERENCES colleges(id),
+  type TEXT NOT NULL,
+  capacity INTEGER,
+  fee NUMERIC(10, 2) -- For ₹30,000 etc.
+);
+
+Messs information--
+CREATE TABLE mess_info (
+  id SERIAL PRIMARY KEY,
+  college_id INTEGER REFERENCES colleges(id),
+  info TEXT
+);
+
+
+Select query for fetch informatin of Hostel--------------------------------
+const getHostelDataByCollegeId = async (collegeId) => {
+  const hostelFacilities = await db.query(
+    "SELECT facility FROM hostel_facilities WHERE college_id = $1",
+    [collegeId]
+  );
+
+  const campusAmenities = await db.query(
+    "SELECT amenity FROM campus_amenities WHERE college_id = $1",
+    [collegeId]
+  );
+
+  const roomTypes = await db.query(
+    "SELECT type, capacity, fee FROM room_types WHERE college_id = $1",
+    [collegeId]
+  );
+
+  const mess = await db.query(
+    "SELECT info FROM mess_info WHERE college_id = $1 LIMIT 1",
+    [collegeId]
+  );
+
+  return {
+    hostelFacilities: hostelFacilities.rows.map((row) => row.facility),
+    campusAmenities: campusAmenities.rows.map((row) => row.amenity),
+    roomTypes: roomTypes.rows,
+    messInfo: mess.rows.length ? mess.rows[0].info : "",
+  };
+};
+
+---
+insert query for Save or dit Button-----------------------
+const saveHostelData = async (collegeId, data) => {
+  await db.query("BEGIN");
+
+  await db.query("DELETE FROM hostel_facilities WHERE college_id = $1", [collegeId]);
+  await Promise.all(
+    data.hostelFacilities.map((f) =>
+      db.query("INSERT INTO hostel_facilities (college_id, facility) VALUES ($1, $2)", [collegeId, f])
+    )
+  );
+
+  await db.query("DELETE FROM campus_amenities WHERE college_id = $1", [collegeId]);
+  await Promise.all(
+    data.campusAmenities.map((a) =>
+      db.query("INSERT INTO campus_amenities (college_id, amenity) VALUES ($1, $2)", [collegeId, a])
+    )
+  );
+
+  await db.query("DELETE FROM room_types WHERE college_id = $1", [collegeId]);
+  await Promise.all(
+    data.roomTypes.map((room) =>
+      db.query(
+        "INSERT INTO room_types (college_id, type, capacity, fee) VALUES ($1, $2, $3, $4)",
+        [collegeId, room.type, room.capacity, room.fee]
+      )
+    )
+  );
+
+  await db.query("DELETE FROM mess_info WHERE college_id = $1", [collegeId]);
+  await db.query("INSERT INTO mess_info (college_id, info) VALUES ($1, $2)", [
+    collegeId,
+    data.messInfo || "",
+  ]);
+
+  await db.query("COMMIT");
+};
+
+
+Faculty---------------------------------------------------------------------------------------------------------------------------------------------------------------
+Faculty Data
+
+CREATE TABLE faculty_data (
+  id SERIAL PRIMARY KEY,
+  data JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create trigger to update timestamp on modification
+
+CREATE OR REPLACE FUNCTION update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+
+
+CREATE TRIGGER update_faculty_data_timestamp
+BEFORE UPDATE ON faculty_data
+FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();
+
+
+-- Faculty statistics
+CREATE TABLE faculty_statistics (
+  id SERIAL PRIMARY KEY,
+  total_faculty VARCHAR(50),
+  phd_faculty VARCHAR(50),
+  faculty_student_ratio VARCHAR(50),
+  research_grants VARCHAR(50),
+  publications VARCHAR(50),
+  patents VARCHAR(50),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Faculty strengths
+CREATE TABLE faculty_strengths (
+  id SERIAL PRIMARY KEY,
+  description TEXT NOT NULL,
+  display_order INTEGER,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Departments
+CREATE TABLE departments (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Faculty achievements
+CREATE TABLE faculty_achievements (
+  id SERIAL PRIMARY KEY,
+  description TEXT NOT NULL,
+  achievement_date DATE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Custom fields
+CREATE TABLE custom_fields (
+  id SERIAL PRIMARY KEY,
+  field_name VARCHAR(100) NOT NULL,
+  field_value TEXT,
+  field_type VARCHAR(50),
+  display_order INTEGER,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Faculty members (if you need individual faculty records)
+CREATE TABLE faculty_members (
+  id SERIAL PRIMARY KEY,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE,
+  phone VARCHAR(20),
+  department_id INTEGER REFERENCES departments(id),
+  position VARCHAR(100),
+  qualifications TEXT,
+  research_interests TEXT,
+  is_phd_holder BOOLEAN DEFAULT FALSE,
+  join_date DATE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Research publications
+CREATE TABLE research_publications (
+  id SERIAL PRIMARY KEY,
+  faculty_id INTEGER REFERENCES faculty_members(id),
+  title TEXT NOT NULL,
+  journal_name VARCHAR(200),
+  publication_date DATE,
+  doi VARCHAR(100),
+  citation_count INTEGER,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Patents
+CREATE TABLE patents (
+  id SERIAL PRIMARY KEY,
+  faculty_id INTEGER REFERENCES faculty_members(id),
+  title TEXT NOT NULL,
+  patent_number VARCHAR(100),
+  filing_date DATE,
+  grant_date DATE,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-------------
+Events
+
+-- Main events table (stores all events information as JSON)
+CREATE TABLE events_data (
+  id SERIAL PRIMARY KEY,
+  data JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create trigger to update timestamp on modification
+CREATE OR REPLACE FUNCTION update_events_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_events_data_timestamp
+BEFORE UPDATE ON events_data
+FOR EACH ROW
+EXECUTE FUNCTION update_events_timestamp();
+
+-- Annual events table
+CREATE TABLE annual_events (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  month VARCHAR(20) NOT NULL,
+  description TEXT,
+  image_url VARCHAR(255),
+  registration_link VARCHAR(255),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tech/Cultural fests
+CREATE TABLE tech_cultural_fests (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  start_date DATE,
+  end_date DATE,
+  registration_link VARCHAR(255),
+  is_tech_fest BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Upcoming events
+CREATE TABLE upcoming_events (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(100) NOT NULL,
+  description TEXT,
+  event_date TIMESTAMP WITH TIME ZONE,
+  location VARCHAR(100),
+  registration_required BOOLEAN DEFAULT FALSE,
+  registration_link VARCHAR(255),
+  image_url VARCHAR(255),
+  event_type VARCHAR(50), -- seminar, conference, workshop, etc.
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Event calendar
+CREATE TABLE event_calendar (
+  id SERIAL PRIMARY KEY,
+  calendar_url VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+

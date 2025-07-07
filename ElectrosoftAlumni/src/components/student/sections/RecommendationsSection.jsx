@@ -7,6 +7,11 @@ const RecommendationsSection = ({
   onRecommendationsUpdate,
   studentId,
 }) => {
+  console.log(
+    "🔍 RecommendationsSection - received recommendations:",
+    recommendations
+  );
+
   const [showRecommendationModal, setShowRecommendationModal] = useState(false);
   const [editingRecommendation, setEditingRecommendation] = useState(null);
   const [recommendationData, setRecommendationData] = useState({
@@ -57,8 +62,9 @@ const RecommendationsSection = ({
     try {
       const recommendationPayload = {
         recommender_name: recommendationData.name,
-        relationship: recommendationData.position,
-        message: recommendationData.message,
+        relationship:
+          recommendationData.position || recommendationData.relation,
+        message: recommendationData.text || recommendationData.message,
       };
 
       if (editingRecommendation) {
@@ -87,6 +93,9 @@ const RecommendationsSection = ({
       position: recommendation.relationship || "",
       message: recommendation.message || "",
       name: recommendation.recommender_name || "",
+      text: recommendation.message || "", // Map message to text field
+      relation: recommendation.relationship || "",
+      date: recommendation.date || "",
       customFields: recommendation.customFields || [],
     });
     setShowRecommendationModal(true);
@@ -147,66 +156,76 @@ const RecommendationsSection = ({
             </div>
           ) : (
             <div className="space-y-6">
-              {recommendations.map((recommendation, index) => (
-                <div
-                  key={recommendation.id || index}
-                  className="border border-gray-200 rounded-lg p-4"
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">
-                        {recommendation.recommender_name || recommendation.name}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {recommendation.relationship || recommendation.position}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {recommendation.relation}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-xs text-gray-500">
-                        {recommendation.date}
-                      </span>
-                      <button
-                        onClick={() => handleEditRecommendation(recommendation)}
-                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                        title="Edit recommendation"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleDeleteRecommendation(recommendation.id)
-                        }
-                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Delete recommendation"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <blockquote className="text-gray-700 italic border-l-4 border-blue-200 pl-4">
-                    "{recommendation.message || recommendation.text}"
-                  </blockquote>
-
-                  {recommendation.customFields &&
-                    recommendation.customFields.length > 0 && (
-                      <div className="mt-3 space-y-1">
-                        {recommendation.customFields.map((field, index) => (
-                          <div key={index} className="text-sm">
-                            <span className="font-medium text-gray-600">
-                              {field.label}:
-                            </span>
-                            <span className="text-gray-700 ml-1">
-                              {field.value}
-                            </span>
-                          </div>
-                        ))}
+              {recommendations.map((recommendation, index) => {
+                console.log(
+                  `🎯 Rendering recommendation ${index}:`,
+                  recommendation
+                );
+                return (
+                  <div
+                    key={recommendation.id || index}
+                    className="border border-gray-200 rounded-lg p-4"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {recommendation.recommender_name ||
+                            recommendation.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {recommendation.relationship ||
+                            recommendation.position}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {recommendation.relation}
+                        </p>
                       </div>
-                    )}
-                </div>
-              ))}
+                      <div className="flex gap-2">
+                        <span className="text-xs text-gray-500">
+                          {recommendation.date}
+                        </span>
+                        <button
+                          onClick={() =>
+                            handleEditRecommendation(recommendation)
+                          }
+                          className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          title="Edit recommendation"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleDeleteRecommendation(recommendation.id)
+                          }
+                          className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete recommendation"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <blockquote className="text-gray-700 italic border-l-4 border-blue-200 pl-4">
+                      "{recommendation.message || recommendation.text}"
+                    </blockquote>
+
+                    {recommendation.customFields &&
+                      recommendation.customFields.length > 0 && (
+                        <div className="mt-3 space-y-1">
+                          {recommendation.customFields.map((field, index) => (
+                            <div key={index} className="text-sm">
+                              <span className="font-medium text-gray-600">
+                                {field.label}:
+                              </span>
+                              <span className="text-gray-700 ml-1">
+                                {field.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

@@ -194,6 +194,7 @@ import "./Home.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../utils/apiService";
+import PostCreator from "../components/student/PostCreator";
 
 import {
   faIndustry,
@@ -230,6 +231,8 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [userProfile, setUserProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -245,6 +248,7 @@ const Home = () => {
 
     if (isAuthenticated && user) {
       fetchUserProfile();
+      fetchPosts();
     } else {
       setIsLoading(false);
     }
@@ -309,6 +313,43 @@ const Home = () => {
     }
   };
 
+  const fetchPosts = async () => {
+    try {
+      setPostsLoading(true);
+      console.log("🔄 fetchPosts - Starting...");
+
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("http://localhost:5000/api/posts", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch posts");
+      }
+
+      const data = await response.json();
+      console.log("✅ Posts fetched successfully:", data);
+
+      if (data.success) {
+        setPosts(data.data || []);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching posts:", error);
+      setPosts([]);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  const handlePostCreated = (newPost) => {
+    console.log("🎉 New post created:", newPost);
+    // Refresh posts after creating a new one
+    fetchPosts();
+  };
+
   const getUserDisplayName = () => {
     console.log("🏷️ getUserDisplayName called:", {
       userProfile,
@@ -319,42 +360,29 @@ const Home = () => {
       isAuthenticated,
     });
 
-    // First priority: auth context user fullName (immediately available after login/registration)
-    if (user && user.fullName) {
-      console.log("✅ Using auth context fullName:", user.fullName);
-      return user.fullName;
+    if (!userProfile || !userProfile.fullName) {
+      // Try to get name from auth context user if userProfile is not set yet
+      if (user && user.fullName) {
+        console.log(
+          "🔄 Using fallback fullName from auth context:",
+          user.fullName
+        );
+        return user.fullName;
+      }
+      console.log("❌ No fullName available, returning Guest User");
+      return "Guest User";
     }
-
-    // Second priority: userProfile fullName (loaded after API call)
-    if (userProfile && userProfile.fullName) {
-      console.log("✅ Using userProfile fullName:", userProfile.fullName);
-      return userProfile.fullName;
-    }
-
-    // Fallback: construct name from first_name and last_name
-    if (user && user.first_name && user.last_name) {
-      const constructedName = `${user.first_name} ${user.last_name}`;
-      console.log("🔄 Constructed name from auth context:", constructedName);
-      return constructedName;
-    }
-
-    console.log("❌ No name available, returning Guest User");
-    return "Guest User";
+    console.log("✅ Using userProfile fullName:", userProfile.fullName);
+    return userProfile.fullName;
   };
 
   const getUserBio = () => {
-    // If no authentication, return default message
-    if (!isAuthenticated) return "Welcome to the platform!";
+    if (!userProfile || !userProfile.role) return "Welcome to the platform!";
 
-    // Get role from auth context user first, then from userProfile
-    const userRole = user?.role || userProfile?.role;
-
-    if (!userRole) return "Welcome to the platform!";
-
-    if (userRole === "student") {
+    if (userProfile.role === "student") {
       // Create a bio from skills and latest education/experience
       const skills =
-        userProfile?.skills
+        userProfile.skills
           ?.slice(0, 3)
           .map((skill) =>
             typeof skill === "object" ? skill.skill_name : skill
@@ -363,26 +391,19 @@ const Home = () => {
 
       if (skills) {
         return `${
-          userRole.charAt(0).toUpperCase() + userRole.slice(1)
+          userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1)
         } | ${skills}`;
-      }
-
-      // If no skills, use interested field from auth context
-      if (user?.interested_field) {
-        return `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} | ${
-          user.interested_field
-        }`;
       }
     }
 
     return (
-      userProfile?.bio ||
-      `${userRole.charAt(0).toUpperCase() + userRole.slice(1)}`
+      userProfile.bio ||
+      `${userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1)}`
     );
   };
 
   const getUserLocation = () => {
-    return userProfile?.location || user?.location || "Location not set";
+    return userProfile?.location || "Location not set";
   };
 
   const getUserAvatar = () => {
@@ -397,11 +418,8 @@ const Home = () => {
   };
 
   const getUserInitials = () => {
-    if (isLoading && !user) return "...";
-
+    if (isLoading || !userProfile) return "GU";
     const name = getUserDisplayName();
-    if (name === "Guest User") return "GU";
-
     return name
       .split(" ")
       .map((n) => n[0])
@@ -413,53 +431,6 @@ const Home = () => {
   const toggleSidebar = () => {
     setShowSidebar(!showSidebar);
   };
-
-  const posts = [
-    {
-      id: 1,
-      user: "SGR Knowledge Foundation",
-      followers: "287 followers",
-      time: "42m • 😊",
-      content: "An Evening of Grace & Inner Awakening",
-      details:
-        "We are honoured to host Jaya Kishori Ji for the G H Raisoni Memorial Talk …more",
-      event: {
-        title: "G H RAISONI MEMORIAL TALK",
-        description:
-          'Featuring the inspiring presence of Jaya Kishori Ji in "You Are Enough: Confidence. Character & the Quiet Revolution Within"',
-      },
-    },
-    {
-      id: 2,
-      user: "riya",
-      content: "Built a new portfolio in React",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFKMVsB3JItIUX-GQrUha5aq42mLal9vr5ag&s",
-      likes: 24,
-      comments: 5,
-      time: "2h ago",
-    },
-    {
-      id: 3,
-      user: "Ganesh Patil",
-      followers: "1st",
-      time: "1w • 🔍",
-      content: "Hit 500+ Subscribers on YouTube 😊",
-      details: "Grateful to everyone who has been watching... more",
-    },
-    {
-      id: 4,
-      user: isAuthenticated ? getUserDisplayName() : "Guest User",
-      followers: "1st",
-      time: "Just now",
-      content:
-        isAuthenticated && userProfile
-          ? getUserBio()
-          : "Welcome to the platform!",
-      details: "Thanks for connecting with me!",
-      isCurrentUser: true,
-    },
-  ];
 
   const newsItems = [
     { title: "ReactJS", time: "3h ago • 127,384 readers" },
@@ -585,48 +556,27 @@ const Home = () => {
 
         {/* Main Feed */}
         <main className="feed">
-          <div className="create-post">
-            <div className="post-input">
-              <div className="profile-pic-small">
-                {isLoading ? "..." : getUserInitials()}
-              </div>
-              <input
-                type="text"
-                placeholder={
-                  isAuthenticated
-                    ? `What's on your mind, ${
-                        getUserDisplayName().split(" ")[0]
-                      }?`
-                    : "Start a post"
-                }
-              />
-            </div>
-            <div className="post-options">
-              <button>
-                <FontAwesomeIcon icon={faImage} /> Photo
-              </button>
-              <button>
-                <FontAwesomeIcon icon={faVideo} /> Video
-              </button>
-              <button>
-                <FontAwesomeIcon icon={faNewspaper} /> Article
-              </button>
-            </div>
-          </div>
+          <PostCreator onPostCreated={handlePostCreated} />
 
           {posts.map((post) => (
-            <div className="post-card" key={post.id}>
+            <div className="post-card" key={post.post_id}>
               <div className="post-header">
+                {" "}
                 <div className="poster-info">
                   <div className="profile-pic-small">
-                    {post.isCurrentUser && !isLoading
-                      ? getUserInitials()
-                      : post.user.charAt(0)}
+                    {post.user && post.user.full_name
+                      ? post.user.full_name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                      : "U"}
                   </div>
                   <div>
-                    <h4>{post.user}</h4>
+                    <h4>{post.user ? post.user.full_name : "Unknown User"}</h4>
                     <p className="post-meta">
-                      {post.followers} • {post.time}
+                      {post.userType} •{" "}
+                      {new Date(post.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>

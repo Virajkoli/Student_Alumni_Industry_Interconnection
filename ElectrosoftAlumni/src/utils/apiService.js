@@ -1,5 +1,5 @@
 // API configuration
-const API_BASE_URL = "https://scaips-backend.onrender.com";
+const API_BASE_URL = "http://localhost:5000";
 // API service class
 class ApiService {
   constructor() {
@@ -270,6 +270,104 @@ class ApiService {
 
   async deleteStudentRecommendation(recommendationId) {
     return this.request(`/api/students/recommendations/${recommendationId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Posts API methods
+  async createPost(postData, mediaFiles = []) {
+    const formData = new FormData();
+
+    // Add text content
+    if (postData.content) {
+      formData.append("content", postData.content);
+    }
+
+    // Add poll options if present
+    if (postData.pollOptions) {
+      formData.append("pollOptions", JSON.stringify(postData.pollOptions));
+    }
+
+    // Add media files
+    if (mediaFiles && mediaFiles.length > 0) {
+      mediaFiles.forEach((file, index) => {
+        formData.append("media", file);
+      });
+    }
+
+    const token = localStorage.getItem("authToken");
+    const headers = {
+      ...(token && { Authorization: `Bearer ${token}` }),
+      // Don't set Content-Type for FormData, let browser set it with boundary
+    };
+
+    const url = `${this.baseURL}/api/posts`;
+    try {
+      console.log(`🌐 API Request: POST ${url}`);
+      const response = await fetch(url, {
+        method: "POST",
+        headers,
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error(`❌ API Error: ${response.status}`, data);
+        throw new Error(
+          data.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      console.log(`✅ API Success: POST ${url}`, data);
+      return data;
+    } catch (error) {
+      console.error("❌ Create post request failed:", error);
+      throw error;
+    }
+  }
+
+  async getPosts(params = {}) {
+    const queryParams = new URLSearchParams();
+
+    if (params.userId) queryParams.append("userId", params.userId);
+    if (params.userType) queryParams.append("userType", params.userType);
+    if (params.limit) queryParams.append("limit", params.limit);
+    if (params.offset) queryParams.append("offset", params.offset);
+
+    const queryString = queryParams.toString();
+    const endpoint = `/api/posts${queryString ? `?${queryString}` : ""}`;
+
+    return this.request(endpoint, {
+      method: "GET",
+    });
+  }
+
+  async getMyPosts(params = {}) {
+    const queryParams = new URLSearchParams();
+
+    if (params.limit) queryParams.append("limit", params.limit);
+    if (params.offset) queryParams.append("offset", params.offset);
+
+    const queryString = queryParams.toString();
+    const endpoint = `/api/posts/my-posts${
+      queryString ? `?${queryString}` : ""
+    }`;
+
+    return this.request(endpoint, {
+      method: "GET",
+    });
+  }
+
+  async reactToPost(postId, reactionType) {
+    return this.request(`/api/posts/${postId}/react`, {
+      method: "POST",
+      body: JSON.stringify({ reactionType }),
+    });
+  }
+
+  async deletePost(postId) {
+    return this.request(`/api/posts/${postId}`, {
       method: "DELETE",
     });
   }

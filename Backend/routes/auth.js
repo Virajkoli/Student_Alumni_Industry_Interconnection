@@ -110,7 +110,6 @@ const register = async (req, res) => {
       email: student.email,
       first_name: student.first_name,
       last_name: student.last_name,
-      fullName: `${student.first_name} ${student.last_name}`,
       contact_no: student.contact_no,
       college_name: student.college_name,
       interested_field: student.interested_field,

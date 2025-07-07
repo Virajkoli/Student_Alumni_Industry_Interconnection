@@ -53,7 +53,6 @@
 //     }
 
 //   ];
-  
 
 //   const newsItems = [
 //     { title: 'ReactJS', time: '3h ago • 127,384 readers' },
@@ -127,16 +126,16 @@
 //       <p>{post.content}</p>
 //       <p className="post-details">{post.details}</p>
 //       {post.image && (
-//         <img 
-//           src={post.image} 
-//           alt="Post content" 
-//           style={{ 
-//             width: '100%', 
-//             maxHeight: '400px', 
-//             objectFit: 'cover', 
+//         <img
+//           src={post.image}
+//           alt="Post content"
+//           style={{
+//             width: '100%',
+//             maxHeight: '400px',
+//             objectFit: 'cover',
 //             borderRadius: '8px',
 //             marginTop: '12px'
-//           }} 
+//           }}
 //         />
 //       )}
 //       {post.event && (
@@ -189,36 +188,227 @@
 
 // Inside your <div className="main-content">
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './Home.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import "./Home.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAuth } from "../contexts/AuthContext";
+import apiService from "../utils/apiService";
 
-import { faIndustry, faFolderOpen, faUserGraduate, faRocket, faSchool, faUserGear, faUser } from '@fortawesome/free-solid-svg-icons';
+import {
+  faIndustry,
+  faFolderOpen,
+  faUserGraduate,
+  faRocket,
+  faSchool,
+  faUserGear,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
-import { 
-  faVideo, 
-  faImage, 
-  faNewspaper, 
-  faEllipsisH, 
+import {
+  faVideo,
+  faImage,
+  faNewspaper,
+  faEllipsisH,
   faBars,
   faHome,
   faUserFriends,
   faBriefcase,
   faBell,
-  faSearch
-} from '@fortawesome/free-solid-svg-icons';
-import { 
-  faThumbsUp, 
-  faComment, 
-  faRetweet, 
+  faSearch,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  faThumbsUp,
+  faComment,
+  faRetweet,
   faPaperPlane,
   // ... your other existing imports
-} from '@fortawesome/free-solid-svg-icons';
+} from "@fortawesome/free-solid-svg-icons";
 
 const Home = () => {
   const [showSidebar, setShowSidebar] = useState(true);
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState("home");
+  const [userProfile, setUserProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    console.log("🔍 Home.jsx useEffect - Auth status:", {
+      isAuthenticated,
+      user,
+      userType: typeof user,
+      userKeys: user ? Object.keys(user) : null,
+      userFullName: user ? user.fullName : null,
+      userFirstName: user ? user.first_name : null,
+      userLastName: user ? user.last_name : null,
+    });
+
+    if (isAuthenticated && user) {
+      fetchUserProfile();
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, user]);
+
+  const fetchUserProfile = async () => {
+    try {
+      setIsLoading(true);
+
+      console.log("🔄 fetchUserProfile - Starting...", {
+        userRole: user.role,
+        userId: user.id,
+        userFullName: user.fullName,
+      });
+
+      // Fetch profile data based on user role
+      let response;
+      if (user.role === "student") {
+        response = await apiService.getStudentProfile();
+        console.log("📊 Student profile response:", response);
+      } else {
+        // For other roles, we'll use the basic user data from auth context
+        console.log("👤 Using basic user data for non-student role");
+        setUserProfile({
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (response.success) {
+        const { data } = response;
+        console.log("✅ Setting user profile from API:", data);
+        setUserProfile({
+          fullName: data.basicInfo.fullName,
+          email: data.basicInfo.email,
+          role: data.basicInfo.role,
+          avatar: data.basicInfo.avatar,
+          bio: data.basicInfo.bio,
+          location: data.basicInfo.location,
+          // Additional student-specific data
+          experiences: data.experiences || [],
+          education: data.education || [],
+          skills: data.skills || [],
+        });
+      }
+    } catch (error) {
+      console.error("❌ Error fetching user profile:", error);
+      // Fallback to auth context user data
+      console.log("🔄 Falling back to auth context user data:", user);
+      setUserProfile({
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getUserDisplayName = () => {
+    console.log("🏷️ getUserDisplayName called:", {
+      userProfile,
+      hasUserProfile: !!userProfile,
+      userProfileFullName: userProfile?.fullName,
+      authUser: user,
+      authUserFullName: user?.fullName,
+      isAuthenticated,
+    });
+
+    // First priority: auth context user fullName (immediately available after login/registration)
+    if (user && user.fullName) {
+      console.log("✅ Using auth context fullName:", user.fullName);
+      return user.fullName;
+    }
+
+    // Second priority: userProfile fullName (loaded after API call)
+    if (userProfile && userProfile.fullName) {
+      console.log("✅ Using userProfile fullName:", userProfile.fullName);
+      return userProfile.fullName;
+    }
+
+    // Fallback: construct name from first_name and last_name
+    if (user && user.first_name && user.last_name) {
+      const constructedName = `${user.first_name} ${user.last_name}`;
+      console.log("🔄 Constructed name from auth context:", constructedName);
+      return constructedName;
+    }
+
+    console.log("❌ No name available, returning Guest User");
+    return "Guest User";
+  };
+
+  const getUserBio = () => {
+    // If no authentication, return default message
+    if (!isAuthenticated) return "Welcome to the platform!";
+
+    // Get role from auth context user first, then from userProfile
+    const userRole = user?.role || userProfile?.role;
+
+    if (!userRole) return "Welcome to the platform!";
+
+    if (userRole === "student") {
+      // Create a bio from skills and latest education/experience
+      const skills =
+        userProfile?.skills
+          ?.slice(0, 3)
+          .map((skill) =>
+            typeof skill === "object" ? skill.skill_name : skill
+          )
+          .join(" | ") || "";
+
+      if (skills) {
+        return `${
+          userRole.charAt(0).toUpperCase() + userRole.slice(1)
+        } | ${skills}`;
+      }
+
+      // If no skills, use interested field from auth context
+      if (user?.interested_field) {
+        return `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} | ${
+          user.interested_field
+        }`;
+      }
+    }
+
+    return (
+      userProfile?.bio ||
+      `${userRole.charAt(0).toUpperCase() + userRole.slice(1)}`
+    );
+  };
+
+  const getUserLocation = () => {
+    return userProfile?.location || user?.location || "Location not set";
+  };
+
+  const getUserAvatar = () => {
+    if (userProfile?.avatar) {
+      return userProfile.avatar;
+    }
+    // Fallback to a generated avatar based on name
+    const name = getUserDisplayName();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&background=0d8abc&color=fff&size=100`;
+  };
+
+  const getUserInitials = () => {
+    if (isLoading && !user) return "...";
+
+    const name = getUserDisplayName();
+    if (name === "Guest User") return "GU";
+
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  };
 
   const toggleSidebar = () => {
     setShowSidebar(!showSidebar);
@@ -227,61 +417,67 @@ const Home = () => {
   const posts = [
     {
       id: 1,
-      user: 'SGR Knowledge Foundation',
-      followers: '287 followers',
-      time: '42m • 😊',
-      content: 'An Evening of Grace & Inner Awakening',
-      details: 'We are honoured to host Jaya Kishori Ji for the G H Raisoni Memorial Talk …more',
+      user: "SGR Knowledge Foundation",
+      followers: "287 followers",
+      time: "42m • 😊",
+      content: "An Evening of Grace & Inner Awakening",
+      details:
+        "We are honoured to host Jaya Kishori Ji for the G H Raisoni Memorial Talk …more",
       event: {
-        title: 'G H RAISONI MEMORIAL TALK',
-        description: 'Featuring the inspiring presence of Jaya Kishori Ji in "You Are Enough: Confidence. Character & the Quiet Revolution Within"'
-      }
+        title: "G H RAISONI MEMORIAL TALK",
+        description:
+          'Featuring the inspiring presence of Jaya Kishori Ji in "You Are Enough: Confidence. Character & the Quiet Revolution Within"',
+      },
     },
     {
       id: 2,
-      user: 'riya',
-      content: 'Built a new portfolio in React',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFKMVsB3JItIUX-GQrUha5aq42mLal9vr5ag&s',
+      user: "riya",
+      content: "Built a new portfolio in React",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFKMVsB3JItIUX-GQrUha5aq42mLal9vr5ag&s",
       likes: 24,
       comments: 5,
-      time: '2h ago'
+      time: "2h ago",
     },
     {
       id: 3,
-      user: 'Ganesh Patil',
-      followers: '1st',
-      time: '1w • 🔍',
-      content: 'Hit 500+ Subscribers on YouTube 😊',
-      details: 'Grateful to everyone who has been watching... more'
+      user: "Ganesh Patil",
+      followers: "1st",
+      time: "1w • 🔍",
+      content: "Hit 500+ Subscribers on YouTube 😊",
+      details: "Grateful to everyone who has been watching... more",
     },
     {
       id: 4,
-      user: 'Rashmi Wankhede',
-      followers: '1st',
-      time: 'Just now',
-      content: 'Fresher | Java full stack developer | SQL',
-      details: 'Congratulations Ganesh 😊',
-      isComment: true
-    }
+      user: isAuthenticated ? getUserDisplayName() : "Guest User",
+      followers: "1st",
+      time: "Just now",
+      content:
+        isAuthenticated && userProfile
+          ? getUserBio()
+          : "Welcome to the platform!",
+      details: "Thanks for connecting with me!",
+      isCurrentUser: true,
+    },
   ];
 
   const newsItems = [
-    { title: 'ReactJS', time: '3h ago • 127,384 readers' },
-    { title: 'Private equity eyes tech deals', time: '16h ago • 696 readers' }
+    { title: "ReactJS", time: "3h ago • 127,384 readers" },
+    { title: "Private equity eyes tech deals", time: "16h ago • 696 readers" },
   ];
 
   const puzzles = [
-    { name: 'Java', played: '12 connections played' },
-    { name: 'Tango #255', played: '6 connections played' }
+    { name: "Java", played: "12 connections played" },
+    { name: "Tango #255", played: "6 connections played" },
   ];
 
   return (
     <div className="linkedin-container">
       {/* Mobile Search Header */}
       <div className="mobile-search-header">
-        <input 
-          type="text" 
-          className="mobile-search-input" 
+        <input
+          type="text"
+          className="mobile-search-input"
           placeholder="Search"
         />
       </div>
@@ -296,29 +492,92 @@ const Home = () => {
         {showSidebar && (
           <nav>
             <aside className="left-nav-sidebar">
-              <div className="profile-banner-linkedin"></div>
-              <div className="profile-img-circle">
-                <img src="https://i.pravatar.cc/100?img=12" alt="Rashmi" />
-              </div>
-              <div className="profile-details-text">
-                <h2>Riya</h2>
-                <p>Fresher | Java full stack developer | SQL</p>
-                <p className="location">Mumbai, Maharashtra</p>
-                <button className="experience-dotted-btn">+ Experience</button>
-              </div>
-              
               <div className="quick-links">
-                <ul>
-                    <li><Link to="/college"><FontAwesomeIcon icon={faSchool} /> College</Link></li>
-  <li><Link to="/alumni"><FontAwesomeIcon icon={faUserGraduate} /> Alumni</Link></li>
-  <li><Link to="/industry"><FontAwesomeIcon icon={faIndustry} /> Industry</Link></li>
-  <li><Link to="/industry/project"><FontAwesomeIcon icon={faFolderOpen} /> Industry Project</Link></li>
-  <li><Link to="/startup"><FontAwesomeIcon icon={faRocket} /> Startup</Link></li>
+                <div className="profile-banner-linkedin"></div>
+                <div className="profile-img-circle">
+                  {isLoading ? (
+                    <div className="loading-avatar">Loading...</div>
+                  ) : (
+                    <img src={getUserAvatar()} alt={getUserDisplayName()} />
+                  )}
+                </div>
+                <div className="profile-details-text">
+                  <h2>{isLoading ? "Loading..." : getUserDisplayName()}</h2>
+                  <p>{isLoading ? "Loading profile..." : getUserBio()}</p>
+                  <p className="location">
+                    {isLoading ? "" : getUserLocation()}
+                  </p>
+                  {isAuthenticated && userProfile?.role === "student" && (
+                    <Link to="/student/profile">
+                      <button className="experience-dotted-btn">
+                        + Update Profile
+                      </button>
+                    </Link>
+                  )}
+                  {!isAuthenticated && (
+                    <Link to="/auth/login">
+                      <button className="experience-dotted-btn">Login</button>
+                    </Link>
+                  )}
+                </div>
 
-  {/* <li><Link to="/alumni"><FontAwesomeIcon icon={faUserGraduate} /> Alumni</Link></li> */}
-  <li><Link to="/industryprofile"><FontAwesomeIcon icon={faUserGear} /> Industry Profile</Link></li>
-  <li><Link to="/CollegeProfile"><FontAwesomeIcon icon={faUser} /> College Profile</Link></li>
-</ul>
+                <ul>
+                  {isAuthenticated ? (
+                    <>
+                      {userProfile?.role === "student" && (
+                        <li>
+                          <Link to="/student/profile">
+                            <FontAwesomeIcon icon={faUser} /> My Profile
+                          </Link>
+                        </li>
+                      )}
+                      <li>
+                        <Link to="/college">
+                          <FontAwesomeIcon icon={faSchool} /> College
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/alumni">
+                          <FontAwesomeIcon icon={faUserGraduate} /> Alumni
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/industry">
+                          <FontAwesomeIcon icon={faIndustry} /> Industry
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/startup">
+                          <FontAwesomeIcon icon={faRocket} /> Startup
+                        </Link>
+                      </li>
+                    </>
+                  ) : (
+                    <>
+                      <li>
+                        <Link to="/auth/login">
+                          <FontAwesomeIcon icon={faUser} /> Login
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/auth/register">
+                          <FontAwesomeIcon icon={faUserGraduate} /> Register
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/college">
+                          <FontAwesomeIcon icon={faSchool} /> Browse Colleges
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/industry">
+                          <FontAwesomeIcon icon={faIndustry} /> Browse
+                          Industries
+                        </Link>
+                      </li>
+                    </>
+                  )}
+                </ul>
               </div>
             </aside>
           </nav>
@@ -328,35 +587,60 @@ const Home = () => {
         <main className="feed">
           <div className="create-post">
             <div className="post-input">
-              <div className="profile-pic-small">RW</div>
-              <input type="text" placeholder="Start a post" />
+              <div className="profile-pic-small">
+                {isLoading ? "..." : getUserInitials()}
+              </div>
+              <input
+                type="text"
+                placeholder={
+                  isAuthenticated
+                    ? `What's on your mind, ${
+                        getUserDisplayName().split(" ")[0]
+                      }?`
+                    : "Start a post"
+                }
+              />
             </div>
             <div className="post-options">
-              <button><FontAwesomeIcon icon={faImage} /> Photo</button>
-              <button><FontAwesomeIcon icon={faVideo} /> Video</button>
-              <button><FontAwesomeIcon icon={faNewspaper} /> Article</button>
+              <button>
+                <FontAwesomeIcon icon={faImage} /> Photo
+              </button>
+              <button>
+                <FontAwesomeIcon icon={faVideo} /> Video
+              </button>
+              <button>
+                <FontAwesomeIcon icon={faNewspaper} /> Article
+              </button>
             </div>
           </div>
 
-          {posts.map(post => (
+          {posts.map((post) => (
             <div className="post-card" key={post.id}>
               <div className="post-header">
                 <div className="poster-info">
-                  <div className="profile-pic-small">{post.user.charAt(0)}</div>
+                  <div className="profile-pic-small">
+                    {post.isCurrentUser && !isLoading
+                      ? getUserInitials()
+                      : post.user.charAt(0)}
+                  </div>
                   <div>
                     <h4>{post.user}</h4>
-                    <p className="post-meta">{post.followers} • {post.time}</p>
+                    <p className="post-meta">
+                      {post.followers} • {post.time}
+                    </p>
                   </div>
                 </div>
-                <button className="more-options"><FontAwesomeIcon icon={faEllipsisH} /></button>
+                <button className="more-options">
+                  <FontAwesomeIcon icon={faEllipsisH} />
+                </button>
               </div>
-              
-
 
               <div className="post-content">
                 <p>{post.content}</p>
                 {post.details && <p className="post-details">{post.details}</p>}
-                {post.image && <img src={post.image} alt="Post" className="post-img" />}
+                {post.image && (
+                  <img src={post.image} alt="Post" className="post-img" />
+                )}
                 {post.event && (
                   <div className="event-card">
                     <h4>{post.event.title}</h4>
@@ -364,43 +648,45 @@ const Home = () => {
                   </div>
                 )}
                 {post.isComment && (
-                  <div style={{ 
-                    backgroundColor: '#f9fafb', 
-                    padding: '8px', 
-                    borderRadius: '4px',
-                    marginTop: '8px'
-                  }}>
+                  <div
+                    style={{
+                      backgroundColor: "#f9fafb",
+                      padding: "8px",
+                      borderRadius: "4px",
+                      marginTop: "8px",
+                    }}
+                  >
                     <p style={{ margin: 0 }}>{post.details}</p>
                   </div>
                 )}
                 <div className="post-actions">
-  <button className="post-action">
-    <FontAwesomeIcon icon={faThumbsUp} /> Like
-  </button>
-  <button className="post-action">
-    <FontAwesomeIcon icon={faComment} /> Comment
-  </button>
-  <button className="post-action">
-    <FontAwesomeIcon icon={faRetweet} /> Repost
-  </button>
-  <button className="post-action">
-    <FontAwesomeIcon icon={faPaperPlane} /> Send
-  </button>
-</div>
+                  <button className="post-action">
+                    <FontAwesomeIcon icon={faThumbsUp} /> Like
+                  </button>
+                  <button className="post-action">
+                    <FontAwesomeIcon icon={faComment} /> Comment
+                  </button>
+                  <button className="post-action">
+                    <FontAwesomeIcon icon={faRetweet} /> Repost
+                  </button>
+                  <button className="post-action">
+                    <FontAwesomeIcon icon={faPaperPlane} /> Send
+                  </button>
+                </div>
               </div>
               <div className="mobile-post-actions">
                 <button className="post-action">
-    <FontAwesomeIcon icon={faThumbsUp} /> Like
-  </button>
-  <button className="post-action">
-    <FontAwesomeIcon icon={faComment} /> Comment
-  </button>
-  <button className="post-action">
-    <FontAwesomeIcon icon={faRetweet} /> Repost
-  </button>
-  <button className="post-action">
-    <FontAwesomeIcon icon={faPaperPlane} /> Send
-  </button>
+                  <FontAwesomeIcon icon={faThumbsUp} /> Like
+                </button>
+                <button className="post-action">
+                  <FontAwesomeIcon icon={faComment} /> Comment
+                </button>
+                <button className="post-action">
+                  <FontAwesomeIcon icon={faRetweet} /> Repost
+                </button>
+                <button className="post-action">
+                  <FontAwesomeIcon icon={faPaperPlane} /> Send
+                </button>
               </div>
             </div>
           ))}
@@ -437,42 +723,52 @@ const Home = () => {
       {/* Mobile Navigation */}
       <div className="mobile-nav">
         <div className="mobile-nav-items">
-          <Link 
-            to="/" 
-            className={`mobile-nav-item ${activeTab === 'home' ? 'active' : ''}`}
-            onClick={() => setActiveTab('home')}
+          <Link
+            to="/"
+            className={`mobile-nav-item ${
+              activeTab === "home" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("home")}
           >
             <FontAwesomeIcon icon={faHome} className="mobile-nav-icon" />
             <span>Home</span>
           </Link>
-          <Link 
-            to="/network" 
-            className={`mobile-nav-item ${activeTab === 'network' ? 'active' : ''}`}
-            onClick={() => setActiveTab('network')}
+          <Link
+            to="/network"
+            className={`mobile-nav-item ${
+              activeTab === "network" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("network")}
           >
             <FontAwesomeIcon icon={faUserFriends} className="mobile-nav-icon" />
             <span>Network</span>
           </Link>
-          <Link 
-            to="/post" 
-            className={`mobile-nav-item ${activeTab === 'post' ? 'active' : ''}`}
-            onClick={() => setActiveTab('post')}
+          <Link
+            to="/post"
+            className={`mobile-nav-item ${
+              activeTab === "post" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("post")}
           >
             <FontAwesomeIcon icon={faNewspaper} className="mobile-nav-icon" />
             <span>Post</span>
           </Link>
-          <Link 
-            to="/notifications" 
-            className={`mobile-nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
-            onClick={() => setActiveTab('notifications')}
+          <Link
+            to="/notifications"
+            className={`mobile-nav-item ${
+              activeTab === "notifications" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("notifications")}
           >
             <FontAwesomeIcon icon={faBell} className="mobile-nav-icon" />
             <span>Notifications</span>
           </Link>
-          <Link 
-            to="/jobs" 
-            className={`mobile-nav-item ${activeTab === 'jobs' ? 'active' : ''}`}
-            onClick={() => setActiveTab('jobs')}
+          <Link
+            to="/jobs"
+            className={`mobile-nav-item ${
+              activeTab === "jobs" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("jobs")}
           >
             <FontAwesomeIcon icon={faBriefcase} className="mobile-nav-icon" />
             <span>Jobs</span>

@@ -24,18 +24,27 @@ class ApiService {
     };
 
     try {
+      console.log(`🌐 API Request: ${config.method || "GET"} ${url}`);
       const response = await fetch(url, config);
       const data = await response.json();
 
       if (!response.ok) {
+        console.error(`❌ API Error: ${response.status}`, data);
+        // Handle authentication errors specifically
+        if (response.status === 401) {
+          console.log("🔑 Authentication failed - clearing tokens");
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("userData");
+        }
         throw new Error(
           data.message || `HTTP error! status: ${response.status}`
         );
       }
 
+      console.log(`✅ API Success: ${config.method || "GET"} ${url}`, data);
       return data;
     } catch (error) {
-      console.error("API request failed:", error);
+      console.error("❌ API request failed:", error);
       throw error;
     }
   }
@@ -99,6 +108,172 @@ class ApiService {
     });
   }
 
+  // Student Profile endpoints
+  async getStudentProfile() {
+    return this.request("/api/students/profile");
+  }
+
+  async updateStudentBasicInfo(basicInfo) {
+    return this.request("/api/students/basic-info", {
+      method: "PUT",
+      body: JSON.stringify(basicInfo),
+    });
+  }
+
+  async updateStudentAbout(aboutData) {
+    return this.request("/api/students/about", {
+      method: "PUT",
+      body: JSON.stringify(aboutData),
+    });
+  }
+
+  // Experience methods
+  async addStudentExperience(experienceData) {
+    return this.request("/api/students/experience", {
+      method: "POST",
+      body: JSON.stringify(experienceData),
+    });
+  }
+
+  async updateStudentExperience(experienceId, experienceData) {
+    return this.request(`/api/students/experience/${experienceId}`, {
+      method: "PUT",
+      body: JSON.stringify(experienceData),
+    });
+  }
+
+  async deleteStudentExperience(experienceId) {
+    return this.request(`/api/students/experience/${experienceId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Education methods
+  async addStudentEducation(educationData) {
+    return this.request("/api/students/education", {
+      method: "POST",
+      body: JSON.stringify(educationData),
+    });
+  }
+
+  async updateStudentEducation(educationId, educationData) {
+    return this.request(`/api/students/education/${educationId}`, {
+      method: "PUT",
+      body: JSON.stringify(educationData),
+    });
+  }
+
+  async deleteStudentEducation(educationId) {
+    return this.request(`/api/students/education/${educationId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Skills methods
+  async addStudentSkill(skillData) {
+    return this.request("/api/students/skills", {
+      method: "POST",
+      body: JSON.stringify(skillData),
+    });
+  }
+
+  async updateStudentSkill(skillId, skillData) {
+    return this.request(`/api/students/skills/${skillId}`, {
+      method: "PUT",
+      body: JSON.stringify(skillData),
+    });
+  }
+
+  async deleteStudentSkill(skillId) {
+    return this.request(`/api/students/skills/${skillId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Projects methods
+  async addStudentProject(projectData) {
+    return this.request("/api/students/projects", {
+      method: "POST",
+      body: JSON.stringify(projectData),
+    });
+  }
+
+  async updateStudentProject(projectId, projectData) {
+    return this.request(`/api/students/projects/${projectId}`, {
+      method: "PUT",
+      body: JSON.stringify(projectData),
+    });
+  }
+
+  async deleteStudentProject(projectId) {
+    return this.request(`/api/students/projects/${projectId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Courses methods
+  async addStudentCourse(courseData) {
+    return this.request("/api/students/courses", {
+      method: "POST",
+      body: JSON.stringify(courseData),
+    });
+  }
+
+  async updateStudentCourse(courseId, courseData) {
+    return this.request(`/api/students/courses/${courseId}`, {
+      method: "PUT",
+      body: JSON.stringify(courseData),
+    });
+  }
+
+  async deleteStudentCourse(courseId) {
+    return this.request(`/api/students/courses/${courseId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Certifications methods
+  async addStudentCertification(certificationData) {
+    return this.request("/api/students/certifications", {
+      method: "POST",
+      body: JSON.stringify(certificationData),
+    });
+  }
+
+  async updateStudentCertification(certificationId, certificationData) {
+    return this.request(`/api/students/certifications/${certificationId}`, {
+      method: "PUT",
+      body: JSON.stringify(certificationData),
+    });
+  }
+
+  async deleteStudentCertification(certificationId) {
+    return this.request(`/api/students/certifications/${certificationId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Recommendation methods
+  async addStudentRecommendation(recommendationData) {
+    return this.request("/api/students/recommendations", {
+      method: "POST",
+      body: JSON.stringify(recommendationData),
+    });
+  }
+
+  async updateStudentRecommendation(recommendationId, recommendationData) {
+    return this.request(`/api/students/recommendations/${recommendationId}`, {
+      method: "PUT",
+      body: JSON.stringify(recommendationData),
+    });
+  }
+
+  async deleteStudentRecommendation(recommendationId) {
+    return this.request(`/api/students/recommendations/${recommendationId}`, {
+      method: "DELETE",
+    });
+  }
+
   // Role-specific helpers
   getRoleHomePage(role) {
     const rolePages = {
@@ -126,6 +301,70 @@ class ApiService {
 // Create and export a singleton instance
 const apiService = new ApiService();
 export default apiService;
+
+// Create studentAPI object for easier access to student-related methods
+export const studentAPI = {
+  // Profile methods
+  getProfile: () => apiService.getStudentProfile(),
+  updateBasicInfo: (basicInfo) => apiService.updateStudentBasicInfo(basicInfo),
+  updateAbout: (aboutData) => apiService.updateStudentAbout(aboutData),
+
+  // Experience methods
+  addExperience: (studentId, experienceData) =>
+    apiService.addStudentExperience(experienceData),
+  updateExperience: (studentId, experienceId, experienceData) =>
+    apiService.updateStudentExperience(experienceId, experienceData),
+  deleteExperience: (studentId, experienceId) =>
+    apiService.deleteStudentExperience(experienceId),
+
+  // Education methods
+  addEducation: (studentId, educationData) =>
+    apiService.addStudentEducation(educationData),
+  updateEducation: (studentId, educationId, educationData) =>
+    apiService.updateStudentEducation(educationId, educationData),
+  deleteEducation: (studentId, educationId) =>
+    apiService.deleteStudentEducation(educationId),
+
+  // Skills methods
+  addSkill: (studentId, skillData) => apiService.addStudentSkill(skillData),
+  updateSkill: (studentId, skillId, skillData) =>
+    apiService.updateStudentSkill(skillId, skillData),
+  deleteSkill: (studentId, skillId) => apiService.deleteStudentSkill(skillId),
+
+  // Projects methods
+  addProject: (studentId, projectData) =>
+    apiService.addStudentProject(projectData),
+  updateProject: (studentId, projectId, projectData) =>
+    apiService.updateStudentProject(projectId, projectData),
+  deleteProject: (studentId, projectId) =>
+    apiService.deleteStudentProject(projectId),
+
+  // Courses methods
+  addCourse: (studentId, courseData) => apiService.addStudentCourse(courseData),
+  updateCourse: (studentId, courseId, courseData) =>
+    apiService.updateStudentCourse(courseId, courseData),
+  deleteCourse: (studentId, courseId) =>
+    apiService.deleteStudentCourse(courseId),
+
+  // Certifications methods
+  addCertification: (studentId, certificationData) =>
+    apiService.addStudentCertification(certificationData),
+  updateCertification: (studentId, certificationId, certificationData) =>
+    apiService.updateStudentCertification(certificationId, certificationData),
+  deleteCertification: (studentId, certificationId) =>
+    apiService.deleteStudentCertification(certificationId),
+
+  // Recommendations methods
+  addRecommendation: (studentId, recommendationData) =>
+    apiService.addStudentRecommendation(recommendationData),
+  updateRecommendation: (studentId, recommendationId, recommendationData) =>
+    apiService.updateStudentRecommendation(
+      recommendationId,
+      recommendationData
+    ),
+  deleteRecommendation: (studentId, recommendationId) =>
+    apiService.deleteStudentRecommendation(recommendationId),
+};
 
 // Export individual methods for convenience
 export const {

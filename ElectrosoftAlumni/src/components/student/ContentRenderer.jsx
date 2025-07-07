@@ -1,5 +1,15 @@
 import React from "react";
-import { Edit3, TrendingUp, TrendingDown, Calendar, FileText, Link, Image, Video, File } from "lucide-react";
+import {
+  Edit3,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  FileText,
+  Link,
+  Image,
+  Video,
+  File,
+} from "lucide-react";
 import AboutSection from "./sections/AboutSection";
 import ExperienceSection from "./sections/ExperienceSection";
 import EducationSection from "./sections/EducationSection";
@@ -15,17 +25,32 @@ const DashboardStats = ({ data }) => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">{data.title || "Dashboard"}</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        {data.title || "Dashboard"}
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {data.stats.map((stat, index) => (
-          <div key={index} className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div
+            key={index}
+            className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm"
+          >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-600">{stat.label}</h3>
+              <h3 className="text-sm font-medium text-gray-600">
+                {stat.label}
+              </h3>
               {stat.trend && (
-                <span className={`flex items-center text-xs font-medium ${
-                  stat.trend.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {stat.trend.startsWith('+') ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                <span
+                  className={`flex items-center text-xs font-medium ${
+                    stat.trend.startsWith("+")
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {stat.trend.startsWith("+") ? (
+                    <TrendingUp className="w-3 h-3 mr-1" />
+                  ) : (
+                    <TrendingDown className="w-3 h-3 mr-1" />
+                  )}
                   {stat.trend}
                 </span>
               )}
@@ -44,11 +69,15 @@ const StructuredContent = ({ data }) => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">{data.title || "Structured Content"}</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        {data.title || "Structured Content"}
+      </h2>
       <div className="space-y-6">
         {data.sections.map((section, index) => (
           <div key={index} className="bg-gray-50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">{section.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              {section.title}
+            </h3>
             <p className="text-gray-700 leading-relaxed">{section.content}</p>
           </div>
         ))}
@@ -63,7 +92,9 @@ const TextContent = ({ data }) => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">{data.title || "Content"}</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        {data.title || "Content"}
+      </h2>
       <div className="prose max-w-none">
         <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
           {data.content}
@@ -97,23 +128,23 @@ const CustomNavigationContent = ({ customNavItem, onEditCustomContent }) => {
       </div>
 
       {/* Content based on type */}
-      {customNavItem.contentType === 'dashboard' && (
+      {customNavItem.contentType === "dashboard" && (
         <DashboardStats data={customNavItem.content} />
       )}
-      {customNavItem.contentType === 'structured' && (
+      {customNavItem.contentType === "structured" && (
         <StructuredContent data={customNavItem.content} />
       )}
-      {customNavItem.contentType === 'text' && (
+      {customNavItem.contentType === "text" && (
         <TextContent data={customNavItem.content} />
       )}
     </div>
   );
 };
 
-const ContentRenderer = ({ 
-  activeContent, 
-  activeContentName, 
-  customNavItem, 
+const ContentRenderer = ({
+  activeContent,
+  activeContentName,
+  customNavItem,
   onEditCustomContent,
   profileData,
   onProfileUpdate,
@@ -130,14 +161,15 @@ const ContentRenderer = ({
   certifications,
   onCertificationsUpdate,
   recommendations,
-  onRecommendationsUpdate
+  onRecommendationsUpdate,
+  studentId,
 }) => {
   // If it's a custom navigation item, render its content
   if (customNavItem) {
     return (
-      <CustomNavigationContent 
-        customNavItem={customNavItem} 
-        onEditCustomContent={onEditCustomContent} 
+      <CustomNavigationContent
+        customNavItem={customNavItem}
+        onEditCustomContent={onEditCustomContent}
       />
     );
   }
@@ -148,10 +180,14 @@ const ContentRenderer = ({
       case "posts":
         return (
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Posts & Activities</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Posts & Activities
+            </h2>
             <div className="text-center py-12">
               <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No posts yet. Start sharing your achievements and thoughts!</p>
+              <p className="text-gray-500">
+                No posts yet. Start sharing your achievements and thoughts!
+              </p>
               <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 Create First Post
               </button>
@@ -161,73 +197,84 @@ const ContentRenderer = ({
 
       case "about":
         return (
-          <AboutSection 
-            profileData={profileData} 
-            onProfileUpdate={onProfileUpdate} 
+          <AboutSection
+            profileData={profileData}
+            onProfileUpdate={onProfileUpdate}
           />
         );
 
       case "experience":
         return (
-          <ExperienceSection 
-            experiences={experiences} 
-            onExperienceUpdate={onExperienceUpdate} 
+          <ExperienceSection
+            experiences={experiences}
+            onExperienceUpdate={onExperienceUpdate}
+            studentId={studentId}
           />
         );
 
       case "education":
         return (
-          <EducationSection 
-            education={education} 
-            onEducationUpdate={onEducationUpdate} 
+          <EducationSection
+            education={education}
+            onEducationUpdate={onEducationUpdate}
+            studentId={studentId}
           />
         );
 
       case "skills":
         return (
-          <SkillsSection 
-            skills={skills} 
-            onSkillsUpdate={onSkillsUpdate} 
+          <SkillsSection
+            skills={skills}
+            onSkillsUpdate={onSkillsUpdate}
+            studentId={studentId}
           />
         );
 
       case "projects":
         return (
-          <ProjectsSection 
-            projects={projects} 
-            onProjectsUpdate={onProjectsUpdate} 
+          <ProjectsSection
+            projects={projects}
+            onProjectsUpdate={onProjectsUpdate}
+            studentId={studentId}
           />
         );
 
       case "courses":
         return (
-          <CoursesSection 
-            courses={courses} 
-            onCoursesUpdate={onCoursesUpdate} 
+          <CoursesSection
+            courses={courses}
+            onCoursesUpdate={onCoursesUpdate}
+            studentId={studentId}
           />
         );
 
       case "certifications":
         return (
-          <CertificationsSection 
-            certifications={certifications} 
-            onCertificationsUpdate={onCertificationsUpdate} 
+          <CertificationsSection
+            certifications={certifications}
+            onCertificationsUpdate={onCertificationsUpdate}
+            studentId={studentId}
           />
         );
 
       case "recommendations":
         return (
-          <RecommendationsSection 
-            recommendations={recommendations} 
-            onRecommendationsUpdate={onRecommendationsUpdate} 
+          <RecommendationsSection
+            recommendations={recommendations}
+            onRecommendationsUpdate={onRecommendationsUpdate}
+            studentId={studentId}
           />
         );
 
       default:
         return (
           <div className="p-6 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{activeContentName}</h2>
-            <p className="text-gray-500">Content for {activeContentName} is coming soon!</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {activeContentName}
+            </h2>
+            <p className="text-gray-500">
+              Content for {activeContentName} is coming soon!
+            </p>
           </div>
         );
     }

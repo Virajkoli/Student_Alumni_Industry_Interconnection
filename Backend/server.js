@@ -12,6 +12,7 @@ const app = express();
 // Import routes
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
+const studentRoutes = require("./routes/students");
 const postRoutes = require("./routes/posts");
 const connectionRoutes = require("./routes/connections");
 const jobRoutes = require("./routes/jobs");
@@ -38,29 +39,15 @@ app.use("/api/", limiter);
 // CORS configuration
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, Postman, etc.)
-      if (!origin) return callback(null, true);
-
-      // List of allowed origins
-      const allowedOrigins = [
-        process.env.FRONTEND_URL,
-        "https://scaipsfrontend.vercel.app",
-        "http://localhost:3000",
-        "http://localhost:5173",
-      ];
-
-      // Check if origin is in allowed list or is a Vercel preview deployment
-      if (
-        allowedOrigins.includes(origin) ||
-        (origin.includes("scaipsfrontend") && origin.includes("vercel.app"))
-      ) {
-        return callback(null, true);
-      }
-
-      // If origin is not allowed
-      return callback(new Error("Not allowed by CORS"), false);
-    },
+    origin: [
+      "http://localhost:5173", // Local development
+      "http://localhost:3000", // Alternative local port
+      "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
+      "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
+      "https://electrosoft-alumni.vercel.app", // Additional frontend URL
+      /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
+      process.env.FRONTEND_URL, // Environment variable for production
+    ].filter(Boolean), // Remove any undefined values
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
@@ -87,20 +74,10 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Debug endpoint
-app.get("/debug", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    message: "Debug endpoint working",
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-    frontendUrl: process.env.FRONTEND_URL,
-  });
-});
-
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/students", studentRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);

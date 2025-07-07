@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Plus, X, Briefcase } from "lucide-react";
+import { studentAPI } from "../../../utils/apiService";
 
-const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
+const ExperienceSection = ({
+  experiences = [],
+  onExperienceUpdate,
+  studentId,
+}) => {
   const [showExperienceModal, setShowExperienceModal] = useState(false);
   const [editingExperience, setEditingExperience] = useState(null);
   const [experienceData, setExperienceData] = useState({
@@ -105,44 +110,96 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingExperience) {
-      // Update existing experience
-      const updatedExperiences = experiences.map((exp) =>
-        exp.id === editingExperience.id
-          ? { ...experienceData, id: editingExperience.id }
-          : exp
-      );
-      onExperienceUpdate(updatedExperiences);
-    } else {
-      // Add new experience
-      const newExperience = {
-        id: Date.now(),
-        ...experienceData,
+    try {
+      // Convert dates to proper format
+      const startDate =
+        experienceData.startMonth && experienceData.startYear
+          ? `${experienceData.startYear}-${String(
+              months.indexOf(experienceData.startMonth) + 1
+            ).padStart(2, "0")}-01`
+          : null;
+
+      const endDate =
+        experienceData.endMonth && experienceData.endYear
+          ? `${experienceData.endYear}-${String(
+              months.indexOf(experienceData.endMonth) + 1
+            ).padStart(2, "0")}-01`
+          : null;
+
+      const experiencePayload = {
+        title: experienceData.title,
+        company: experienceData.company,
+        employment_type: experienceData.employmentType,
+        currently_working: experienceData.currentlyWorking,
+        start_date: startDate,
+        end_date: endDate,
+        location: experienceData.location,
+        description: experienceData.description,
       };
-      onExperienceUpdate((prev) => [...prev, newExperience]);
+
+      if (editingExperience) {
+        // Update existing experience
+        await studentAPI.updateExperience(
+          studentId,
+          editingExperience.id,
+          experiencePayload
+        );
+      } else {
+        // Add new experience
+        await studentAPI.addExperience(studentId, experiencePayload);
+      }
+      closeModal();
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving experience:", error);
     }
-    closeModal();
   };
 
   const handleEditExperience = (experience) => {
     setEditingExperience(experience);
     setExperienceData({
-      ...experience,
+      title: experience.title || "",
+      company: experience.company || "",
+      employmentType: experience.employment_type || "Full-time",
+      currentlyWorking: experience.currently_working || false,
+      startMonth: experience.start_date
+        ? new Date(experience.start_date).toLocaleDateString("en-US", {
+            month: "long",
+          })
+        : "",
+      startYear: experience.start_date
+        ? new Date(experience.start_date).getFullYear().toString()
+        : "",
+      endMonth: experience.end_date
+        ? new Date(experience.end_date).toLocaleDateString("en-US", {
+            month: "long",
+          })
+        : "",
+      endYear: experience.end_date
+        ? new Date(experience.end_date).getFullYear().toString()
+        : "",
+      location: experience.location || "",
+      description: experience.description || "",
       skills: experience.skills || [],
       achievements: experience.achievements || [],
       customFields: experience.customFields || [],
+      notifyNetwork: true,
     });
     setShowExperienceModal(true);
   };
 
-  const handleDeleteExperience = (experienceId) => {
-    const updatedExperiences = experiences.filter(
-      (exp) => exp.id !== experienceId
-    );
-    onExperienceUpdate(updatedExperiences);
+  const handleDeleteExperience = async (experienceId) => {
+    try {
+      await studentAPI.deleteExperience(studentId, experienceId);
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting experience:", error);
+    }
   };
 
   const closeModal = () => {
@@ -207,10 +264,25 @@ const ExperienceSection = ({ experiences = [], onExperienceUpdate }) => {
                     </h3>
                     <p className="text-gray-600">{experience.company}</p>
                     <p className="text-sm text-gray-500">
-                      {experience.employmentType} • {experience.startMonth}{" "}
-                      {experience.startYear} -
-                      {experience.currentlyWorking
+                      {experience.employment_type ||
+                        experience.employmentType ||
+                        "Full-time"}{" "}
+                      •
+                      {experience.start_date
+                        ? new Date(experience.start_date).toLocaleDateString(
+                            "en-US",
+                            { month: "long", year: "numeric" }
+                          )
+                        : `${experience.startMonth} ${experience.startYear}`}{" "}
+                      -
+                      {experience.currently_working ||
+                      experience.currentlyWorking
                         ? " Present"
+                        : experience.end_date
+                        ? ` ${new Date(experience.end_date).toLocaleDateString(
+                            "en-US",
+                            { month: "long", year: "numeric" }
+                          )}`
                         : ` ${experience.endMonth} ${experience.endYear}`}
                     </p>
                     {experience.location && (

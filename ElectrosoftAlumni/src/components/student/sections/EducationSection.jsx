@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, GraduationCap } from "lucide-react";
+import { studentAPI } from "../../../utils/apiService";
 
-const EducationSection = ({ education = [], onEducationUpdate }) => {
+const EducationSection = ({ education = [], onEducationUpdate, studentId }) => {
   const [showEducationModal, setShowEducationModal] = useState(false);
   const [editingEducation, setEditingEducation] = useState(null);
   const [educationData, setEducationData] = useState({
@@ -67,40 +68,69 @@ const EducationSection = ({ education = [], onEducationUpdate }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingEducation) {
-      // Update existing education
-      const updatedEducation = education.map((edu) =>
-        edu.id === editingEducation.id
-          ? { ...educationData, id: editingEducation.id }
-          : edu
-      );
-      onEducationUpdate(updatedEducation);
-    } else {
-      // Add new education
-      const newEducation = {
-        id: Date.now(),
-        ...educationData,
+    try {
+      const educationPayload = {
+        institution: educationData.school,
+        degree: educationData.degree,
+        field_of_study: educationData.field,
+        start_year: educationData.startYear
+          ? parseInt(educationData.startYear)
+          : null,
+        end_year: educationData.endYear
+          ? parseInt(educationData.endYear)
+          : null,
+        grade: educationData.grade,
       };
-      onEducationUpdate((prev) => [...prev, newEducation]);
+
+      if (editingEducation) {
+        // Update existing education
+        await studentAPI.updateEducation(
+          studentId,
+          editingEducation.id,
+          educationPayload
+        );
+      } else {
+        // Add new education
+        await studentAPI.addEducation(studentId, educationPayload);
+      }
+      closeModal();
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error saving education:", error);
     }
-    closeModal();
   };
 
   const handleEditEducation = (education) => {
     setEditingEducation(education);
     setEducationData({
-      ...education,
+      school: education.institution || "",
+      degree: education.degree || "",
+      field: education.field_of_study || "",
+      grade: education.grade || "",
+      activities: "",
+      description: "",
+      startMonth: "",
+      startYear: education.start_year ? education.start_year.toString() : "",
+      endMonth: "",
+      endYear: education.end_year ? education.end_year.toString() : "",
       customFields: education.customFields || [],
+      notifyNetwork: true,
     });
     setShowEducationModal(true);
   };
 
-  const handleDeleteEducation = (educationId) => {
-    const updatedEducation = education.filter((edu) => edu.id !== educationId);
-    onEducationUpdate(updatedEducation);
+  const handleDeleteEducation = async (educationId) => {
+    try {
+      await studentAPI.deleteEducation(studentId, educationId);
+      // Reload the page to reflect changes
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting education:", error);
+    }
   };
 
   const closeModal = () => {
@@ -159,14 +189,16 @@ const EducationSection = ({ education = [], onEducationUpdate }) => {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">
-                      {edu.school}
+                      {edu.institution || edu.school}
                     </h3>
                     <p className="text-gray-600">
                       {edu.degree}
-                      {edu.field && `, ${edu.field}`}
+                      {(edu.field_of_study || edu.field) &&
+                        `, ${edu.field_of_study || edu.field}`}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {edu.startYear} - {edu.endYear || "Present"}
+                      {edu.start_year || edu.startYear} -{" "}
+                      {edu.end_year || edu.endYear || "Present"}
                     </p>
                     {edu.grade && (
                       <p className="text-sm text-gray-500">

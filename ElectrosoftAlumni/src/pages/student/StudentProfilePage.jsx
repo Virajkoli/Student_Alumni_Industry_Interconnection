@@ -195,34 +195,6 @@ const StudentProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <h1 className="text-3xl font-bold text-center my-8">
-        Electrosoft Alumni Platform
-      </h1>
-
-      {/* Navigation Buttons */}
-      <div className="flex justify-center gap-4 mb-4">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded">
-          <a href="/startup-profile" className="text-white no-underline">
-            Go to Startup Profile
-          </a>
-        </button>
-        <button className="bg-green-500 text-white px-4 py-2 rounded">
-          <a href="/industry-profile" className="text-white no-underline">
-            Go to Industry Profile
-          </a>
-        </button>
-        <button className="bg-red-500 text-white px-4 py-2 rounded">
-          <a href="/college-profile" className="text-white no-underline">
-            Go to College Profile
-          </a>
-        </button>
-        <button className="bg-yellow-500 text-white px-4 py-2 rounded">
-          <a href="/student-profile" className="text-white no-underline">
-            Go to Student Profile
-          </a>
-        </button>
-      </div>
-
       {/* Error Message */}
       {error && (
         <div className="max-w-7xl mx-auto px-4 mb-4">
@@ -263,7 +235,7 @@ const StudentProfilePage = () => {
       ) : (
         <>
           {/* Search Container */}
-          <div className="bg-white shadow-sm border-b border-gray-200">
+          {/* <div className="bg-white shadow-sm border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 py-3">
               <div className="flex justify-center">
                 <div className="relative">
@@ -292,7 +264,7 @@ const StudentProfilePage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
             {/* Profile Header Section with integrated navigation */}

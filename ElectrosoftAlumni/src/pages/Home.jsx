@@ -348,7 +348,7 @@ const Home = () => {
 
     // Get role from auth context user first, then from userProfile
     const userRole = user?.role || userProfile?.role;
-    
+
     if (!userRole) return "Welcome to the platform!";
 
     if (userRole === "student") {
@@ -366,12 +366,12 @@ const Home = () => {
           userRole.charAt(0).toUpperCase() + userRole.slice(1)
         } | ${skills}`;
       }
-      
+
       // If no skills, use interested field from auth context
       if (user?.interested_field) {
-        return `${
-          userRole.charAt(0).toUpperCase() + userRole.slice(1)
-        } | ${user.interested_field}`;
+        return `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} | ${
+          user.interested_field
+        }`;
       }
     }
 
@@ -398,10 +398,10 @@ const Home = () => {
 
   const getUserInitials = () => {
     if (isLoading && !user) return "...";
-    
+
     const name = getUserDisplayName();
     if (name === "Guest User") return "GU";
-    
+
     return name
       .split(" ")
       .map((n) => n[0])

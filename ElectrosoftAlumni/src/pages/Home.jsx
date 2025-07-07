@@ -319,29 +319,42 @@ const Home = () => {
       isAuthenticated,
     });
 
-    if (!userProfile || !userProfile.fullName) {
-      // Try to get name from auth context user if userProfile is not set yet
-      if (user && user.fullName) {
-        console.log(
-          "🔄 Using fallback fullName from auth context:",
-          user.fullName
-        );
-        return user.fullName;
-      }
-      console.log("❌ No fullName available, returning Guest User");
-      return "Guest User";
+    // First priority: auth context user fullName (immediately available after login/registration)
+    if (user && user.fullName) {
+      console.log("✅ Using auth context fullName:", user.fullName);
+      return user.fullName;
     }
-    console.log("✅ Using userProfile fullName:", userProfile.fullName);
-    return userProfile.fullName;
+
+    // Second priority: userProfile fullName (loaded after API call)
+    if (userProfile && userProfile.fullName) {
+      console.log("✅ Using userProfile fullName:", userProfile.fullName);
+      return userProfile.fullName;
+    }
+
+    // Fallback: construct name from first_name and last_name
+    if (user && user.first_name && user.last_name) {
+      const constructedName = `${user.first_name} ${user.last_name}`;
+      console.log("🔄 Constructed name from auth context:", constructedName);
+      return constructedName;
+    }
+
+    console.log("❌ No name available, returning Guest User");
+    return "Guest User";
   };
 
   const getUserBio = () => {
-    if (!userProfile || !userProfile.role) return "Welcome to the platform!";
+    // If no authentication, return default message
+    if (!isAuthenticated) return "Welcome to the platform!";
 
-    if (userProfile.role === "student") {
+    // Get role from auth context user first, then from userProfile
+    const userRole = user?.role || userProfile?.role;
+    
+    if (!userRole) return "Welcome to the platform!";
+
+    if (userRole === "student") {
       // Create a bio from skills and latest education/experience
       const skills =
-        userProfile.skills
+        userProfile?.skills
           ?.slice(0, 3)
           .map((skill) =>
             typeof skill === "object" ? skill.skill_name : skill
@@ -350,19 +363,26 @@ const Home = () => {
 
       if (skills) {
         return `${
-          userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1)
+          userRole.charAt(0).toUpperCase() + userRole.slice(1)
         } | ${skills}`;
+      }
+      
+      // If no skills, use interested field from auth context
+      if (user?.interested_field) {
+        return `${
+          userRole.charAt(0).toUpperCase() + userRole.slice(1)
+        } | ${user.interested_field}`;
       }
     }
 
     return (
-      userProfile.bio ||
-      `${userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1)}`
+      userProfile?.bio ||
+      `${userRole.charAt(0).toUpperCase() + userRole.slice(1)}`
     );
   };
 
   const getUserLocation = () => {
-    return userProfile?.location || "Location not set";
+    return userProfile?.location || user?.location || "Location not set";
   };
 
   const getUserAvatar = () => {
@@ -377,8 +397,11 @@ const Home = () => {
   };
 
   const getUserInitials = () => {
-    if (isLoading || !userProfile) return "GU";
+    if (isLoading && !user) return "...";
+    
     const name = getUserDisplayName();
+    if (name === "Guest User") return "GU";
+    
     return name
       .split(" ")
       .map((n) => n[0])

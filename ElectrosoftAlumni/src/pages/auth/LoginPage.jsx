@@ -62,14 +62,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-content">
-        {/* Logo Section */}
-        <div className="logo-section">
-          <img src="/newlogo-removebg-preview.png" alt="Logo" className="w-48" />
-        </div>
-
-        <div className="flex flex-col items-center">
+    <div className="login-main-layout">
+      <div className="login-logo-side">
+        <img src="/newlogo-removebg-preview.png" alt="Logo" className="big-logo-img" />
+      </div>
+      <div className="login-container right-align">
+        <div className="login-content">
           {/* Login Box */}
           <div className="login-box">
             {error && <div className="error-alert">{error}</div>}

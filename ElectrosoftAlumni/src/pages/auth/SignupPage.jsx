@@ -433,117 +433,126 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-card">
-        <form
-          className="register-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
-          <div className="register-grid">
+    <div className="login-main-layout">
+      <div className="login-logo-side">
+        <img
+          src="/newlogo-removebg-preview.png"
+          alt="Logo"
+          className="big-logo-img"
+        />
+      </div>
+      <div className="register-container">
+        <div className="register-card">
+          <form
+            className="register-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
+            <div className="register-grid">
+              <div className="form-group">
+                <label htmlFor="first_name">First name</label>
+                <input
+                  type="text"
+                  id="first_name"
+                  name="first_name"
+                  placeholder="First Name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  required
+                  className="input-field"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="last_name">
+                  Last name{" "}
+                  <span className="optional">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="last_name"
+                  name="last_name"
+                  placeholder="Last Name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  className="input-field"
+                />
+              </div>
+            </div>
+
             <div className="form-group">
-              <label htmlFor="first_name">First name</label>
+              <label htmlFor="email">Email</label>
               <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                placeholder="First Name"
-                value={formData.first_name}
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
                 onChange={handleChange}
                 required
                 className="input-field"
               />
             </div>
+
             <div className="form-group">
-              <label htmlFor="last_name">
-                Last name{" "}
-                <span className="optional">(Optional)</span>
-              </label>
+              <label htmlFor="password">Password</label>
               <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                placeholder="Last Name"
-                value={formData.last_name}
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
                 onChange={handleChange}
+                required
                 className="input-field"
               />
             </div>
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="input-field"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="input-field"
-            />
-          </div>
-
-          {/* Role Selection */}
-          <div className="form-group">
-            <label htmlFor="role">Register as</label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="input-field"
-              required
-            >
-              <option value="">Select Your Role</option>
-              <option value="student">Student</option>
-              <option value="college">College</option>
-              <option value="industry">Industry</option>
-              <option value="startup">Startup</option>
-            </select>
-          </div>
-
-          {/* Role-specific Fields */}
-          {formData.role && (
-            <div className="role-fields">{renderRoleSpecificFields()}</div>
-          )}
-
-          {error && (
-            <div className="error-alert" style={{ margin: "10px 0" }}>
-              {error}
+            {/* Role Selection */}
+            <div className="form-group">
+              <label htmlFor="role">Register as</label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="">Select Your Role</option>
+                <option value="student">Student</option>
+                <option value="college">College</option>
+                <option value="industry">Industry</option>
+                <option value="startup">Startup</option>
+              </select>
             </div>
-          )}
 
-          <button
-            className="register-btn"
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? "Registering..." : "Next"}
-          </button>
+            {/* Role-specific Fields */}
+            {formData.role && (
+              <div className="role-fields">{renderRoleSpecificFields()}</div>
+            )}
 
-          <p className="join-text">
-            Already have an account?{" "}
-            <Link to="/auth/login">Go back to Login</Link>
-          </p>
-        </form>
+            {error && (
+              <div className="error-alert" style={{ margin: "10px 0" }}>
+                {error}
+              </div>
+            )}
+
+            <button
+              className="register-btn"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? "Registering..." : "Next"}
+            </button>
+
+            <p className="join-text">
+              Already have an account?{" "}
+              <Link to="/auth/login">Go back to Login</Link>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );

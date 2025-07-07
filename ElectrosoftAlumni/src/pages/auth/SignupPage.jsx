@@ -155,6 +155,47 @@ export default function SignupPage() {
     }
   };
 
+  const pillOptions = {
+    interested_field: [
+      { value: "Computer", label: "Computer" },
+      { value: "Electronics", label: "Electronics" },
+      { value: "Electrical", label: "Electrical" },
+      { value: "AI", label: "AI" },
+      { value: "Cybersecurity", label: "Cybersecurity" },
+      { value: "Data Science", label: "Data Science" },
+      { value: "Other", label: "Other" },
+    ],
+    industry_type: [
+      { value: "Technology", label: "Technology" },
+      { value: "Manufacturing", label: "Manufacturing" },
+      { value: "Healthcare", label: "Healthcare" },
+      { value: "Finance", label: "Finance" },
+      { value: "Education", label: "Education" },
+      { value: "Other", label: "Other" },
+    ],
+    company_size: [
+      { value: "1-10", label: "1-10 employees" },
+      { value: "11-50", label: "11-50 employees" },
+      { value: "51-200", label: "51-200 employees" },
+      { value: "201-1000", label: "201-1000 employees" },
+      { value: "1000+", label: "1000+ employees" },
+    ],
+    startup_stage: [
+      { value: "Idea", label: "Idea Stage" },
+      { value: "MVP", label: "MVP Stage" },
+      { value: "Early", label: "Early Stage" },
+      { value: "Growth", label: "Growth Stage" },
+      { value: "Scale", label: "Scale Stage" },
+    ],
+    funding_status: [
+      { value: "Bootstrapped", label: "Bootstrapped" },
+      { value: "Pre-Seed", label: "Pre-Seed" },
+      { value: "Seed", label: "Seed" },
+      { value: "Series A", label: "Series A" },
+      { value: "Series B+", label: "Series B+" },
+    ],
+  };
+
   const renderRoleSpecificFields = () => {
     switch (formData.role) {
       case "student":
@@ -166,6 +207,7 @@ export default function SignupPage() {
               placeholder="Contact Number"
               value={formData.contact_no}
               onChange={handleChange}
+              className="input-field"
             />
             <input
               type="text"
@@ -173,18 +215,29 @@ export default function SignupPage() {
               placeholder="College Name"
               value={formData.college_name}
               onChange={handleChange}
+              className="input-field"
             />
-            <select
-              name="interested_field"
-              value={formData.interested_field}
-              onChange={handleChange}
-            >
-              <option value="">Select Interested Field</option>
-              <option value="Computer">Computer</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Electrical">Electrical</option>
-              <option value="Other">Other</option>
-            </select>
+            <div className="form-group">
+              <label>Select Interested Field</label>
+              <div className="pill-group">
+                {pillOptions.interested_field.map((opt) => (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    className={`pill-btn${
+                      formData.interested_field === opt.value ? " selected" : ""
+                    }`}
+                    onClick={() =>
+                      handleChange({
+                        target: { name: "interested_field", value: opt.value },
+                      })
+                    }
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             {formData.interested_field === "Other" && (
               <input
                 type="text"
@@ -192,6 +245,7 @@ export default function SignupPage() {
                 placeholder="Specify Other Field"
                 value={formData.other_field}
                 onChange={handleChange}
+                className="input-field"
               />
             )}
           </>
@@ -206,6 +260,7 @@ export default function SignupPage() {
               placeholder="College Name"
               value={formData.college_name}
               onChange={handleChange}
+              className="input-field"
             />
             <input
               type="text"
@@ -213,6 +268,7 @@ export default function SignupPage() {
               placeholder="College Address"
               value={formData.college_address}
               onChange={handleChange}
+              className="input-field"
             />
             <input
               type="text"
@@ -220,6 +276,7 @@ export default function SignupPage() {
               placeholder="Dean Name"
               value={formData.dean_name}
               onChange={handleChange}
+              className="input-field"
             />
             <input
               type="number"
@@ -227,6 +284,7 @@ export default function SignupPage() {
               placeholder="Establishment Year"
               value={formData.establishment_year}
               onChange={handleChange}
+              className="input-field"
             />
           </>
         );
@@ -240,38 +298,67 @@ export default function SignupPage() {
               placeholder="Company Name"
               value={formData.company_name}
               onChange={handleChange}
+              className="input-field"
             />
-            <select
-              name="industry_type"
-              value={formData.industry_type}
-              onChange={handleChange}
-            >
-              <option value="">Select Industry Type</option>
-              <option value="Technology">Technology</option>
-              <option value="Manufacturing">Manufacturing</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Finance">Finance</option>
-              <option value="Education">Education</option>
-              <option value="Other">Other</option>
-            </select>
-            <select
-              name="company_size"
-              value={formData.company_size}
-              onChange={handleChange}
-            >
-              <option value="">Select Company Size</option>
-              <option value="1-10">1-10 employees</option>
-              <option value="11-50">11-50 employees</option>
-              <option value="51-200">51-200 employees</option>
-              <option value="201-1000">201-1000 employees</option>
-              <option value="1000+">1000+ employees</option>
-            </select>
+            <div className="form-group">
+              <label>Industry Type</label>
+              <div className="pill-group">
+                {pillOptions.industry_type.map((opt) => (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    className={`pill-btn${
+                      formData.industry_type === opt.value ? " selected" : ""
+                    }`}
+                    onClick={() =>
+                      handleChange({
+                        target: { name: "industry_type", value: opt.value },
+                      })
+                    }
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {formData.interested_field === "Other" && (
+              <input
+                type="text"
+                name="other_field"
+                placeholder="Specify Other Field"
+                value={formData.other_field}
+                onChange={handleChange}
+                className="input-field"
+              />
+            )}
+            <div className="form-group">
+              <label>Company Size</label>
+              <div className="pill-group">
+                {pillOptions.company_size.map((opt) => (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    className={`pill-btn${
+                      formData.company_size === opt.value ? " selected" : ""
+                    }`}
+                    onClick={() =>
+                      handleChange({
+                        target: { name: "company_size", value: opt.value },
+                      })
+                    }
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <input
               type="text"
               name="designation"
               placeholder="Your Designation"
               value={formData.designation}
               onChange={handleChange}
+              className="input-field"
             />
           </>
         );
@@ -285,37 +372,57 @@ export default function SignupPage() {
               placeholder="Startup Name"
               value={formData.startup_name}
               onChange={handleChange}
+              className="input-field"
             />
-            <select
-              name="startup_stage"
-              value={formData.startup_stage}
-              onChange={handleChange}
-            >
-              <option value="">Select Startup Stage</option>
-              <option value="Idea">Idea Stage</option>
-              <option value="MVP">MVP Stage</option>
-              <option value="Early">Early Stage</option>
-              <option value="Growth">Growth Stage</option>
-              <option value="Scale">Scale Stage</option>
-            </select>
-            <select
-              name="funding_status"
-              value={formData.funding_status}
-              onChange={handleChange}
-            >
-              <option value="">Select Funding Status</option>
-              <option value="Bootstrapped">Bootstrapped</option>
-              <option value="Pre-Seed">Pre-Seed</option>
-              <option value="Seed">Seed</option>
-              <option value="Series A">Series A</option>
-              <option value="Series B+">Series B+</option>
-            </select>
+            <div className="form-group">
+              <label>Startup Stage</label>
+              <div className="pill-group">
+                {pillOptions.startup_stage.map((opt) => (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    className={`pill-btn${
+                      formData.startup_stage === opt.value ? " selected" : ""
+                    }`}
+                    onClick={() =>
+                      handleChange({
+                        target: { name: "startup_stage", value: opt.value },
+                      })
+                    }
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Funding Status</label>
+              <div className="pill-group">
+                {pillOptions.funding_status.map((opt) => (
+                  <button
+                    type="button"
+                    key={opt.value}
+                    className={`pill-btn${
+                      formData.funding_status === opt.value ? " selected" : ""
+                    }`}
+                    onClick={() =>
+                      handleChange({
+                        target: { name: "funding_status", value: opt.value },
+                      })
+                    }
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <input
               type="number"
               name="team_size"
               placeholder="Team Size"
               value={formData.team_size}
               onChange={handleChange}
+              className="input-field"
             />
           </>
         );
@@ -326,75 +433,126 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <h2>Register</h2>
-
-        {/* Role Selection */}
-        <select
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          style={{ marginBottom: "15px" }}
-        >
-          <option value="">Select Your Role</option>
-          <option value="student">Student</option>
-          <option value="college">College</option>
-          <option value="industry">Industry</option>
-          <option value="startup">Startup</option>
-        </select>
-
-        {/* Common Fields */}
-        <input
-          type="text"
-          name="first_name"
-          placeholder="First Name"
-          value={formData.first_name}
-          onChange={handleChange}
+    <div className="login-main-layout">
+      <div className="login-logo-side">
+        <img
+          src="/newlogo-removebg-preview.png"
+          alt="Logo"
+          className="big-logo-img"
         />
-        <input
-          type="text"
-          name="last_name"
-          placeholder="Last Name"
-          value={formData.last_name}
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-        />
+      </div>
+      <div className="register-container">
+        <div className="register-card">
+          <form
+            className="register-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
+            <div className="register-grid">
+              <div className="form-group">
+                <label htmlFor="first_name">First name</label>
+                <input
+                  type="text"
+                  id="first_name"
+                  name="first_name"
+                  placeholder="First Name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  required
+                  className="input-field"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="last_name">
+                  Last name{" "}
+                  <span className="optional">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="last_name"
+                  name="last_name"
+                  placeholder="Last Name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  className="input-field"
+                />
+              </div>
+            </div>
 
-        {/* Role-specific Fields */}
-        {formData.role && renderRoleSpecificFields()}
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="input-field"
+              />
+            </div>
 
-        {error && (
-          <div style={{ color: "red", margin: "10px 0", fontSize: "14px" }}>
-            {error}
-          </div>
-        )}
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="input-field"
+              />
+            </div>
 
-        <button
-          className="signin-btn"
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? "Registering..." : "Register"}
-        </button>
+            {/* Role Selection */}
+            <div className="form-group">
+              <label htmlFor="role">Register as</label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="">Select Your Role</option>
+                <option value="student">Student</option>
+                <option value="college">College</option>
+                <option value="industry">Industry</option>
+                <option value="startup">Startup</option>
+              </select>
+            </div>
 
-        <p className="join-text">
-          Already have an account?{" "}
-          <Link to="/auth/login">Go back to Login</Link>
-        </p>
+            {/* Role-specific Fields */}
+            {formData.role && (
+              <div className="role-fields">{renderRoleSpecificFields()}</div>
+            )}
+
+            {error && (
+              <div className="error-alert" style={{ margin: "10px 0" }}>
+                {error}
+              </div>
+            )}
+
+            <button
+              className="register-btn"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? "Registering..." : "Next"}
+            </button>
+
+            <p className="join-text">
+              Already have an account?{" "}
+              <Link to="/auth/login">Go back to Login</Link>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );

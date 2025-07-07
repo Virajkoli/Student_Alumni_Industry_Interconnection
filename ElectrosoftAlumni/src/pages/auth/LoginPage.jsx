@@ -41,20 +41,16 @@ export default function LoginPage() {
     }
 
     try {
-      // Login using the API
       const result = await loginUser({
         email: formData.email,
         password: formData.password,
       });
 
       if (result.success) {
-        // Redirect based on user role
         const rolePage = apiService.getRoleHomePage(result.user.role);
         navigate(rolePage, {
           replace: true,
-          state: {
-            welcomeMessage: `Welcome back, ${result.user.fullName}!`,
-          },
+          state: { newUser: false },
         });
       }
     } catch (err) {
@@ -66,84 +62,86 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <h2>Sign in</h2>
+    <div className="login-main-layout">
+      <div className="login-logo-side">
+        <img src="/newlogo-removebg-preview.png" alt="Logo" className="big-logo-img" />
+      </div>
+      <div className="login-container right-align">
+        <div className="login-content">
+          {/* Login Box */}
+          <div className="login-box">
+            {error && <div className="error-alert">{error}</div>}
 
-        <button className="social-button google">
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="Google"
-          />
-          Continue with Google
-        </button>
+            <form onSubmit={handleSubmit} className="form-content">
+              <div className="form-group">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="input-field"
+                />
+              </div>
 
-        <div className="divider">
-          <span>or</span>
+              <div className="form-group">
+                <div className="password-field">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="Password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    className="input-field"
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePassword}
+                    className="password-toggle"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-options" style={{ justifyContent: 'flex-end' }}>
+                <a href="#forgot-password" className="forgot-password">
+                  Forgot password?
+                </a>
+              </div>
+
+              <button
+                type="submit"
+                className={`login-button ${isLoading ? "loading" : ""}`}
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing in..." : "Login"}
+              </button>
+
+              <div className="separator">
+                <span>OR</span>
+              </div>
+
+              <button type="button" className="google-login">
+                <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google"
+                  className="google-icon"
+                />
+                <span>Login with Google</span>
+              </button>
+            </form>
+          </div>
+
+          <div className="register-prompt">
+            <span>New to platform?</span>
+            <Link to="/auth/signup" className="register-link">
+              Register
+            </Link>
+          </div>
         </div>
-
-        {error && (
-          <div
-            className="error-message"
-            style={{
-              color: "red",
-              textAlign: "center",
-              marginBottom: "1rem",
-              padding: "0.5rem",
-              backgroundColor: "#fee",
-              borderRadius: "4px",
-            }}
-          >
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email or phone"
-            value={formData.email}
-            onChange={handleInputChange}
-            required
-          />
-
-          <div className="password-field">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-            />
-            <button type="button" className="show-btn" onClick={togglePassword}>
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
-
-          <a href="#" className="forgot">
-            Forgot password?
-          </a>
-
-          <label className="keep-logged">
-            <input
-              type="checkbox"
-              name="keepLoggedIn"
-              checked={formData.keepLoggedIn}
-              onChange={handleInputChange}
-            />
-            Keep me logged in
-          </label>
-
-          <button type="submit" className="signin-btn" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
-
-        <p className="join-text">
-          New to the portal? <Link to="/auth/signup">Join now</Link>
-        </p>
       </div>
     </div>
   );

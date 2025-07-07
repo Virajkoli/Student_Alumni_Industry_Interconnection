@@ -6,6 +6,8 @@ const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 const { testConnection, syncDatabase } = require("./config/database");
 require("dotenv").config();
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
 
@@ -61,8 +63,21 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
-// Static files (for uploaded files)
-app.use("/uploads", express.static("uploads"));
+// Static files (for uploaded files) with comprehensive CORS
+app.use(
+  "/uploads",
+  cors(),
+  express.static("uploads", {
+    setHeaders: (res, path) => {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET");
+      res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+      );
+    },
+  })
+);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -82,6 +97,27 @@ app.use("/api/posts", postRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/notifications", notificationRoutes);
+
+// Dedicated media serving endpoint with CORS
+app.get("/api/media/*", (req, res) => {
+  const filePath = req.params[0]; // Get the file path after /api/media/
+  const fullPath = path.join(__dirname, "uploads", filePath);
+
+  // Set CORS headers
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+
+  // Check if file exists
+  if (fs.existsSync(fullPath)) {
+    res.sendFile(fullPath);
+  } else {
+    res.status(404).json({ error: "Media file not found" });
+  }
+});
 
 // Welcome route
 app.get("/", (req, res) => {

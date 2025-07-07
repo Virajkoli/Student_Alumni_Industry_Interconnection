@@ -87,6 +87,20 @@ CREATE TABLE student_projects (
   project_link TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+--Add profile and cover picture columns to students table
+-- This allows students to upload images for their profiles and covers
+-- Note: Ensure your database supports large text fields for image URLs or paths
+--mkdir -p uploads/profile_pics
+--mkdir -p uploads/cover_pics
+--// Serve static files from the uploads folder
+--app.use('/uploads', express.static('uploads'));
+--/uploads/profile_pics/student1.jpg
+--/uploads/cover_pics/student1_cover.jpg
+ALTER TABLE students
+ADD COLUMN profile_pic TEXT,
+ADD COLUMN cover_pic TEXT;
+
+
 
 CREATE TABLE posts (
   post_id SERIAL PRIMARY KEY,

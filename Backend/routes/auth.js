@@ -557,7 +557,9 @@ const registerCollege = async (req, res) => {
       email,
       password,
       name: college_name,
-      description: description || `${college_name} - Established in ${establishment_year || 'N/A'}`,
+      description:
+        description ||
+        `${college_name} - Established in ${establishment_year || "N/A"}`,
       location: college_address,
       established: establishment_year ? parseInt(establishment_year) : null,
       campusArea: campus_area ? parseFloat(campus_area) : null,
@@ -612,7 +614,9 @@ const registerCollege = async (req, res) => {
     if (error.name === "SequelizeConnectionError") {
       errorMessage = "Database connection error. Please try again later.";
     } else if (error.name === "SequelizeValidationError") {
-      errorMessage = `Validation error: ${error.errors.map(e => e.message).join(", ")}`;
+      errorMessage = `Validation error: ${error.errors
+        .map((e) => e.message)
+        .join(", ")}`;
     } else if (error.name === "SequelizeUniqueConstraintError") {
       errorMessage = "College with this email already exists";
     } else if (error.message.includes("password")) {
@@ -696,7 +700,9 @@ const collegeRegistrationValidation = [
   body("college_name")
     .trim()
     .isLength({ min: 1, max: 200 })
-    .withMessage("College name is required and must be between 1-200 characters"),
+    .withMessage(
+      "College name is required and must be between 1-200 characters"
+    ),
   body("college_address")
     .optional()
     .trim()
@@ -740,7 +746,11 @@ const collegeRegistrationValidation = [
 
 // Routes
 router.post("/register", registerValidation, registerStudent);
-router.post("/register/college", collegeRegistrationValidation, registerCollege);
+router.post(
+  "/register/college",
+  collegeRegistrationValidation,
+  registerCollege
+);
 router.post("/login", loginValidation, login);
 router.post("/logout", logout);
 router.post("/refresh", refreshToken);

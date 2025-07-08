@@ -31,33 +31,69 @@ const { notFound } = require("./middleware/notFound");
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
+// Handle preflight requests BEFORE rate limiting
+app.options("*", cors({
+  origin: [
+    "http://localhost:5173", // Local development
+    "http://localhost:3000", // Alternative local port
+    "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
+    "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
+    "https://electrosoft-alumni.vercel.app", // Additional frontend URL
+    "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
+    "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
+    /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
+    process.env.FRONTEND_URL, // Environment variable for production
+  ].filter(Boolean), // Remove any undefined values
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+}));
+
+// Rate limiting (applied after CORS preflight)
 const limiter = rateLimit({
   windowMs:
     parseInt(process.env.RATE_LIMIT_WINDOW) * 60 * 1000 || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 100, // limit each IP to 100 requests per windowMs
+  max: parseInt(process.env.RATE_LIMIT_MAX) || 500, // Increased for development
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for OPTIONS requests (CORS preflight)
+    return req.method === 'OPTIONS';
+  },
 });
 app.use("/api/", limiter);
 
-// CORS configuration
+// CORS configuration - Applied globally
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // Local development
-      "http://localhost:3000", // Alternative local port
-      "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
-      "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
-      "https://electrosoft-alumni.vercel.app", // Additional frontend URL
-      "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
-      "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
-      /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
-      process.env.FRONTEND_URL, // Environment variable for production
-    ].filter(Boolean), // Remove any undefined values
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      const allowedOrigins = [
+        "http://localhost:5173", // Local development
+        "http://localhost:3000", // Alternative local port
+        "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
+        "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
+        "https://electrosoft-alumni.vercel.app", // Additional frontend URL
+        "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
+        "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
+        process.env.FRONTEND_URL, // Environment variable for production
+      ].filter(Boolean);
+      
+      // Check if origin is in allowed list or matches Vercel pattern
+      if (allowedOrigins.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
+        callback(null, true);
+      } else {
+        console.log(`❌ CORS blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'), false);
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
 

@@ -14,16 +14,16 @@ import {
 import apiService from "../../utils/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
-const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
+const AllPostsFeed = ({ refreshTrigger, onRefreshReady }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-  // Fetch posts from backend
+  // Fetch all posts from backend
   useEffect(() => {
     if (isAuthenticated) {
-      fetchMyPosts();
+      fetchAllPosts();
     } else {
       setLoading(false);
       setError("Please log in to view posts");
@@ -33,25 +33,22 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   // Expose refresh function to parent component
   useEffect(() => {
     if (onRefreshReady) {
-      onRefreshReady(fetchMyPosts);
+      onRefreshReady(fetchAllPosts);
     }
   }, [onRefreshReady]);
 
-  const fetchMyPosts = async () => {
+  const fetchAllPosts = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log("🔄 Fetching my posts...");
-      console.log("🔐 Auth status:", { isAuthenticated, user: user?.id });
+      console.log("🔄 Fetching all posts...");
       console.log(
         "🔑 Token:",
         localStorage.getItem("authToken")?.substring(0, 20) + "..."
       );
 
-      // Fetch only posts by the current user
-      const response = await apiService.getMyPosts({
-        limit: 50,
-      });
+      // Fetch all posts (no userId/userType filter)
+      const response = await apiService.getPosts({ limit: 100 });
       console.log("📦 API Response:", response);
       console.log("📝 Posts data:", response.data);
       if (response.data && response.data.length > 0) {
@@ -61,7 +58,7 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
       }
       setPosts(response.data || []);
     } catch (error) {
-      console.error("❌ Error fetching my posts:", error);
+      console.error("❌ Error fetching all posts:", error);
       console.error("❌ Error message:", error.message);
       console.error("❌ Error stack:", error.stack);
       setError(`Failed to load posts: ${error.message}`);
@@ -120,11 +117,6 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
     );
   };
 
-  const handlePollVote = (postId, option) => {
-    // Poll voting logic (to be implemented when poll feature is added)
-    console.log("Poll vote:", postId, option);
-  };
-
   const renderPost = (post) => {
     const user = post.user;
     const hasMedia = post.media && post.media.length > 0;
@@ -136,6 +128,17 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
       mediaType: typeof post.media,
     });
 
+    // Debug media URLs
+    if (hasMedia) {
+      console.log(
+        `🖼️ Media URLs for post ${post.post_id}:`,
+        post.media.map((m) => ({
+          originalPath: m.media_url,
+          constructedUrl: apiService.getMediaUrl(m.media_url),
+        }))
+      );
+    }
+
     return (
       <div
         key={post.post_id}
@@ -145,9 +148,9 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
-              {user?.profile_pic ? (
+              {user?.profile_pic || user?.avatar ? (
                 <img
-                  src={apiService.getMediaUrl(user.profile_pic)}
+                  src={apiService.getMediaUrl(user.profile_pic || user.avatar)}
                   alt={user.full_name}
                   className="w-full h-full object-cover"
                 />
@@ -159,8 +162,8 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
               <h4 className="font-semibold text-gray-900 text-sm">
                 {user?.full_name || "Anonymous User"}
               </h4>
-              <p className="text-gray-600 text-xs">
-                {post.userType === "startup" ? "Startup" : post.userType}
+              <p className="text-gray-600 text-xs capitalize">
+                {post.userType || "User"}
               </p>
               <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
                 <Clock className="w-3 h-3" />
@@ -192,6 +195,16 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
                       src={apiService.getMediaUrl(post.media[0].media_url)}
                       alt="Post media"
                       className="w-full max-h-96 object-cover"
+                      onError={(e) => {
+                        console.error("Failed to load image:", e.target.src);
+                        e.target.style.display = "none";
+                      }}
+                      onLoad={() => {
+                        console.log(
+                          "Successfully loaded image:",
+                          apiService.getMediaUrl(post.media[0].media_url)
+                        );
+                      }}
                     />
                   ) : (
                     <video
@@ -296,7 +309,7 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
           </h3>
           <p className="text-gray-500 text-sm mb-4">{error}</p>
           <button
-            onClick={fetchMyPosts}
+            onClick={fetchAllPosts}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             Try Again
@@ -313,7 +326,7 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
             No posts yet
           </h3>
           <p className="text-gray-500 text-sm">
-            Start connecting with your network to see posts and updates here.
+            Be the first to share something with the community!
           </p>
         </div>
       )}
@@ -321,4 +334,4 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   );
 };
 
-export default FeedArea;
+export default AllPostsFeed;

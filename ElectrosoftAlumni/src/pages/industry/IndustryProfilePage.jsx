@@ -108,7 +108,7 @@ const IndustryProfilePage = () => {
               {/* Content Area */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 {activeContent === "posts" ? (
-                  <FeedArea isIndustry={true} />
+                  <FeedArea />
                 ) : (
                   <ContentRenderer
                     activeContent={activeContent}

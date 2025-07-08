@@ -14,7 +14,7 @@ import {
 import apiService from "../../utils/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
-const FeedArea = () => {
+const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,25 +23,35 @@ const FeedArea = () => {
   // Fetch posts from backend
   useEffect(() => {
     if (isAuthenticated) {
-      fetchPosts();
+      fetchMyPosts();
     } else {
       setLoading(false);
       setError("Please log in to view posts");
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, refreshTrigger]);
 
-  const fetchPosts = async () => {
+  // Expose refresh function to parent component
+  useEffect(() => {
+    if (onRefreshReady) {
+      onRefreshReady(fetchMyPosts);
+    }
+  }, [onRefreshReady]);
+
+  const fetchMyPosts = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log("🔄 Fetching posts...");
+      console.log("🔄 Fetching my posts...");
       console.log("🔐 Auth status:", { isAuthenticated, user: user?.id });
       console.log(
         "🔑 Token:",
         localStorage.getItem("authToken")?.substring(0, 20) + "..."
       );
 
-      const response = await apiService.getPosts({ limit: 50 });
+      // Fetch only posts by the current user
+      const response = await apiService.getMyPosts({
+        limit: 50,
+      });
       console.log("📦 API Response:", response);
       console.log("📝 Posts data:", response.data);
       if (response.data && response.data.length > 0) {
@@ -51,7 +61,7 @@ const FeedArea = () => {
       }
       setPosts(response.data || []);
     } catch (error) {
-      console.error("❌ Error fetching posts:", error);
+      console.error("❌ Error fetching my posts:", error);
       console.error("❌ Error message:", error.message);
       console.error("❌ Error stack:", error.stack);
       setError(`Failed to load posts: ${error.message}`);
@@ -137,7 +147,7 @@ const FeedArea = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
               {user?.profile_pic ? (
                 <img
-                  src={`https://scaips-backend.onrender.com/api/media${user.profile_pic}`}
+                  src={apiService.getMediaUrl(user.profile_pic)}
                   alt={user.full_name}
                   className="w-full h-full object-cover"
                 />
@@ -179,13 +189,13 @@ const FeedArea = () => {
                 <div className="rounded-lg overflow-hidden border border-gray-200">
                   {post.media[0].media_type === "image" ? (
                     <img
-                      src={`http://localhost:5000/api/media${post.media[0].media_url}`}
+                      src={apiService.getMediaUrl(post.media[0].media_url)}
                       alt="Post media"
                       className="w-full max-h-96 object-cover"
                     />
                   ) : (
                     <video
-                      src={`http://localhost:5000/api/media${post.media[0].media_url}`}
+                      src={apiService.getMediaUrl(post.media[0].media_url)}
                       controls
                       className="w-full max-h-96"
                     />
@@ -201,7 +211,7 @@ const FeedArea = () => {
                     >
                       {media.media_type === "image" ? (
                         <img
-                          src={`http://localhost:5000/api/media${media.media_url}`}
+                          src={apiService.getMediaUrl(media.media_url)}
                           alt={`Post media ${index + 1}`}
                           className="w-full h-32 object-cover"
                         />
@@ -286,7 +296,7 @@ const FeedArea = () => {
           </h3>
           <p className="text-gray-500 text-sm mb-4">{error}</p>
           <button
-            onClick={fetchPosts}
+            onClick={fetchMyPosts}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             Try Again

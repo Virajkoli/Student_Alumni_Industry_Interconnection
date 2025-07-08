@@ -76,6 +76,8 @@ app.use(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept"
       );
+      // Add Cross-Origin-Resource-Policy header
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     },
   })
 );

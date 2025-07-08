@@ -21,3 +21,8 @@ echo "✅ Database setup complete!"
 echo ""
 echo "🏃‍♂️ Starting backend server..."
 npm start
+
+
+
+
+https://120148362755-dmisbc1usk06heg33nan4cklovcreqm6.apps.googleusercontent.com

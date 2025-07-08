@@ -453,22 +453,29 @@ router.post("/:postId/react", auth, async (req, res) => {
       });
     }
 
-    // Use UPSERT (ON CONFLICT) to handle race conditions
-    const upsertQuery = `
-      INSERT INTO post_reactions (post_id, reaction_type, ${userInfo.column})
-      VALUES ($1, $2, $3)
-      ON CONFLICT (post_id, ${userInfo.column})
-      DO UPDATE SET 
-        reaction_type = EXCLUDED.reaction_type,
-        created_at = CURRENT_TIMESTAMP
-      RETURNING reaction_id, reaction_type
-    `;
+    // Check if user already reacted to this post and update/insert accordingly
+    // TODO: Replace with UPSERT once unique constraints are added via migration
+    const existingReaction = await pool.query(
+      `SELECT reaction_id FROM post_reactions WHERE post_id = $1 AND ${userInfo.column} = $2`,
+      [postId, userInfo.value]
+    );
 
-    const result = await pool.query(upsertQuery, [
-      postId,
-      reactionType,
-      userInfo.value,
-    ]);
+    let result;
+    if (existingReaction.rows.length > 0) {
+      // Update existing reaction
+      result = await pool.query(
+        `UPDATE post_reactions SET reaction_type = $1, created_at = CURRENT_TIMESTAMP 
+         WHERE reaction_id = $2 RETURNING reaction_id, reaction_type`,
+        [reactionType, existingReaction.rows[0].reaction_id]
+      );
+    } else {
+      // Create new reaction
+      result = await pool.query(
+        `INSERT INTO post_reactions (post_id, reaction_type, ${userInfo.column}) 
+         VALUES ($1, $2, $3) RETURNING reaction_id, reaction_type`,
+        [postId, reactionType, userInfo.value]
+      );
+    }
 
     res.json({
       success: true,

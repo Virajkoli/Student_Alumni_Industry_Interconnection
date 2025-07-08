@@ -13,7 +13,7 @@ const app = express();
 
 // Trust proxy - Required for deployment on Render and other proxy services
 // This allows express-rate-limit to work correctly with X-Forwarded-For headers
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // Import routes
 const authRoutes = require("./routes/auth");

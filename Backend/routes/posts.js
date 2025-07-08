@@ -307,7 +307,7 @@ router.get("/my-posts", auth, async (req, res) => {
     const { limit = 20, offset = 0 } = req.query;
 
     const postsQuery = `
-      SELECT ````
+      SELECT 
         p.post_id,
         p.content,
         p.created_at,

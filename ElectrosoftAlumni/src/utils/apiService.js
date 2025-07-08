@@ -1,6 +1,7 @@
 // API configuration
-const API_BASE_URL = "https://scaips-backend.onrender.com";
-// const API_BASE_URL = "http://localhost:5000";
+// Get API base URL from environment variables with fallback
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 // API service class
 class ApiService {
   constructor() {
@@ -371,6 +372,40 @@ class ApiService {
     return this.request(`/api/posts/${postId}`, {
       method: "DELETE",
     });
+  }
+
+  // Helper method to get media URL
+  getMediaUrl(mediaPath) {
+    if (!mediaPath) return null;
+
+    // If mediaPath already starts with http/https, return as is
+    if (mediaPath.startsWith("http://") || mediaPath.startsWith("https://")) {
+      console.log(`🔗 Media URL (absolute): ${mediaPath}`);
+      return mediaPath;
+    }
+
+    let fullUrl;
+
+    // If mediaPath starts with /uploads, construct the full URL
+    if (mediaPath.startsWith("/uploads")) {
+      fullUrl = `${this.baseURL}${mediaPath}`;
+    }
+    // If mediaPath starts with uploads (no leading slash), add the slash
+    else if (mediaPath.startsWith("uploads")) {
+      fullUrl = `${this.baseURL}/${mediaPath}`;
+    }
+    // For any other path, assume it's relative to uploads directory
+    else {
+      fullUrl = `${this.baseURL}/uploads/${mediaPath}`;
+    }
+
+    console.log(`🔗 Media URL: ${mediaPath} → ${fullUrl}`);
+    return fullUrl;
+  }
+
+  // Helper method to get base URL (for components that need direct access)
+  getBaseUrl() {
+    return this.baseURL;
   }
 
   // Role-specific helpers

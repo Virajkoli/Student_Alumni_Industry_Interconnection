@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Image, Video, FileText, MapPin, Users, X } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import apiService from "../../utils/apiService";
 
 const PostCreator = ({ onPostCreated }) => {
   const [postText, setPostText] = useState("");
@@ -26,39 +27,18 @@ const PostCreator = ({ onPostCreated }) => {
       // Create FormData for file upload
       const formData = new FormData();
 
-      // Add text content
-      if (postText.trim()) {
-        formData.append("content", postText);
-      }
+      // Create post data object
+      const postData = {
+        content: postText.trim(),
+      };
 
-      // Add poll options if any
+      // Add poll options if present
       if (showPollOptions && pollOptions.some((opt) => opt.trim())) {
-        formData.append(
-          "pollOptions",
-          JSON.stringify(pollOptions.filter((opt) => opt.trim()))
-        );
+        postData.pollOptions = pollOptions.filter((opt) => opt.trim());
       }
 
-      // Add media files
-      selectedFiles.forEach((file) => {
-        formData.append("media", file);
-      });
-
-      // Make API call
-      const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:5000/api/posts", {
-        method: "POST",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create post");
-      }
+      // Use apiService to create post
+      const data = await apiService.createPost(postData, selectedFiles);
 
       console.log("Post created successfully:", data);
 

@@ -22,7 +22,7 @@ const notificationRoutes = require("./routes/notifications");
 
 // Import middleware
 const { errorHandler } = require("./middleware/errorHandler");
-const { notFound } = require("./middleware/notFound");
+const { notFound } = require("./middleware/notFound);
 
 // Security middleware
 app.use(helmet());
@@ -56,6 +56,9 @@ app.use(
     credentials: true,
   })
 );
+
+// Handle CORS preflight requests explicitly
+app.options('*', cors()); // Enable preflight for all routes
 
 // Logging middleware
 app.use(morgan("combined"));

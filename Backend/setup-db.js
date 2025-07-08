@@ -13,18 +13,21 @@ const pool = new Pool({
   database: process.env.DB_DATABASE,
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
-  ssl: process.env.DB_SSL === "true" ? {
-    require: true,
-    rejectUnauthorized: false,
-  } : false,
+  ssl:
+    process.env.DB_SSL === "true"
+      ? {
+          require: true,
+          rejectUnauthorized: false,
+        }
+      : false,
 });
 
 async function setupDatabase() {
   const client = await pool.connect();
-  
+
   try {
     console.log("🔍 Checking database connection...");
-    await client.query('SELECT NOW()');
+    await client.query("SELECT NOW()");
     console.log("✅ Database connected successfully");
 
     console.log("🔄 Creating posts tables...");
@@ -87,7 +90,7 @@ async function setupDatabase() {
     `);
     console.log("✅ Post reactions table created");
 
-    // Create post_comments table  
+    // Create post_comments table
     await client.query(`
       CREATE TABLE IF NOT EXISTS post_comments (
         comment_id SERIAL PRIMARY KEY,
@@ -127,14 +130,13 @@ async function setupDatabase() {
       AND tablename LIKE 'post%' 
       ORDER BY tablename
     `);
-    
+
     console.log("📋 Posts-related tables found:");
-    tablesResult.rows.forEach(row => {
+    tablesResult.rows.forEach((row) => {
       console.log(`  - ${row.tablename}`);
     });
 
     console.log("🎉 Database setup completed successfully!");
-    
   } catch (error) {
     console.error("❌ Database setup failed:", error);
     throw error;
@@ -144,7 +146,7 @@ async function setupDatabase() {
   }
 }
 
-setupDatabase().catch(error => {
+setupDatabase().catch((error) => {
   console.error("Fatal error:", error);
   process.exit(1);
 });

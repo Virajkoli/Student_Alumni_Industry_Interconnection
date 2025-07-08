@@ -21,7 +21,7 @@ const pool = new Pool({
 // Simple migration runner
 async function runMigrations() {
   const client = await pool.connect();
-  
+
   try {
     console.log("🔄 Starting database migrations...");
 
@@ -35,16 +35,17 @@ async function runMigrations() {
     `);
 
     const migrationsDir = path.join(__dirname, "../migrations");
-    const migrationFiles = fs.readdirSync(migrationsDir)
-      .filter(file => file.endsWith('.js'))
+    const migrationFiles = fs
+      .readdirSync(migrationsDir)
+      .filter((file) => file.endsWith(".js"))
       .sort();
 
     for (const file of migrationFiles) {
-      const migrationName = path.basename(file, '.js');
-      
+      const migrationName = path.basename(file, ".js");
+
       // Check if migration has already been run
       const result = await client.query(
-        'SELECT id FROM migration_history WHERE migration_name = $1',
+        "SELECT id FROM migration_history WHERE migration_name = $1",
         [migrationName]
       );
 
@@ -54,24 +55,30 @@ async function runMigrations() {
       }
 
       console.log(`🔄 Running migration: ${migrationName}`);
-      
+
       try {
         // Simple SQL execution for our posts tables migration
-        if (migrationName === '20250707000002-create-posts-tables') {
+        if (migrationName === "20250707000002-create-posts-tables") {
           await runPostsTablesMigration(client);
-        } else if (migrationName === '20250708000001-add-unique-constraint-post-reactions') {
+        } else if (
+          migrationName ===
+          "20250708000001-add-unique-constraint-post-reactions"
+        ) {
           await runReactionsConstraintMigration(client);
         }
 
         // Mark migration as completed
         await client.query(
-          'INSERT INTO migration_history (migration_name) VALUES ($1)',
+          "INSERT INTO migration_history (migration_name) VALUES ($1)",
           [migrationName]
         );
 
         console.log(`✅ Completed migration: ${migrationName}`);
       } catch (migrationError) {
-        console.error(`❌ Error in migration ${migrationName}:`, migrationError);
+        console.error(
+          `❌ Error in migration ${migrationName}:`,
+          migrationError
+        );
         throw migrationError;
       }
     }
@@ -182,7 +189,7 @@ async function runReactionsConstraintMigration(client) {
 
 // Run migrations if this script is executed directly
 if (require.main === module) {
-  runMigrations().catch(error => {
+  runMigrations().catch((error) => {
     console.error("Fatal error:", error);
     process.exit(1);
   });

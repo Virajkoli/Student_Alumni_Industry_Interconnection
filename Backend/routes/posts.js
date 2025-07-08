@@ -47,14 +47,24 @@ const upload = multer({
   },
   fileFilter: function (req, file, cb) {
     // Allow only specific image and video formats
-    const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+    const allowedImageTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
+    const allowedVideoTypes = ["video/mp4", "video/webm", "video/quicktime"];
     const allowedTypes = [...allowedImageTypes, ...allowedVideoTypes];
-    
+
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Only .jpg, .jpeg, .png, .webp, .mp4, .webm files are allowed!"), false);
+      cb(
+        new Error(
+          "Only .jpg, .jpeg, .png, .webp, .mp4, .webm files are allowed!"
+        ),
+        false
+      );
     }
   },
 });
@@ -167,7 +177,9 @@ router.post("/", auth, upload.array("media", 5), async (req, res) => {
           ? "image"
           : "video";
         // Use absolute URL with BASE_URL from environment
-        const mediaUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/uploads/posts/${file.filename}`;
+        const mediaUrl = `${
+          process.env.BASE_URL || "http://localhost:5000"
+        }/uploads/posts/${file.filename}`;
 
         await client.query(
           "INSERT INTO post_media (post_id, media_type, media_url) VALUES ($1, $2, $3)",
@@ -179,9 +191,9 @@ router.post("/", auth, upload.array("media", 5), async (req, res) => {
     // Insert poll options if present
     if (pollOptions) {
       let parsedPollOptions;
-      
+
       // Handle both JSON string and array formats
-      if (typeof pollOptions === 'string') {
+      if (typeof pollOptions === "string") {
         try {
           parsedPollOptions = JSON.parse(pollOptions);
         } catch (parseError) {
@@ -196,7 +208,7 @@ router.post("/", auth, upload.array("media", 5), async (req, res) => {
 
       if (Array.isArray(parsedPollOptions) && parsedPollOptions.length > 0) {
         for (const option of parsedPollOptions) {
-          if (option && typeof option === 'string' && option.trim()) {
+          if (option && typeof option === "string" && option.trim()) {
             await client.query(
               "INSERT INTO post_polls (post_id, option_text) VALUES ($1, $2)",
               [postId, option.trim()]
@@ -359,9 +371,9 @@ router.get("/my-posts", auth, async (req, res) => {
         AND table_name = 'posts'
       );
     `;
-    
+
     const tableExists = await pool.query(tableExistsQuery);
-    
+
     if (!tableExists.rows[0].exists) {
       return res.json({
         success: true,
@@ -435,16 +447,19 @@ router.get("/my-posts", auth, async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching user posts:", error);
-    
+
     // If the error is about missing tables, return empty array
-    if (error.message.includes('relation') && error.message.includes('does not exist')) {
+    if (
+      error.message.includes("relation") &&
+      error.message.includes("does not exist")
+    ) {
       return res.json({
         success: true,
         data: [],
         message: "Posts tables not found. Please run database migrations.",
       });
     }
-    
+
     res.status(500).json({
       success: false,
       message: "Failed to fetch user posts",
@@ -461,7 +476,7 @@ router.post("/:postId/react", auth, async (req, res) => {
     const userInfo = getUserTypeAndId(req.user);
 
     // Validate reaction type
-    const validReactionTypes = ['like', 'love', 'share', 'wow', 'sad'];
+    const validReactionTypes = ["like", "love", "share", "wow", "sad"];
     if (!validReactionTypes.includes(reactionType)) {
       return res.status(400).json({
         success: false,
@@ -593,16 +608,16 @@ router.delete("/:postId", auth, async (req, res) => {
       try {
         // Handle both absolute and relative URLs
         let filePath;
-        if (media.media_url.startsWith('http')) {
+        if (media.media_url.startsWith("http")) {
           // Extract filename from absolute URL
-          const urlParts = media.media_url.split('/');
+          const urlParts = media.media_url.split("/");
           const filename = urlParts[urlParts.length - 1];
           filePath = path.join(__dirname, "..", "uploads", "posts", filename);
         } else {
           // Handle relative path
           filePath = path.join(__dirname, "..", media.media_url);
         }
-        
+
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
           console.log(`Deleted media file: ${filePath}`);
@@ -610,7 +625,10 @@ router.delete("/:postId", auth, async (req, res) => {
           console.warn(`Media file not found: ${filePath}`);
         }
       } catch (fileError) {
-        console.error(`Error deleting media file ${media.media_url}:`, fileError);
+        console.error(
+          `Error deleting media file ${media.media_url}:`,
+          fileError
+        );
         // Don't fail the entire operation if file deletion fails
       }
     }
@@ -805,7 +823,9 @@ router.delete("/:postId/comment/:commentId", auth, async (req, res) => {
     }
 
     // Delete comment
-    await pool.query("DELETE FROM post_comments WHERE comment_id = $1", [commentId]);
+    await pool.query("DELETE FROM post_comments WHERE comment_id = $1", [
+      commentId,
+    ]);
 
     res.json({
       success: true,

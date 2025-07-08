@@ -18,41 +18,41 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'students',
-          key: 'id'
-        }
+          model: "students",
+          key: "id",
+        },
       },
       college_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'college',
-          key: 'id'
-        }
+          model: "college",
+          key: "id",
+        },
       },
       industry_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'industry',
-          key: 'id'
-        }
+          model: "industry",
+          key: "id",
+        },
       },
       alumni_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'alumni',
-          key: 'id'
-        }
+          model: "alumni",
+          key: "id",
+        },
       },
       startup_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'startup',
-          key: 'id'
-        }
+          model: "startup",
+          key: "id",
+        },
       },
       created_at: {
         type: Sequelize.DATE,
@@ -78,13 +78,13 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'posts',
-          key: 'post_id'
+          model: "posts",
+          key: "post_id",
         },
-        onDelete: 'CASCADE'
+        onDelete: "CASCADE",
       },
       media_type: {
-        type: Sequelize.ENUM('image', 'video'),
+        type: Sequelize.ENUM("image", "video"),
         allowNull: false,
       },
       media_url: {
@@ -115,10 +115,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'posts',
-          key: 'post_id'
+          model: "posts",
+          key: "post_id",
         },
-        onDelete: 'CASCADE'
+        onDelete: "CASCADE",
       },
       option_text: {
         type: Sequelize.STRING,
@@ -148,54 +148,54 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'posts',
-          key: 'post_id'
+          model: "posts",
+          key: "post_id",
         },
-        onDelete: 'CASCADE'
+        onDelete: "CASCADE",
       },
       reaction_type: {
-        type: Sequelize.ENUM('like', 'love', 'share', 'wow', 'sad'),
+        type: Sequelize.ENUM("like", "love", "share", "wow", "sad"),
         allowNull: false,
       },
       student_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'students',
-          key: 'id'
-        }
+          model: "students",
+          key: "id",
+        },
       },
       college_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'college',
-          key: 'id'
-        }
+          model: "college",
+          key: "id",
+        },
       },
       industry_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'industry',
-          key: 'id'
-        }
+          model: "industry",
+          key: "id",
+        },
       },
       alumni_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'alumni',
-          key: 'id'
-        }
+          model: "alumni",
+          key: "id",
+        },
       },
       startup_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'startup',
-          key: 'id'
-        }
+          model: "startup",
+          key: "id",
+        },
       },
       created_at: {
         type: Sequelize.DATE,
@@ -221,10 +221,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'posts',
-          key: 'post_id'
+          model: "posts",
+          key: "post_id",
         },
-        onDelete: 'CASCADE'
+        onDelete: "CASCADE",
       },
       content: {
         type: Sequelize.TEXT,
@@ -234,41 +234,41 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'students',
-          key: 'id'
-        }
+          model: "students",
+          key: "id",
+        },
       },
       college_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'college',
-          key: 'id'
-        }
+          model: "college",
+          key: "id",
+        },
       },
       industry_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'industry',
-          key: 'id'
-        }
+          model: "industry",
+          key: "id",
+        },
       },
       alumni_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'alumni',
-          key: 'id'
-        }
+          model: "alumni",
+          key: "id",
+        },
       },
       startup_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'startup',
-          key: 'id'
-        }
+          model: "startup",
+          key: "id",
+        },
       },
       created_at: {
         type: Sequelize.DATE,
@@ -294,50 +294,50 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'posts',
-          key: 'post_id'
+          model: "posts",
+          key: "post_id",
         },
-        onDelete: 'CASCADE'
+        onDelete: "CASCADE",
       },
       student_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'students',
-          key: 'id'
-        }
+          model: "students",
+          key: "id",
+        },
       },
       college_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'college',
-          key: 'id'
-        }
+          model: "college",
+          key: "id",
+        },
       },
       industry_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'industry',
-          key: 'id'
-        }
+          model: "industry",
+          key: "id",
+        },
       },
       alumni_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'alumni',
-          key: 'id'
-        }
+          model: "alumni",
+          key: "id",
+        },
       },
       startup_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'startup',
-          key: 'id'
-        }
+          model: "startup",
+          key: "id",
+        },
       },
       created_at: {
         type: Sequelize.DATE,
@@ -351,7 +351,7 @@ module.exports = {
       },
     });
 
-    console.log('Successfully created all posts-related tables');
+    console.log("Successfully created all posts-related tables");
   },
 
   async down(queryInterface, Sequelize) {
@@ -363,6 +363,6 @@ module.exports = {
     await queryInterface.dropTable("post_media");
     await queryInterface.dropTable("posts");
 
-    console.log('Successfully dropped all posts-related tables');
+    console.log("Successfully dropped all posts-related tables");
   },
 };

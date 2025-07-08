@@ -58,14 +58,14 @@ const Hostel = ({ data, onEdit }) => {
       {/* Mess Facilities */}
       <div className="mb-6">
         <h3 className="font-semibold text-blue-800 mb-2 text-lg">Mess Facilities</h3>
-        <div className="bg-yellow-50 rounded-lg p-4">
+        <div className="rounded-lg p-4">
           <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7 mb-4">
             {safeData.mess.facilities.map((item, idx) => (
               <li key={idx}>{item || "-"}</li>
             ))}
           </ul>
           <div className="border-t pt-4">
-            <h4 className="font-semibold text-yellow-900 mb-2">Meal Timings</h4>
+            <h4 className="font-semibold text-900 mb-2">Meal Timings</h4>
             <ul className="list-none space-y-1 text-gray-700">
               {safeData.mess.mealTimings.map((timing, idx) => (
                 <li key={idx}>{timing || "-"}</li>
@@ -73,7 +73,7 @@ const Hostel = ({ data, onEdit }) => {
             </ul>
           </div>
           <div className="border-t mt-4 pt-4">
-            <div className="text-yellow-900">
+            <div className="text-900">
               <span className="font-semibold">Mess Fees:</span> {safeData.mess.fees || "-"}
             </div>
           </div>

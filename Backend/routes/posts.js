@@ -207,7 +207,7 @@ router.get("/", auth, async (req, res) => {
 
     if (userId && userType) {
       const userInfo = getUserTypeAndId({ role: userType, id: userId });
-      whereClause = `WHERE ${userInfo.column} = $3`;
+      whereClause = `WHERE p.${userInfo.column} = $3`;
       queryParams.push(userInfo.value);
     }
 
@@ -331,7 +331,7 @@ router.get("/my-posts", auth, async (req, res) => {
       LEFT JOIN post_reactions pr ON p.post_id = pr.post_id
       LEFT JOIN post_comments pc ON p.post_id = pc.post_id
       LEFT JOIN post_shares ps ON p.post_id = ps.post_id
-      WHERE ${userInfo.column} = $1
+      WHERE p.${userInfo.column} = $1
       GROUP BY p.post_id
       ORDER BY p.created_at DESC
       LIMIT $2 OFFSET $3

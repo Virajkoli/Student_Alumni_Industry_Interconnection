@@ -1,10 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { Pool } = require("pg");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 const { auth } = require("../middleware/auth");
+const { uploadPostMedia, deleteFromCloudinary, extractPublicId } = require("../config/cloudinary");
 
 // Database connection
 const pool = new Pool({
@@ -20,53 +18,6 @@ const pool = new Pool({
           rejectUnauthorized: false,
         }
       : false,
-});
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = "uploads/posts";
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
-    );
-  },
-});
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
-  },
-  fileFilter: function (req, file, cb) {
-    // Allow only specific image and video formats
-    const allowedImageTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-    ];
-    const allowedVideoTypes = ["video/mp4", "video/webm", "video/quicktime"];
-    const allowedTypes = [...allowedImageTypes, ...allowedVideoTypes];
-
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Only .jpg, .jpeg, .png, .webp, .mp4, .webm files are allowed!"
-        ),
-        false
-      );
-    }
-  },
 });
 
 // Helper function to determine user type and ID from token
@@ -141,7 +92,7 @@ async function getUserDetails(userType, userId) {
 }
 
 // Create a new post
-router.post("/", auth, upload.array("media", 5), async (req, res) => {
+router.post("/", auth, uploadPostMedia.array("media", 5), async (req, res) => {
   const client = await pool.connect();
 
   try {
@@ -170,20 +121,20 @@ router.post("/", auth, upload.array("media", 5), async (req, res) => {
     ]);
     const postId = postResult.rows[0].post_id;
 
-    // Insert media if present
+    // Insert media if present (now using Cloudinary URLs)
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const mediaType = file.mimetype.startsWith("image/")
           ? "image"
           : "video";
-        // Use absolute URL with BASE_URL from environment
-        const mediaUrl = `${
-          process.env.BASE_URL || "http://localhost:5000"
-        }/uploads/posts/${file.filename}`;
+        // Use the Cloudinary URL directly
+        const mediaUrl = file.path; // Cloudinary provides the full URL in file.path
+
+        console.log(`📁 Uploaded to Cloudinary: ${mediaUrl}`);
 
         await client.query(
-          "INSERT INTO post_media (post_id, media_type, media_url) VALUES ($1, $2, $3)",
-          [postId, mediaType, mediaUrl]
+          "INSERT INTO post_media (post_id, media_type, media_url, cloudinary_public_id) VALUES ($1, $2, $3, $4)",
+          [postId, mediaType, mediaUrl, file.filename] // file.filename contains the public_id from Cloudinary
         );
       }
     }
@@ -594,39 +545,35 @@ router.delete("/:postId", auth, async (req, res) => {
       });
     }
 
-    // Get media files to delete
+    // Get media files to delete from Cloudinary
     const mediaResult = await client.query(
-      "SELECT media_url FROM post_media WHERE post_id = $1",
+      "SELECT media_url, cloudinary_public_id FROM post_media WHERE post_id = $1",
       [postId]
     );
 
     // Delete post (cascade will handle related tables)
     await client.query("DELETE FROM posts WHERE post_id = $1", [postId]);
 
-    // Delete media files from filesystem
+    // Delete media files from Cloudinary
     for (const media of mediaResult.rows) {
       try {
-        // Handle both absolute and relative URLs
-        let filePath;
-        if (media.media_url.startsWith("http")) {
-          // Extract filename from absolute URL
-          const urlParts = media.media_url.split("/");
-          const filename = urlParts[urlParts.length - 1];
-          filePath = path.join(__dirname, "..", "uploads", "posts", filename);
+        if (media.cloudinary_public_id) {
+          // Delete from Cloudinary using public_id
+          await deleteFromCloudinary(media.cloudinary_public_id);
+          console.log(`Deleted media from Cloudinary: ${media.cloudinary_public_id}`);
         } else {
-          // Handle relative path
-          filePath = path.join(__dirname, "..", media.media_url);
-        }
-
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-          console.log(`Deleted media file: ${filePath}`);
-        } else {
-          console.warn(`Media file not found: ${filePath}`);
+          // Fallback: try to extract public_id from URL
+          const publicId = extractPublicId(media.media_url);
+          if (publicId) {
+            await deleteFromCloudinary(publicId);
+            console.log(`Deleted media from Cloudinary (extracted): ${publicId}`);
+          } else {
+            console.warn(`Could not extract public_id from URL: ${media.media_url}`);
+          }
         }
       } catch (fileError) {
         console.error(
-          `Error deleting media file ${media.media_url}:`,
+          `Error deleting media file from Cloudinary ${media.media_url}:`,
           fileError
         );
         // Don't fail the entire operation if file deletion fails

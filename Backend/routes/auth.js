@@ -44,7 +44,7 @@ const registerStudent = async (req, res) => {
       first_name,
       last_name,
       contact_no,
-      college_name,
+      student_college_name,
       interested_field,
       other_field,
       role,
@@ -56,7 +56,7 @@ const registerStudent = async (req, res) => {
       email,
       first_name,
       last_name,
-      college_name,
+      student_college_name,
       interested_field,
     });
 
@@ -85,7 +85,7 @@ const registerStudent = async (req, res) => {
       first_name,
       last_name,
       contact_no,
-      college_name,
+      student_college_name,
       interested_field,
       other_field: interested_field === "Other" ? other_field : null,
     });
@@ -111,7 +111,7 @@ const registerStudent = async (req, res) => {
       first_name: student.first_name,
       last_name: student.last_name,
       contact_no: student.contact_no,
-      college_name: student.college_name,
+      student_college_name: student.student_college_name,
       interested_field: student.interested_field,
       other_field: student.other_field,
       role: "student",
@@ -239,7 +239,7 @@ const login = async (req, res) => {
         last_name: user.last_name,
         fullName: `${user.first_name} ${user.last_name}`,
         contact_no: user.contact_no,
-        college_name: user.college_name,
+        student_college_name: user.student_college_name,
         interested_field: user.interested_field,
         other_field: user.other_field,
         role: "student",
@@ -394,7 +394,7 @@ const getMe = async (req, res) => {
         last_name: user.last_name,
         fullName: `${user.first_name} ${user.last_name}`,
         contact_no: user.contact_no,
-        college_name: user.college_name,
+        student_college_name: user.student_college_name,
         interested_field: user.interested_field,
         other_field: user.other_field,
         role: "student",
@@ -475,7 +475,7 @@ const registerValidation = [
     .trim()
     .isLength({ max: 15 })
     .withMessage("Contact number must be 15 characters or less"),
-  body("college_name")
+  body("student_college_name")
     .optional()
     .trim()
     .isLength({ max: 200 })

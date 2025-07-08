@@ -6,8 +6,6 @@ const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 const { testConnection, syncDatabase } = require("./config/database");
 require("dotenv").config();
-const path = require("path");
-const fs = require("fs");
 
 const app = express();
 
@@ -32,21 +30,24 @@ const { notFound } = require("./middleware/notFound");
 app.use(helmet());
 
 // Handle preflight requests BEFORE rate limiting
-app.options("*", cors({
-  origin: [
-    "http://localhost:5173", // Local development
-    "http://localhost:3000", // Alternative local port
-    "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
-    "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
-    "https://electrosoft-alumni.vercel.app", // Additional frontend URL
-    "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
-    "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
-    /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
-    process.env.FRONTEND_URL, // Environment variable for production
-  ].filter(Boolean), // Remove any undefined values
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-}));
+app.options(
+  "*",
+  cors({
+    origin: [
+      "http://localhost:5173", // Local development
+      "http://localhost:3000", // Alternative local port
+      "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
+      "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
+      "https://electrosoft-alumni.vercel.app", // Additional frontend URL
+      "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
+      "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
+      /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
+      process.env.FRONTEND_URL, // Environment variable for production
+    ].filter(Boolean), // Remove any undefined values
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
 
 // Rate limiting (applied after CORS preflight)
 const limiter = rateLimit({
@@ -58,7 +59,7 @@ const limiter = rateLimit({
   legacyHeaders: false,
   skip: (req) => {
     // Skip rate limiting for OPTIONS requests (CORS preflight)
-    return req.method === 'OPTIONS';
+    return req.method === "OPTIONS";
   },
 });
 app.use("/api/", limiter);
@@ -69,7 +70,7 @@ app.use(
     origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      
+
       const allowedOrigins = [
         "http://localhost:5173", // Local development
         "http://localhost:3000", // Alternative local port
@@ -80,20 +81,23 @@ app.use(
         "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
         process.env.FRONTEND_URL, // Environment variable for production
       ].filter(Boolean);
-      
+
       // Check if origin is in allowed list or matches Vercel pattern
-      if (allowedOrigins.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
+      if (
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/.*\.vercel\.app$/.test(origin)
+      ) {
         callback(null, true);
       } else {
         console.log(`❌ CORS blocked origin: ${origin}`);
-        callback(new Error('Not allowed by CORS'), false);
+        callback(new Error("Not allowed by CORS"), false);
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
     preflightContinue: false,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 204,
   })
 );
 
@@ -105,21 +109,8 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
-// Static files (for uploaded files) with comprehensive CORS
-app.use(
-  "/uploads",
-  cors(),
-  express.static("uploads", {
-    setHeaders: (res, path) => {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Methods", "GET");
-      res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-      );
-    },
-  })
-);
+// Note: Static file serving removed - using Cloudinary for media storage
+// Files are now stored in Cloudinary and served directly from there
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -140,57 +131,7 @@ app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// Dedicated media serving endpoint with CORS
-app.get("/api/media/*", (req, res) => {
-  const filePath = req.params[0]; // Get the file path after /api/media/
-  const fullPath = path.join(__dirname, "uploads", filePath);
-
-  console.log(`🔍 Media request: ${filePath}`);
-  console.log(`📂 Full path: ${fullPath}`);
-  console.log(`📁 Directory exists: ${fs.existsSync(path.dirname(fullPath))}`);
-  console.log(`📄 File exists: ${fs.existsSync(fullPath)}`);
-
-  // Set CORS headers
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-
-  // Check if file exists
-  if (fs.existsSync(fullPath)) {
-    console.log(`✅ Serving file: ${fullPath}`);
-    res.sendFile(fullPath);
-  } else {
-    console.log(`❌ File not found: ${fullPath}`);
-
-    // List contents of uploads directory for debugging
-    const uploadsDir = path.join(__dirname, "uploads");
-    if (fs.existsSync(uploadsDir)) {
-      try {
-        const contents = fs.readdirSync(uploadsDir, { withFileTypes: true });
-        console.log(
-          `📋 Uploads directory contents:`,
-          contents.map(
-            (item) => `${item.name} (${item.isDirectory() ? "dir" : "file"})`
-          )
-        );
-      } catch (error) {
-        console.log(`❌ Cannot read uploads directory: ${error.message}`);
-      }
-    } else {
-      console.log(`❌ Uploads directory does not exist: ${uploadsDir}`);
-    }
-
-    res.status(404).json({
-      error: "Media file not found",
-      requestedFile: filePath,
-      message:
-        "Files may be temporarily unavailable due to server restart. Please re-upload content.",
-    });
-  }
-});
+// Note: Media serving endpoint removed - files are now served directly from Cloudinary
 
 // Debug endpoint to list uploads directory contents
 app.get("/api/debug/uploads", (req, res) => {

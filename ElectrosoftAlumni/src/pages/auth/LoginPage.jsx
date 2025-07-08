@@ -55,22 +55,24 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      
+
       // Handle specific error types
       let errorMessage = "Login failed. Please try again.";
-      
+
       if (err.message.includes("CORS")) {
         errorMessage = "Connection issue. Please wait a moment and try again.";
       } else if (err.message.includes("Failed to fetch")) {
-        errorMessage = "Unable to connect to server. Please check your internet connection.";
+        errorMessage =
+          "Unable to connect to server. Please check your internet connection.";
       } else if (err.message.includes("Too many requests")) {
-        errorMessage = "Too many login attempts. Please wait a few minutes and try again.";
+        errorMessage =
+          "Too many login attempts. Please wait a few minutes and try again.";
       } else if (err.message.includes("Invalid credentials")) {
         errorMessage = "Invalid email or password. Please try again.";
       } else {
         errorMessage = err.message || "Login failed. Please try again.";
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -80,7 +82,11 @@ export default function LoginPage() {
   return (
     <div className="login-main-layout">
       <div className="login-logo-side">
-        <img src="/newlogo-removebg-preview.png" alt="Logo" className="big-logo-img" />
+        <img
+          src="/newlogo-removebg-preview.png"
+          alt="Logo"
+          className="big-logo-img"
+        />
       </div>
       <div className="login-container right-align">
         <div className="login-content">
@@ -122,7 +128,10 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="form-options" style={{ justifyContent: 'flex-end' }}>
+              <div
+                className="form-options"
+                style={{ justifyContent: "flex-end" }}
+              >
                 <a href="#forgot-password" className="forgot-password">
                   Forgot password?
                 </a>

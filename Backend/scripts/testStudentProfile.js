@@ -1,5 +1,5 @@
 const { Student, StudentAbout } = require("../config/database");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 
 async function testStudentProfile() {
   try {

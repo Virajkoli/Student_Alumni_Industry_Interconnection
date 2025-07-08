@@ -13,7 +13,7 @@ export default function SignupPage() {
     password: "",
     // Student fields
     contact_no: "",
-    college_name: "",
+    student_college_name: "",
     interested_field: "",
     other_field: "",
     // College fields
@@ -72,6 +72,10 @@ export default function SignupPage() {
         setError("Please fill in first name and last name");
         return;
       }
+      if (!formData.student_college_name.trim()) {
+        setError("Student college name is required");
+        return;
+      }
       if (
         formData.interested_field === "Other" &&
         !formData.other_field.trim()
@@ -109,7 +113,7 @@ export default function SignupPage() {
           first_name: formData.first_name,
           last_name: formData.last_name,
           contact_no: formData.contact_no,
-          college_name: formData.college_name,
+          student_college_name: formData.student_college_name,
           interested_field: formData.interested_field,
           other_field:
             formData.interested_field === "Other"
@@ -237,9 +241,9 @@ export default function SignupPage() {
             />
             <input
               type="text"
-              name="college_name"
+              name="student_college_name"
               placeholder="College Name"
-              value={formData.college_name}
+              value={formData.student_college_name}
               onChange={handleChange}
               className="input-field"
             />

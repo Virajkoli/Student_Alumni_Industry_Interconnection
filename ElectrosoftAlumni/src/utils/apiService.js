@@ -395,29 +395,26 @@ class ApiService {
   getMediaUrl(mediaPath) {
     if (!mediaPath) return null;
 
-    // Force production URL for media files
-    const mediaBaseURL = "https://scaips-backend.onrender.com";
-
-    // If mediaPath already starts with http/https, return as is
+    // If mediaPath already starts with http/https, return as is (Cloudinary URLs)
     if (mediaPath.startsWith("http://") || mediaPath.startsWith("https://")) {
-      console.log(`🔗 Media URL (absolute): ${mediaPath}`);
+      console.log(`🔗 Media URL (Cloudinary): ${mediaPath}`);
       return mediaPath;
     }
 
-    let fullUrl;
-
-    // Remove /uploads prefix if present and use /api/media/ endpoint
+    // For backward compatibility with old local file paths
+    // This shouldn't happen with new uploads but may exist for old data
+    console.warn(`⚠️ Legacy media path detected: ${mediaPath}`);
+    
+    const mediaBaseURL = "https://scaips-backend.onrender.com";
     let cleanPath = mediaPath;
     if (mediaPath.startsWith("/uploads/")) {
-      cleanPath = mediaPath.substring(9); // Remove "/uploads/" prefix
+      cleanPath = mediaPath.substring(9);
     } else if (mediaPath.startsWith("uploads/")) {
-      cleanPath = mediaPath.substring(8); // Remove "uploads/" prefix
+      cleanPath = mediaPath.substring(8);
     }
-
-    // Use the dedicated media serving endpoint
-    fullUrl = `${mediaBaseURL}/api/media/${cleanPath}`;
-
-    console.log(`🔗 Media URL: ${mediaPath} → ${fullUrl}`);
+    
+    const fullUrl = `${mediaBaseURL}/api/media/${cleanPath}`;
+    console.log(`🔗 Legacy Media URL: ${mediaPath} → ${fullUrl}`);
     return fullUrl;
   }
 

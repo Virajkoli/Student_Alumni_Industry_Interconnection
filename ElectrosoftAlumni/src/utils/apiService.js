@@ -64,7 +64,12 @@ class ApiService {
 
   // Authentication endpoints
   async register(userData) {
-    return this.request("/api/auth/register", {
+    // Determine endpoint based on role
+    const endpoint = userData.role === "college" 
+      ? "/api/auth/register/college" 
+      : "/api/auth/register";
+    
+    return this.request(endpoint, {
       method: "POST",
       body: JSON.stringify(userData),
     });

@@ -19,10 +19,10 @@ const generateRefreshToken = (userId) => {
   });
 };
 
-// @desc    Register user (student)
+// @desc    Register user (student) - Legacy route for backward compatibility
 // @route   POST /api/auth/register
 // @access  Public
-const register = async (req, res) => {
+const registerStudent = async (req, res) => {
   try {
     console.log("=== STUDENT REGISTRATION ===");
     console.log("Request body:", { ...req.body, password: "[HIDDEN]" });
@@ -502,7 +502,7 @@ const loginValidation = [
 ];
 
 // @desc    Register college
-// @route   POST /api/auth/register-college
+// @route   POST /api/auth/register/college
 // @access  Public
 const registerCollege = async (req, res) => {
   try {
@@ -521,25 +521,23 @@ const registerCollege = async (req, res) => {
     }
 
     const {
-      name,
       email,
       password,
-      description,
-      location,
-      established,
-      campusArea,
-      nirfRank,
-      accreditation,
-      totalStudents,
-      totalFaculty,
-      website,
+      first_name,
+      last_name,
+      college_name,
+      college_address,
+      dean_name,
+      establishment_year,
     } = req.body;
 
     console.log("Processing college registration:", {
-      name,
       email,
-      location,
-      established,
+      first_name,
+      last_name,
+      college_name,
+      dean_name,
+      establishment_year,
     });
 
     // Check if college already exists
@@ -554,18 +552,15 @@ const registerCollege = async (req, res) => {
 
     // Create college
     const college = await College.create({
-      name,
       email,
       password,
-      description,
-      location,
-      established,
-      campusArea,
-      nirfRank,
-      accreditation,
-      totalStudents,
-      totalFaculty,
-      website,
+      name: college_name,
+      description: `${college_name} - Established in ${establishment_year || 'N/A'}`,
+      location: college_address,
+      established: establishment_year ? parseInt(establishment_year) : null,
+      dean_name,
+      first_name,
+      last_name,
     });
 
     console.log("College created successfully:", college.id, college.email);
@@ -582,52 +577,41 @@ const registerCollege = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
-    // Return college data (excluding password)
-    const collegeResponse = {
-      id: college.id,
-      name: college.name,
-      email: college.email,
-      description: college.description,
-      location: college.location,
-      established: college.established,
-      campusArea: college.campusArea,
-      nirfRank: college.nirfRank,
-      accreditation: college.accreditation,
-      totalStudents: college.totalStudents,
-      totalFaculty: college.totalFaculty,
-      website: college.website,
-      role: "college",
-      isEmailVerified: college.isEmailVerified,
-      profileCompletion: college.getProfileCompletion(),
-      createdAt: college.createdAt,
-    };
+    console.log("College registration successful, returning response");
 
     res.status(201).json({
       success: true,
       message: "College registered successfully",
       data: {
-        user: collegeResponse,
+        user: {
+          id: college.id,
+          email: college.email,
+          name: college.name,
+          first_name: college.first_name,
+          last_name: college.last_name,
+          role: "college",
+          isEmailVerified: college.isEmailVerified,
+          profileCompletion: 60,
+          createdAt: college.createdAt,
+        },
         token,
       },
     });
   } catch (error) {
-    console.error("=== COLLEGE REGISTRATION ERROR ===");
-    console.error("Error type:", error.constructor.name);
+    console.error("College registration error:", error);
     console.error("Error message:", error.message);
     console.error("Error stack:", error.stack);
 
     // Check for specific error types
     let errorMessage = "Server error during college registration";
     if (error.name === "SequelizeConnectionError") {
-      errorMessage = "Database connection error";
+      errorMessage = "Database connection error. Please try again later.";
     } else if (error.name === "SequelizeValidationError") {
-      errorMessage =
-        "Validation error: " + error.errors.map((e) => e.message).join(", ");
-    } else if (
-      error.message.includes("relation") &&
-      error.message.includes("does not exist")
-    ) {
-      errorMessage = "Database table not found. Please contact support.";
+      errorMessage = `Validation error: ${error.errors.map(e => e.message).join(", ")}`;
+    } else if (error.name === "SequelizeUniqueConstraintError") {
+      errorMessage = "College with this email already exists";
+    } else if (error.message.includes("password")) {
+      errorMessage = "Password hashing error. Please try again.";
     }
 
     res.status(500).json({
@@ -696,13 +680,49 @@ const registerCollegeValidation = [
   body("website").optional().isURL().withMessage("Website must be a valid URL"),
 ];
 
+const collegeRegistrationValidation = [
+  body("email")
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Please provide a valid email"),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  body("first_name")
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage("First name is required and must be between 1-100 characters"),
+  body("last_name")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Last name must be 100 characters or less"),
+  body("college_name")
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage("College name is required and must be between 1-200 characters"),
+  body("college_address")
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage("College address must be 500 characters or less"),
+  body("dean_name")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Dean name must be 100 characters or less"),
+  body("establishment_year")
+    .optional()
+    .isInt({ min: 1800, max: new Date().getFullYear() })
+    .withMessage("Establishment year must be a valid year"),
+];
+
 // Routes
-router.post("/register", registerValidation, register);
-router.post("/register-college", registerCollegeValidation, registerCollege);
+router.post("/register", registerValidation, registerStudent);
+router.post("/register/college", collegeRegistrationValidation, registerCollege);
 router.post("/login", loginValidation, login);
 router.post("/logout", logout);
 router.post("/refresh", refreshToken);
 router.get("/me", auth, getMe);
-router.post("/register-college", registerCollegeValidation, registerCollege);
 
 module.exports = router;

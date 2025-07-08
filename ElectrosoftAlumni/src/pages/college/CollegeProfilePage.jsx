@@ -8,19 +8,22 @@ import Faculty from "../../components/college/sections/Faculty";
 import Downloads from "../../components/college/sections/Downloads";
 import Admission from "../../components/college/sections/Admission";
 import Placement from "../../components/college/sections/Placement";
-// import EventsNews from "../../components/college/sections/EventsNews";
+import Events from "../../components/college/sections/Events";
 // import Facilities from "../../components/college/sections/Facilities";
 import Alumni from "../../components/college/sections/Alumni";
+import Hostel from "../../components/college/sections/Hostel";
 
 const NAV_OPTIONS = [
   { id: "college-info", name: "College Info" },
-  { id: "course-details", name: "Course Details" }, // Added Course Details as a separate tab
+  { id: "course-details", name: "Course Details" },
   { id: "course-fees", name: "Course Fees" },
   { id: "review", name: "Review" },
   { id: "admission", name: "Admission" },
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
   { id: "downloads", name: "Downloads" },
+  { id: "hostel", name: "Hostel/Campus" }, // Added Hostel/Campus tab
+  { id: "events", name: "Events" }, // Added Events tab
 ];
 
 // Mock external review form responses (in a real app, this would come from an API/database)
@@ -367,8 +370,7 @@ const CollegeProfilePage = () => {
     if (tab === "review") {
       setSectionFormData({
         ...formData[tab],
-        // Only pass comments since ratings are from external source
-        comments: formData[tab].comments || [],
+        comments: (formData[tab] && formData[tab].comments) ? formData[tab].comments : [],
       });
     } else {
       setSectionFormData(formData[tab]);
@@ -455,19 +457,11 @@ const CollegeProfilePage = () => {
             onEdit={() => openSectionForm("placement")}
           />
         );
-
-      case "events-news":
+      case "events":
         return (
-          <EventsNews
-            data={formData["events-news"]}
-            onEdit={() => openSectionForm("events-news")}
-          />
-        );
-      case "facilities":
-        return (
-          <Facilities
-            data={formData["facilities"]}
-            onEdit={() => openSectionForm("facilities")}
+          <Events
+            data={formData["events"]}
+            onEdit={() => openSectionForm("events")}
           />
         );
       case "alumni":
@@ -498,6 +492,13 @@ const CollegeProfilePage = () => {
                 ))}
             </ul>
           </div>
+        );
+      case "hostel":
+        return (
+          <Hostel
+            data={formData["hostel"]}
+            onEdit={() => openSectionForm("hostel")}
+          />
         );
       default:
         return null;

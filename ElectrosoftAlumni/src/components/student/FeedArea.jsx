@@ -179,13 +179,13 @@ const FeedArea = () => {
                 <div className="rounded-lg overflow-hidden border border-gray-200">
                   {post.media[0].media_type === "image" ? (
                     <img
-                      src={`http://localhost:5000/api/media${post.media[0].media_url}`}
+                      src={`https://scaips-backend.onrender.com/api/media${post.media[0].media_url}`}
                       alt="Post media"
                       className="w-full max-h-96 object-cover"
                     />
                   ) : (
                     <video
-                      src={`http://localhost:5000/api/media${post.media[0].media_url}`}
+                      src={`https://scaips-backend.onrender.com/api/media${post.media[0].media_url}`}
                       controls
                       className="w-full max-h-96"
                     />

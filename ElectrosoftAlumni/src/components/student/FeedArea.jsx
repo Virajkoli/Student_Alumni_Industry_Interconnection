@@ -7,7 +7,7 @@ import {
   MoreHorizontal,
   Clock,
   Users,
-  Image,
+  Image as ImageIcon,
   Video,
   Loader2,
 } from "lucide-react";
@@ -18,7 +18,24 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [failedImages, setFailedImages] = useState(new Set());
   const { isAuthenticated, user } = useAuth();
+
+  // Component for image fallback
+  const ImageFallback = ({ className, size = "large" }) => (
+    <div
+      className={`${className} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center`}
+    >
+      <div className="text-center">
+        <ImageIcon
+          className={`${
+            size === "large" ? "w-12 h-12" : "w-6 h-6"
+          } text-gray-400 mx-auto mb-2`}
+        />
+        <p className="text-gray-500 text-sm">Image not available</p>
+      </div>
+    </div>
+  );
 
   // Fetch posts from backend
   useEffect(() => {
@@ -58,6 +75,18 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
         console.log("🖼️ First post media:", response.data[0].media);
         console.log("🖼️ Media type:", typeof response.data[0].media);
         console.log("🖼️ Media length:", response.data[0].media?.length);
+        console.log("👤 First post user:", response.data[0].user);
+        console.log("🔗 First post userType:", response.data[0].userType);
+        if (response.data[0].media && response.data[0].media.length > 0) {
+          console.log(
+            "🔗 First media URL:",
+            response.data[0].media[0].media_url
+          );
+          console.log(
+            "🔗 Constructed media URL:",
+            apiService.getMediaUrl(response.data[0].media[0].media_url)
+          );
+        }
       }
       setPosts(response.data || []);
     } catch (error) {
@@ -126,7 +155,10 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   };
 
   const renderPost = (post) => {
-    const user = post.user;
+    const user = post.user || {
+      full_name: "Current User",
+      userType: "student",
+    }; // Fallback user data
     const hasMedia = post.media && post.media.length > 0;
 
     console.log(`🎨 Rendering post ${post.post_id}:`, {
@@ -134,6 +166,8 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
       hasMedia,
       mediaLength: post.media?.length,
       mediaType: typeof post.media,
+      user: user,
+      userType: post.userType,
     });
 
     return (
@@ -157,10 +191,14 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">
-                {user?.full_name || "Anonymous User"}
+                {user?.full_name || "Current User"}
               </h4>
               <p className="text-gray-600 text-xs">
-                {post.userType === "student" ? "Student" : post.userType}
+                {post.userType
+                  ? post.userType === "student"
+                    ? "Student"
+                    : post.userType
+                  : "Student"}
               </p>
               <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
                 <Clock className="w-3 h-3" />
@@ -188,27 +226,28 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
                 // Single media item
                 <div className="rounded-lg overflow-hidden border border-gray-200">
                   {post.media[0].media_type === "image" ? (
-                    <img
-                      src={apiService.getMediaUrl(post.media[0].media_url)}
-                      alt="Post media"
-                      className="w-full max-h-96 object-cover"
-                      onError={(e) => {
-                        console.error("Failed to load image:", e.target.src);
-                        e.target.parentElement.innerHTML = `
-                          <div class="w-full h-48 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                            <div class="text-center">
-                              <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                              </svg>
-                              <p class="text-gray-500 text-sm">Image not available</p>
-                            </div>
-                          </div>
-                        `;
-                      }}
-                      onLoad={() => {
-                        console.log("Successfully loaded image:", apiService.getMediaUrl(post.media[0].media_url));
-                      }}
-                    />
+                    failedImages.has(post.media[0].media_url) ? (
+                      <ImageFallback className="w-full h-48" size="large" />
+                    ) : (
+                      <img
+                        src={apiService.getMediaUrl(post.media[0].media_url)}
+                        alt="Post media"
+                        className="w-full max-h-96 object-cover"
+                        onError={(e) => {
+                          console.error("Failed to load image:", e.target.src);
+                          setFailedImages(
+                            (prev) =>
+                              new Set([...prev, post.media[0].media_url])
+                          );
+                        }}
+                        onLoad={() => {
+                          console.log(
+                            "Successfully loaded image:",
+                            apiService.getMediaUrl(post.media[0].media_url)
+                          );
+                        }}
+                      />
+                    )
                   ) : (
                     <video
                       src={apiService.getMediaUrl(post.media[0].media_url)}
@@ -226,21 +265,24 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
                       className="relative border border-gray-200 rounded-lg overflow-hidden"
                     >
                       {media.media_type === "image" ? (
-                        <img
-                          src={apiService.getMediaUrl(media.media_url)}
-                          alt={`Post media ${index + 1}`}
-                          className="w-full h-32 object-cover"
-                          onError={(e) => {
-                            console.error("Failed to load image:", e.target.src);
-                            e.target.parentElement.innerHTML = `
-                              <div class="w-full h-32 bg-gray-100 border border-gray-300 rounded flex items-center justify-center">
-                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                              </div>
-                            `;
-                          }}
-                        />
+                        failedImages.has(media.media_url) ? (
+                          <ImageFallback className="w-full h-32" size="small" />
+                        ) : (
+                          <img
+                            src={apiService.getMediaUrl(media.media_url)}
+                            alt={`Post media ${index + 1}`}
+                            className="w-full h-32 object-cover"
+                            onError={(e) => {
+                              console.error(
+                                "Failed to load image:",
+                                e.target.src
+                              );
+                              setFailedImages(
+                                (prev) => new Set([...prev, media.media_url])
+                              );
+                            }}
+                          />
+                        )
                       ) : (
                         <div className="w-full h-32 bg-gray-900 flex items-center justify-center">
                           <Video className="w-8 h-8 text-white" />

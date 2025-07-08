@@ -39,6 +39,13 @@ class ApiService {
     try {
       console.log(`🌐 API Request: ${config.method || "GET"} ${url}`);
       const response = await fetch(url, config);
+      
+      // Handle rate limiting specifically
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('retry-after') || '60';
+        throw new Error(`Rate limit exceeded. Please try again in ${retryAfter} seconds.`);
+      }
+      
       const data = await response.json();
 
       if (!response.ok) {
@@ -57,6 +64,10 @@ class ApiService {
       console.log(`✅ API Success: ${config.method || "GET"} ${url}`, data);
       return data;
     } catch (error) {
+      // Handle network/CORS errors
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('Network error or CORS issue. Please check if the backend is accessible.');
+      }
       console.error("❌ API request failed:", error);
       throw error;
     }
@@ -65,10 +76,11 @@ class ApiService {
   // Authentication endpoints
   async register(userData) {
     // Determine endpoint based on role
-    const endpoint = userData.role === "college" 
-      ? "/api/auth/register/college" 
-      : "/api/auth/register";
-    
+    const endpoint =
+      userData.role === "college"
+        ? "/api/auth/register/college"
+        : "/api/auth/register";
+
     return this.request(endpoint, {
       method: "POST",
       body: JSON.stringify(userData),

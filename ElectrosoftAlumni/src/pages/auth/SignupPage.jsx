@@ -167,7 +167,9 @@ export default function SignupPage() {
         navigate(roleRoutes[formData.role] || "/", {
           replace: true,
           state: {
-            welcomeMessage: `Welcome${response.user.first_name ? `, ${response.user.first_name}` : ""}! Registration successful.`,
+            welcomeMessage: `Welcome${
+              response.user.first_name ? `, ${response.user.first_name}` : ""
+            }! Registration successful.`,
           },
         });
       }
@@ -554,8 +556,7 @@ export default function SignupPage() {
                   </div>
                   <div className="form-group">
                     <label htmlFor="last_name">
-                      Last name{" "}
-                      <span className="optional">(Optional)</span>
+                      Last name <span className="optional">(Optional)</span>
                     </label>
                     <input
                       type="text"
@@ -629,11 +630,7 @@ export default function SignupPage() {
               </div>
             )}
 
-            <button
-              className="register-btn"
-              type="submit"
-              disabled={isLoading}
-            >
+            <button className="register-btn" type="submit" disabled={isLoading}>
               {isLoading ? "Registering..." : "Next"}
             </button>
 

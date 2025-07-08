@@ -105,6 +105,11 @@ app.get("/api/media/*", (req, res) => {
   const filePath = req.params[0]; // Get the file path after /api/media/
   const fullPath = path.join(__dirname, "uploads", filePath);
 
+  console.log(`🔍 Media request: ${filePath}`);
+  console.log(`📂 Full path: ${fullPath}`);
+  console.log(`📁 Directory exists: ${fs.existsSync(path.dirname(fullPath))}`);
+  console.log(`📄 File exists: ${fs.existsSync(fullPath)}`);
+
   // Set CORS headers
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET");
@@ -115,9 +120,102 @@ app.get("/api/media/*", (req, res) => {
 
   // Check if file exists
   if (fs.existsSync(fullPath)) {
+    console.log(`✅ Serving file: ${fullPath}`);
     res.sendFile(fullPath);
   } else {
-    res.status(404).json({ error: "Media file not found" });
+    console.log(`❌ File not found: ${fullPath}`);
+
+    // List contents of uploads directory for debugging
+    const uploadsDir = path.join(__dirname, "uploads");
+    if (fs.existsSync(uploadsDir)) {
+      try {
+        const contents = fs.readdirSync(uploadsDir, { withFileTypes: true });
+        console.log(
+          `📋 Uploads directory contents:`,
+          contents.map(
+            (item) => `${item.name} (${item.isDirectory() ? "dir" : "file"})`
+          )
+        );
+      } catch (error) {
+        console.log(`❌ Cannot read uploads directory: ${error.message}`);
+      }
+    } else {
+      console.log(`❌ Uploads directory does not exist: ${uploadsDir}`);
+    }
+
+    res.status(404).json({
+      error: "Media file not found",
+      requestedFile: filePath,
+      message:
+        "Files may be temporarily unavailable due to server restart. Please re-upload content.",
+    });
+  }
+});
+
+// Debug endpoint to list uploads directory contents
+app.get("/api/debug/uploads", (req, res) => {
+  const uploadsDir = path.join(__dirname, "uploads");
+
+  if (!fs.existsSync(uploadsDir)) {
+    return res.json({
+      exists: false,
+      message: "Uploads directory does not exist",
+      path: uploadsDir,
+    });
+  }
+
+  try {
+    const listDirectory = (dirPath, relativePath = "") => {
+      const items = fs.readdirSync(dirPath, { withFileTypes: true });
+      const result = [];
+
+      for (const item of items) {
+        const itemPath = path.join(dirPath, item.name);
+        const relativeItemPath = path.join(relativePath, item.name);
+
+        if (item.isDirectory()) {
+          result.push({
+            name: item.name,
+            type: "directory",
+            path: relativeItemPath,
+            children: listDirectory(itemPath, relativeItemPath),
+          });
+        } else {
+          const stats = fs.statSync(itemPath);
+          result.push({
+            name: item.name,
+            type: "file",
+            path: relativeItemPath,
+            size: stats.size,
+            modified: stats.mtime,
+          });
+        }
+      }
+
+      return result;
+    };
+
+    const contents = listDirectory(uploadsDir);
+
+    res.json({
+      exists: true,
+      path: uploadsDir,
+      contents: contents,
+      totalFiles: contents.reduce((count, item) => {
+        if (item.type === "file") return count + 1;
+        if (item.children)
+          return (
+            count +
+            item.children.filter((child) => child.type === "file").length
+          );
+        return count;
+      }, 0),
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to read uploads directory",
+      message: error.message,
+    });
   }
 });
 

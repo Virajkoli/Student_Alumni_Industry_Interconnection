@@ -1,19 +1,22 @@
 // API configuration
-// Get API base URL from environment variables with fallback
+// Force production URL to avoid localhost issues
 console.log("🔧 Environment variables:", {
   VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
   NODE_ENV: import.meta.env.NODE_ENV,
   MODE: import.meta.env.MODE,
 });
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://scaips-backend.onrender.com";
+// Always use production URL for now to fix localhost issue
+const API_BASE_URL = "https://scaips-backend.onrender.com";
+
+console.log("🚀 Using API Base URL:", API_BASE_URL);
 
 console.log("🌐 API Base URL configured as:", API_BASE_URL);
 // API service class
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
+    console.log("🔗 ApiService initialized with baseURL:", this.baseURL);
   }
 
   // Get authorization headers

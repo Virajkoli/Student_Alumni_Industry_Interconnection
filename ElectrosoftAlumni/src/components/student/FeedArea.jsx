@@ -71,7 +71,8 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
       console.log("🔐 Auth status:", { isAuthenticated, user: user?.id });
       console.log(
         "🌐 API Base URL:",
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
+        import.meta.env.VITE_API_BASE_URL ||
+          "https://scaips-backend.onrender.com"
       );
       const token = localStorage.getItem("authToken");
       console.log("🔑 Token exists:", !!token);

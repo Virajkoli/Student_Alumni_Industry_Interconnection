@@ -17,9 +17,16 @@ export default function SignupPage() {
     interested_field: "",
     other_field: "",
     // College fields
+    college_name: "",
     college_address: "",
-    dean_name: "",
     establishment_year: "",
+    website: "",
+    campus_area: "",
+    nirf_rank: "",
+    accreditation: "",
+    total_students: "",
+    total_faculty: "",
+    description: "",
     // Industry fields
     company_name: "",
     industry_type: "",
@@ -49,15 +56,8 @@ export default function SignupPage() {
       return;
     }
 
-    if (
-      !formData.first_name ||
-      !formData.last_name ||
-      !formData.email ||
-      !formData.password
-    ) {
-      setError(
-        "Please fill in all required fields (First Name, Last Name, Email, Password)"
-      );
+    if (!formData.email || !formData.password) {
+      setError("Please fill in email and password");
       return;
     }
 
@@ -68,11 +68,25 @@ export default function SignupPage() {
 
     // Role-specific validation
     if (formData.role === "student") {
+      if (!formData.first_name || !formData.last_name) {
+        setError("Please fill in first name and last name");
+        return;
+      }
       if (
         formData.interested_field === "Other" &&
         !formData.other_field.trim()
       ) {
         setError("Please specify the other field of interest");
+        return;
+      }
+    } else if (formData.role === "college") {
+      if (!formData.college_name.trim()) {
+        setError("College name is required");
+        return;
+      }
+    } else if (formData.role === "industry" || formData.role === "startup") {
+      if (!formData.first_name || !formData.last_name) {
+        setError("Please fill in first name and last name");
         return;
       }
     }
@@ -83,8 +97,6 @@ export default function SignupPage() {
 
       // Prepare data based on role - only send relevant fields
       let registrationData = {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
         email: formData.email,
         password: formData.password,
         role: formData.role,
@@ -94,6 +106,8 @@ export default function SignupPage() {
       if (formData.role === "student") {
         registrationData = {
           ...registrationData,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           contact_no: formData.contact_no,
           college_name: formData.college_name,
           interested_field: formData.interested_field,
@@ -107,12 +121,20 @@ export default function SignupPage() {
           ...registrationData,
           college_name: formData.college_name,
           college_address: formData.college_address,
-          dean_name: formData.dean_name,
           establishment_year: formData.establishment_year,
+          website: formData.website,
+          campus_area: formData.campus_area,
+          nirf_rank: formData.nirf_rank,
+          accreditation: formData.accreditation,
+          total_students: formData.total_students,
+          total_faculty: formData.total_faculty,
+          description: formData.description,
         };
       } else if (formData.role === "industry") {
         registrationData = {
           ...registrationData,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           company_name: formData.company_name,
           industry_type: formData.industry_type,
           company_size: formData.company_size,
@@ -121,6 +143,8 @@ export default function SignupPage() {
       } else if (formData.role === "startup") {
         registrationData = {
           ...registrationData,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           startup_name: formData.startup_name,
           startup_stage: formData.startup_stage,
           funding_status: formData.funding_status,
@@ -143,7 +167,7 @@ export default function SignupPage() {
         navigate(roleRoutes[formData.role] || "/", {
           replace: true,
           state: {
-            welcomeMessage: `Welcome, ${response.user.first_name}! Registration successful.`,
+            welcomeMessage: `Welcome${response.user.first_name ? `, ${response.user.first_name}` : ""}! Registration successful.`,
           },
         });
       }
@@ -257,34 +281,96 @@ export default function SignupPage() {
             <input
               type="text"
               name="college_name"
-              placeholder="College Name"
+              placeholder="College Name *"
               value={formData.college_name}
               onChange={handleChange}
               className="input-field"
+              required
             />
             <input
               type="text"
               name="college_address"
-              placeholder="College Address"
+              placeholder="College Address/Location"
               value={formData.college_address}
               onChange={handleChange}
               className="input-field"
             />
+            <div className="register-grid">
+              <input
+                type="number"
+                name="establishment_year"
+                placeholder="Establishment Year"
+                value={formData.establishment_year}
+                onChange={handleChange}
+                className="input-field"
+                min="1800"
+                max={new Date().getFullYear()}
+              />
+              <input
+                type="url"
+                name="website"
+                placeholder="College Website"
+                value={formData.website}
+                onChange={handleChange}
+                className="input-field"
+              />
+            </div>
+            <div className="register-grid">
+              <input
+                type="number"
+                name="campus_area"
+                placeholder="Campus Area (in acres)"
+                value={formData.campus_area}
+                onChange={handleChange}
+                className="input-field"
+                step="0.01"
+                min="0"
+              />
+              <input
+                type="number"
+                name="nirf_rank"
+                placeholder="NIRF Ranking"
+                value={formData.nirf_rank}
+                onChange={handleChange}
+                className="input-field"
+                min="1"
+              />
+            </div>
             <input
               type="text"
-              name="dean_name"
-              placeholder="Dean Name"
-              value={formData.dean_name}
+              name="accreditation"
+              placeholder="Accreditation (e.g., NAAC A+)"
+              value={formData.accreditation}
               onChange={handleChange}
               className="input-field"
             />
-            <input
-              type="number"
-              name="establishment_year"
-              placeholder="Establishment Year"
-              value={formData.establishment_year}
+            <div className="register-grid">
+              <input
+                type="number"
+                name="total_students"
+                placeholder="Total Students"
+                value={formData.total_students}
+                onChange={handleChange}
+                className="input-field"
+                min="0"
+              />
+              <input
+                type="number"
+                name="total_faculty"
+                placeholder="Total Faculty"
+                value={formData.total_faculty}
+                onChange={handleChange}
+                className="input-field"
+                min="0"
+              />
+            </div>
+            <textarea
+              name="description"
+              placeholder="College Description (optional)"
+              value={formData.description}
               onChange={handleChange}
               className="input-field"
+              rows="3"
             />
           </>
         );
@@ -451,34 +537,38 @@ export default function SignupPage() {
             }}
           >
             <div className="register-grid">
-              <div className="form-group">
-                <label htmlFor="first_name">First name</label>
-                <input
-                  type="text"
-                  id="first_name"
-                  name="first_name"
-                  placeholder="First Name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                  required
-                  className="input-field"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="last_name">
-                  Last name{" "}
-                  <span className="optional">(Optional)</span>
-                </label>
-                <input
-                  type="text"
-                  id="last_name"
-                  name="last_name"
-                  placeholder="Last Name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  className="input-field"
-                />
-              </div>
+              {formData.role !== "college" && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="first_name">First name</label>
+                    <input
+                      type="text"
+                      id="first_name"
+                      name="first_name"
+                      placeholder="First Name"
+                      value={formData.first_name}
+                      onChange={handleChange}
+                      required
+                      className="input-field"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="last_name">
+                      Last name{" "}
+                      <span className="optional">(Optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="last_name"
+                      name="last_name"
+                      placeholder="Last Name"
+                      value={formData.last_name}
+                      onChange={handleChange}
+                      className="input-field"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="form-group">

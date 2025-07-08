@@ -523,21 +523,23 @@ const registerCollege = async (req, res) => {
     const {
       email,
       password,
-      first_name,
-      last_name,
       college_name,
       college_address,
-      dean_name,
       establishment_year,
+      website,
+      campus_area,
+      nirf_rank,
+      accreditation,
+      total_students,
+      total_faculty,
+      description,
     } = req.body;
 
     console.log("Processing college registration:", {
       email,
-      first_name,
-      last_name,
       college_name,
-      dean_name,
       establishment_year,
+      website,
     });
 
     // Check if college already exists
@@ -555,12 +557,15 @@ const registerCollege = async (req, res) => {
       email,
       password,
       name: college_name,
-      description: `${college_name} - Established in ${establishment_year || 'N/A'}`,
+      description: description || `${college_name} - Established in ${establishment_year || 'N/A'}`,
       location: college_address,
       established: establishment_year ? parseInt(establishment_year) : null,
-      dean_name,
-      first_name,
-      last_name,
+      campusArea: campus_area ? parseFloat(campus_area) : null,
+      nirfRank: nirf_rank ? parseInt(nirf_rank) : null,
+      accreditation: accreditation || null,
+      totalStudents: total_students ? parseInt(total_students) : null,
+      totalFaculty: total_faculty ? parseInt(total_faculty) : null,
+      website: website || null,
     });
 
     console.log("College created successfully:", college.id, college.email);
@@ -688,15 +693,6 @@ const collegeRegistrationValidation = [
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
-  body("first_name")
-    .trim()
-    .isLength({ min: 1, max: 100 })
-    .withMessage("First name is required and must be between 1-100 characters"),
-  body("last_name")
-    .optional()
-    .trim()
-    .isLength({ max: 100 })
-    .withMessage("Last name must be 100 characters or less"),
   body("college_name")
     .trim()
     .isLength({ min: 1, max: 200 })
@@ -706,15 +702,40 @@ const collegeRegistrationValidation = [
     .trim()
     .isLength({ max: 500 })
     .withMessage("College address must be 500 characters or less"),
-  body("dean_name")
-    .optional()
-    .trim()
-    .isLength({ max: 100 })
-    .withMessage("Dean name must be 100 characters or less"),
   body("establishment_year")
     .optional()
     .isInt({ min: 1800, max: new Date().getFullYear() })
     .withMessage("Establishment year must be a valid year"),
+  body("website")
+    .optional()
+    .isURL()
+    .withMessage("Please provide a valid website URL"),
+  body("campus_area")
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage("Campus area must be a positive number"),
+  body("nirf_rank")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("NIRF rank must be a positive integer"),
+  body("accreditation")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Accreditation must be 100 characters or less"),
+  body("total_students")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Total students must be a non-negative integer"),
+  body("total_faculty")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Total faculty must be a non-negative integer"),
+  body("description")
+    .optional()
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage("Description must be 1000 characters or less"),
 ];
 
 // Routes

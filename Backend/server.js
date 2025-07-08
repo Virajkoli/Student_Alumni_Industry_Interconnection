@@ -47,7 +47,7 @@ app.use(
       "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
       "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
       "https://electrosoft-alumni.vercel.app", // Additional frontend URL
-      "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev/",
+      "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
       /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
       process.env.FRONTEND_URL, // Environment variable for production
     ].filter(Boolean), // Remove any undefined values

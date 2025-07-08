@@ -27,7 +27,54 @@ const { notFound } = require("./middleware/notFound");
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
+// CORS configuration (MUST be before rate limiting)
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        "http://localhost:5173", // Local development
+        "http://localhost:3000", // Alternative local port
+        "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
+        "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
+        "https://electrosoft-alumni.vercel.app", // Additional frontend URL
+        "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
+        process.env.FRONTEND_URL, // Environment variable for production
+      ].filter(Boolean);
+
+      // Check if origin is in allowed list or matches Vercel pattern
+      if (
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/.*\.vercel\.app$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      console.log(`🚫 CORS blocked origin: ${origin}`);
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+      "Cache-Control",
+      "Pragma",
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200, // For legacy browser support
+    preflightContinue: false,
+  })
+);
+
+// Handle preflight requests explicitly
+app.options("*", cors());
+
+// Rate limiting (AFTER CORS to avoid blocking preflight requests)
 const limiter = rateLimit({
   windowMs:
     parseInt(process.env.RATE_LIMIT_WINDOW) * 60 * 1000 || 15 * 60 * 1000, // 15 minutes
@@ -35,29 +82,26 @@ const limiter = rateLimit({
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting for OPTIONS requests (CORS preflight)
+  skip: (req) => req.method === "OPTIONS",
 });
 app.use("/api/", limiter);
 
-// CORS configuration
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173", // Local development
-      "http://localhost:3000", // Alternative local port
-      "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
-      "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
-      "https://electrosoft-alumni.vercel.app", // Additional frontend URL
-      "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
-      /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
-      process.env.FRONTEND_URL, // Environment variable for production
-    ].filter(Boolean), // Remove any undefined values
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-  })
-);
-
 // Logging middleware
 app.use(morgan("combined"));
+
+// Debug middleware for CORS requests
+app.use((req, res, next) => {
+  console.log(
+    `🌐 ${req.method} ${req.path} - Origin: ${
+      req.headers.origin || "No origin"
+    }`
+  );
+  if (req.method === "OPTIONS") {
+    console.log("✈️  CORS Preflight request");
+  }
+  next();
+});
 
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
@@ -76,6 +120,8 @@ app.use(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept"
       );
+      // Add Cross-Origin-Resource-Policy header
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     },
   })
 );

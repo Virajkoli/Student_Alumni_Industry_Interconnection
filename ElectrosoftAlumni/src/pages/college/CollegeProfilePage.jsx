@@ -8,19 +8,22 @@ import Faculty from "../../components/college/sections/Faculty";
 import Downloads from "../../components/college/sections/Downloads";
 import Admission from "../../components/college/sections/Admission";
 import Placement from "../../components/college/sections/Placement";
-// import EventsNews from "../../components/college/sections/EventsNews";
+import Events from "../../components/college/sections/Events";
 // import Facilities from "../../components/college/sections/Facilities";
 import Alumni from "../../components/college/sections/Alumni";
+import Hostel from "../../components/college/sections/Hostel";
 
 const NAV_OPTIONS = [
   { id: "college-info", name: "College Info" },
-  { id: "course-details", name: "Course Details" }, // Added Course Details as a separate tab
+  { id: "course-details", name: "Course Details" },
   { id: "course-fees", name: "Course Fees" },
   { id: "review", name: "Review" },
   { id: "admission", name: "Admission" },
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
   { id: "downloads", name: "Downloads" },
+  { id: "hostel", name: "Hostel/Campus" }, // Added Hostel/Campus tab
+  { id: "events", name: "Events" }, // Added Events tab
 ];
 
 // Mock external review form responses (in a real app, this would come from an API/database)
@@ -360,47 +363,170 @@ const CollegeProfilePage = () => {
         },
       ],
     },
+    events: {
+      upcomingEvents: [],
+      annualEvents: [
+        {
+          name: "Alumni Meet",
+          month: "January",
+          description:
+            "A grand gathering of alumni, students, and faculty for networking and celebration.",
+        },
+        {
+          name: "Techno-Cultural Fest",
+          month: "March",
+          description:
+            "A week-long festival featuring technical competitions, cultural nights, and celebrity performances.",
+        },
+        {
+          name: "Foundation Day",
+          month: "August",
+          description:
+            "Commemorating the establishment of the college with cultural programs and awards.",
+        },
+      ],
+      techCulture: [
+        "Innovision: National-level technical symposium",
+        "Renaissance: Annual cultural extravaganza",
+        "Sports Fiesta: Inter-college sports competition",
+      ],
+      seminars: [
+        "Industry-Academia Conclave: Talks by industry leaders and researchers",
+        "Entrepreneurship Summit: Workshops and panel discussions for startups",
+        "Research Symposium: Student and faculty research presentations",
+      ],
+      conferences: [
+        "International Conference on Emerging Technologies",
+        "National Conference on Sustainable Development",
+        "Annual Management Conference",
+      ],
+    },
+    hostel: {
+      facilities: [
+        "Separate hostels for boys and girls",
+        "24x7 security and CCTV surveillance",
+        "Wi-Fi enabled rooms",
+        "Common room with TV and indoor games",
+        "Gym and sports facilities",
+        "Reading room and study areas",
+      ],
+      rooms: [
+        {
+          type: "Single Occupancy",
+          description: "Available for senior students and research scholars",
+          amenities: "Attached bathroom, study table, wardrobe",
+          fees: "₹25,000/semester",
+        },
+        {
+          type: "Double Occupancy",
+          description: "Standard accommodation for undergraduate students",
+          amenities: "Shared bathroom, study tables, wardrobes",
+          fees: "₹20,000/semester",
+        },
+        {
+          type: "Triple Occupancy",
+          description: "Economy option for first-year students",
+          amenities: "Common bathroom, study space, lockers",
+          fees: "₹15,000/semester",
+        },
+      ],
+      mess: {
+        facilities: [
+          "Modern kitchen with hygiene standards",
+          "Multiple dining halls",
+          "Vegetarian and non-vegetarian options",
+          "Special diet accommodations",
+          "24x7 canteen facility",
+        ],
+        mealTimings: [
+          "Breakfast: 7:30 AM - 9:30 AM",
+          "Lunch: 12:00 PM - 2:30 PM",
+          "Snacks: 4:30 PM - 6:00 PM",
+          "Dinner: 7:30 PM - 9:30 PM",
+        ],
+        fees: "₹18,000/semester",
+      },
+      rules: [
+        "Entry timing restrictions apply",
+        "Visitors allowed in designated areas only",
+        "Mandatory attendance requirements",
+        "Regular cleanliness inspections",
+        "Strict disciplinary guidelines",
+      ],
+    },
+    alumni: {
+      notableAlumni: [
+        {
+          name: "Dr. Rajesh Kumar",
+          batch: "1985",
+          achievement:
+            "CEO of Tech Innovations Inc., Pioneer in AI research",
+          contribution: "Established innovation lab, Regular guest lectures",
+        },
+        {
+          name: "Ms. Priya Sharma",
+          batch: "1992",
+          achievement:
+            "Founder of EduTech Solutions, Forbes 30 under 30",
+          contribution: "Scholarship foundation, Mentorship program",
+        },
+        {
+          name: "Mr. Arun Patel",
+          batch: "2000",
+          achievement: "Senior Director at Google, Patent holder",
+          contribution: "Campus recruitment drive, Research funding",
+        },
+      ],
+      initiatives: [
+        "Annual Alumni Meet",
+        "Mentorship Program",
+        "Career Guidance Sessions",
+        "Scholarship Programs",
+        "Industry Connect Workshops",
+      ],
+      networks: [
+        "Global Alumni Association",
+        "Regional Chapters worldwide",
+        "Online Alumni Portal",
+        "LinkedIn Group",
+        "Newsletter Subscription",
+      ],
+      contributions: [
+        "Research Funding Support",
+        "Infrastructure Development",
+        "Internship Opportunities",
+        "Guest Lectures",
+        "Placement Assistance",
+      ],
+    },
   });
 
   const openSectionForm = (tab) => {
     setShowSectionForm(tab);
-    if (tab === "review") {
-      setSectionFormData({
-        ...formData[tab],
-        // Only pass comments since ratings are from external source
-        comments: formData[tab].comments || [],
-      });
-    } else {
-      setSectionFormData(formData[tab]);
-    }
+    setSectionFormData(formData[tab] || {});
   };
   const closeSectionForm = () => setShowSectionForm(null);
   const handleSectionFormChange = (field, value) => {
-    setSectionFormData((prev) => {
-      if (Array.isArray(field)) {
-        // Nested field (e.g., ['breakdown', 'academics'])
-        const [parent, child] = field;
-        return {
-          ...prev,
-          [parent]: {
-            ...prev[parent],
-            [child]: value,
-          },
-        };
-      } else {
-        return { ...prev, [field]: value };
-      }
-    });
+    setSectionFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
-  const handleSectionFormArrayChange = (field, idx, value) => {
+  const handleSectionFormArrayChange = (arrayField, idx, value) => {
     setSectionFormData((prev) => {
-      const arr = [...prev[field]];
-      arr[idx] = value;
-      return { ...prev, [field]: arr };
+      const array = [...(prev[arrayField] || [])];
+      array[idx] = value;
+      return {
+        ...prev,
+        [arrayField]: array,
+      };
     });
   };
   const saveSectionForm = (tab) => {
-    setFormData((prev) => ({ ...prev, [tab]: sectionFormData }));
+    setFormData((prev) => ({
+      ...prev,
+      [tab]: sectionFormData,
+    }));
     setShowSectionForm(null);
   };
 
@@ -455,19 +581,11 @@ const CollegeProfilePage = () => {
             onEdit={() => openSectionForm("placement")}
           />
         );
-
-      case "events-news":
+      case "events":
         return (
-          <EventsNews
-            data={formData["events-news"]}
-            onEdit={() => openSectionForm("events-news")}
-          />
-        );
-      case "facilities":
-        return (
-          <Facilities
-            data={formData["facilities"]}
-            onEdit={() => openSectionForm("facilities")}
+          <Events
+            data={formData["events"]}
+            onEdit={() => openSectionForm("events")}
           />
         );
       case "alumni":
@@ -498,6 +616,13 @@ const CollegeProfilePage = () => {
                 ))}
             </ul>
           </div>
+        );
+      case "hostel":
+        return (
+          <Hostel
+            data={formData["hostel"]}
+            onEdit={() => openSectionForm("hostel")}
+          />
         );
       default:
         return null;
@@ -1749,6 +1874,706 @@ const CollegeProfilePage = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {showSectionForm === "events" && (
+              <div>
+                {/* Annual Events */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Annual Events
+                  </h3>
+                  <div className="space-y-4">
+                    {sectionFormData.annualEvents?.map((event, idx) => (
+                      <div key={idx} className="border rounded-lg p-4">
+                        <div className="flex justify-between mb-2">
+                          <h4 className="font-semibold">Event {idx + 1}</h4>
+                          <button
+                            onClick={() => {
+                              const newEvents = [...sectionFormData.annualEvents];
+                              newEvents.splice(idx, 1);
+                              handleSectionFormChange("annualEvents", newEvents);
+                            }}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <input
+                          className="w-full mb-2 p-2 border rounded"
+                          value={event.name}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("annualEvents", idx, {
+                              ...event,
+                              name: e.target.value,
+                            })
+                          }
+                          placeholder="Event Name"
+                        />
+                        <input
+                          className="w-full mb-2 p-2 border rounded"
+                          value={event.month}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("annualEvents", idx, {
+                              ...event,
+                              month: e.target.value,
+                            })
+                          }
+                          placeholder="Month"
+                        />
+                        <textarea
+                          className="w-full p-2 border rounded"
+                          value={event.description}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("annualEvents", idx, {
+                              ...event,
+                              description: e.target.value,
+                            })
+                          }
+                          placeholder="Description"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("annualEvents", [
+                          ...(sectionFormData.annualEvents || []),
+                          { name: "", month: "", description: "" },
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Event
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tech & Cultural Fests */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Tech & Cultural Fests
+                  </h3>
+                  <div className="space-y-2">
+                    {sectionFormData.techCulture?.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          className="flex-1 p-2 border rounded"
+                          value={item}
+                          onChange={(e) => {
+                            const newItems = [...(sectionFormData.techCulture || [])];
+                            newItems[idx] = e.target.value;
+                            handleSectionFormChange("techCulture", newItems);
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            const newItems = [...(sectionFormData.techCulture || [])];
+                            newItems.splice(idx, 1);
+                            handleSectionFormChange("techCulture", newItems);
+                          }}
+                          className="text-red-600 hover:text-red-800 px-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("techCulture", [
+                          ...(sectionFormData.techCulture || []),
+                          ""
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Fest
+                    </button>
+                  </div>
+                </div>
+
+                {/* Seminars */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Seminars
+                  </h3>
+                  <div className="space-y-2">
+                    {sectionFormData.seminars?.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          className="flex-1 p-2 border rounded"
+                          value={item}
+                          onChange={(e) => {
+                            const newItems = [...(sectionFormData.seminars || [])];
+                            newItems[idx] = e.target.value;
+                            handleSectionFormChange("seminars", newItems);
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            const newItems = [...(sectionFormData.seminars || [])];
+                            newItems.splice(idx, 1);
+                            handleSectionFormChange("seminars", newItems);
+                          }}
+                          className="text-red-600 hover:text-red-800 px-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("seminars", [
+                          ...(sectionFormData.seminars || []),
+                          ""
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Seminar
+                    </button>
+                  </div>
+                </div>
+
+                {/* Conferences */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Conferences
+                  </h3>
+                  <div className="space-y-2">
+                    {sectionFormData.conferences?.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          className="flex-1 p-2 border rounded"
+                          value={item}
+                          onChange={(e) => {
+                            const newItems = [...(sectionFormData.conferences || [])];
+                            newItems[idx] = e.target.value;
+                            handleSectionFormChange("conferences", newItems);
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            const newItems = [...(sectionFormData.conferences || [])];
+                            newItems.splice(idx, 1);
+                            handleSectionFormChange("conferences", newItems);
+                          }}
+                          className="text-red-600 hover:text-red-800 px-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("conferences", [
+                          ...(sectionFormData.conferences || []),
+                          ""
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Conference
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showSectionForm === "hostel" && (
+              <div>
+                {/* Facilities */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Facilities
+                  </h3>
+                  <div className="space-y-2">
+                    {sectionFormData.facilities?.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          className="flex-1 p-2 border rounded"
+                          value={item}
+                          onChange={(e) => {
+                            const newItems = [...(sectionFormData.facilities || [])];
+                            newItems[idx] = e.target.value;
+                            handleSectionFormChange("facilities", newItems);
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            const newItems = [...(sectionFormData.facilities || [])];
+                            newItems.splice(idx, 1);
+                            handleSectionFormChange("facilities", newItems);
+                          }}
+                          className="text-red-600 hover:text-red-800 px-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("facilities", [
+                          ...(sectionFormData.facilities || []),
+                          ""
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Facility
+                    </button>
+                  </div>
+                </div>
+
+                {/* Room Types */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Room Types
+                  </h3>
+                  <div className="space-y-4">
+                    {sectionFormData.rooms?.map((room, idx) => (
+                      <div key={idx} className="border rounded-lg p-4">
+                        <div className="flex justify-between mb-2">
+                          <h4 className="font-semibold">Room Type {idx + 1}</h4>
+                          <button
+                            onClick={() => {
+                              const newRooms = [...(sectionFormData.rooms || [])];
+                              newRooms.splice(idx, 1);
+                              handleSectionFormChange("rooms", newRooms);
+                            }}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <input
+                          className="w-full mb-2 p-2 border rounded"
+                          value={room.type}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("rooms", idx, {
+                              ...room,
+                              type: e.target.value,
+                            })
+                          }
+                          placeholder="Room Type"
+                        />
+                        <textarea
+                          className="w-full mb-2 p-2 border rounded"
+                          value={room.description}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("rooms", idx, {
+                              ...room,
+                              description: e.target.value,
+                            })
+                          }
+                          placeholder="Description"
+                        />
+                        <input
+                          className="w-full mb-2 p-2 border rounded"
+                          value={room.amenities}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("rooms", idx, {
+                              ...room,
+                              amenities: e.target.value,
+                            })
+                          }
+                          placeholder="Amenities"
+                        />
+                        <input
+                          className="w-full p-2 border rounded"
+                          value={room.fees}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("rooms", idx, {
+                              ...room,
+                              fees: e.target.value,
+                            })
+                          }
+                          placeholder="Fees"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("rooms", [
+                          ...(sectionFormData.rooms || []),
+                          { type: "", description: "", amenities: "", fees: "" },
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Room Type
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mess Facilities */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Mess Facilities
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4">
+                      <div className="mb-4">
+                        <h4 className="font-semibold mb-2">Facilities</h4>
+                        {sectionFormData.mess?.facilities?.map((item, idx) => (
+                          <div key={idx} className="flex gap-2 mb-2">
+                            <input
+                              className="flex-1 p-2 border rounded"
+                              value={item}
+                              onChange={(e) => {
+                                const newItems = [...(sectionFormData.mess?.facilities || [])];
+                                newItems[idx] = e.target.value;
+                                handleSectionFormChange("mess", {
+                                  ...sectionFormData.mess,
+                                  facilities: newItems,
+                                });
+                              }}
+                            />
+                            <button
+                              onClick={() => {
+                                const newItems = [...(sectionFormData.mess?.facilities || [])];
+                                newItems.splice(idx, 1);
+                                handleSectionFormChange("mess", {
+                                  ...sectionFormData.mess,
+                                  facilities: newItems,
+                                });
+                              }}
+                              className="text-red-600 hover:text-red-800 px-2"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          onClick={() =>
+                            handleSectionFormChange("mess", {
+                              ...sectionFormData.mess,
+                              facilities: [...(sectionFormData.mess?.facilities || []), ""],
+                            })
+                          }
+                          className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                        >
+                          Add Facility
+                        </button>
+                      </div>
+
+                      <div className="mb-4">
+                        <h4 className="font-semibold mb-2">Meal Timings</h4>
+                        {sectionFormData.mess?.mealTimings?.map((item, idx) => (
+                          <div key={idx} className="flex gap-2 mb-2">
+                            <input
+                              className="flex-1 p-2 border rounded"
+                              value={item}
+                              onChange={(e) => {
+                                const newItems = [...(sectionFormData.mess?.mealTimings || [])];
+                                newItems[idx] = e.target.value;
+                                handleSectionFormChange("mess", {
+                                  ...sectionFormData.mess,
+                                  mealTimings: newItems,
+                                });
+                              }}
+                            />
+                            <button
+                              onClick={() => {
+                                const newItems = [...(sectionFormData.mess?.mealTimings || [])];
+                                newItems.splice(idx, 1);
+                                handleSectionFormChange("mess", {
+                                  ...sectionFormData.mess,
+                                  mealTimings: newItems,
+                                });
+                              }}
+                              className="text-red-600 hover:text-red-800 px-2"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          onClick={() =>
+                            handleSectionFormChange("mess", {
+                              ...sectionFormData.mess,
+                              mealTimings: [...(sectionFormData.mess?.mealTimings || []), ""],
+                            })
+                          }
+                          className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                        >
+                          Add Timing
+                        </button>
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold mb-2">Mess Fees</h4>
+                        <input
+                          className="w-full p-2 border rounded"
+                          value={sectionFormData.mess?.fees || ""}
+                          onChange={(e) =>
+                            handleSectionFormChange("mess", {
+                              ...sectionFormData.mess,
+                              fees: e.target.value,
+                            })
+                          }
+                          placeholder="Mess Fees"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rules */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Rules & Regulations
+                  </h3>
+                  <div className="space-y-2">
+                    {sectionFormData.rules?.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          className="flex-1 p-2 border rounded"
+                          value={item}
+                          onChange={(e) => {
+                            const newItems = [...(sectionFormData.rules || [])];
+                            newItems[idx] = e.target.value;
+                            handleSectionFormChange("rules", newItems);
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            const newItems = [...(sectionFormData.rules || [])];
+                            newItems.splice(idx, 1);
+                            handleSectionFormChange("rules", newItems);
+                          }}
+                          className="text-red-600 hover:text-red-800 px-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("rules", [
+                          ...(sectionFormData.rules || []),
+                          ""
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Rule
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showSectionForm === "alumni" && (
+              <div>
+                {/* Notable Alumni */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Notable Alumni
+                  </h3>
+                  <div className="space-y-4">
+                    {sectionFormData.notableAlumni?.map((alumni, idx) => (
+                      <div key={idx} className="border rounded-lg p-4">
+                        <div className="flex justify-between mb-2">
+                          <h4 className="font-semibold">Alumni {idx + 1}</h4>
+                          <button
+                            onClick={() => {
+                              const newAlumni = [...(sectionFormData.notableAlumni || [])];
+                              newAlumni.splice(idx, 1);
+                              handleSectionFormChange("notableAlumni", newAlumni);
+                            }}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <input
+                          className="w-full mb-2 p-2 border rounded"
+                          value={alumni.name}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("notableAlumni", idx, {
+                              ...alumni,
+                              name: e.target.value,
+                            })
+                          }
+                          placeholder="Name"
+                        />
+                        <input
+                          className="w-full mb-2 p-2 border rounded"
+                          value={alumni.batch}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("notableAlumni", idx, {
+                              ...alumni,
+                              batch: e.target.value,
+                            })
+                          }
+                          placeholder="Batch"
+                        />
+                        <textarea
+                          className="w-full mb-2 p-2 border rounded"
+                          value={alumni.achievement}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("notableAlumni", idx, {
+                              ...alumni,
+                              achievement: e.target.value,
+                            })
+                          }
+                          placeholder="Achievement"
+                        />
+                        <textarea
+                          className="w-full p-2 border rounded"
+                          value={alumni.contribution}
+                          onChange={(e) =>
+                            handleSectionFormArrayChange("notableAlumni", idx, {
+                              ...alumni,
+                              contribution: e.target.value,
+                            })
+                          }
+                          placeholder="Contribution"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("notableAlumni", [
+                          ...(sectionFormData.notableAlumni || []),
+                          { name: "", batch: "", achievement: "", contribution: "" },
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Alumni
+                    </button>
+                  </div>
+                </div>
+
+                {/* Initiatives */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Alumni Initiatives
+                  </h3>
+                  <div className="space-y-2">
+                    {sectionFormData.initiatives?.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          className="flex-1 p-2 border rounded"
+                          value={item}
+                          onChange={(e) => {
+                            const newItems = [...(sectionFormData.initiatives || [])];
+                            newItems[idx] = e.target.value;
+                            handleSectionFormChange("initiatives", newItems);
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            const newItems = [...(sectionFormData.initiatives || [])];
+                            newItems.splice(idx, 1);
+                            handleSectionFormChange("initiatives", newItems);
+                          }}
+                          className="text-red-600 hover:text-red-800 px-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("initiatives", [
+                          ...(sectionFormData.initiatives || []),
+                          ""
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Initiative
+                    </button>
+                  </div>
+                </div>
+
+                {/* Networks */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Alumni Networks
+                  </h3>
+                  <div className="space-y-2">
+                    {sectionFormData.networks?.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          className="flex-1 p-2 border rounded"
+                          value={item}
+                          onChange={(e) => {
+                            const newItems = [...(sectionFormData.networks || [])];
+                            newItems[idx] = e.target.value;
+                            handleSectionFormChange("networks", newItems);
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            const newItems = [...(sectionFormData.networks || [])];
+                            newItems.splice(idx, 1);
+                            handleSectionFormChange("networks", newItems);
+                          }}
+                          className="text-red-600 hover:text-red-800 px-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("networks", [
+                          ...(sectionFormData.networks || []),
+                          ""
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Network
+                    </button>
+                  </div>
+                </div>
+
+                {/* Contributions */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-blue-800 mb-2 text-lg">
+                    Alumni Contributions
+                  </h3>
+                  <div className="space-y-2">
+                    {sectionFormData.contributions?.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <input
+                          className="flex-1 p-2 border rounded"
+                          value={item}
+                          onChange={(e) => {
+                            const newItems = [...(sectionFormData.contributions || [])];
+                            newItems[idx] = e.target.value;
+                            handleSectionFormChange("contributions", newItems);
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            const newItems = [...(sectionFormData.contributions || [])];
+                            newItems.splice(idx, 1);
+                            handleSectionFormChange("contributions", newItems);
+                          }}
+                          className="text-red-600 hover:text-red-800 px-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() =>
+                        handleSectionFormChange("contributions", [
+                          ...(sectionFormData.contributions || []),
+                          ""
+                        ])
+                      }
+                      className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      Add Contribution
+                    </button>
                   </div>
                 </div>
               </div>

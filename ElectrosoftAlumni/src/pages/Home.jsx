@@ -195,6 +195,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../utils/apiService";
 import PostCreator from "../components/student/PostCreator";
+import AllPostsFeed from "../components/common/AllPostsFeed";
 
 import {
   faIndustry,
@@ -231,9 +232,10 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [userProfile, setUserProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [posts, setPosts] = useState([]);
-  const [postsLoading, setPostsLoading] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { user, isAuthenticated } = useAuth();
+
+  let refreshAllPosts = null;
 
   useEffect(() => {
     console.log("🔍 Home.jsx useEffect - Auth status:", {
@@ -248,7 +250,6 @@ const Home = () => {
 
     if (isAuthenticated && user) {
       fetchUserProfile();
-      fetchPosts();
     } else {
       setIsLoading(false);
     }
@@ -346,8 +347,17 @@ const Home = () => {
 
   const handlePostCreated = (newPost) => {
     console.log("🎉 New post created:", newPost);
-    // Refresh posts after creating a new one
-    fetchPosts();
+    // Trigger refresh of all posts
+    if (refreshAllPosts) {
+      refreshAllPosts();
+    } else {
+      // Fallback: use state trigger
+      setRefreshTrigger((prev) => prev + 1);
+    }
+  };
+
+  const handleRefreshReady = (refreshFunction) => {
+    refreshAllPosts = refreshFunction;
   };
 
   const getUserDisplayName = () => {
@@ -557,89 +567,10 @@ const Home = () => {
         {/* Main Feed */}
         <main className="feed">
           <PostCreator onPostCreated={handlePostCreated} />
-
-          {posts.map((post) => (
-            <div className="post-card" key={post.post_id}>
-              <div className="post-header">
-                {" "}
-                <div className="poster-info">
-                  <div className="profile-pic-small">
-                    {post.user && post.user.full_name
-                      ? post.user.full_name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                      : "U"}
-                  </div>
-                  <div>
-                    <h4>{post.user ? post.user.full_name : "Unknown User"}</h4>
-                    <p className="post-meta">
-                      {post.userType} •{" "}
-                      {new Date(post.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <button className="more-options">
-                  <FontAwesomeIcon icon={faEllipsisH} />
-                </button>
-              </div>
-
-              <div className="post-content">
-                <p>{post.content}</p>
-                {post.details && <p className="post-details">{post.details}</p>}
-                {post.image && (
-                  <img src={post.image} alt="Post" className="post-img" />
-                )}
-                {post.event && (
-                  <div className="event-card">
-                    <h4>{post.event.title}</h4>
-                    <p>{post.event.description}</p>
-                  </div>
-                )}
-                {post.isComment && (
-                  <div
-                    style={{
-                      backgroundColor: "#f9fafb",
-                      padding: "8px",
-                      borderRadius: "4px",
-                      marginTop: "8px",
-                    }}
-                  >
-                    <p style={{ margin: 0 }}>{post.details}</p>
-                  </div>
-                )}
-                <div className="post-actions">
-                  <button className="post-action">
-                    <FontAwesomeIcon icon={faThumbsUp} /> Like
-                  </button>
-                  <button className="post-action">
-                    <FontAwesomeIcon icon={faComment} /> Comment
-                  </button>
-                  <button className="post-action">
-                    <FontAwesomeIcon icon={faRetweet} /> Repost
-                  </button>
-                  <button className="post-action">
-                    <FontAwesomeIcon icon={faPaperPlane} /> Send
-                  </button>
-                </div>
-              </div>
-              <div className="mobile-post-actions">
-                <button className="post-action">
-                  <FontAwesomeIcon icon={faThumbsUp} /> Like
-                </button>
-                <button className="post-action">
-                  <FontAwesomeIcon icon={faComment} /> Comment
-                </button>
-                <button className="post-action">
-                  <FontAwesomeIcon icon={faRetweet} /> Repost
-                </button>
-                <button className="post-action">
-                  <FontAwesomeIcon icon={faPaperPlane} /> Send
-                </button>
-              </div>
-            </div>
-          ))}
+          <AllPostsFeed
+            refreshTrigger={refreshTrigger}
+            onRefreshReady={handleRefreshReady}
+          />
         </main>
 
         {/* Right Sidebar (Desktop) */}

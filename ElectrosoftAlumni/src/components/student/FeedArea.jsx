@@ -7,51 +7,90 @@ import {
   MoreHorizontal,
   Clock,
   Users,
-  Image,
+  Image as ImageIcon,
   Video,
   Loader2,
 } from "lucide-react";
 import apiService from "../../utils/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
-const FeedArea = () => {
+const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [failedImages, setFailedImages] = useState(new Set());
   const { isAuthenticated, user } = useAuth();
+
+  // Component for image fallback
+  const ImageFallback = ({ className, size = "large" }) => (
+    <div
+      className={`${className} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center`}
+    >
+      <div className="text-center">
+        <ImageIcon
+          className={`${
+            size === "large" ? "w-12 h-12" : "w-6 h-6"
+          } text-gray-400 mx-auto mb-2`}
+        />
+        <p className="text-gray-500 text-sm">Image not available</p>
+      </div>
+    </div>
+  );
 
   // Fetch posts from backend
   useEffect(() => {
     if (isAuthenticated) {
-      fetchPosts();
+      fetchMyPosts();
     } else {
       setLoading(false);
       setError("Please log in to view posts");
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, refreshTrigger]);
 
-  const fetchPosts = async () => {
+  // Expose refresh function to parent component
+  useEffect(() => {
+    if (onRefreshReady) {
+      onRefreshReady(fetchMyPosts);
+    }
+  }, [onRefreshReady]);
+
+  const fetchMyPosts = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log("🔄 Fetching posts...");
+      console.log("🔄 Fetching my posts...");
       console.log("🔐 Auth status:", { isAuthenticated, user: user?.id });
       console.log(
         "🔑 Token:",
         localStorage.getItem("authToken")?.substring(0, 20) + "..."
       );
 
-      const response = await apiService.getPosts({ limit: 50 });
+      // Fetch only posts by the current user
+      const response = await apiService.getMyPosts({
+        limit: 50,
+      });
       console.log("📦 API Response:", response);
       console.log("📝 Posts data:", response.data);
       if (response.data && response.data.length > 0) {
         console.log("🖼️ First post media:", response.data[0].media);
         console.log("🖼️ Media type:", typeof response.data[0].media);
         console.log("🖼️ Media length:", response.data[0].media?.length);
+        console.log("👤 First post user:", response.data[0].user);
+        console.log("🔗 First post userType:", response.data[0].userType);
+        if (response.data[0].media && response.data[0].media.length > 0) {
+          console.log(
+            "🔗 First media URL:",
+            response.data[0].media[0].media_url
+          );
+          console.log(
+            "🔗 Constructed media URL:",
+            apiService.getMediaUrl(response.data[0].media[0].media_url)
+          );
+        }
       }
       setPosts(response.data || []);
     } catch (error) {
-      console.error("❌ Error fetching posts:", error);
+      console.error("❌ Error fetching my posts:", error);
       console.error("❌ Error message:", error.message);
       console.error("❌ Error stack:", error.stack);
       setError(`Failed to load posts: ${error.message}`);
@@ -116,7 +155,10 @@ const FeedArea = () => {
   };
 
   const renderPost = (post) => {
-    const user = post.user;
+    const user = post.user || {
+      full_name: "Current User",
+      userType: "student",
+    }; // Fallback user data
     const hasMedia = post.media && post.media.length > 0;
 
     console.log(`🎨 Rendering post ${post.post_id}:`, {
@@ -124,6 +166,8 @@ const FeedArea = () => {
       hasMedia,
       mediaLength: post.media?.length,
       mediaType: typeof post.media,
+      user: user,
+      userType: post.userType,
     });
 
     return (
@@ -137,7 +181,7 @@ const FeedArea = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
               {user?.profile_pic ? (
                 <img
-                  src={`https://scaips-backend.onrender.com/api/media${user.profile_pic}`}
+                  src={apiService.getMediaUrl(user.profile_pic)}
                   alt={user.full_name}
                   className="w-full h-full object-cover"
                 />
@@ -147,10 +191,14 @@ const FeedArea = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">
-                {user?.full_name || "Anonymous User"}
+                {user?.full_name || "Current User"}
               </h4>
               <p className="text-gray-600 text-xs">
-                {post.userType === "student" ? "Student" : post.userType}
+                {post.userType
+                  ? post.userType === "student"
+                    ? "Student"
+                    : post.userType
+                  : "Student"}
               </p>
               <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
                 <Clock className="w-3 h-3" />
@@ -178,14 +226,31 @@ const FeedArea = () => {
                 // Single media item
                 <div className="rounded-lg overflow-hidden border border-gray-200">
                   {post.media[0].media_type === "image" ? (
-                    <img
-                      src={`https://scaips-backend.onrender.com/api/media${post.media[0].media_url}`}
-                      alt="Post media"
-                      className="w-full max-h-96 object-cover"
-                    />
+                    failedImages.has(post.media[0].media_url) ? (
+                      <ImageFallback className="w-full h-48" size="large" />
+                    ) : (
+                      <img
+                        src={apiService.getMediaUrl(post.media[0].media_url)}
+                        alt="Post media"
+                        className="w-full max-h-96 object-cover"
+                        onError={(e) => {
+                          console.error("Failed to load image:", e.target.src);
+                          setFailedImages(
+                            (prev) =>
+                              new Set([...prev, post.media[0].media_url])
+                          );
+                        }}
+                        onLoad={() => {
+                          console.log(
+                            "Successfully loaded image:",
+                            apiService.getMediaUrl(post.media[0].media_url)
+                          );
+                        }}
+                      />
+                    )
                   ) : (
                     <video
-                      src={`https://scaips-backend.onrender.com/api/media${post.media[0].media_url}`}
+                      src={apiService.getMediaUrl(post.media[0].media_url)}
                       controls
                       className="w-full max-h-96"
                     />
@@ -200,11 +265,24 @@ const FeedArea = () => {
                       className="relative border border-gray-200 rounded-lg overflow-hidden"
                     >
                       {media.media_type === "image" ? (
-                        <img
-                          src={`http://localhost:5000/api/media${media.media_url}`}
-                          alt={`Post media ${index + 1}`}
-                          className="w-full h-32 object-cover"
-                        />
+                        failedImages.has(media.media_url) ? (
+                          <ImageFallback className="w-full h-32" size="small" />
+                        ) : (
+                          <img
+                            src={apiService.getMediaUrl(media.media_url)}
+                            alt={`Post media ${index + 1}`}
+                            className="w-full h-32 object-cover"
+                            onError={(e) => {
+                              console.error(
+                                "Failed to load image:",
+                                e.target.src
+                              );
+                              setFailedImages(
+                                (prev) => new Set([...prev, media.media_url])
+                              );
+                            }}
+                          />
+                        )
                       ) : (
                         <div className="w-full h-32 bg-gray-900 flex items-center justify-center">
                           <Video className="w-8 h-8 text-white" />
@@ -286,7 +364,7 @@ const FeedArea = () => {
           </h3>
           <p className="text-gray-500 text-sm mb-4">{error}</p>
           <button
-            onClick={fetchPosts}
+            onClick={fetchMyPosts}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             Try Again

@@ -46,7 +46,7 @@ const PostCreator = ({ onPostCreated }) => {
 
       // Make API call
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:5000/api/posts", {
+      const response = await fetch("https://scaips-backend.onrender.com/api/posts", {
         method: "POST",
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),

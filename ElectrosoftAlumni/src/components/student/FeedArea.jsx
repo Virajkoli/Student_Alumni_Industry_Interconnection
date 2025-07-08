@@ -137,7 +137,7 @@ const FeedArea = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
               {user?.profile_pic ? (
                 <img
-                  src={`http://localhost:5000/api/media${user.profile_pic}`}
+                  src={`https://scaips-backend.onrender.com/api/media${user.profile_pic}`}
                   alt={user.full_name}
                   className="w-full h-full object-cover"
                 />

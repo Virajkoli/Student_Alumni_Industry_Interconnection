@@ -351,6 +351,25 @@ router.get("/my-posts", auth, async (req, res) => {
     const userInfo = getUserTypeAndId(req.user);
     const { limit = 20, offset = 0 } = req.query;
 
+    // First check if posts table exists
+    const tableExistsQuery = `
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'posts'
+      );
+    `;
+    
+    const tableExists = await pool.query(tableExistsQuery);
+    
+    if (!tableExists.rows[0].exists) {
+      return res.json({
+        success: true,
+        data: [],
+        message: "Posts table not found. Please run database migrations.",
+      });
+    }
+
     const postsQuery = `
       SELECT 
         p.post_id,
@@ -416,6 +435,16 @@ router.get("/my-posts", auth, async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching user posts:", error);
+    
+    // If the error is about missing tables, return empty array
+    if (error.message.includes('relation') && error.message.includes('does not exist')) {
+      return res.json({
+        success: true,
+        data: [],
+        message: "Posts tables not found. Please run database migrations.",
+      });
+    }
+    
     res.status(500).json({
       success: false,
       message: "Failed to fetch user posts",

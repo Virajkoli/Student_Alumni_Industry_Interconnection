@@ -155,7 +155,10 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   };
 
   const renderPost = (post) => {
-    const user = post.user;
+    const user = post.user || {
+      full_name: "Current User",
+      userType: "student",
+    }; // Fallback user data
     const hasMedia = post.media && post.media.length > 0;
 
     console.log(`🎨 Rendering post ${post.post_id}:`, {
@@ -163,6 +166,8 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
       hasMedia,
       mediaLength: post.media?.length,
       mediaType: typeof post.media,
+      user: user,
+      userType: post.userType,
     });
 
     return (
@@ -186,10 +191,14 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">
-                {user?.full_name || "Anonymous User"}
+                {user?.full_name || "Current User"}
               </h4>
               <p className="text-gray-600 text-xs">
-                {post.userType === "student" ? "Student" : post.userType}
+                {post.userType
+                  ? post.userType === "student"
+                    ? "Student"
+                    : post.userType
+                  : "Student"}
               </p>
               <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
                 <Clock className="w-3 h-3" />

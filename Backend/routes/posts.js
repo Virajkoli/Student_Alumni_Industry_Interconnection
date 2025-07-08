@@ -98,7 +98,7 @@ async function getUserDetails(userType, userId) {
       query = `
         SELECT id, first_name, last_name, 
                CONCAT(first_name, ' ', last_name) as full_name,
-               email, profile_pic
+               email
         FROM students WHERE id = $1
       `;
       break;

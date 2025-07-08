@@ -30,10 +30,10 @@ app.use(helmet());
 // CORS configuration (MUST be before rate limiting)
 app.use(
   cors({
-    origin: function(origin, callback) {
+    origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps, Postman, etc.)
       if (!origin) return callback(null, true);
-      
+
       const allowedOrigins = [
         "http://localhost:5173", // Local development
         "http://localhost:3000", // Alternative local port
@@ -43,33 +43,36 @@ app.use(
         "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
         process.env.FRONTEND_URL, // Environment variable for production
       ].filter(Boolean);
-      
+
       // Check if origin is in allowed list or matches Vercel pattern
-      if (allowedOrigins.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
+      if (
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/.*\.vercel\.app$/.test(origin)
+      ) {
         return callback(null, true);
       }
-      
+
       console.log(`🚫 CORS blocked origin: ${origin}`);
-      return callback(new Error('Not allowed by CORS'));
+      return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: [
       "Origin",
-      "X-Requested-With", 
-      "Content-Type", 
-      "Accept", 
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
       "Authorization",
       "Cache-Control",
-      "Pragma"
+      "Pragma",
     ],
     credentials: true,
     optionsSuccessStatus: 200, // For legacy browser support
-    preflightContinue: false
+    preflightContinue: false,
   })
 );
 
 // Handle preflight requests explicitly
-app.options('*', cors());
+app.options("*", cors());
 
 // Rate limiting (AFTER CORS to avoid blocking preflight requests)
 const limiter = rateLimit({
@@ -80,7 +83,7 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   // Skip rate limiting for OPTIONS requests (CORS preflight)
-  skip: (req) => req.method === 'OPTIONS'
+  skip: (req) => req.method === "OPTIONS",
 });
 app.use("/api/", limiter);
 
@@ -89,9 +92,13 @@ app.use(morgan("combined"));
 
 // Debug middleware for CORS requests
 app.use((req, res, next) => {
-  console.log(`🌐 ${req.method} ${req.path} - Origin: ${req.headers.origin || 'No origin'}`);
-  if (req.method === 'OPTIONS') {
-    console.log('✈️  CORS Preflight request');
+  console.log(
+    `🌐 ${req.method} ${req.path} - Origin: ${
+      req.headers.origin || "No origin"
+    }`
+  );
+  if (req.method === "OPTIONS") {
+    console.log("✈️  CORS Preflight request");
   }
   next();
 });

@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
-const { User, Student } = require("../config/database");
+const { User, Student, College } = require("../config/database");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
 
@@ -161,7 +161,7 @@ const register = async (req, res) => {
   }
 };
 
-// @desc    Login user
+// @desc    Login user (student or college)
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res) => {
@@ -178,8 +178,15 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user by email
-    const user = await Student.findOne({ where: { email } });
+    // Try to find user in both Student and College models
+    let user = await Student.findOne({ where: { email } });
+    let userType = "student";
+
+    if (!user) {
+      user = await College.findOne({ where: { email } });
+      userType = "college";
+    }
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -222,27 +229,53 @@ const login = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
-    // Return user data (excluding password)
-    const userResponse = {
-      id: user.id,
-      email: user.email,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      fullName: `${user.first_name} ${user.last_name}`,
-      contact_no: user.contact_no,
-      college_name: user.college_name,
-      interested_field: user.interested_field,
-      other_field: user.other_field,
-      role: "student",
-      avatar: user.avatar,
-      bio: user.bio,
-      location: user.location,
-      isEmailVerified: user.isEmailVerified,
-      isActive: user.isActive,
-      profileCompletion: user.getProfileCompletion(),
-      lastLogin: user.lastLogin,
-      createdAt: user.created_at,
-    };
+    // Return user data based on type
+    let userResponse;
+    if (userType === "student") {
+      userResponse = {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        fullName: `${user.first_name} ${user.last_name}`,
+        contact_no: user.contact_no,
+        college_name: user.college_name,
+        interested_field: user.interested_field,
+        other_field: user.other_field,
+        role: "student",
+        avatar: user.avatar,
+        bio: user.bio,
+        location: user.location,
+        isEmailVerified: user.isEmailVerified,
+        isActive: user.isActive,
+        profileCompletion: user.getProfileCompletion(),
+        lastLogin: user.lastLogin,
+        createdAt: user.created_at,
+      };
+    } else {
+      userResponse = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        description: user.description,
+        location: user.location,
+        established: user.established,
+        campusArea: user.campusArea,
+        nirfRank: user.nirfRank,
+        accreditation: user.accreditation,
+        totalStudents: user.totalStudents,
+        totalFaculty: user.totalFaculty,
+        website: user.website,
+        role: "college",
+        logoUrl: user.logoUrl,
+        backgroundUrl: user.backgroundUrl,
+        isEmailVerified: user.isEmailVerified,
+        isActive: user.isActive,
+        profileCompletion: user.getProfileCompletion(),
+        lastLogin: user.lastLogin,
+        createdAt: user.createdAt,
+      };
+    }
 
     res.json({
       success: true,
@@ -291,8 +324,11 @@ const refreshToken = async (req, res) => {
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-    // For now, we're only supporting students, so check Student model
-    const user = await Student.findByPk(decoded.userId);
+    // Try to find user in both Student and College models
+    let user = await Student.findByPk(decoded.userId);
+    if (!user) {
+      user = await College.findByPk(decoded.userId);
+    }
 
     if (!user || !user.isActive) {
       return res.status(401).json({
@@ -324,12 +360,22 @@ const refreshToken = async (req, res) => {
 // @access  Private
 const getMe = async (req, res) => {
   try {
-    // For now, we're only supporting students, so check Student model
-    const user = await Student.findByPk(req.user.id, {
+    // Try to find user in both Student and College models
+    let user = await Student.findByPk(req.user.id, {
       attributes: {
         exclude: ["password"],
       },
     });
+    let userType = "student";
+
+    if (!user) {
+      user = await College.findByPk(req.user.id, {
+        attributes: {
+          exclude: ["password"],
+        },
+      });
+      userType = "college";
+    }
 
     if (!user) {
       return res.status(404).json({
@@ -338,27 +384,53 @@ const getMe = async (req, res) => {
       });
     }
 
-    // Return user data in consistent format
-    const userResponse = {
-      id: user.id,
-      email: user.email,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      fullName: `${user.first_name} ${user.last_name}`,
-      contact_no: user.contact_no,
-      college_name: user.college_name,
-      interested_field: user.interested_field,
-      other_field: user.other_field,
-      role: "student",
-      avatar: user.avatar,
-      bio: user.bio,
-      location: user.location,
-      isEmailVerified: user.isEmailVerified,
-      isActive: user.isActive,
-      profileCompletion: user.getProfileCompletion(),
-      lastLogin: user.lastLogin,
-      createdAt: user.created_at,
-    };
+    // Return user data based on type
+    let userResponse;
+    if (userType === "student") {
+      userResponse = {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        fullName: `${user.first_name} ${user.last_name}`,
+        contact_no: user.contact_no,
+        college_name: user.college_name,
+        interested_field: user.interested_field,
+        other_field: user.other_field,
+        role: "student",
+        avatar: user.avatar,
+        bio: user.bio,
+        location: user.location,
+        isEmailVerified: user.isEmailVerified,
+        isActive: user.isActive,
+        profileCompletion: user.getProfileCompletion(),
+        lastLogin: user.lastLogin,
+        createdAt: user.created_at,
+      };
+    } else {
+      userResponse = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        description: user.description,
+        location: user.location,
+        established: user.established,
+        campusArea: user.campusArea,
+        nirfRank: user.nirfRank,
+        accreditation: user.accreditation,
+        totalStudents: user.totalStudents,
+        totalFaculty: user.totalFaculty,
+        website: user.website,
+        role: "college",
+        logoUrl: user.logoUrl,
+        backgroundUrl: user.backgroundUrl,
+        isEmailVerified: user.isEmailVerified,
+        isActive: user.isActive,
+        profileCompletion: user.getProfileCompletion(),
+        lastLogin: user.lastLogin,
+        createdAt: user.createdAt,
+      };
+    }
 
     res.json({
       success: true,
@@ -429,11 +501,209 @@ const loginValidation = [
   body("password").notEmpty().withMessage("Password is required"),
 ];
 
+// @desc    Register college
+// @route   POST /api/auth/register-college
+// @access  Public
+const registerCollege = async (req, res) => {
+  try {
+    console.log("=== COLLEGE REGISTRATION ===");
+    console.log("Request body:", { ...req.body, password: "[HIDDEN]" });
+
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("Validation errors:", errors.array());
+      return res.status(400).json({
+        success: false,
+        message: "Validation errors",
+        errors: errors.array(),
+      });
+    }
+
+    const {
+      name,
+      email,
+      password,
+      description,
+      location,
+      established,
+      campusArea,
+      nirfRank,
+      accreditation,
+      totalStudents,
+      totalFaculty,
+      website,
+    } = req.body;
+
+    console.log("Processing college registration:", {
+      name,
+      email,
+      location,
+      established,
+    });
+
+    // Check if college already exists
+    const existingCollege = await College.findOne({ where: { email } });
+    if (existingCollege) {
+      console.log("College already exists:", email);
+      return res.status(400).json({
+        success: false,
+        message: "College already exists with this email",
+      });
+    }
+
+    // Create college
+    const college = await College.create({
+      name,
+      email,
+      password,
+      description,
+      location,
+      established,
+      campusArea,
+      nirfRank,
+      accreditation,
+      totalStudents,
+      totalFaculty,
+      website,
+    });
+
+    console.log("College created successfully:", college.id, college.email);
+
+    // Generate tokens
+    const token = generateToken(college.id);
+    const refreshToken = generateRefreshToken(college.id);
+
+    // Set refresh token in httpOnly cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    // Return college data (excluding password)
+    const collegeResponse = {
+      id: college.id,
+      name: college.name,
+      email: college.email,
+      description: college.description,
+      location: college.location,
+      established: college.established,
+      campusArea: college.campusArea,
+      nirfRank: college.nirfRank,
+      accreditation: college.accreditation,
+      totalStudents: college.totalStudents,
+      totalFaculty: college.totalFaculty,
+      website: college.website,
+      role: "college",
+      isEmailVerified: college.isEmailVerified,
+      profileCompletion: college.getProfileCompletion(),
+      createdAt: college.createdAt,
+    };
+
+    res.status(201).json({
+      success: true,
+      message: "College registered successfully",
+      data: {
+        user: collegeResponse,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("=== COLLEGE REGISTRATION ERROR ===");
+    console.error("Error type:", error.constructor.name);
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
+
+    // Check for specific error types
+    let errorMessage = "Server error during college registration";
+    if (error.name === "SequelizeConnectionError") {
+      errorMessage = "Database connection error";
+    } else if (error.name === "SequelizeValidationError") {
+      errorMessage =
+        "Validation error: " + error.errors.map((e) => e.message).join(", ");
+    } else if (
+      error.message.includes("relation") &&
+      error.message.includes("does not exist")
+    ) {
+      errorMessage = "Database table not found. Please contact support.";
+    }
+
+    res.status(500).json({
+      success: false,
+      message: errorMessage,
+      ...(process.env.NODE_ENV === "development" && {
+        debug: {
+          error: error.message,
+          type: error.constructor.name,
+        },
+      }),
+    });
+  }
+};
+
+// Validation middleware for college registration
+const registerCollegeValidation = [
+  body("name")
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage("College name is required and must be between 1-100 characters"),
+  body("email")
+    .isEmail()
+    .normalizeEmail()
+    .withMessage("Please provide a valid email"),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  body("description")
+    .optional()
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage("Description must be 1000 characters or less"),
+  body("location")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Location must be 100 characters or less"),
+  body("established")
+    .optional()
+    .isInt({ min: 1800, max: new Date().getFullYear() })
+    .withMessage("Establishment year must be between 1800 and current year"),
+  body("campusArea")
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage("Campus area must be a positive number"),
+  body("nirfRank")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("NIRF rank must be a positive integer"),
+  body("accreditation")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Accreditation must be 100 characters or less"),
+  body("totalStudents")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Total students must be a non-negative integer"),
+  body("totalFaculty")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Total faculty must be a non-negative integer"),
+  body("website")
+    .optional()
+    .isURL()
+    .withMessage("Website must be a valid URL"),
+];
+
 // Routes
 router.post("/register", registerValidation, register);
+router.post("/register-college", registerCollegeValidation, registerCollege);
 router.post("/login", loginValidation, login);
 router.post("/logout", logout);
 router.post("/refresh", refreshToken);
 router.get("/me", auth, getMe);
+router.post("/register-college", registerCollegeValidation, registerCollege);
 
 module.exports = router;

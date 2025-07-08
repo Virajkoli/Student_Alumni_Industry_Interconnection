@@ -160,3 +160,46 @@ CREATE TABLE post_shares (
   shared_by_college_id INTEGER REFERENCES college(id),
   shared_by_industry_id INTEGER REFERENCES industry(id),
   shared
+
+
+  CREATE TABLE post_tags (
+  tag_id SERIAL PRIMARY KEY,
+  post_id INTEGER REFERENCES posts(post_id) ON DELETE CASCADE,
+  tag_name VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+);    
+
+
+CREATE TABLE ping_networks (
+    id SERIAL PRIMARY KEY,
+
+    -- Sender Info
+    sender_profile_id INTEGER NOT NULL,
+    sender_profile_type TEXT NOT NULL CHECK (sender_profile_type IN ('student', 'college', 'industry', 'startup', 'alumni')),
+
+    -- Receiver Info
+    receiver_profile_id INTEGER NOT NULL,
+    receiver_profile_type TEXT NOT NULL CHECK (receiver_profile_type IN ('student', 'college', 'industry', 'startup', 'alumni')),
+
+    -- Connection status
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+
+    -- Timestamp
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION update_ping_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = NOW();
+   RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_ping_networks_updated
+BEFORE UPDATE ON ping_networks
+FOR EACH ROW
+EXECUTE FUNCTION update_ping_updated_at();
+

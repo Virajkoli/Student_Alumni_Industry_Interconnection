@@ -23,9 +23,15 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
 
   // Component for image fallback
   const ImageFallback = ({ className, size = "large" }) => (
-    <div className={`${className} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center`}>
+    <div
+      className={`${className} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center`}
+    >
       <div className="text-center">
-        <ImageIcon className={`${size === "large" ? "w-12 h-12" : "w-6 h-6"} text-gray-400 mx-auto mb-2`} />
+        <ImageIcon
+          className={`${
+            size === "large" ? "w-12 h-12" : "w-6 h-6"
+          } text-gray-400 mx-auto mb-2`}
+        />
         <p className="text-gray-500 text-sm">Image not available</p>
       </div>
     </div>
@@ -69,6 +75,18 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
         console.log("🖼️ First post media:", response.data[0].media);
         console.log("🖼️ Media type:", typeof response.data[0].media);
         console.log("🖼️ Media length:", response.data[0].media?.length);
+        console.log("👤 First post user:", response.data[0].user);
+        console.log("🔗 First post userType:", response.data[0].userType);
+        if (response.data[0].media && response.data[0].media.length > 0) {
+          console.log(
+            "🔗 First media URL:",
+            response.data[0].media[0].media_url
+          );
+          console.log(
+            "🔗 Constructed media URL:",
+            apiService.getMediaUrl(response.data[0].media[0].media_url)
+          );
+        }
       }
       setPosts(response.data || []);
     } catch (error) {
@@ -208,7 +226,10 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
                         className="w-full max-h-96 object-cover"
                         onError={(e) => {
                           console.error("Failed to load image:", e.target.src);
-                          setFailedImages(prev => new Set([...prev, post.media[0].media_url]));
+                          setFailedImages(
+                            (prev) =>
+                              new Set([...prev, post.media[0].media_url])
+                          );
                         }}
                         onLoad={() => {
                           console.log(
@@ -247,7 +268,9 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
                                 "Failed to load image:",
                                 e.target.src
                               );
-                              setFailedImages(prev => new Set([...prev, media.media_url]));
+                              setFailedImages(
+                                (prev) => new Set([...prev, media.media_url])
+                              );
                             }}
                           />
                         )

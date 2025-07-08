@@ -343,9 +343,18 @@ router.get("/my-posts", auth, async (req, res) => {
       offset,
     ]);
 
+    // Add user details to each post (since these are all from the same user)
+    const userDetails = await getUserDetails(req.user.role, req.user.id);
+
+    const postsWithUserDetails = result.rows.map((post) => ({
+      ...post,
+      user: userDetails,
+      userType: req.user.role,
+    }));
+
     res.json({
       success: true,
-      data: result.rows,
+      data: postsWithUserDetails,
     });
   } catch (error) {
     console.error("Error fetching user posts:", error);

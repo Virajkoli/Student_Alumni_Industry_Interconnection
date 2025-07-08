@@ -55,7 +55,23 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.message || "Login failed. Please try again.");
+      
+      // Handle specific error types
+      let errorMessage = "Login failed. Please try again.";
+      
+      if (err.message.includes("CORS")) {
+        errorMessage = "Connection issue. Please wait a moment and try again.";
+      } else if (err.message.includes("Failed to fetch")) {
+        errorMessage = "Unable to connect to server. Please check your internet connection.";
+      } else if (err.message.includes("Too many requests")) {
+        errorMessage = "Too many login attempts. Please wait a few minutes and try again.";
+      } else if (err.message.includes("Invalid credentials")) {
+        errorMessage = "Invalid email or password. Please try again.";
+      } else {
+        errorMessage = err.message || "Login failed. Please try again.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -314,6 +314,37 @@ const Home = () => {
     }
   };
 
+  const fetchPosts = async () => {
+    try {
+      setPostsLoading(true);
+      console.log("🔄 fetchPosts - Starting...");
+
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("https://scaips-backend.onrender.com/api/posts", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch posts");
+      }
+
+      const data = await response.json();
+      console.log("✅ Posts fetched successfully:", data);
+
+      if (data.success) {
+        setPosts(data.data || []);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching posts:", error);
+      setPosts([]);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
   const handlePostCreated = (newPost) => {
     console.log("🎉 New post created:", newPost);
     // Trigger refresh of all posts

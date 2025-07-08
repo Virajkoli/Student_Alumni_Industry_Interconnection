@@ -648,7 +648,9 @@ const registerCollegeValidation = [
   body("name")
     .trim()
     .isLength({ min: 1, max: 100 })
-    .withMessage("College name is required and must be between 1-100 characters"),
+    .withMessage(
+      "College name is required and must be between 1-100 characters"
+    ),
   body("email")
     .isEmail()
     .normalizeEmail()
@@ -691,10 +693,7 @@ const registerCollegeValidation = [
     .optional()
     .isInt({ min: 0 })
     .withMessage("Total faculty must be a non-negative integer"),
-  body("website")
-    .optional()
-    .isURL()
-    .withMessage("Website must be a valid URL"),
+  body("website").optional().isURL().withMessage("Website must be a valid URL"),
 ];
 
 // Routes

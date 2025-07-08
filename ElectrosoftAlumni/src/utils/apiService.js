@@ -1,7 +1,15 @@
 // API configuration
 // Get API base URL from environment variables with fallback
+console.log("🔧 Environment variables:", {
+  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  NODE_ENV: import.meta.env.NODE_ENV,
+  MODE: import.meta.env.MODE,
+});
+
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  import.meta.env.VITE_API_BASE_URL || "https://scaips-backend.onrender.com";
+
+console.log("🌐 API Base URL configured as:", API_BASE_URL);
 // API service class
 class ApiService {
   constructor() {
@@ -378,6 +386,9 @@ class ApiService {
   getMediaUrl(mediaPath) {
     if (!mediaPath) return null;
 
+    // Force production URL for media files
+    const mediaBaseURL = "https://scaips-backend.onrender.com";
+
     // If mediaPath already starts with http/https, return as is
     if (mediaPath.startsWith("http://") || mediaPath.startsWith("https://")) {
       console.log(`🔗 Media URL (absolute): ${mediaPath}`);
@@ -386,18 +397,16 @@ class ApiService {
 
     let fullUrl;
 
-    // If mediaPath starts with /uploads, construct the full URL
-    if (mediaPath.startsWith("/uploads")) {
-      fullUrl = `${this.baseURL}${mediaPath}`;
+    // Remove /uploads prefix if present and use /api/media/ endpoint
+    let cleanPath = mediaPath;
+    if (mediaPath.startsWith("/uploads/")) {
+      cleanPath = mediaPath.substring(9); // Remove "/uploads/" prefix
+    } else if (mediaPath.startsWith("uploads/")) {
+      cleanPath = mediaPath.substring(8); // Remove "uploads/" prefix
     }
-    // If mediaPath starts with uploads (no leading slash), add the slash
-    else if (mediaPath.startsWith("uploads")) {
-      fullUrl = `${this.baseURL}/${mediaPath}`;
-    }
-    // For any other path, assume it's relative to uploads directory
-    else {
-      fullUrl = `${this.baseURL}/uploads/${mediaPath}`;
-    }
+
+    // Use the dedicated media serving endpoint
+    fullUrl = `${mediaBaseURL}/api/media/${cleanPath}`;
 
     console.log(`🔗 Media URL: ${mediaPath} → ${fullUrl}`);
     return fullUrl;

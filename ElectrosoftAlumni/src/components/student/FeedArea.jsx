@@ -32,7 +32,16 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
             size === "large" ? "w-12 h-12" : "w-6 h-6"
           } text-gray-400 mx-auto mb-2`}
         />
-        <p className="text-gray-500 text-sm">Image not available</p>
+        <p className="text-gray-500 text-sm">
+          {size === "large"
+            ? "Media temporarily unavailable"
+            : "Media unavailable"}
+        </p>
+        {size === "large" && (
+          <p className="text-gray-400 text-xs mt-1">
+            Files may be restored on next upload
+          </p>
+        )}
       </div>
     </div>
   );
@@ -61,9 +70,14 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
       console.log("🔄 Fetching my posts...");
       console.log("🔐 Auth status:", { isAuthenticated, user: user?.id });
       console.log(
-        "🔑 Token:",
-        localStorage.getItem("authToken")?.substring(0, 20) + "..."
+        "🌐 API Base URL:",
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
       );
+      const token = localStorage.getItem("authToken");
+      console.log("🔑 Token exists:", !!token);
+      console.log("🔑 Token length:", token?.length);
+      console.log("🔑 Token preview:", token?.substring(0, 20) + "...");
+      console.log("👤 Current user:", user);
 
       // Fetch only posts by the current user
       const response = await apiService.getMyPosts({
@@ -71,6 +85,22 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
       });
       console.log("📦 API Response:", response);
       console.log("📝 Posts data:", response.data);
+
+      // Check for media availability issues
+      if (response.data && response.data.length > 0) {
+        const postsWithMedia = response.data.filter(
+          (post) => post.media && post.media.length > 0
+        );
+        if (postsWithMedia.length > 0) {
+          console.warn(
+            "⚠️  Note: Media files may not be available due to Render's ephemeral filesystem"
+          );
+          console.warn(
+            "💡 Consider implementing cloud storage (AWS S3, Cloudinary) for production"
+          );
+        }
+      }
+
       if (response.data && response.data.length > 0) {
         console.log("🖼️ First post media:", response.data[0].media);
         console.log("🖼️ Media type:", typeof response.data[0].media);
@@ -235,6 +265,9 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
                         className="w-full max-h-96 object-cover"
                         onError={(e) => {
                           console.error("Failed to load image:", e.target.src);
+                          console.warn(
+                            "🚨 Image not found on server - using fallback"
+                          );
                           setFailedImages(
                             (prev) =>
                               new Set([...prev, post.media[0].media_url])
@@ -276,6 +309,9 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
                               console.error(
                                 "Failed to load image:",
                                 e.target.src
+                              );
+                              console.warn(
+                                "🚨 Image not found on server - using fallback"
                               );
                               setFailedImages(
                                 (prev) => new Set([...prev, media.media_url])

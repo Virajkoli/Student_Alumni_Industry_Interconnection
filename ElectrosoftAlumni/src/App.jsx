@@ -189,11 +189,11 @@ function App() {
           <Route
             path="/college-profile"
             element={
-              // <ProtectedRoute>
+              <ProtectedRoute>
                 <Layout>
                   <CollegeProfilePage />
                 </Layout>
-              // </ProtectedRoute>
+              </ProtectedRoute>
             }
           />
           <Route

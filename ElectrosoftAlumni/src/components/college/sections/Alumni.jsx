@@ -52,7 +52,7 @@ const Alumni = ({ data, onEdit }) => {
       {/* Networks */}
       <div className="mb-6">
         <h3 className="font-semibold text-blue-800 mb-2 text-lg">Alumni Networks</h3>
-        <div className="bg-blue-50 rounded-lg p-4">
+        <div className="bg-50 rounded-lg p-4">
           <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
             {safeData.networks.map((item, idx) => (
               <li key={idx}>{item || "-"}</li>

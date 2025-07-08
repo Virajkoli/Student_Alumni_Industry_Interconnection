@@ -28,8 +28,8 @@ const Events = ({ data, onEdit }) => {
         <h3 className="font-semibold text-blue-800 mb-2 text-lg">Annual Events</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {safeData.annualEvents.map((event, idx) => (
-            <div key={idx} className="border rounded-lg p-4 bg-yellow-50">
-              <div className="font-bold text-yellow-900 text-lg mb-1">{event.name || "-"}</div>
+            <div key={idx} className="border rounded-lg p-4 bg-50">
+              <div className="font-bold text-900 text-lg mb-1">{event.name || "-"}</div>
               <div className="text-gray-700 text-sm mb-1">
                 <span className="font-semibold">Month:</span> {event.month || "-"}
               </div>

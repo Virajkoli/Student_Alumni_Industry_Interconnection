@@ -538,6 +538,14 @@ export default function SignupPage() {
                 {error}
               </div>
             )}
+            <button type="button" className="google-login">
+                <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google"
+                  className="google-icon"
+                />
+                <span>Login with Google</span>
+              </button>
 
             <button
               className="register-btn"

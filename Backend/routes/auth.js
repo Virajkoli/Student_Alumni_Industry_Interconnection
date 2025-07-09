@@ -744,6 +744,260 @@ const collegeRegistrationValidation = [
     .withMessage("Description must be 1000 characters or less"),
 ];
 
+// Google Authentication Helper Function
+const verifyGoogleToken = async (accessToken) => {
+  try {
+    // Verify the access token by calling Google's userinfo endpoint
+    const response = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`);
+    if (!response.ok) {
+      throw new Error('Invalid access token');
+    }
+    const userInfo = await response.json();
+    return userInfo;
+  } catch (error) {
+    console.error("Google token verification error:", error);
+    throw new Error("Invalid Google token");
+  }
+};
+
+// @desc    Google Login
+// @route   POST /api/auth/google/login
+// @access  Public
+const googleLogin = async (req, res) => {
+  try {
+    console.log("=== GOOGLE LOGIN ===");
+    console.log("Request body:", req.body);
+
+    const { email, googleId, firstName, lastName, imageUrl, accessToken } = req.body;
+
+    // Verify Google token
+    let googleUserInfo;
+    if (accessToken) {
+      googleUserInfo = await verifyGoogleToken(accessToken);
+      if (googleUserInfo.email !== email) {
+        return res.status(400).json({
+          success: false,
+          message: "Google token email doesn't match provided email",
+        });
+      }
+    }
+
+    // Check if user exists
+    const existingUser = await User.findOne({ 
+      where: { 
+        email: email,
+      } 
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found. Please register first.",
+      });
+    }
+
+    // Update user with Google information if not already set
+    if (!existingUser.googleId) {
+      existingUser.googleId = googleId;
+      existingUser.imageUrl = imageUrl;
+      existingUser.first_name = firstName;
+      existingUser.last_name = lastName;
+      await existingUser.save();
+    }
+
+    // Generate tokens
+    const token = generateToken(existingUser.id);
+    const refreshToken = generateRefreshToken(existingUser.id);
+
+    // Set refresh token cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    console.log("Google login successful for:", existingUser.email);
+
+    res.json({
+      success: true,
+      message: "Google login successful",
+      data: {
+        token,
+        user: {
+          id: existingUser.id,
+          email: existingUser.email,
+          first_name: existingUser.first_name,
+          last_name: existingUser.last_name,
+          role: existingUser.role,
+          googleId: existingUser.googleId,
+          imageUrl: existingUser.imageUrl,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Google login failed",
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Google Register
+// @route   POST /api/auth/google/register
+// @access  Public
+const googleRegister = async (req, res) => {
+  try {
+    console.log("=== GOOGLE REGISTRATION ===");
+    console.log("Request body:", req.body);
+
+    const { 
+      email, 
+      firstName, 
+      lastName, 
+      googleId, 
+      imageUrl, 
+      accessToken, 
+      role,
+      ...roleSpecificData 
+    } = req.body;
+
+    // Verify Google token
+    let googleUserInfo;
+    if (accessToken) {
+      googleUserInfo = await verifyGoogleToken(accessToken);
+      if (googleUserInfo.email !== email) {
+        return res.status(400).json({
+          success: false,
+          message: "Google token email doesn't match provided email",
+        });
+      }
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ where: { email } });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists with this email",
+      });
+    }
+
+    // Create user based on role
+    let newUser;
+    let roleSpecificRecord;
+
+    if (role === "student") {
+      // Create main user record
+      newUser = await User.create({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        fullName: `${firstName} ${lastName}`,
+        role: "student",
+        googleId,
+        imageUrl,
+      });
+
+      // Create student record
+      roleSpecificRecord = await Student.create({
+        user_id: newUser.id,
+        contact_no: roleSpecificData.contact_no,
+        student_college_name: roleSpecificData.student_college_name,
+        interested_field: roleSpecificData.interested_field,
+        other_field: roleSpecificData.other_field,
+      });
+    } else if (role === "college") {
+      // Create main user record
+      newUser = await User.create({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        fullName: `${firstName} ${lastName}`,
+        role: "college",
+        googleId,
+        imageUrl,
+      });
+
+      // Create college record
+      roleSpecificRecord = await College.create({
+        user_id: newUser.id,
+        college_name: roleSpecificData.college_name,
+        college_address: roleSpecificData.college_address,
+        establishment_year: roleSpecificData.establishment_year,
+        website: roleSpecificData.website,
+        campus_area: roleSpecificData.campus_area,
+        nirf_rank: roleSpecificData.nirf_rank,
+        accreditation: roleSpecificData.accreditation,
+        total_students: roleSpecificData.total_students,
+        total_faculty: roleSpecificData.total_faculty,
+        description: roleSpecificData.description,
+      });
+    } else {
+      // For industry and startup, create basic user record
+      newUser = await User.create({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        fullName: `${firstName} ${lastName}`,
+        role,
+        googleId,
+        imageUrl,
+        // Store role-specific data in user record for now
+        company_name: roleSpecificData.company_name,
+        industry_type: roleSpecificData.industry_type,
+        designation: roleSpecificData.designation,
+        company_size: roleSpecificData.company_size,
+        startup_name: roleSpecificData.startup_name,
+        startup_stage: roleSpecificData.startup_stage,
+        funding_status: roleSpecificData.funding_status,
+        team_size: roleSpecificData.team_size,
+      });
+    }
+
+    // Generate tokens
+    const token = generateToken(newUser.id);
+    const refreshToken = generateRefreshToken(newUser.id);
+
+    // Set refresh token cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    console.log("Google registration successful for:", newUser.email);
+
+    res.status(201).json({
+      success: true,
+      message: "Google registration successful",
+      data: {
+        token,
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          first_name: newUser.first_name,
+          last_name: newUser.last_name,
+          role: newUser.role,
+          googleId: newUser.googleId,
+          imageUrl: newUser.imageUrl,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Google registration error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Google registration failed",
+      error: error.message,
+    });
+  }
+};
+
 // Routes
 router.post("/register", registerValidation, registerStudent);
 router.post(
@@ -752,6 +1006,8 @@ router.post(
   registerCollege
 );
 router.post("/login", loginValidation, login);
+router.post("/google/login", googleLogin);
+router.post("/google/register", googleRegister);
 router.post("/logout", logout);
 router.post("/refresh", refreshToken);
 router.get("/me", auth, getMe);

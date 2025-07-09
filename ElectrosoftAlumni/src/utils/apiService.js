@@ -83,6 +83,21 @@ class ApiService {
     });
   }
 
+  // Google authentication endpoints
+  async googleLogin(googleData) {
+    return this.request("/api/auth/google/login", {
+      method: "POST",
+      body: JSON.stringify(googleData),
+    });
+  }
+
+  async googleRegister(googleData) {
+    return this.request("/api/auth/google/register", {
+      method: "POST",
+      body: JSON.stringify(googleData),
+    });
+  }
+
   async logout() {
     return this.request("/api/auth/logout", {
       method: "POST",

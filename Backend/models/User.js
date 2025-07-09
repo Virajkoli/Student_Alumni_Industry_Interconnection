@@ -22,7 +22,7 @@ module.exports = (sequelize) => {
       },
       password: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true, // Allow null for Google OAuth users
         validate: {
           len: [6, 100],
         },
@@ -43,6 +43,14 @@ module.exports = (sequelize) => {
       fullName: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      first_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      last_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       avatar: {
         type: DataTypes.STRING,
@@ -145,6 +153,22 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      company_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      industry_type: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      company_size: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      designation: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       sector: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -168,6 +192,22 @@ module.exports = (sequelize) => {
 
       // Startup specific fields
       startupName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      startup_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      startup_stage: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      funding_status: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      team_size: {
         type: DataTypes.STRING,
         allowNull: true,
       },
@@ -242,6 +282,7 @@ module.exports = (sequelize) => {
       googleId: {
         type: DataTypes.STRING,
         allowNull: true,
+        unique: true,
       },
       microsoftId: {
         type: DataTypes.STRING,

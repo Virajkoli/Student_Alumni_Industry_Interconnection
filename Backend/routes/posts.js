@@ -97,6 +97,9 @@ async function getUserDetails(userType, userId) {
 
 // Create a new post
 router.post("/", auth, uploadPostMedia.array("media", 5), async (req, res) => {
+  console.log("📨 Incoming post content:", req.body.content);
+console.log("📷 Files:", req.files);
+console.log("👤 Authenticated user:", req.user);
   const client = await pool.connect();
 
   try {
@@ -198,15 +201,15 @@ router.post("/", auth, uploadPostMedia.array("media", 5), async (req, res) => {
         createdAt: postResult.rows[0].created_at,
       },
     });
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Error creating post:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create post",
-      error: error.message,
-    });
-  } finally {
+ } catch (error) {
+  await client.query("ROLLBACK");
+  console.error("❌ Error creating post:", error); // ✅ ADD THIS LINE
+  return res.status(500).json({
+    success: false,
+    message: "Server Error",
+    backendMessage: error.message, // ✅ ADD THIS TOO
+  });
+} finally {
     client.release();
   }
 });

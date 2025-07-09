@@ -135,7 +135,8 @@ router.post("/", auth, uploadPostMedia.array("media", 5), async (req, res) => {
         const mediaUrl = file.path; // Cloudinary provides the full URL in file.path
 
         console.log(`📁 Uploaded to Cloudinary: ${mediaUrl}`);
-
+        console.log("📦 Uploaded File:", file);
+        
         try {
           // Try to insert with cloudinary_public_id first
           await client.query(

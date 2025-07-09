@@ -4,9 +4,10 @@ import { Edit, X } from "lucide-react";
 const Courses = ({ data, onEdit }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ ...data });
+  const [courseData, setCourseData] = useState({ ...data });
 
   const handleEditClick = () => {
-    setEditData({ ...data });
+    setEditData({ ...courseData });
     setIsEditModalOpen(true);
   };
 
@@ -38,16 +39,16 @@ const Courses = ({ data, onEdit }) => {
   };
 
   const handleSave = () => {
-    if (onEdit) onEdit(editData);
+    setCourseData({ ...editData });
     setIsEditModalOpen(false);
   };
 
   const handleCancel = () => {
-    setEditData({ ...data });
+    setEditData({ ...courseData });
     setIsEditModalOpen(false);
   };
 
-  if (!data) return null;
+  if (!courseData) return null;
 
   // Helper to render a table row for each course type
   const renderTableRow = (label, duration, eligibility, branches, fees, totalSeats) => (
@@ -94,51 +95,51 @@ const Courses = ({ data, onEdit }) => {
                 <tbody>
                   {renderTableRow(
                     "B.Tech",
-                    data.btechDuration,
-                    data.btechEligibility,
-                    data.btechBranches,
-                    data.btechFees,
-                    data.btechTotalSeats
+                    courseData.btechDuration,
+                    courseData.btechEligibility,
+                    courseData.btechBranches,
+                    courseData.btechFees,
+                    courseData.btechTotalSeats
                   )}
                   {renderTableRow(
                     "M.Tech",
-                    data.mtechDuration,
-                    data.mtechEligibility,
-                    data.mtechBranches,
-                    data.mtechFees,
-                    data.mtechTotalSeats
+                    courseData.mtechDuration,
+                    courseData.mtechEligibility,
+                    courseData.mtechBranches,
+                    courseData.mtechFees,
+                    courseData.mtechTotalSeats
                   )}
                   {renderTableRow(
                     "B.Sc",
-                    data.bscDuration,
-                    data.bscEligibility,
-                    data.bscBranches,
-                    data.bscFees,
-                    data.bscTotalSeats
+                    courseData.bscDuration,
+                    courseData.bscEligibility,
+                    courseData.bscBranches,
+                    courseData.bscFees,
+                    courseData.bscTotalSeats
                   )}
                   {renderTableRow(
                     "M.Sc",
-                    data.mscDuration,
-                    data.mscEligibility,
-                    data.mscBranches,
-                    data.mscFees,
-                    data.mscTotalSeats
+                    courseData.mscDuration,
+                    courseData.mscEligibility,
+                    courseData.mscBranches,
+                    courseData.mscFees,
+                    courseData.mscTotalSeats
                   )}
                   {renderTableRow(
                     "MBA",
-                    data.mbaDuration,
-                    data.mbaEligibility,
-                    data.mbaBranches,
-                    data.mbaFees,
-                    data.mbaTotalSeats
+                    courseData.mbaDuration,
+                    courseData.mbaEligibility,
+                    courseData.mbaBranches,
+                    courseData.mbaFees,
+                    courseData.mbaTotalSeats
                   )}
                   {renderTableRow(
                     "Ph.D",
-                    data.phdDuration,
-                    data.phdEligibility,
-                    data.phdBranches,
-                    data.phdFees,
-                    data.phdTotalSeats
+                    courseData.phdDuration,
+                    courseData.phdEligibility,
+                    courseData.phdBranches,
+                    courseData.phdFees,
+                    courseData.phdTotalSeats
                   )}
                 </tbody>
               </table>

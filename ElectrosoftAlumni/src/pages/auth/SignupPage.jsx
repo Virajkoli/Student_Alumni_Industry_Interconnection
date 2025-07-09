@@ -544,7 +544,7 @@ export default function SignupPage() {
                   alt="Google"
                   className="google-icon"
                 />
-                <span>Login with Google</span>
+                <span>Register with Google</span>
               </button>
 
             <button

@@ -404,7 +404,7 @@ class ApiService {
     // For backward compatibility with old local file paths
     // This shouldn't happen with new uploads but may exist for old data
     console.warn(`⚠️ Legacy media path detected: ${mediaPath}`);
-    
+
     const mediaBaseURL = "https://scaips-backend.onrender.com";
     let cleanPath = mediaPath;
     if (mediaPath.startsWith("/uploads/")) {
@@ -412,7 +412,7 @@ class ApiService {
     } else if (mediaPath.startsWith("uploads/")) {
       cleanPath = mediaPath.substring(8);
     }
-    
+
     const fullUrl = `${mediaBaseURL}/api/media/${cleanPath}`;
     console.log(`🔗 Legacy Media URL: ${mediaPath} → ${fullUrl}`);
     return fullUrl;

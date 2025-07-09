@@ -2,7 +2,11 @@ const express = require("express");
 const router = express.Router();
 const { Pool } = require("pg");
 const { auth } = require("../middleware/auth");
-const { uploadPostMedia, deleteFromCloudinary, extractPublicId } = require("../config/cloudinary");
+const {
+  uploadPostMedia,
+  deleteFromCloudinary,
+  extractPublicId,
+} = require("../config/cloudinary");
 
 // Database connection
 const pool = new Pool({
@@ -132,10 +136,23 @@ router.post("/", auth, uploadPostMedia.array("media", 5), async (req, res) => {
 
         console.log(`📁 Uploaded to Cloudinary: ${mediaUrl}`);
 
-        await client.query(
-          "INSERT INTO post_media (post_id, media_type, media_url, cloudinary_public_id) VALUES ($1, $2, $3, $4)",
-          [postId, mediaType, mediaUrl, file.filename] // file.filename contains the public_id from Cloudinary
-        );
+        try {
+          // Try to insert with cloudinary_public_id first
+          await client.query(
+            "INSERT INTO post_media (post_id, media_type, media_url, cloudinary_public_id) VALUES ($1, $2, $3, $4)",
+            [postId, mediaType, mediaUrl, file.filename]
+          );
+        } catch (columnError) {
+          // If column doesn't exist, fall back to the old structure
+          console.log(
+            `⚠️ cloudinary_public_id column not found, using fallback:`,
+            columnError.message
+          );
+          await client.query(
+            "INSERT INTO post_media (post_id, media_type, media_url) VALUES ($1, $2, $3)",
+            [postId, mediaType, mediaUrl]
+          );
+        }
       }
     }
 
@@ -546,10 +563,24 @@ router.delete("/:postId", auth, async (req, res) => {
     }
 
     // Get media files to delete from Cloudinary
-    const mediaResult = await client.query(
-      "SELECT media_url, cloudinary_public_id FROM post_media WHERE post_id = $1",
-      [postId]
-    );
+    let mediaResult;
+    try {
+      // Try to get media with cloudinary_public_id first
+      mediaResult = await client.query(
+        "SELECT media_url, cloudinary_public_id FROM post_media WHERE post_id = $1",
+        [postId]
+      );
+    } catch (columnError) {
+      // If column doesn't exist, fall back to the old structure
+      console.log(
+        `⚠️ cloudinary_public_id column not found in deletion, using fallback:`,
+        columnError.message
+      );
+      mediaResult = await client.query(
+        "SELECT media_url FROM post_media WHERE post_id = $1",
+        [postId]
+      );
+    }
 
     // Delete post (cascade will handle related tables)
     await client.query("DELETE FROM posts WHERE post_id = $1", [postId]);
@@ -560,15 +591,21 @@ router.delete("/:postId", auth, async (req, res) => {
         if (media.cloudinary_public_id) {
           // Delete from Cloudinary using public_id
           await deleteFromCloudinary(media.cloudinary_public_id);
-          console.log(`Deleted media from Cloudinary: ${media.cloudinary_public_id}`);
+          console.log(
+            `Deleted media from Cloudinary: ${media.cloudinary_public_id}`
+          );
         } else {
           // Fallback: try to extract public_id from URL
           const publicId = extractPublicId(media.media_url);
           if (publicId) {
             await deleteFromCloudinary(publicId);
-            console.log(`Deleted media from Cloudinary (extracted): ${publicId}`);
+            console.log(
+              `Deleted media from Cloudinary (extracted): ${publicId}`
+            );
           } else {
-            console.warn(`Could not extract public_id from URL: ${media.media_url}`);
+            console.warn(
+              `Could not extract public_id from URL: ${media.media_url}`
+            );
           }
         }
       } catch (fileError) {

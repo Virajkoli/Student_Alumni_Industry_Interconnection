@@ -552,8 +552,8 @@ const registerCollege = async (req, res) => {
       });
     }
 
-    // Create college
-    const college = await College.create({
+    // Convert string values to appropriate types
+    const collegeData = {
       email,
       password,
       name: college_name,
@@ -568,7 +568,12 @@ const registerCollege = async (req, res) => {
       totalStudents: total_students ? parseInt(total_students) : null,
       totalFaculty: total_faculty ? parseInt(total_faculty) : null,
       website: website || null,
-    });
+    };
+
+    console.log("Converted college data:", collegeData);
+
+    // Create college
+    const college = await College.create(collegeData);
 
     console.log("College created successfully:", college.id, college.email);
 
@@ -710,20 +715,45 @@ const collegeRegistrationValidation = [
     .withMessage("College address must be 500 characters or less"),
   body("establishment_year")
     .optional()
-    .isInt({ min: 1800, max: new Date().getFullYear() })
-    .withMessage("Establishment year must be a valid year"),
+    .custom((value) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const year = parseInt(value);
+      if (isNaN(year) || year < 1800 || year > new Date().getFullYear()) {
+        throw new Error("Establishment year must be a valid year between 1800 and current year");
+      }
+      return true;
+    }),
   body("website")
     .optional()
-    .isURL()
-    .withMessage("Please provide a valid website URL"),
+    .custom((value) => {
+      if (!value || value.trim() === "") return true;
+      try {
+        new URL(value);
+        return true;
+      } catch {
+        throw new Error("Please provide a valid website URL");
+      }
+    }),
   body("campus_area")
     .optional()
-    .isFloat({ min: 0 })
-    .withMessage("Campus area must be a positive number"),
+    .custom((value) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const area = parseFloat(value);
+      if (isNaN(area) || area < 0) {
+        throw new Error("Campus area must be a positive number");
+      }
+      return true;
+    }),
   body("nirf_rank")
     .optional()
-    .isInt({ min: 1 })
-    .withMessage("NIRF rank must be a positive integer"),
+    .custom((value) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const rank = parseInt(value);
+      if (isNaN(rank) || rank < 1) {
+        throw new Error("NIRF rank must be a positive integer");
+      }
+      return true;
+    }),
   body("accreditation")
     .optional()
     .trim()
@@ -731,12 +761,24 @@ const collegeRegistrationValidation = [
     .withMessage("Accreditation must be 100 characters or less"),
   body("total_students")
     .optional()
-    .isInt({ min: 0 })
-    .withMessage("Total students must be a non-negative integer"),
+    .custom((value) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const students = parseInt(value);
+      if (isNaN(students) || students < 0) {
+        throw new Error("Total students must be a non-negative integer");
+      }
+      return true;
+    }),
   body("total_faculty")
     .optional()
-    .isInt({ min: 0 })
-    .withMessage("Total faculty must be a non-negative integer"),
+    .custom((value) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const faculty = parseInt(value);
+      if (isNaN(faculty) || faculty < 0) {
+        throw new Error("Total faculty must be a non-negative integer");
+      }
+      return true;
+    }),
   body("description")
     .optional()
     .trim()

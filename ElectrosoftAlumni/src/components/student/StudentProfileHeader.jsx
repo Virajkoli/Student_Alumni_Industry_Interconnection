@@ -10,6 +10,7 @@ import {
   Plus,
   User,
 } from "lucide-react";
+import { studentAPI } from "../../utils/apiService";
 
 const StudentProfileHeader = ({
   profileData,
@@ -35,6 +36,47 @@ const StudentProfileHeader = ({
   });
   const [editingCustomNav, setEditingCustomNav] = useState(null);
   const [isEditingCustomNav, setIsEditingCustomNav] = useState(false);
+
+  // Profile picture and cover photo URLs
+  const [profilePicUrl, setProfilePicUrl] = useState("");
+  const [coverPicUrl, setCoverPicUrl] = useState("");
+
+  // Fetch profile data on mount
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await studentAPI.getStudentProfile();
+        setEditData(response.data);
+        setProfilePicUrl(response.data.profile_picture);
+        setCoverPicUrl(response.data.cover_picture);
+      } catch (error) {
+        console.error("Failed to fetch profile data:", error);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  // Fetch additional information
+  useEffect(() => {
+    if (!profileData || !profileData.id) {
+      console.error("Invalid profileData: Missing student ID", profileData);
+      return;
+    }
+
+    const fetchAdditionalInfo = async () => {
+      try {
+        const response = await studentAPI.getStudentAdditionalInfo(
+          profileData.id
+        );
+        setEditData(response.data);
+      } catch (error) {
+        console.error("Failed to fetch additional information:", error);
+      }
+    };
+
+    fetchAdditionalInfo();
+  }, [profileData]);
 
   // Listen for custom navigation edit events
   useEffect(() => {
@@ -107,9 +149,6 @@ const StudentProfileHeader = ({
     },
   ];
 
-  const profilePicUrl =
-    "https://static.vecteezy.com/system/resources/thumbnails/007/209/020/small_2x/close-up-shot-of-happy-dark-skinned-afro-american-woman-laughs-positively-being-in-good-mood-dressed-in-black-casual-clothes-isolated-on-grey-background-human-emotions-and-feeligs-concept-photo.jpg";
-
   // Profile handlers
   const handleEditClick = () => {
     setEditData({ ...profileData });
@@ -120,9 +159,50 @@ const StudentProfileHeader = ({
     setIsImageEditModalOpen(true);
   };
 
-  const handleSaveProfile = () => {
-    onProfileUpdate(editData);
-    setIsEditModalOpen(false);
+  const handleSaveProfile = async () => {
+    if (!profileData || !profileData.id) {
+      console.error("Invalid profileData: Missing student ID", profileData);
+      return;
+    }
+
+    try {
+      await apiService.updateStudentAdditionalInfo(profileData.id, editData);
+      onProfileUpdate(editData);
+    } catch (error) {
+      console.error("Failed to update additional information:", error);
+    }
+  };
+
+  const handleUploadProfilePic = async (file) => {
+    const formData = new FormData();
+    formData.append("profile_picture", file);
+
+    try {
+      const response = await studentAPI.uploadStudentAvatar(formData);
+      setProfilePicUrl(response.data.profile_picture);
+      onProfileUpdate({
+        ...editData,
+        profile_picture: response.data.profile_picture,
+      });
+    } catch (error) {
+      console.error("Failed to upload profile picture:", error);
+    }
+  };
+
+  const handleUploadCoverPic = async (file) => {
+    const formData = new FormData();
+    formData.append("cover_picture", file);
+
+    try {
+      const response = await studentAPI.uploadStudentAvatar(formData);
+      setCoverPicUrl(response.data.cover_picture);
+      onProfileUpdate({
+        ...editData,
+        cover_picture: response.data.cover_picture,
+      });
+    } catch (error) {
+      console.error("Failed to upload cover picture:", error);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -233,19 +313,23 @@ const StudentProfileHeader = ({
           {/* Cover Photo */}
           <div
             className="h-44 bg-gradient-to-r from-blue-400 to-indigo-500"
-            style={{
-              background: "linear-gradient(135deg, #B5D3E7 0%, #6EA9CB 100%)",
-            }}
+            style={{ backgroundImage: `url(${coverPicUrl})` }}
           ></div>
 
           {/* Edit Background/Profile Image Button - Top right of background */}
           <button
-            onClick={handleImageEditClick}
+            onClick={() => document.getElementById("coverPicInput").click()}
             className="absolute top-4 right-4 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
             title="Edit Background & Profile Image"
           >
             <Camera className="w-5 h-5" />
           </button>
+          <input
+            type="file"
+            id="coverPicInput"
+            style={{ display: "none" }}
+            onChange={(e) => handleUploadCoverPic(e.target.files[0])}
+          />
 
           {/* Profile Image */}
           <div className="absolute -bottom-14 left-8">
@@ -255,12 +339,21 @@ const StudentProfileHeader = ({
                   src={profilePicUrl}
                   alt="Profile"
                   className="w-full h-full object-cover rounded-full"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
                 />
               </div>
             </div>
+            <button
+              onClick={() => document.getElementById("profilePicInput").click()}
+              className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+            >
+              <Camera className="w-3 h-3" />
+            </button>
+            <input
+              type="file"
+              id="profilePicInput"
+              style={{ display: "none" }}
+              onChange={(e) => handleUploadProfilePic(e.target.files[0])}
+            />
           </div>
         </div>
 

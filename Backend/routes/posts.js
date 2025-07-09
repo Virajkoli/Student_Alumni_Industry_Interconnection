@@ -139,9 +139,10 @@ router.post("/", auth, uploadPostMedia.array("media", 5), async (req, res) => {
         try {
           // Try to insert with cloudinary_public_id first
           await client.query(
-            "INSERT INTO post_media (post_id, media_type, media_url, cloudinary_public_id) VALUES ($1, $2, $3, $4)",
-            [postId, mediaType, mediaUrl, file.filename]
-          );
+  "INSERT INTO post_media (post_id, media_type, media_url, cloudinary_public_id) VALUES ($1, $2, $3, $4)",
+  [postId, mediaType, mediaUrl, file.public_id || null] // ✅ Correct field from Cloudinary response
+);
+
         } catch (columnError) {
           // If column doesn't exist, fall back to the old structure
           console.log(

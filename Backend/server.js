@@ -122,7 +122,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-// API routes
+ // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/students", studentRoutes);

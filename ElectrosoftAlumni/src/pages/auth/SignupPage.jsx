@@ -633,6 +633,14 @@ export default function SignupPage() {
                 {error}
               </div>
             )}
+            <button type="button" className="google-login">
+                <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google"
+                  className="google-icon"
+                />
+                <span>Register with Google</span>
+              </button>
 
             <button className="register-btn" type="submit" disabled={isLoading}>
               {isLoading ? "Registering..." : "Next"}

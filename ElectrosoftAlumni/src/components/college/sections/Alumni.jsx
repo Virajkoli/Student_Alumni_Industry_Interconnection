@@ -166,7 +166,7 @@ const Alumni = () => {
           <div className="p-8">
             {/* Notable Alumni */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Notable Alumni
               </h3>
               <div className="space-y-3">
@@ -174,7 +174,7 @@ const Alumni = () => {
                   alumniData.notableAlumni.map((alumni, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{alumni}</p>
+                      <p className="text-gray-700 leading-relaxed text-base">{alumni}</p>
                     </div>
                   ))}
               </div>
@@ -182,7 +182,7 @@ const Alumni = () => {
 
             {/* Alumni Initiatives */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Alumni Initiatives
               </h3>
               <div className="space-y-3">
@@ -192,7 +192,7 @@ const Alumni = () => {
                       <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
                         {index + 1}
                       </div>
-                      <p className="text-gray-700 leading-relaxed pt-0.5">{initiative}</p>
+                      <p className="text-gray-700 leading-relaxed pt-0.5 text-base">{initiative}</p>
                     </div>
                   ))}
               </div>
@@ -200,7 +200,7 @@ const Alumni = () => {
 
             {/* Alumni Networks */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Alumni Networks
               </h3>
               <div className="space-y-3">
@@ -208,7 +208,7 @@ const Alumni = () => {
                   alumniData.networks.map((network, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{network}</p>
+                      <p className="text-gray-700 leading-relaxed text-base">{network}</p>
                     </div>
                   ))}
               </div>
@@ -216,7 +216,7 @@ const Alumni = () => {
 
             {/* Alumni Contributions */}
             <div className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Alumni Contributions
               </h3>
               <div className="space-y-3">
@@ -224,7 +224,7 @@ const Alumni = () => {
                   alumniData.contributions.map((contribution, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{contribution}</p>
+                      <p className="text-gray-700 leading-relaxed text-base">{contribution}</p>
                     </div>
                   ))}
               </div>
@@ -246,7 +246,6 @@ const Alumni = () => {
                 <X className="w-6 h-6" />
               </button>
             </div>
-
             <div className="space-y-6">
               {/* Notable Alumni */}
               <div>
@@ -258,7 +257,7 @@ const Alumni = () => {
                         type="text"
                         value={alumni}
                         onChange={(e) => handleNotableAlumniChange(index, e.target.value)}
-                        className="flex-1 p-2 border rounded"
+                        className="flex-1 p-2 border rounded text-base"
                         placeholder="Alumni details (e.g., Dr. John Smith (Class of 1995) - CEO, Tech Corp)"
                       />
                       <button
@@ -271,7 +270,7 @@ const Alumni = () => {
                   ))}
                   <button
                     onClick={handleAddNotableAlumni}
-                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
                     Add Notable Alumni
@@ -289,7 +288,7 @@ const Alumni = () => {
                         type="text"
                         value={initiative}
                         onChange={(e) => handleInitiativeChange(index, e.target.value)}
-                        className="flex-1 p-2 border rounded"
+                        className="flex-1 p-2 border rounded text-base"
                         placeholder="Initiative details"
                       />
                       <button
@@ -302,7 +301,7 @@ const Alumni = () => {
                   ))}
                   <button
                     onClick={handleAddInitiative}
-                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
                     Add Initiative
@@ -320,7 +319,7 @@ const Alumni = () => {
                         type="text"
                         value={network}
                         onChange={(e) => handleNetworkChange(index, e.target.value)}
-                        className="flex-1 p-2 border rounded"
+                        className="flex-1 p-2 border rounded text-base"
                         placeholder="Network details"
                       />
                       <button
@@ -333,7 +332,7 @@ const Alumni = () => {
                   ))}
                   <button
                     onClick={handleAddNetwork}
-                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
                     Add Network
@@ -351,7 +350,7 @@ const Alumni = () => {
                         type="text"
                         value={contribution}
                         onChange={(e) => handleContributionChange(index, e.target.value)}
-                        className="flex-1 p-2 border rounded"
+                        className="flex-1 p-2 border rounded text-base"
                         placeholder="Contribution details"
                       />
                       <button
@@ -364,7 +363,7 @@ const Alumni = () => {
                   ))}
                   <button
                     onClick={handleAddContribution}
-                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
                     Add Contribution
@@ -373,22 +372,20 @@ const Alumni = () => {
               </div>
 
               {/* Action Buttons */}
-
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
-              <button
-                onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-
+                <button
+                  onClick={handleCancelEdit}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>

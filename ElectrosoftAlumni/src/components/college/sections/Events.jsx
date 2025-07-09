@@ -166,7 +166,7 @@ const Events = () => {
           <div className="p-8">
             {/* Annual Events */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Annual Events
               </h3>
               <div className="space-y-3">
@@ -174,7 +174,7 @@ const Events = () => {
                   eventsData.annualEvents.map((event, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{event}</p>
+                      <p className="text-gray-700 leading-relaxed text-base">{event}</p>
                     </div>
                   ))}
               </div>
@@ -182,7 +182,7 @@ const Events = () => {
 
             {/* Tech & Cultural Events */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Tech & Cultural Events
               </h3>
               <div className="space-y-3">
@@ -192,7 +192,7 @@ const Events = () => {
                       <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
                         {index + 1}
                       </div>
-                      <p className="text-gray-700 leading-relaxed pt-0.5">{event}</p>
+                      <p className="text-gray-700 leading-relaxed pt-0.5 text-base">{event}</p>
                     </div>
                   ))}
               </div>
@@ -200,7 +200,7 @@ const Events = () => {
 
             {/* Seminars & Workshops */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Seminars & Workshops
               </h3>
               <div className="space-y-3">
@@ -208,7 +208,7 @@ const Events = () => {
                   eventsData.seminars.map((seminar, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{seminar}</p>
+                      <p className="text-gray-700 leading-relaxed text-base">{seminar}</p>
                     </div>
                   ))}
               </div>
@@ -216,7 +216,7 @@ const Events = () => {
 
             {/* Conferences */}
             <div className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Conferences
               </h3>
               <div className="space-y-3">
@@ -224,7 +224,7 @@ const Events = () => {
                   eventsData.conferences.map((conference, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{conference}</p>
+                      <p className="text-gray-700 leading-relaxed text-base">{conference}</p>
                     </div>
                   ))}
               </div>
@@ -246,7 +246,6 @@ const Events = () => {
                 <X className="w-6 h-6" />
               </button>
             </div>
-
             <div className="space-y-6">
               {/* Annual Events */}
               <div>
@@ -258,7 +257,7 @@ const Events = () => {
                         type="text"
                         value={event}
                         onChange={(e) => handleAnnualEventChange(index, e.target.value)}
-                        className="flex-1 p-2 border rounded"
+                        className="flex-1 p-2 border rounded text-base"
                         placeholder="Event details"
                       />
                       <button
@@ -271,7 +270,7 @@ const Events = () => {
                   ))}
                   <button
                     onClick={handleAddAnnualEvent}
-                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
                     Add Annual Event
@@ -289,7 +288,7 @@ const Events = () => {
                         type="text"
                         value={event}
                         onChange={(e) => handleTechCultureChange(index, e.target.value)}
-                        className="flex-1 p-2 border rounded"
+                        className="flex-1 p-2 border rounded text-base"
                         placeholder="Tech/Cultural event details"
                       />
                       <button
@@ -302,7 +301,7 @@ const Events = () => {
                   ))}
                   <button
                     onClick={handleAddTechCulture}
-                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
                     Add Tech/Cultural Event
@@ -320,7 +319,7 @@ const Events = () => {
                         type="text"
                         value={seminar}
                         onChange={(e) => handleSeminarChange(index, e.target.value)}
-                        className="flex-1 p-2 border rounded"
+                        className="flex-1 p-2 border rounded text-base"
                         placeholder="Seminar/Workshop details"
                       />
                       <button
@@ -333,7 +332,7 @@ const Events = () => {
                   ))}
                   <button
                     onClick={handleAddSeminar}
-                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
                     Add Seminar/Workshop
@@ -351,7 +350,7 @@ const Events = () => {
                         type="text"
                         value={conference}
                         onChange={(e) => handleConferenceChange(index, e.target.value)}
-                        className="flex-1 p-2 border rounded"
+                        className="flex-1 p-2 border rounded text-base"
                         placeholder="Conference details"
                       />
                       <button
@@ -364,7 +363,7 @@ const Events = () => {
                   ))}
                   <button
                     onClick={handleAddConference}
-                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50"
+                    className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                   >
                     <Plus className="w-4 h-4 inline mr-2" />
                     Add Conference
@@ -374,19 +373,19 @@ const Events = () => {
 
               {/* Action Buttons */}
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 rounded-b-xl">
-              <button
-                onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
+                <button
+                  onClick={handleCancelEdit}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>

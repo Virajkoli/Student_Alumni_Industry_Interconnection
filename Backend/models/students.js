@@ -68,6 +68,18 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      // Google OAuth fields
+      googleId: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+        field: 'google_id', // Map to database column name
+      },
+      imageUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'profile_picture', // Map to database column name
+      },
     },
     {
       tableName: "students",

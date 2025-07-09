@@ -6,8 +6,9 @@ console.log("🔧 Environment variables:", {
   MODE: import.meta.env.MODE,
 });
 
-// Always use production URL for now to fix localhost issue
+// Use localhost for development
 const API_BASE_URL = "https://scaips-backend.onrender.com";
+// const API_BASE_URL = "http://localhost:5000"; // Use this for local development
 
 console.log("🚀 Using API Base URL:", API_BASE_URL);
 

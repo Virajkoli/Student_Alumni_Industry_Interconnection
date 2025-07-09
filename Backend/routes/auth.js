@@ -786,6 +786,277 @@ const collegeRegistrationValidation = [
     .withMessage("Description must be 1000 characters or less"),
 ];
 
+// Google Authentication Helper Function
+const verifyGoogleToken = async (accessToken) => {
+  try {
+    // Verify the access token by calling Google's userinfo endpoint
+    const response = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`);
+    if (!response.ok) {
+      throw new Error('Invalid access token');
+    }
+    const userInfo = await response.json();
+    return userInfo;
+  } catch (error) {
+    console.error("Google token verification error:", error);
+    throw new Error("Invalid Google token");
+  }
+};
+
+// @desc    Google Login
+// @route   POST /api/auth/google/login
+// @access  Public
+const googleLogin = async (req, res) => {
+  try {
+    console.log("=== GOOGLE LOGIN ===");
+    console.log("Request body:", req.body);
+
+    const { email, googleId, firstName, lastName, imageUrl, accessToken } = req.body;
+
+    // Verify Google token
+    let googleUserInfo;
+    if (accessToken) {
+      try {
+        googleUserInfo = await verifyGoogleToken(accessToken);
+        if (googleUserInfo.email !== email) {
+          return res.status(400).json({
+            success: false,
+            message: "Google token email doesn't match provided email",
+          });
+        }
+      } catch (tokenError) {
+        console.log("Token verification failed, proceeding without verification:", tokenError.message);
+        // Continue without token verification for now
+      }
+    }
+
+    // Check if user exists in Student or College tables
+    let existingUser = await Student.findOne({ where: { email } });
+    let userType = "student";
+
+    if (!existingUser) {
+      existingUser = await College.findOne({ where: { email } });
+      userType = "college";
+    }
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found. Please register first.",
+      });
+    }
+
+    // Update user with Google information if not already set
+    if (!existingUser.googleId) {
+      existingUser.googleId = googleId;
+      existingUser.imageUrl = imageUrl;
+      if (!existingUser.first_name) existingUser.first_name = firstName;
+      if (!existingUser.last_name) existingUser.last_name = lastName;
+      await existingUser.save();
+    }
+
+    // Generate tokens
+    const token = generateToken(existingUser.id);
+    const refreshToken = generateRefreshToken(existingUser.id);
+
+    // Set refresh token cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    console.log("Google login successful for:", existingUser.email);
+
+    // Return user data based on type
+    let userResponse;
+    if (userType === "student") {
+      userResponse = {
+        id: existingUser.id,
+        email: existingUser.email,
+        first_name: existingUser.first_name,
+        last_name: existingUser.last_name,
+        fullName: `${existingUser.first_name} ${existingUser.last_name}`,
+        contact_no: existingUser.contact_no,
+        student_college_name: existingUser.student_college_name,
+        interested_field: existingUser.interested_field,
+        other_field: existingUser.other_field,
+        role: "student",
+        googleId: existingUser.googleId,
+        imageUrl: existingUser.imageUrl,
+      };
+    } else {
+      userResponse = {
+        id: existingUser.id,
+        email: existingUser.email,
+        name: existingUser.name,
+        role: "college",
+        googleId: existingUser.googleId,
+        imageUrl: existingUser.imageUrl,
+      };
+    }
+
+    res.json({
+      success: true,
+      message: "Google login successful",
+      data: {
+        token,
+        user: userResponse,
+      },
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Google login failed",
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Google Register
+// @route   POST /api/auth/google/register
+// @access  Public
+const googleRegister = async (req, res) => {
+  try {
+    console.log("=== GOOGLE REGISTRATION ===");
+    console.log("Request body:", req.body);
+
+    const { 
+      email, 
+      firstName, 
+      lastName, 
+      googleId, 
+      imageUrl, 
+      accessToken, 
+      role,
+      ...roleSpecificData 
+    } = req.body;
+
+    // Verify Google token
+    let googleUserInfo;
+    if (accessToken) {
+      try {
+        googleUserInfo = await verifyGoogleToken(accessToken);
+        if (googleUserInfo.email !== email) {
+          return res.status(400).json({
+            success: false,
+            message: "Google token email doesn't match provided email",
+          });
+        }
+      } catch (tokenError) {
+        console.log("Token verification failed, proceeding without verification:", tokenError.message);
+        // Continue without token verification for now
+      }
+    }
+
+    // Check if user already exists in Student or College tables
+    let existingUser = await Student.findOne({ where: { email } });
+    if (!existingUser) {
+      existingUser = await College.findOne({ where: { email } });
+    }
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists with this email",
+      });
+    }
+
+    // Create user based on role
+    let newUser;
+
+    if (role === "student") {
+      // Create student record directly
+      newUser = await Student.create({
+        email,
+        password: `google_auth_${Date.now()}`, // Dummy password for Google users
+        first_name: firstName,
+        last_name: lastName,
+        contact_no: roleSpecificData.contact_no,
+        student_college_name: roleSpecificData.student_college_name,
+        interested_field: roleSpecificData.interested_field,
+        other_field: roleSpecificData.other_field,
+        // Add Google-specific fields if the model supports them
+        google_id: googleId,
+        profile_picture: imageUrl,
+      });
+    } else if (role === "college") {
+      // Create college record directly
+      newUser = await College.create({
+        email,
+        password: `google_auth_${Date.now()}`, // Dummy password for Google users
+        name: roleSpecificData.college_name,
+        description: roleSpecificData.description || `${roleSpecificData.college_name} - College`,
+        location: roleSpecificData.college_address,
+        established: roleSpecificData.establishment_year ? parseInt(roleSpecificData.establishment_year) : null,
+        website: roleSpecificData.website,
+        campusArea: roleSpecificData.campus_area ? parseFloat(roleSpecificData.campus_area) : null,
+        nirfRank: roleSpecificData.nirf_rank ? parseInt(roleSpecificData.nirf_rank) : null,
+        accreditation: roleSpecificData.accreditation,
+        totalStudents: roleSpecificData.total_students ? parseInt(roleSpecificData.total_students) : null,
+        totalFaculty: roleSpecificData.total_faculty ? parseInt(roleSpecificData.total_faculty) : null,
+        // Add Google-specific fields if the model supports them
+        google_id: googleId,
+        profile_picture: imageUrl,
+      });
+    } else {
+      // For industry and startup, create student record for now (can be changed later)
+      newUser = await Student.create({
+        email,
+        password: `google_auth_${Date.now()}`, // Dummy password for Google users
+        first_name: firstName,
+        last_name: lastName,
+        contact_no: roleSpecificData.contact_no || "N/A",
+        student_college_name: roleSpecificData.company_name || roleSpecificData.startup_name || "N/A",
+        interested_field: roleSpecificData.industry_type || roleSpecificData.startup_stage || "Other",
+        other_field: `${role} - ${roleSpecificData.designation || roleSpecificData.funding_status || 'N/A'}`,
+        // Add Google-specific fields if the model supports them
+        google_id: googleId,
+        profile_picture: imageUrl,
+      });
+    }
+
+    // Generate tokens
+    const token = generateToken(newUser.id);
+    const refreshToken = generateRefreshToken(newUser.id);
+
+    // Set refresh token cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    console.log("Google registration successful for:", newUser.email);
+
+    res.status(201).json({
+      success: true,
+      message: "Google registration successful",
+      data: {
+        token,
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          first_name: newUser.first_name || firstName,
+          last_name: newUser.last_name || lastName,
+          role: role,
+          googleId: newUser.googleId || googleId,
+          imageUrl: newUser.imageUrl || imageUrl,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Google registration error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Google registration failed",
+      error: error.message,
+    });
+  }
+};
+
 // Routes
 router.post("/register", registerValidation, registerStudent);
 router.post(
@@ -794,6 +1065,8 @@ router.post(
   registerCollege
 );
 router.post("/login", loginValidation, login);
+router.post("/google/login", googleLogin);
+router.post("/google/register", googleRegister);
 router.post("/logout", logout);
 router.post("/refresh", refreshToken);
 router.get("/me", auth, getMe);

@@ -5,14 +5,9 @@ console.log("🔧 Environment variables:", {
   MODE: import.meta.env.MODE,
 });
 
-// Use environment variable or fallback to local development
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-
-// For debugging: Force localhost if we're in development
-if (import.meta.env.DEV) {
-  console.log("🔧 Development mode detected, ensuring localhost is used");
-}
+// Use localhost for development
+const API_BASE_URL = "https://scaips-backend.onrender.com";
+// const API_BASE_URL = "http://localhost:5000"; // Use this for local development
 
 console.log("🚀 Using API Base URL:", API_BASE_URL);
 
@@ -92,6 +87,21 @@ class ApiService {
     return this.request("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
+    });
+  }
+
+  // Google authentication endpoints
+  async googleLogin(googleData) {
+    return this.request("/api/auth/google/login", {
+      method: "POST",
+      body: JSON.stringify(googleData),
+    });
+  }
+
+  async googleRegister(googleData) {
+    return this.request("/api/auth/google/register", {
+      method: "POST",
+      body: JSON.stringify(googleData),
     });
   }
 

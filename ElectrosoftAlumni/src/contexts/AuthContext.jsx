@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import apiService from "../utils/apiService";
+import googleAuthService from "../utils/googleAuth";
 
 const AuthContext = createContext();
 
@@ -144,6 +145,66 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Google Login function
+  const loginWithGoogle = async (googleUser) => {
+    try {
+      setIsLoading(true);
+      
+      // Send Google user info to backend for authentication
+      const response = await apiService.googleLogin({
+        googleId: googleUser.id,
+        email: googleUser.email,
+        firstName: googleUser.firstName,
+        lastName: googleUser.lastName,
+        name: googleUser.name,
+        imageUrl: googleUser.imageUrl,
+        accessToken: googleUser.accessToken
+      });
+
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        throw new Error(response.message || "Google login failed");
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Google Registration function
+  const registerWithGoogle = async (googleUser) => {
+    try {
+      setIsLoading(true);
+      
+      // Send Google user info to backend for registration
+      const response = await apiService.googleRegister({
+        googleId: googleUser.id,
+        email: googleUser.email,
+        firstName: googleUser.firstName,
+        lastName: googleUser.lastName,
+        name: googleUser.name,
+        imageUrl: googleUser.imageUrl,
+        accessToken: googleUser.accessToken
+      });
+
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        throw new Error(response.message || "Google registration failed");
+      }
+    } catch (error) {
+      console.error("Google registration error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value = {
     isAuthenticated,
     isLoading,
@@ -152,6 +213,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     register,
     loginUser,
+    loginWithGoogle,
+    registerWithGoogle,
     checkAuthStatus,
   };
 

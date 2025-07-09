@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import apiService from "../../utils/apiService";
+import GoogleSignInButton from "../../components/GoogleSignInButton";
 import "./LoginPage.css";
 
 export default function LoginPage() {
@@ -149,14 +150,16 @@ export default function LoginPage() {
                 <span>OR</span>
               </div>
 
-              <button type="button" className="google-login">
-                <img
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  alt="Google"
-                  className="google-icon"
-                />
-                <span>Login with Google</span>
-              </button>
+              <GoogleSignInButton
+                isSignUp={false}
+                onSuccess={(result) => {
+                  const rolePage = apiService.getRoleHomePage(result.user.role);
+                  navigate(rolePage);
+                }}
+                onError={(error) => {
+                  setError(error);
+                }}
+              />
             </form>
           </div>
 

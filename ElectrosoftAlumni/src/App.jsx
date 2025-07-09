@@ -21,6 +21,8 @@ import StartupDashboard from "./pages/startup/StartupDashboard";
 // Auth Pages
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
+import CompleteGoogleSignup from "./pages/auth/CompleteGoogleSignup";
+import GoogleAuthTest from "./components/GoogleAuthTest";
 
 function App() {
   return (
@@ -46,6 +48,24 @@ function App() {
                   <SignupPage />
                 </AuthLayout>
               </PublicRoute>
+            }
+          />
+          <Route
+            path="/auth/complete-google-signup"
+            element={
+              <PublicRoute>
+                <AuthLayout>
+                  <CompleteGoogleSignup />
+                </AuthLayout>
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/auth/google-test"
+            element={
+              <AuthLayout>
+                <GoogleAuthTest />
+              </AuthLayout>
             }
           />
 

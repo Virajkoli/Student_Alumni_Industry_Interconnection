@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import GoogleSignInButton from "../../components/GoogleSignInButton";
 import "./LoginPage.css";
 
 export default function SignupPage() {
@@ -633,18 +634,28 @@ export default function SignupPage() {
                 {error}
               </div>
             )}
-            <button type="button" className="google-login">
-                <img
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  alt="Google"
-                  className="google-icon"
-                />
-                <span>Register with Google</span>
-              </button>
 
             <button className="register-btn" type="submit" disabled={isLoading}>
               {isLoading ? "Registering..." : "Next"}
             </button>
+             
+             <div className="separator">
+                <span>OR</span>
+              </div>
+              
+              <GoogleSignInButton
+                isSignUp={true}
+                onSuccess={(googleUser) => {
+                  // Navigate to role selection page for Google users
+                  navigate('/auth/complete-google-signup', { 
+                    state: { googleUser } 
+                  });
+                }}
+                onError={(error) => {
+                  setError(error);
+                }}
+              />
+
 
             <p className="join-text">
               Already have an account?{" "}

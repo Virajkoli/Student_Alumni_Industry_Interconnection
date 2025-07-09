@@ -6,10 +6,12 @@ const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 const { testConnection, syncDatabase } = require("./config/database");
 require("dotenv").config();
-const path = require("path");
-const fs = require("fs");
 
 const app = express();
+
+// Trust proxy - Required for deployment on Render and other proxy services
+// This allows express-rate-limit to work correctly with X-Forwarded-For headers
+app.set("trust proxy", 1);
 
 // Import routes
 const authRoutes = require("./routes/auth");
@@ -27,19 +29,9 @@ const { notFound } = require("./middleware/notFound");
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs:
-    parseInt(process.env.RATE_LIMIT_WINDOW) * 60 * 1000 || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later.",
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use("/api/", limiter);
-
-// CORS configuration
-app.use(
+// Handle preflight requests BEFORE rate limiting
+app.options(
+  "*",
   cors({
     origin: [
       "http://localhost:5173", // Local development
@@ -48,11 +40,64 @@ app.use(
       "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
       "https://electrosoft-alumni.vercel.app", // Additional frontend URL
       "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
+      "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
       /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
       process.env.FRONTEND_URL, // Environment variable for production
     ].filter(Boolean), // Remove any undefined values
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
+  })
+);
+
+// Rate limiting (applied after CORS preflight)
+const limiter = rateLimit({
+  windowMs:
+    parseInt(process.env.RATE_LIMIT_WINDOW) * 60 * 1000 || 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX) || 500, // Increased for development
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for OPTIONS requests (CORS preflight)
+    return req.method === "OPTIONS";
+  },
+});
+app.use("/api/", limiter);
+
+// CORS configuration - Applied globally
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        "http://localhost:5173", // Local development
+        "http://localhost:3000", // Alternative local port
+        "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
+        "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
+        "https://electrosoft-alumni.vercel.app", // Additional frontend URL
+        "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
+        "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
+        process.env.FRONTEND_URL, // Environment variable for production
+      ].filter(Boolean);
+
+      // Check if origin is in allowed list or matches Vercel pattern
+      if (
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/.*\.vercel\.app$/.test(origin)
+      ) {
+        callback(null, true);
+      } else {
+        console.log(`❌ CORS blocked origin: ${origin}`);
+        callback(new Error("Not allowed by CORS"), false);
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
 
@@ -64,23 +109,8 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
-// Static files (for uploaded files) with comprehensive CORS
-app.use(
-  "/uploads",
-  cors(),
-  express.static("uploads", {
-    setHeaders: (res, path) => {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Methods", "GET");
-      res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-      );
-      // Add Cross-Origin-Resource-Policy header
-      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-    },
-  })
-);
+// Note: Static file serving removed - using Cloudinary for media storage
+// Files are now stored in Cloudinary and served directly from there
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -101,24 +131,72 @@ app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// Dedicated media serving endpoint with CORS
-app.get("/api/media/*", (req, res) => {
-  const filePath = req.params[0]; // Get the file path after /api/media/
-  const fullPath = path.join(__dirname, "uploads", filePath);
+// Note: Media serving endpoint removed - files are now served directly from Cloudinary
 
-  // Set CORS headers
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
+// Debug endpoint to list uploads directory contents
+app.get("/api/debug/uploads", (req, res) => {
+  const uploadsDir = path.join(__dirname, "uploads");
 
-  // Check if file exists
-  if (fs.existsSync(fullPath)) {
-    res.sendFile(fullPath);
-  } else {
-    res.status(404).json({ error: "Media file not found" });
+  if (!fs.existsSync(uploadsDir)) {
+    return res.json({
+      exists: false,
+      message: "Uploads directory does not exist",
+      path: uploadsDir,
+    });
+  }
+
+  try {
+    const listDirectory = (dirPath, relativePath = "") => {
+      const items = fs.readdirSync(dirPath, { withFileTypes: true });
+      const result = [];
+
+      for (const item of items) {
+        const itemPath = path.join(dirPath, item.name);
+        const relativeItemPath = path.join(relativePath, item.name);
+
+        if (item.isDirectory()) {
+          result.push({
+            name: item.name,
+            type: "directory",
+            path: relativeItemPath,
+            children: listDirectory(itemPath, relativeItemPath),
+          });
+        } else {
+          const stats = fs.statSync(itemPath);
+          result.push({
+            name: item.name,
+            type: "file",
+            path: relativeItemPath,
+            size: stats.size,
+            modified: stats.mtime,
+          });
+        }
+      }
+
+      return result;
+    };
+
+    const contents = listDirectory(uploadsDir);
+
+    res.json({
+      exists: true,
+      path: uploadsDir,
+      contents: contents,
+      totalFiles: contents.reduce((count, item) => {
+        if (item.type === "file") return count + 1;
+        if (item.children)
+          return (
+            count +
+            item.children.filter((child) => child.type === "file").length
+          );
+        return count;
+      }, 0),
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to read uploads directory",
+      message: error.message,
+    });
   }
 });
 

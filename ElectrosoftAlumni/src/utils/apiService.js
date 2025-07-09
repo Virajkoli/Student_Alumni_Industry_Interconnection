@@ -1,11 +1,22 @@
 // API configuration
-// Get API base URL from environment variables with fallback
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+// Force production URL to avoid localhost issues
+console.log("🔧 Environment variables:", {
+  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  NODE_ENV: import.meta.env.NODE_ENV,
+  MODE: import.meta.env.MODE,
+});
+
+// Always use production URL for now to fix localhost issue
+const API_BASE_URL = "https://scaips-backend.onrender.com";
+
+console.log("🚀 Using API Base URL:", API_BASE_URL);
+
+console.log("🌐 API Base URL configured as:", API_BASE_URL);
 // API service class
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
+    console.log("🔗 ApiService initialized with baseURL:", this.baseURL);
   }
 
   // Get authorization headers
@@ -53,7 +64,13 @@ class ApiService {
 
   // Authentication endpoints
   async register(userData) {
-    return this.request("/api/auth/register", {
+    // Determine endpoint based on role
+    const endpoint =
+      userData.role === "college"
+        ? "/api/auth/register/college"
+        : "/api/auth/register";
+
+    return this.request(endpoint, {
       method: "POST",
       body: JSON.stringify(userData),
     });
@@ -378,28 +395,26 @@ class ApiService {
   getMediaUrl(mediaPath) {
     if (!mediaPath) return null;
 
-    // If mediaPath already starts with http/https, return as is
+    // If mediaPath already starts with http/https, return as is (Cloudinary URLs)
     if (mediaPath.startsWith("http://") || mediaPath.startsWith("https://")) {
-      console.log(`🔗 Media URL (absolute): ${mediaPath}`);
+      console.log(`🔗 Media URL (Cloudinary): ${mediaPath}`);
       return mediaPath;
     }
 
-    let fullUrl;
-
-    // If mediaPath starts with /uploads, construct the full URL
-    if (mediaPath.startsWith("/uploads")) {
-      fullUrl = `${this.baseURL}${mediaPath}`;
+    // For backward compatibility with old local file paths
+    // This shouldn't happen with new uploads but may exist for old data
+    console.warn(`⚠️ Legacy media path detected: ${mediaPath}`);
+    
+    const mediaBaseURL = "https://scaips-backend.onrender.com";
+    let cleanPath = mediaPath;
+    if (mediaPath.startsWith("/uploads/")) {
+      cleanPath = mediaPath.substring(9);
+    } else if (mediaPath.startsWith("uploads/")) {
+      cleanPath = mediaPath.substring(8);
     }
-    // If mediaPath starts with uploads (no leading slash), add the slash
-    else if (mediaPath.startsWith("uploads")) {
-      fullUrl = `${this.baseURL}/${mediaPath}`;
-    }
-    // For any other path, assume it's relative to uploads directory
-    else {
-      fullUrl = `${this.baseURL}/uploads/${mediaPath}`;
-    }
-
-    console.log(`🔗 Media URL: ${mediaPath} → ${fullUrl}`);
+    
+    const fullUrl = `${mediaBaseURL}/api/media/${cleanPath}`;
+    console.log(`🔗 Legacy Media URL: ${mediaPath} → ${fullUrl}`);
     return fullUrl;
   }
 

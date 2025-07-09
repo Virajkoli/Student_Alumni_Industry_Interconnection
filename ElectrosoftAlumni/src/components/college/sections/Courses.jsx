@@ -240,13 +240,7 @@ const Courses = ({ data, onEdit }) => {
                   </div>
                 </div>
               ))}
-              <div className="flex gap-4 pt-4 border-t">
-                <button 
-                  type="submit" 
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-base"
-                >
-                  Save Changes
-                </button>
+              <div className="flex gap-4 pt-4 border-t justify-end">
                 <button 
                   type="button" 
                   onClick={handleCancel} 
@@ -254,6 +248,13 @@ const Courses = ({ data, onEdit }) => {
                 >
                   Cancel
                 </button>
+                <button 
+                  type="submit" 
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-base"
+                >
+                  Save Changes
+                </button>
+                
               </div>
             </form>
           </div>

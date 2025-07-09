@@ -75,22 +75,11 @@ const PostCreator = ({ onPostCreated }) => {
     } catch (error) {
       console.error("❌ Error creating post:", error);
 
-      // More specific error messages
-      let errorMessage = "Failed to create post";
-      if (error.message.includes("Failed to fetch")) {
-        errorMessage =
-          "Network error - please check your connection and try again";
-      } else if (error.message.includes("500")) {
-        errorMessage = "Server error - please try again in a moment";
-      } else if (error.message.includes("413")) {
-        errorMessage = "File too large - please select smaller files";
-      } else if (error.message.includes("400")) {
-        errorMessage = "Invalid file type or missing content";
-      } else {
-        errorMessage = error.message;
-      }
+      // Use the improved error messages from apiService
+      let errorMessage = error.message || "Failed to create post";
 
-      alert(`${errorMessage}`);
+      // Show user-friendly error message
+      alert(`Error: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,17 +1,29 @@
 // API configuration
-// Force production URL to avoid localhost issues
 console.log("🔧 Environment variables:", {
   VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
   NODE_ENV: import.meta.env.NODE_ENV,
   MODE: import.meta.env.MODE,
 });
 
-// Always use production URL for now to fix localhost issue
-const API_BASE_URL = "https://scaips-backend.onrender.com";
+// Use environment variable or fallback to local development
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
+// For debugging: Force localhost if we're in development
+if (import.meta.env.DEV) {
+  console.log("🔧 Development mode detected, ensuring localhost is used");
+}
 
 console.log("🚀 Using API Base URL:", API_BASE_URL);
 
 console.log("🌐 API Base URL configured as:", API_BASE_URL);
+
+// Debug: Show what URL we're actually using
+if (API_BASE_URL.includes("localhost")) {
+  console.log("🏠 Using LOCAL development backend");
+} else {
+  console.log("🌐 Using REMOTE production backend");
+}
 // API service class
 class ApiService {
   constructor() {
@@ -320,8 +332,30 @@ class ApiService {
 
         if (!response.ok) {
           console.error(`❌ API Error: ${response.status}`, data);
+
+          // Handle specific error cases with better messages
+          if (response.status === 401) {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userData");
+            throw new Error("🔑 Session expired. Please login again.");
+          } else if (response.status === 500) {
+            throw new Error(
+              "🔧 Server error. The backend service is experiencing issues. Please try again in a few moments."
+            );
+          } else if (response.status === 400) {
+            throw new Error(
+              data.message ||
+                "📝 Invalid request. Please check your input and try again."
+            );
+          } else if (response.status === 413) {
+            throw new Error("📎 File too large. Please choose smaller files.");
+          } else if (response.status === 403) {
+            throw new Error("🚫 Access denied. Please check your permissions.");
+          }
+
           throw new Error(
-            data.message || `HTTP error! status: ${response.status}`
+            data.message ||
+              `❌ Server error (${response.status}). Please try again.`
           );
         }
 
@@ -363,8 +397,30 @@ class ApiService {
 
       if (!response.ok) {
         console.error(`❌ API Error: ${response.status}`, data);
+
+        // Handle specific error cases with better messages
+        if (response.status === 401) {
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("userData");
+          throw new Error("🔑 Session expired. Please login again.");
+        } else if (response.status === 500) {
+          throw new Error(
+            "🔧 Server error. The backend service is experiencing issues. Please try again in a few moments."
+          );
+        } else if (response.status === 400) {
+          throw new Error(
+            data.message ||
+              "📝 Invalid request. Please check your input and try again."
+          );
+        } else if (response.status === 413) {
+          throw new Error("📎 File too large. Please choose smaller files.");
+        } else if (response.status === 403) {
+          throw new Error("🚫 Access denied. Please check your permissions.");
+        }
+
         throw new Error(
-          data.message || `HTTP error! status: ${response.status}`
+          data.message ||
+            `❌ Server error (${response.status}). Please try again.`
         );
       }
 
@@ -474,6 +530,71 @@ class ApiService {
       startup: "/startup-profile",
     };
     return profilePages[role] || "/student-profile";
+  }
+
+  // Test connection method for debugging
+  async testConnection() {
+    try {
+      console.log("🔍 Testing backend connection...");
+
+      const response = await fetch(`${this.baseURL}/health`);
+      const data = await response.json();
+
+      console.log("Backend health check:", {
+        status: response.status,
+        data: data,
+      });
+
+      return {
+        success: response.ok,
+        status: response.status,
+        data: data,
+      };
+    } catch (error) {
+      console.error("❌ Connection test failed:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  // Test authentication
+  async testAuth() {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        return { success: false, error: "No auth token found" };
+      }
+
+      console.log("🔍 Testing authentication...");
+
+      const response = await fetch(`${this.baseURL}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      console.log("Auth test result:", {
+        status: response.status,
+        data: data,
+      });
+
+      return {
+        success: response.ok,
+        status: response.status,
+        data: data,
+      };
+    } catch (error) {
+      console.error("❌ Auth test failed:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   }
 }
 

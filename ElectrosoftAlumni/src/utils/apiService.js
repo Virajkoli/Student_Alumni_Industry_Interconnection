@@ -295,34 +295,64 @@ class ApiService {
 
   // Posts API methods
   async createPost(postData, mediaFiles = []) {
-    const formData = new FormData();
-
-    // Add text content
-    if (postData.content) {
-      formData.append("content", postData.content);
-    }
-
-    // Add poll options if present
-    if (postData.pollOptions) {
-      formData.append("pollOptions", JSON.stringify(postData.pollOptions));
-    }
-
-    // Add media files
-    if (mediaFiles && mediaFiles.length > 0) {
-      mediaFiles.forEach((file, index) => {
-        formData.append("media", file);
-      });
-    }
-
     const token = localStorage.getItem("authToken");
-    const headers = {
-      ...(token && { Authorization: `Bearer ${token}` }),
-      // Don't set Content-Type for FormData, let browser set it with boundary
-    };
-
     const url = `${this.baseURL}/api/posts`;
+
     try {
       console.log(`🌐 API Request: POST ${url}`);
+      console.log(`📝 Post data:`, postData);
+      console.log(`📎 Media files:`, mediaFiles?.length || 0);
+
+      // If there are no media files, send as JSON
+      if (!mediaFiles || mediaFiles.length === 0) {
+        const headers = {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        };
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(postData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error(`❌ API Error: ${response.status}`, data);
+          throw new Error(
+            data.message || `HTTP error! status: ${response.status}`
+          );
+        }
+
+        console.log(`✅ API Success: POST ${url}`, data);
+        return data;
+      }
+
+      // If there are media files, send as FormData
+      const formData = new FormData();
+
+      // Add text content
+      if (postData.content) {
+        formData.append("content", postData.content);
+      }
+
+      // Add poll options if present
+      if (postData.pollOptions) {
+        formData.append("pollOptions", JSON.stringify(postData.pollOptions));
+      }
+
+      // Add media files
+      mediaFiles.forEach((file, index) => {
+        formData.append("media", file);
+        console.log(`📎 Adding file ${index + 1}: ${file.name} (${file.type})`);
+      });
+
+      const headers = {
+        ...(token && { Authorization: `Bearer ${token}` }),
+        // Don't set Content-Type for FormData, let browser set it with boundary
+      };
+
       const response = await fetch(url, {
         method: "POST",
         headers,

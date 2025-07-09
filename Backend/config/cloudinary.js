@@ -1,6 +1,6 @@
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const multer = require("multer");
 
 // Configure Cloudinary
 cloudinary.config({
@@ -13,14 +13,14 @@ cloudinary.config({
 const postStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'scaips/posts', // Folder in Cloudinary
-    allowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm', 'mov'],
-    resource_type: 'auto', // Automatically detect if it's image, video, or raw
+    folder: "scaips/posts", // Folder in Cloudinary
+    allowedFormats: ["jpg", "jpeg", "png", "webp", "mp4", "webm", "mov"],
+    resource_type: "auto", // Automatically detect if it's image, video, or raw
     transformation: [
       {
-        quality: 'auto:good',
-        fetch_format: 'auto',
-      }
+        quality: "auto:good",
+        fetch_format: "auto",
+      },
     ],
   },
 });
@@ -29,17 +29,17 @@ const postStorage = new CloudinaryStorage({
 const profileStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'scaips/profiles',
-    allowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
-    resource_type: 'image',
+    folder: "scaips/profiles",
+    allowedFormats: ["jpg", "jpeg", "png", "webp"],
+    resource_type: "image",
     transformation: [
       {
         width: 400,
         height: 400,
-        crop: 'fill',
-        quality: 'auto:good',
-        fetch_format: 'auto',
-      }
+        crop: "fill",
+        quality: "auto:good",
+        fetch_format: "auto",
+      },
     ],
   },
 });
@@ -52,23 +52,21 @@ const uploadPostMedia = multer({
   },
   fileFilter: function (req, file, cb) {
     const allowedImageTypes = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/webp',
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
     ];
-    const allowedVideoTypes = [
-      'video/mp4',
-      'video/webm',
-      'video/quicktime',
-    ];
+    const allowedVideoTypes = ["video/mp4", "video/webm", "video/quicktime"];
     const allowedTypes = [...allowedImageTypes, ...allowedVideoTypes];
 
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
       cb(
-        new Error('Only .jpg, .jpeg, .png, .webp, .mp4, .webm files are allowed!'),
+        new Error(
+          "Only .jpg, .jpeg, .png, .webp, .mp4, .webm files are allowed!"
+        ),
         false
       );
     }
@@ -82,13 +80,15 @@ const uploadProfileImage = multer({
     fileSize: 5 * 1024 * 1024, // 5MB limit for profile images
   },
   fileFilter: function (req, file, cb) {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
       cb(
-        new Error('Only .jpg, .jpeg, .png, .webp files are allowed for profile images!'),
+        new Error(
+          "Only .jpg, .jpeg, .png, .webp files are allowed for profile images!"
+        ),
         false
       );
     }
@@ -99,10 +99,10 @@ const uploadProfileImage = multer({
 const deleteFromCloudinary = async (publicId) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
-    console.log('File deleted from Cloudinary:', result);
+    console.log("File deleted from Cloudinary:", result);
     return result;
   } catch (error) {
-    console.error('Error deleting file from Cloudinary:', error);
+    console.error("Error deleting file from Cloudinary:", error);
     throw error;
   }
 };
@@ -110,12 +110,12 @@ const deleteFromCloudinary = async (publicId) => {
 // Helper function to extract public ID from Cloudinary URL
 const extractPublicId = (url) => {
   try {
-    const parts = url.split('/');
+    const parts = url.split("/");
     const filename = parts[parts.length - 1];
-    const publicId = filename.split('.')[0];
+    const publicId = filename.split(".")[0];
     return publicId;
   } catch (error) {
-    console.error('Error extracting public ID from URL:', error);
+    console.error("Error extracting public ID from URL:", error);
     return null;
   }
 };

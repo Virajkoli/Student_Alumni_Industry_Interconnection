@@ -24,8 +24,10 @@ const PostCreator = ({ onPostCreated }) => {
     setIsSubmitting(true);
 
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
+      console.log("🚀 Starting post creation...");
+      console.log("📝 Post text:", postText.trim());
+      console.log("📎 Selected files:", selectedFiles.length);
+      console.log("🗳️ Poll options:", showPollOptions ? pollOptions : "none");
 
       // Create post data object
       const postData = {
@@ -35,12 +37,27 @@ const PostCreator = ({ onPostCreated }) => {
       // Add poll options if present
       if (showPollOptions && pollOptions.some((opt) => opt.trim())) {
         postData.pollOptions = pollOptions.filter((opt) => opt.trim());
+        console.log("🗳️ Adding poll options:", postData.pollOptions);
+      }
+
+      // Log file details for debugging
+      if (selectedFiles.length > 0) {
+        console.log("📎 File details:");
+        selectedFiles.forEach((file, index) => {
+          console.log(
+            `  File ${index + 1}: ${file.name} (${file.type}, ${(
+              file.size /
+              1024 /
+              1024
+            ).toFixed(2)}MB)`
+          );
+        });
       }
 
       // Use apiService to create post
       const data = await apiService.createPost(postData, selectedFiles);
 
-      console.log("Post created successfully:", data);
+      console.log("✅ Post created successfully:", data);
 
       // Reset form
       setPostText("");
@@ -56,8 +73,13 @@ const PostCreator = ({ onPostCreated }) => {
 
       alert("Post created successfully!");
     } catch (error) {
-      console.error("Error creating post:", error);
-      alert(`Failed to create post: ${error.message}`);
+      console.error("❌ Error creating post:", error);
+
+      // Use the improved error messages from apiService
+      let errorMessage = error.message || "Failed to create post";
+
+      // Show user-friendly error message
+      alert(`Error: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,15 +103,77 @@ const PostCreator = ({ onPostCreated }) => {
 
   const handleFileSelect = (type) => {
     if (fileInputRef.current) {
-      fileInputRef.current.accept =
-        type === "image" ? "image/*" : type === "video" ? "video/*" : "*/*";
+      // Set specific file types based on what the backend supports
+      switch (type) {
+        case "image":
+          fileInputRef.current.accept =
+            "image/jpeg,image/jpg,image/png,image/webp";
+          break;
+        case "video":
+          fileInputRef.current.accept = "video/mp4,video/webm,video/quicktime";
+          break;
+        case "document":
+          // For now, limit documents to common types
+          fileInputRef.current.accept = "application/pdf,text/plain,.doc,.docx";
+          break;
+        default:
+          fileInputRef.current.accept = "*/*";
+      }
       fileInputRef.current.click();
     }
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles((prev) => [...prev, ...files]);
+
+    // Validate file types and sizes
+    const validFiles = files.filter((file) => {
+      // Check file size (50MB limit to match backend)
+      if (file.size > 50 * 1024 * 1024) {
+        alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
+        return false;
+      }
+
+      // Check file type
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "video/mp4",
+        "video/webm",
+        "video/quicktime",
+        "application/pdf",
+        "text/plain",
+      ];
+
+      if (
+        !allowedTypes.includes(file.type) &&
+        !file.name.match(/\.(doc|docx)$/i)
+      ) {
+        alert(`File "${file.name}" is not a supported file type.`);
+        return false;
+      }
+
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      setSelectedFiles((prev) => {
+        const newFiles = [...prev, ...validFiles];
+        // Limit to 5 files total
+        if (newFiles.length > 5) {
+          alert(
+            "Maximum 5 files allowed. Only the first 5 files will be kept."
+          );
+          return newFiles.slice(0, 5);
+        }
+        return newFiles;
+      });
+    }
+
+    // Clear the input so the same file can be selected again if needed
+    e.target.value = "";
   };
 
   const removeFile = (index) => {
@@ -130,17 +214,28 @@ const PostCreator = ({ onPostCreated }) => {
             {selectedFiles.length > 0 && (
               <div className="mt-3 space-y-2">
                 <h4 className="text-sm font-medium text-gray-700">
-                  Selected Files:
+                  Selected Files ({selectedFiles.length}):
                 </h4>
                 {selectedFiles.map((file, index) => (
                   <div
                     key={index}
                     className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
                   >
-                    <FileText className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-700 flex-1">
-                      {file.name}
-                    </span>
+                    {file.type.startsWith("image/") ? (
+                      <Image className="w-4 h-4 text-blue-500" />
+                    ) : file.type.startsWith("video/") ? (
+                      <Video className="w-4 h-4 text-purple-500" />
+                    ) : (
+                      <FileText className="w-4 h-4 text-gray-500" />
+                    )}
+                    <div className="flex-1">
+                      <span className="text-sm text-gray-700 block">
+                        {file.name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {(file.size / 1024 / 1024).toFixed(2)} MB • {file.type}
+                      </span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => removeFile(index)}
@@ -151,6 +246,12 @@ const PostCreator = ({ onPostCreated }) => {
                     </button>
                   </div>
                 ))}
+                {selectedFiles.length >= 5 && (
+                  <p className="text-xs text-amber-600">
+                    Maximum 5 files allowed. Additional files will not be
+                    uploaded.
+                  </p>
+                )}
               </div>
             )}
 
@@ -204,9 +305,9 @@ const PostCreator = ({ onPostCreated }) => {
               <button
                 type="button"
                 onClick={() => handleFileSelect("image")}
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm"
+                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Add Image"
-                disabled={isSubmitting}
+                disabled={isSubmitting || selectedFiles.length >= 5}
               >
                 <Image className="w-4 h-4" />
                 <span className="hidden sm:block">Photo</span>
@@ -214,9 +315,9 @@ const PostCreator = ({ onPostCreated }) => {
               <button
                 type="button"
                 onClick={() => handleFileSelect("video")}
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm"
+                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Add Video"
-                disabled={isSubmitting}
+                disabled={isSubmitting || selectedFiles.length >= 5}
               >
                 <Video className="w-4 h-4" />
                 <span className="hidden sm:block">Video</span>
@@ -224,9 +325,9 @@ const PostCreator = ({ onPostCreated }) => {
               <button
                 type="button"
                 onClick={() => handleFileSelect("document")}
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm"
+                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Add Document"
-                disabled={isSubmitting}
+                disabled={isSubmitting || selectedFiles.length >= 5}
               >
                 <FileText className="w-4 h-4" />
                 <span className="hidden sm:block">Document</span>

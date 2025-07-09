@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import StudentProfileHeader from "../../components/student/StudentProfileHeader";
 import AboutSection from "../../components/student/sections/AboutSection";
 import ExperienceSection from "../../components/student/sections/ExperienceSection";
@@ -8,98 +8,131 @@ import ProjectsSection from "../../components/student/sections/ProjectsSection";
 import CoursesSection from "../../components/student/sections/CoursesSection";
 import CertificationsSection from "../../components/student/sections/CertificationsSection";
 import RecommendationsSection from "../../components/student/sections/RecommendationsSection";
+import apiService from "../../utils/apiService";
 
 const StudentProfilePage = () => {
   // State for search bar
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // State for profile data
+  // State for profile data - initialize with empty values
   const [profileData, setProfileData] = useState({
-    firstName: "Priya",
-    lastName: "P",
+    firstName: "",
+    lastName: "",
     additionalName: "",
     pronouns: "",
-    headline: "Computer Engineering Student",
-    industry: "IT Services and IT Consulting",
-    school: "Government Polytechnic",
+    headline: "",
+    industry: "",
+    school: "",
     showSchool: true,
-    country: "India",
-    city: "Jalgaon, Maharashtra",
-    about:
-      "Passionate computer engineering student with a strong foundation in web development and software engineering. Eager to apply theoretical knowledge in real-world projects and contribute to innovative solutions.",
+    country: "",
+    city: "",
+    about: "",
   });
 
-  // State for experiences
+  // State for other sections
   const [experiences, setExperiences] = useState([]);
+  const [education, setEducation] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [certifications, setCertifications] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
 
-  // State for education
-  const [education, setEducation] = useState([
-    {
-      id: 1,
-      school: "Government Polytechnic",
-      degree: "Diploma",
-      field: "Computer Engineering",
-      startYear: "2022",
-      endYear: "2025",
-      grade: "8.5 CGPA",
-      activities: "Programming Club, Technical Events",
-      description:
-        "Focused on software development, data structures, and web technologies.",
-    },
-  ]);
+  // Fetch profile data on component mount
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getStudentProfile();
+        console.log("📊 Profile data loaded:", response);
 
-  // State for skills
-  const [skills, setSkills] = useState([
-    "Web Development",
-    "JavaScript",
-    "React",
-    "HTML/CSS",
-  ]);
+        if (response.success && response.data) {
+          const data = response.data;
 
-  // State for projects
-  const [projects, setProjects] = useState([
-    {
-      id: 1,
-      title: "E-commerce Website",
-      description:
-        "Developed a full-stack e-commerce platform with React and Node.js",
-      date: "May 2024",
-      url: "https://github.com/username/ecommerce",
-    },
-  ]);
+          // Update profile data
+          setProfileData({
+            firstName: data.first_name || "",
+            lastName: data.last_name || "",
+            additionalName: data.additional_name || "",
+            pronouns: data.pronouns || "",
+            headline: data.headline || "",
+            industry: data.industry || "",
+            school: data.school || "",
+            showSchool: data.show_school !== false,
+            country: data.country || "",
+            city: data.city || "",
+            about: data.about || "",
+          });
 
-  // State for courses
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      name: "Advanced React",
-      institution: "Udemy",
-      completionDate: "April 2024",
-    },
-  ]);
+          // Update other sections if data exists
+          if (data.experiences) setExperiences(data.experiences);
+          if (data.education) setEducation(data.education);
+          if (data.skills) setSkills(data.skills);
+          if (data.projects) setProjects(data.projects);
+          if (data.courses) setCourses(data.courses);
+          if (data.certifications) setCertifications(data.certifications);
+          if (data.recommendations) setRecommendations(data.recommendations);
+        }
+      } catch (err) {
+        console.error("❌ Error loading profile:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // State for certifications
-  const [certifications, setCertifications] = useState([
-    {
-      id: 1,
-      name: "AWS Certified Developer",
-      issuer: "Amazon Web Services",
-      date: "March 2024",
-      credentialId: "AWS123456",
-    },
-  ]);
+    fetchProfileData();
+  }, []);
 
-  // State for recommendations
-  const [recommendations, setRecommendations] = useState([
-    {
-      id: 1,
-      text: "Priya is an excellent developer with strong problem-solving skills.",
-      name: "Rajesh Kumar",
-      position: "Senior Developer at Tech Solutions",
-      relation: "Worked together on multiple projects",
-      date: "June 2024",
-    },
-  ]);
+  // Handle profile updates
+  const handleProfileUpdate = async (updatedData) => {
+    try {
+      console.log("💾 Updating profile data:", updatedData);
+
+      // Update the about section specifically
+      if (updatedData.about !== undefined) {
+        const response = await apiService.updateStudentAbout({
+          about: updatedData.about,
+        });
+        console.log("✅ About section updated:", response);
+      }
+
+      // Update local state
+      setProfileData(updatedData);
+    } catch (err) {
+      console.error("❌ Error updating profile:", err);
+      alert("Failed to update profile: " + err.message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading profile: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -176,7 +209,7 @@ const StudentProfilePage = () => {
           {/* About Section */}
           <AboutSection
             profileData={profileData}
-            onProfileUpdate={setProfileData}
+            onProfileUpdate={handleProfileUpdate}
           />
 
           {/* Experience Section */}

@@ -44,7 +44,13 @@ const PostCreator = ({ onPostCreated }) => {
       if (selectedFiles.length > 0) {
         console.log("📎 File details:");
         selectedFiles.forEach((file, index) => {
-          console.log(`  File ${index + 1}: ${file.name} (${file.type}, ${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+          console.log(
+            `  File ${index + 1}: ${file.name} (${file.type}, ${(
+              file.size /
+              1024 /
+              1024
+            ).toFixed(2)}MB)`
+          );
         });
       }
 
@@ -68,11 +74,12 @@ const PostCreator = ({ onPostCreated }) => {
       alert("Post created successfully!");
     } catch (error) {
       console.error("❌ Error creating post:", error);
-      
+
       // More specific error messages
       let errorMessage = "Failed to create post";
       if (error.message.includes("Failed to fetch")) {
-        errorMessage = "Network error - please check your connection and try again";
+        errorMessage =
+          "Network error - please check your connection and try again";
       } else if (error.message.includes("500")) {
         errorMessage = "Server error - please try again in a moment";
       } else if (error.message.includes("413")) {
@@ -82,7 +89,7 @@ const PostCreator = ({ onPostCreated }) => {
       } else {
         errorMessage = error.message;
       }
-      
+
       alert(`${errorMessage}`);
     } finally {
       setIsSubmitting(false);
@@ -110,7 +117,8 @@ const PostCreator = ({ onPostCreated }) => {
       // Set specific file types based on what the backend supports
       switch (type) {
         case "image":
-          fileInputRef.current.accept = "image/jpeg,image/jpg,image/png,image/webp";
+          fileInputRef.current.accept =
+            "image/jpeg,image/jpg,image/png,image/webp";
           break;
         case "video":
           fileInputRef.current.accept = "video/mp4,video/webm,video/quicktime";
@@ -128,44 +136,55 @@ const PostCreator = ({ onPostCreated }) => {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    
+
     // Validate file types and sizes
-    const validFiles = files.filter(file => {
+    const validFiles = files.filter((file) => {
       // Check file size (50MB limit to match backend)
       if (file.size > 50 * 1024 * 1024) {
         alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
         return false;
       }
-      
+
       // Check file type
       const allowedTypes = [
-        'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
-        'video/mp4', 'video/webm', 'video/quicktime',
-        'application/pdf', 'text/plain'
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "video/mp4",
+        "video/webm",
+        "video/quicktime",
+        "application/pdf",
+        "text/plain",
       ];
-      
-      if (!allowedTypes.includes(file.type) && !file.name.match(/\.(doc|docx)$/i)) {
+
+      if (
+        !allowedTypes.includes(file.type) &&
+        !file.name.match(/\.(doc|docx)$/i)
+      ) {
         alert(`File "${file.name}" is not a supported file type.`);
         return false;
       }
-      
+
       return true;
     });
-    
+
     if (validFiles.length > 0) {
       setSelectedFiles((prev) => {
         const newFiles = [...prev, ...validFiles];
         // Limit to 5 files total
         if (newFiles.length > 5) {
-          alert("Maximum 5 files allowed. Only the first 5 files will be kept.");
+          alert(
+            "Maximum 5 files allowed. Only the first 5 files will be kept."
+          );
           return newFiles.slice(0, 5);
         }
         return newFiles;
       });
     }
-    
+
     // Clear the input so the same file can be selected again if needed
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const removeFile = (index) => {
@@ -213,9 +232,9 @@ const PostCreator = ({ onPostCreated }) => {
                     key={index}
                     className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
                   >
-                    {file.type.startsWith('image/') ? (
+                    {file.type.startsWith("image/") ? (
                       <Image className="w-4 h-4 text-blue-500" />
-                    ) : file.type.startsWith('video/') ? (
+                    ) : file.type.startsWith("video/") ? (
                       <Video className="w-4 h-4 text-purple-500" />
                     ) : (
                       <FileText className="w-4 h-4 text-gray-500" />
@@ -240,7 +259,8 @@ const PostCreator = ({ onPostCreated }) => {
                 ))}
                 {selectedFiles.length >= 5 && (
                   <p className="text-xs text-amber-600">
-                    Maximum 5 files allowed. Additional files will not be uploaded.
+                    Maximum 5 files allowed. Additional files will not be
+                    uploaded.
                   </p>
                 )}
               </div>

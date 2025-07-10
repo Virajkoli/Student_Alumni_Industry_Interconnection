@@ -205,6 +205,61 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Login with GitHub
+  const loginWithGitHub = async (githubUserData) => {
+    setIsLoading(true);
+    try {
+      const response = await apiService.request("/api/auth/github/login", {
+        method: "POST",
+        body: JSON.stringify(githubUserData),
+      });
+
+      if (response.success) {
+        const { token, user } = response.data;
+        
+        // Save token and user data
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("userData", JSON.stringify(user));
+        
+        setIsAuthenticated(true);
+        setUser(user);
+        setIsLoading(false);
+        
+        return { success: true, user };
+      } else {
+        setIsLoading(false);
+        return { success: false, error: response.message };
+      }
+    } catch (error) {
+      console.error("GitHub login error:", error);
+      setIsLoading(false);
+      return { success: false, error: error.message };
+    }
+  };
+
+  // Register with GitHub
+  const registerWithGitHub = async (githubUserData) => {
+    setIsLoading(true);
+    try {
+      const response = await apiService.request("/api/auth/github/register", {
+        method: "POST",
+        body: JSON.stringify(githubUserData),
+      });
+
+      if (response.success) {
+        setIsLoading(false);
+        return { success: true, data: response.data };
+      } else {
+        setIsLoading(false);
+        return { success: false, error: response.message };
+      }
+    } catch (error) {
+      console.error("GitHub registration error:", error);
+      setIsLoading(false);
+      return { success: false, error: error.message };
+    }
+  };
+
   const value = {
     isAuthenticated,
     isLoading,
@@ -215,6 +270,8 @@ export const AuthProvider = ({ children }) => {
     loginUser,
     loginWithGoogle,
     registerWithGoogle,
+    loginWithGitHub,
+    registerWithGitHub,
     checkAuthStatus,
   };
 

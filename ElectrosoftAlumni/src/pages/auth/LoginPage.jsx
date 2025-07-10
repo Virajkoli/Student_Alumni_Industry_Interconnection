@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import apiService from "../../utils/apiService";
 import GoogleSignInButton from "../../components/GoogleSignInButton";
+import GitHubSignInButton from "../../components/GitHubSignInButton";
 import "./LoginPage.css";
+import { FaGithub } from "react-icons/fa";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +31,12 @@ export default function LoginPage() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+const handleGithubSignIn = () => {
+    // Don't use this function - we're using the GitHubSignInButton component instead
+    // This function is kept for reference only
+    console.warn("Direct handleGithubSignIn called - should use GitHubSignInButton component");
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -133,7 +141,10 @@ export default function LoginPage() {
                 className="form-options"
                 style={{ justifyContent: "flex-end" }}
               >
-                <a href="#forgot-password" className="forgot-password">
+                <a
+                  href="#forgot-password"
+                  className="text-blue-500 hover:text-blue-700 font-medium ml-1 transition-colors"
+                >
                   Forgot password?
                 </a>
               </div>
@@ -149,6 +160,18 @@ export default function LoginPage() {
               <div className="separator">
                 <span>OR</span>
               </div>
+              
+              {/* GitHub Login Button */}
+              <GitHubSignInButton
+                isSignUp={false}
+                onSuccess={(result) => {
+                  const rolePage = apiService.getRoleHomePage(result.user.role);
+                  navigate(rolePage);
+                }}
+                onError={(error) => {
+                  setError(error);
+                }}
+              />
 
               <GoogleSignInButton
                 isSignUp={false}
@@ -165,7 +188,10 @@ export default function LoginPage() {
 
           <div className="register-prompt">
             <span>New to platform?</span>
-            <Link to="/auth/signup" className="register-link">
+            <Link
+              to="/auth/signup"
+              className="text-blue-500 hover:text-blue-700 font-medium ml-1 transition-colors"
+            >
               Register
             </Link>
           </div>

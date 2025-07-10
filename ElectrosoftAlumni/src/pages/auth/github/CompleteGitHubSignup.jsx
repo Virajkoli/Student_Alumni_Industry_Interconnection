@@ -1,86 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const CompleteGitHubSignup = () => {
   const [searchParams] = useSearchParams();
   const [githubData, setGithubData] = useState(null);
   const [formData, setFormData] = useState({
-    contact_no: '',
-    student_college_name: '',
-    interested_field: 'Computer',
-    other_field: '',
-    userType: 'student'
+    contact_no: "",
+    student_college_name: "",
+    interested_field: "Computer",
+    other_field: "",
+    userType: "student",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  
+  const [error, setError] = useState("");
+
   const navigate = useNavigate();
   const { registerWithGitHub } = useAuth();
-  
+
   useEffect(() => {
     // Extract and decode GitHub data from URL
-    const encodedData = searchParams.get('data');
+    const encodedData = searchParams.get("data");
     if (encodedData) {
       try {
         const decodedData = JSON.parse(atob(encodedData));
         setGithubData(decodedData);
       } catch (error) {
-        console.error('Error decoding GitHub data:', error);
-        setError('Invalid GitHub data. Please try again.');
+        console.error("Error decoding GitHub data:", error);
+        setError("Invalid GitHub data. Please try again.");
       }
     } else {
-      setError('No GitHub data provided. Please try again.');
+      setError("No GitHub data provided. Please try again.");
     }
   }, [searchParams]);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    
+    setError("");
     if (!githubData) {
-      setError('GitHub information is missing. Please try again.');
+      setError("GitHub information is missing. Please try again.");
       setIsLoading(false);
       return;
     }
-    
+
     try {
       // Combine GitHub data with form data
       const registrationData = {
         ...githubData,
-        ...formData
+        ...formData,
       };
-      
+
       const result = await registerWithGitHub(registrationData);
-      
+
       if (result.success) {
         // For students, redirect to dashboard
-        if (formData.userType === 'student') {
-          navigate('/student/dashboard');
+        if (formData.userType === "student") {
+          navigate("/student/dashboard");
         } else {
           // For colleges, redirect to college dashboard
-          navigate('/college/dashboard');
+          navigate("/college/dashboard");
         }
       } else {
-        setError(result.error || 'Registration failed. Please try again.');
+        setError(result.error || "Registration failed. Please try again.");
       }
     } catch (error) {
-      console.error('GitHub registration error:', error);
-      setError(error.message || 'Registration failed. Please try again.');
+      console.error("GitHub registration error:", error);
+      setError(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   if (!githubData && !error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -88,27 +87,25 @@ const CompleteGitHubSignup = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
           Complete Your Registration
         </h2>
-        
+
         {error && (
-          <div className="bg-red-50 text-red-700 p-3 rounded mb-4">
-            {error}
-          </div>
+          <div className="bg-red-50 text-red-700 p-3 rounded mb-4">{error}</div>
         )}
-        
+
         {githubData && (
           <div className="mb-6">
             <div className="flex items-center mb-4">
               {githubData.imageUrl && (
-                <img 
-                  src={githubData.imageUrl} 
-                  alt="GitHub Profile" 
+                <img
+                  src={githubData.imageUrl}
+                  alt="GitHub Profile"
                   className="w-12 h-12 rounded-full mr-4"
                 />
               )}
@@ -121,7 +118,7 @@ const CompleteGitHubSignup = () => {
             </div>
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">I am a:</label>
@@ -131,7 +128,7 @@ const CompleteGitHubSignup = () => {
                   type="radio"
                   name="userType"
                   value="student"
-                  checked={formData.userType === 'student'}
+                  checked={formData.userType === "student"}
                   onChange={handleChange}
                   className="mr-2"
                 />
@@ -142,7 +139,7 @@ const CompleteGitHubSignup = () => {
                   type="radio"
                   name="userType"
                   value="college"
-                  checked={formData.userType === 'college'}
+                  checked={formData.userType === "college"}
                   onChange={handleChange}
                   className="mr-2"
                 />
@@ -150,8 +147,8 @@ const CompleteGitHubSignup = () => {
               </label>
             </div>
           </div>
-          
-          {formData.userType === 'student' && (
+
+          {formData.userType === "student" && (
             <>
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">
@@ -166,11 +163,9 @@ const CompleteGitHubSignup = () => {
                   required
                 />
               </div>
-              
+
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2">
-                  College Name
-                </label>
+                <label className="block text-gray-700 mb-2">College Name</label>
                 <input
                   type="text"
                   name="student_college_name"
@@ -180,7 +175,7 @@ const CompleteGitHubSignup = () => {
                   required
                 />
               </div>
-              
+
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">
                   Interested Field
@@ -198,8 +193,8 @@ const CompleteGitHubSignup = () => {
                   <option value="Other">Other</option>
                 </select>
               </div>
-              
-              {formData.interested_field === 'Other' && (
+
+              {formData.interested_field === "Other" && (
                 <div className="mb-4">
                   <label className="block text-gray-700 mb-2">
                     Specify Other Field
@@ -216,13 +211,13 @@ const CompleteGitHubSignup = () => {
               )}
             </>
           )}
-          
+
           <button
             type="submit"
             disabled={isLoading}
             className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isLoading ? 'Processing...' : 'Complete Registration'}
+            {isLoading ? "Processing..." : "Complete Registration"}
           </button>
         </form>
       </div>

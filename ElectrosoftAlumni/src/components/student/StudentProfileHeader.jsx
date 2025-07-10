@@ -41,41 +41,49 @@ const StudentProfileHeader = ({
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [coverPicUrl, setCoverPicUrl] = useState("");
 
-  // Fetch profile data on mount
+  // Fetch profile data on mount and whenever profileData changes
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await studentAPI.getStudentProfile();
+        const response = await studentAPI.getProfile();
+        console.log("Fetched profile data:", response.data);
+
+        // Set the complete profile data
         setEditData(response.data);
-        setProfilePicUrl(response.data.profile_picture);
-        setCoverPicUrl(response.data.cover_picture);
+
+        // Set image URLs from the correct data structure
+        const profilePic = response.data.basicInfo?.profile_picture || "";
+        const coverPic = response.data.basicInfo?.cover_picture || "";
+
+        console.log("Profile pic URL:", profilePic);
+        console.log("Cover pic URL:", coverPic);
+
+        setProfilePicUrl(profilePic);
+        setCoverPicUrl(coverPic);
       } catch (error) {
         console.error("Failed to fetch profile data:", error);
       }
     };
 
     fetchProfileData();
-  }, []);
+  }, [profileData]);
 
-  // Fetch additional information
+  // Update image URLs when profileData changes
   useEffect(() => {
-    if (!profileData || !profileData.id) {
-      console.error("Invalid profileData: Missing student ID", profileData);
-      return;
+    if (profileData) {
+      const profilePic =
+        profileData.basicInfo?.profile_picture ||
+        profileData.profile_picture ||
+        "";
+      const coverPic =
+        profileData.basicInfo?.cover_picture || profileData.cover_picture || "";
+
+      console.log("Updated profile pic URL from props:", profilePic);
+      console.log("Updated cover pic URL from props:", coverPic);
+
+      setProfilePicUrl(profilePic);
+      setCoverPicUrl(coverPic);
     }
-
-    const fetchAdditionalInfo = async () => {
-      try {
-        const response = await studentAPI.getStudentAdditionalInfo(
-          profileData.id
-        );
-        setEditData(response.data);
-      } catch (error) {
-        console.error("Failed to fetch additional information:", error);
-      }
-    };
-
-    fetchAdditionalInfo();
   }, [profileData]);
 
   // Listen for custom navigation edit events
@@ -160,13 +168,14 @@ const StudentProfileHeader = ({
   };
 
   const handleSaveProfile = async () => {
-    if (!profileData || !profileData.id) {
+    const studentId = profileData?.id || profileData?.basicInfo?.id;
+    if (!profileData || !studentId) {
       console.error("Invalid profileData: Missing student ID", profileData);
       return;
     }
 
     try {
-      await apiService.updateStudentAdditionalInfo(profileData.id, editData);
+      await studentAPI.updateStudentAdditionalInfo(studentId, editData);
       onProfileUpdate(editData);
     } catch (error) {
       console.error("Failed to update additional information:", error);
@@ -174,32 +183,62 @@ const StudentProfileHeader = ({
   };
 
   const handleUploadProfilePic = async (file) => {
+    const studentId = profileData?.id || profileData?.basicInfo?.id;
+    if (!profileData || !studentId) {
+      console.error("Invalid profileData: Missing student ID", profileData);
+      return;
+    }
+
     const formData = new FormData();
     formData.append("profile_picture", file);
 
     try {
-      const response = await studentAPI.uploadStudentAvatar(formData);
+      const response = await studentAPI.uploadProfileImage(formData);
       setProfilePicUrl(response.data.profile_picture);
-      onProfileUpdate({
+
+      // Update the editData with the new profile picture
+      const updatedEditData = {
         ...editData,
-        profile_picture: response.data.profile_picture,
-      });
+        basicInfo: {
+          ...editData.basicInfo,
+          profile_picture: response.data.profile_picture,
+        },
+      };
+      setEditData(updatedEditData);
+
+      // Notify parent component
+      onProfileUpdate(updatedEditData);
     } catch (error) {
       console.error("Failed to upload profile picture:", error);
     }
   };
 
   const handleUploadCoverPic = async (file) => {
+    const studentId = profileData?.id || profileData?.basicInfo?.id;
+    if (!profileData || !studentId) {
+      console.error("Invalid profileData: Missing student ID", profileData);
+      return;
+    }
+
     const formData = new FormData();
     formData.append("cover_picture", file);
 
     try {
-      const response = await studentAPI.uploadStudentAvatar(formData);
+      const response = await studentAPI.uploadCoverImage(formData);
       setCoverPicUrl(response.data.cover_picture);
-      onProfileUpdate({
+
+      // Update the editData with the new cover picture
+      const updatedEditData = {
         ...editData,
-        cover_picture: response.data.cover_picture,
-      });
+        basicInfo: {
+          ...editData.basicInfo,
+          cover_picture: response.data.cover_picture,
+        },
+      };
+      setEditData(updatedEditData);
+
+      // Notify parent component
+      onProfileUpdate(updatedEditData);
     } catch (error) {
       console.error("Failed to upload cover picture:", error);
     }
@@ -313,16 +352,21 @@ const StudentProfileHeader = ({
           {/* Cover Photo */}
           <div
             className="h-44 bg-gradient-to-r from-blue-400 to-indigo-500"
-            style={{ backgroundImage: `url(${coverPicUrl})` }}
+            style={{
+              backgroundImage: coverPicUrl ? `url(${coverPicUrl})` : "none",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           ></div>
 
           {/* Edit Background/Profile Image Button - Top right of background */}
           <button
-            onClick={() => document.getElementById("coverPicInput").click()}
+            // onClick={() => document.getElementById("coverPicInput").click()}
+            onClick={handleImageEditClick}
             className="absolute top-4 right-4 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
             title="Edit Background & Profile Image"
           >
-            <Camera className="w-5 h-5" />
+            <Camera className="w-7 h-7 invert" />
           </button>
           <input
             type="file"
@@ -335,11 +379,15 @@ const StudentProfileHeader = ({
           <div className="absolute -bottom-14 left-8">
             <div className="w-28 h-28 bg-white rounded-full p-1.5 shadow-xl">
               <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center overflow-hidden">
-                <img
-                  src={profilePicUrl}
-                  alt="Profile"
-                  className="w-full h-full object-cover rounded-full"
-                />
+                {profilePicUrl ? (
+                  <img
+                    src={profilePicUrl}
+                    alt="Profile"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <User className="w-12 h-12 text-gray-500" />
+                )}
               </div>
             </div>
             <button
@@ -362,18 +410,31 @@ const StudentProfileHeader = ({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex-1">
               <h3 className="text-2xl font-bold text-gray-900">
-                {profileData.firstName} {profileData.lastName}
+                {editData?.basicInfo?.first_name ||
+                  profileData?.basicInfo?.first_name ||
+                  profileData?.firstName}{" "}
+                {editData?.basicInfo?.last_name ||
+                  profileData?.basicInfo?.last_name ||
+                  profileData?.lastName}
               </h3>
               <p className="text-md text-gray-600 mt-1">
-                {profileData.headline}
+                {editData?.basicInfo?.interested_field ||
+                  profileData?.basicInfo?.interested_field ||
+                  profileData?.headline}
               </p>
               <div className="flex items-center text-sm text-gray-500 mt-2">
                 <MapPin className="w-4 h-4 mr-1.5" />
-                {profileData.city}
+                {editData?.basicInfo?.college_name ||
+                  profileData?.basicInfo?.college_name ||
+                  profileData?.city}
               </div>
-              {profileData.showSchool && (
+              {(editData?.basicInfo?.college_name ||
+                profileData?.basicInfo?.college_name ||
+                profileData?.showSchool) && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {profileData.school}
+                  {editData?.basicInfo?.college_name ||
+                    profileData?.basicInfo?.college_name ||
+                    profileData?.school}
                 </p>
               )}
             </div>
@@ -823,19 +884,37 @@ const StudentProfileHeader = ({
                   <div
                     className="w-full h-32 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg overflow-hidden"
                     style={{
-                      background:
-                        "linear-gradient(135deg, #B5D3E7 0%, #6EA9CB 100%)",
+                      backgroundImage: `url(${coverPicUrl})`,
                     }}
                   ></div>
-                  <button className="absolute bottom-2 right-2 p-2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-700 rounded-full transition-all duration-200">
+                  <button
+                    onClick={() =>
+                      document.getElementById("coverPicInputModal").click()
+                    }
+                    className="absolute bottom-2 right-2 p-2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-700 rounded-full transition-all duration-200"
+                  >
                     <Camera className="w-4 h-4" />
                   </button>
+                  <input
+                    type="file"
+                    id="coverPicInputModal"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleUploadCoverPic(e.target.files[0])}
+                  />
                 </div>
                 <div className="flex gap-2">
-                  <button className="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">
+                  <button
+                    onClick={() =>
+                      document.getElementById("coverPicInputModal").click()
+                    }
+                    className="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
+                  >
                     Upload New
                   </button>
-                  <button className="flex-1 py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                  <button
+                    onClick={() => setCoverPicUrl("")}
+                    className="flex-1 py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+                  >
                     Remove
                   </button>
                 </div>
@@ -856,19 +935,42 @@ const StudentProfileHeader = ({
                         }}
                       />
                     </div>
-                    <button className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                    <button
+                      onClick={() =>
+                        document.getElementById("profilePicInputModal").click()
+                      }
+                      className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+                    >
                       <Camera className="w-3 h-3" />
                     </button>
+                    <input
+                      type="file"
+                      id="profilePicInputModal"
+                      style={{ display: "none" }}
+                      onChange={(e) =>
+                        handleUploadProfilePic(e.target.files[0])
+                      }
+                    />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-gray-600 mb-3">
                       JPG, PNG or GIF (max. 2MB)
                     </p>
                     <div className="flex gap-2">
-                      <button className="py-2 px-4 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">
+                      <button
+                        onClick={() =>
+                          document
+                            .getElementById("profilePicInputModal")
+                            .click()
+                        }
+                        className="py-2 px-4 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
+                      >
                         Upload New
                       </button>
-                      <button className="py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">
+                      <button
+                        onClick={() => setProfilePicUrl("")}
+                        className="py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+                      >
                         Remove
                       </button>
                     </div>

@@ -49,13 +49,13 @@ const AllPostsFeed = ({ refreshTrigger, onRefreshReady }) => {
 
       // Fetch all posts (no userId/userType filter)
       const response = await apiService.getPosts({ limit: 100 });
-      console.log("📦 API Response:", response);
-      console.log("📝 Posts data:", response.data);
-      if (response.data && response.data.length > 0) {
-        console.log("🖼️ First post media:", response.data[0].media);
-        console.log("🖼️ Media type:", typeof response.data[0].media);
-        console.log("🖼️ Media length:", response.data[0].media?.length);
-      }
+      // console.log("📦 API Response:", response);
+      // console.log("📝 Posts data:", response.data);
+      // if (response.data && response.data.length > 0) {
+      //   console.log("🖼️ First post media:", response.data[0].media);
+      //   console.log("🖼️ Media type:", typeof response.data[0].media);
+      //   console.log("🖼️ Media length:", response.data[0].media?.length);
+      // }
       setPosts(response.data || []);
     } catch (error) {
       console.error("❌ Error fetching all posts:", error);
@@ -121,23 +121,23 @@ const AllPostsFeed = ({ refreshTrigger, onRefreshReady }) => {
     const user = post.user;
     const hasMedia = post.media && post.media.length > 0;
 
-    console.log(`🎨 Rendering post ${post.post_id}:`, {
-      media: post.media,
-      hasMedia,
-      mediaLength: post.media?.length,
-      mediaType: typeof post.media,
-    });
+    // console.log(`🎨 Rendering post ${post.post_id}:`, {
+    //   media: post.media,
+    //   hasMedia,
+    //   mediaLength: post.media?.length,
+    //   mediaType: typeof post.media,
+    // });
 
     // Debug media URLs
-    if (hasMedia) {
-      console.log(
-        `🖼️ Media URLs for post ${post.post_id}:`,
-        post.media.map((m) => ({
-          originalPath: m.media_url,
-          constructedUrl: apiService.getMediaUrl(m.media_url),
-        }))
-      );
-    }
+    // if (hasMedia) {
+    //   console.log(
+    //     `🖼️ Media URLs for post ${post.post_id}:`,
+    //     post.media.map((m) => ({
+    //       originalPath: m.media_url,
+    //       constructedUrl: apiService.getMediaUrl(m.media_url),
+    //     }))
+    //   );
+    // }
 
     return (
       <div

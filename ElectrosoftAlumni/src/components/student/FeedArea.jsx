@@ -161,14 +161,14 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
     }; // Fallback user data
     const hasMedia = post.media && post.media.length > 0;
 
-    console.log(`🎨 Rendering post ${post.post_id}:`, {
-      media: post.media,
-      hasMedia,
-      mediaLength: post.media?.length,
-      mediaType: typeof post.media,
-      user: user,
-      userType: post.userType,
-    });
+    // console.log(`🎨 Rendering post ${post.post_id}:`, {
+    //   media: post.media,
+    //   hasMedia,
+    //   mediaLength: post.media?.length,
+    //   mediaType: typeof post.media,
+    //   user: user,
+    //   userType: post.userType,
+    // });
 
     return (
       <div

@@ -33,9 +33,10 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
   // Sync aboutText with profileData changes
   useEffect(() => {
     setAboutText(
-      aboutText || "Add a summary to highlight your personality and work style."
+      profileData?.about ||
+        "Add a summary to highlight your personality and work style."
     );
-  }, [aboutText]);
+  }, [profileData]);
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);

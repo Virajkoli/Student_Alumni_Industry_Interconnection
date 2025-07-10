@@ -12,6 +12,17 @@ const {
 } = require("../config/database");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
+const upload = require("../middleware/upload");
+const streamifier = require("streamifier");
+
+const cloudinary = require("cloudinary").v2;
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // @desc    Get complete student profile
 // @route   GET /api/students/profile
@@ -86,6 +97,8 @@ const getStudentProfile = async (req, res) => {
           college_name: student.college_name,
           interested_field: student.interested_field,
           other_field: student.other_field,
+          profile_picture: student.profile_picture,
+          cover_picture: student.cover_picture,
           created_at: student.created_at,
         },
         about: about?.summary || null,
@@ -944,8 +957,222 @@ const deleteCertification = async (req, res) => {
   }
 };
 
+// @desc    Upload student profile picture
+// @route   POST /api/students/profile-image
+// @access  Private
+const uploadProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "profile_pictures" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+    });
+
+    const profile_picture = uploadResult.secure_url;
+
+    const student = await Student.findByPk(req.user.id);
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    await student.update({ profile_picture });
+
+    res.json({
+      success: true,
+      message: "Profile image updated successfully",
+      data: { profile_picture },
+    });
+  } catch (error) {
+    console.error("Upload profile image error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while uploading profile image",
+    });
+  }
+};
+
+// @desc    Upload student cover picture
+// @route   POST /api/students/cover-image
+// @access  Private
+const uploadCoverImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "cover_pictures" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+    });
+
+    const cover_picture = uploadResult.secure_url;
+
+    const student = await Student.findByPk(req.user.id);
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    await student.update({ cover_picture });
+
+    res.json({
+      success: true,
+      message: "Cover image updated successfully",
+      data: { cover_picture },
+    });
+  } catch (error) {
+    console.error("Upload cover image error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while uploading cover image",
+    });
+  }
+};
+
+// @desc    Get student additional information
+// @route   GET /api/students/:id/additional-info
+// @access  Private
+const getStudentAdditionalInfo = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Make sure the student can only access their own data
+    if (parseInt(id) !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. You can only view your own profile.",
+      });
+    }
+
+    const student = await Student.findByPk(id, {
+      attributes: { exclude: ["password"] },
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: student.id,
+        first_name: student.first_name,
+        last_name: student.last_name,
+        email: student.email,
+        contact_no: student.contact_no,
+        college_name: student.college_name,
+        interested_field: student.interested_field,
+        other_field: student.other_field,
+        profile_picture: student.profile_picture,
+        cover_picture: student.cover_picture,
+        created_at: student.created_at,
+      },
+    });
+  } catch (error) {
+    console.error("Get student additional info error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching additional information",
+    });
+  }
+};
+
+// @desc    Update student additional information
+// @route   PUT /api/students/:id/additional-info
+// @access  Private
+const updateStudentAdditionalInfo = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Make sure the student can only update their own data
+    if (parseInt(id) !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. You can only update your own profile.",
+      });
+    }
+
+    const {
+      first_name,
+      last_name,
+      contact_no,
+      college_name,
+      interested_field,
+      other_field,
+    } = req.body;
+
+    const student = await Student.findByPk(id);
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    await student.update({
+      first_name,
+      last_name,
+      contact_no,
+      college_name,
+      interested_field,
+      other_field: interested_field === "Other" ? other_field : null,
+    });
+
+    res.json({
+      success: true,
+      message: "Additional info updated successfully",
+      data: {
+        id: student.id,
+        first_name: student.first_name,
+        last_name: student.last_name,
+        contact_no: student.contact_no,
+        college_name: student.college_name,
+        interested_field: student.interested_field,
+        other_field: student.other_field,
+      },
+    });
+  } catch (error) {
+    console.error("Update student additional info error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating additional information",
+    });
+  }
+};
+
 // Routes
 router.get("/profile", auth, getStudentProfile);
+router.get("/:id/additional-info", auth, getStudentAdditionalInfo);
+router.put("/:id/additional-info", auth, updateStudentAdditionalInfo);
 router.put("/basic-info", auth, updateBasicInfo);
 router.put("/about", auth, updateAbout);
 router.post("/experience", auth, addExperience);
@@ -969,5 +1196,17 @@ router.delete("/certifications/:id", auth, deleteCertification);
 router.post("/recommendations", auth, addRecommendation);
 router.put("/recommendations/:id", auth, updateRecommendation);
 router.delete("/recommendations/:id", auth, deleteRecommendation);
+router.post(
+  "/profile-image",
+  auth,
+  upload.single("profile_picture"),
+  uploadProfileImage
+);
+router.post(
+  "/cover-image",
+  auth,
+  upload.single("cover_picture"),
+  uploadCoverImage
+);
 
 module.exports = router;

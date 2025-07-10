@@ -6,7 +6,7 @@ echo.
 
 echo The issue was a naming mismatch:
 echo - Database columns: google_id, image_url (snake_case)
-echo - Model fields: googleId, imageUrl (camelCase)
+echo - Model fields: google_id, imageUrl (camelCase)
 echo.
 
 echo Step 1: Checking/adding missing columns...
@@ -15,7 +15,7 @@ node check-google-columns.js
 
 echo.
 echo Step 2: Models have been updated with field mapping:
-echo - googleId maps to google_id column
+echo - google_id maps to google_id column
 echo - imageUrl maps to image_url column
 echo.
 

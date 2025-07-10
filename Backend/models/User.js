@@ -279,7 +279,7 @@ module.exports = (sequelize) => {
       },
 
       // Social login
-      googleId: {
+      google_id: {
         type: DataTypes.STRING,
         allowNull: true,
         unique: true,

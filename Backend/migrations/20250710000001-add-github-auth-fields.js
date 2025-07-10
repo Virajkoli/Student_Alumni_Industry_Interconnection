@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Add githubId column to Students table
-    await queryInterface.addColumn('Students', 'githubId', {
+    // Add github_id column to Students table
+    await queryInterface.addColumn("Students", "github_id", {
       type: Sequelize.STRING,
       allowNull: true,
     });
 
-    // Add githubId column to Colleges table
-    await queryInterface.addColumn('Colleges', 'githubId', {
+    // Add github_id column to Colleges table
+    await queryInterface.addColumn("Colleges", "github_id", {
       type: Sequelize.STRING,
       allowNull: true,
     });
@@ -18,12 +18,12 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // Remove githubId column from Students table
-    await queryInterface.removeColumn('Students', 'githubId');
+    // Remove github_id column from Students table
+    await queryInterface.removeColumn("Students", "github_id");
 
-    // Remove githubId column from Colleges table
-    await queryInterface.removeColumn('Colleges', 'githubId');
+    // Remove github_id column from Colleges table
+    await queryInterface.removeColumn("Colleges", "github_id");
 
     return Promise.resolve();
-  }
+  },
 };

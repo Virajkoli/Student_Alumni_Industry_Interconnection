@@ -719,7 +719,9 @@ const collegeRegistrationValidation = [
       if (value === "" || value === null || value === undefined) return true;
       const year = parseInt(value);
       if (isNaN(year) || year < 1800 || year > new Date().getFullYear()) {
-        throw new Error("Establishment year must be a valid year between 1800 and current year");
+        throw new Error(
+          "Establishment year must be a valid year between 1800 and current year"
+        );
       }
       return true;
     }),
@@ -790,9 +792,11 @@ const collegeRegistrationValidation = [
 const verifyGoogleToken = async (accessToken) => {
   try {
     // Verify the access token by calling Google's userinfo endpoint
-    const response = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`);
+    const response = await fetch(
+      `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`
+    );
     if (!response.ok) {
-      throw new Error('Invalid access token');
+      throw new Error("Invalid access token");
     }
     const userInfo = await response.json();
     return userInfo;
@@ -810,7 +814,14 @@ const googleLogin = async (req, res) => {
     console.log("=== GOOGLE LOGIN ===");
     console.log("Request body:", req.body);
 
-    const { email, googleId, firstName, lastName, imageUrl, accessToken } = req.body;
+    const {
+      email,
+      google_id,
+      firstName,
+      lastName,
+      profile_picture,
+      accessToken,
+    } = req.body;
 
     // Verify Google token
     let googleUserInfo;
@@ -824,7 +835,10 @@ const googleLogin = async (req, res) => {
           });
         }
       } catch (tokenError) {
-        console.log("Token verification failed, proceeding without verification:", tokenError.message);
+        console.log(
+          "Token verification failed, proceeding without verification:",
+          tokenError.message
+        );
         // Continue without token verification for now
       }
     }
@@ -846,9 +860,9 @@ const googleLogin = async (req, res) => {
     }
 
     // Update user with Google information if not already set
-    if (!existingUser.googleId) {
-      existingUser.googleId = googleId;
-      existingUser.imageUrl = imageUrl;
+    if (!existingUser.google_id) {
+      existingUser.google_id = google_id;
+      existingUser.profile_picture = profile_picture;
       if (!existingUser.first_name) existingUser.first_name = firstName;
       if (!existingUser.last_name) existingUser.last_name = lastName;
       await existingUser.save();
@@ -882,8 +896,8 @@ const googleLogin = async (req, res) => {
         interested_field: existingUser.interested_field,
         other_field: existingUser.other_field,
         role: "student",
-        googleId: existingUser.googleId,
-        imageUrl: existingUser.imageUrl,
+        google_id: existingUser.google_id,
+        profile_picture: existingUser.profile_picture,
       };
     } else {
       userResponse = {
@@ -891,8 +905,8 @@ const googleLogin = async (req, res) => {
         email: existingUser.email,
         name: existingUser.name,
         role: "college",
-        googleId: existingUser.googleId,
-        imageUrl: existingUser.imageUrl,
+        google_id: existingUser.google_id,
+        profile_picture: existingUser.profile_picture,
       };
     }
 
@@ -922,15 +936,15 @@ const googleRegister = async (req, res) => {
     console.log("=== GOOGLE REGISTRATION ===");
     console.log("Request body:", req.body);
 
-    const { 
-      email, 
-      firstName, 
-      lastName, 
-      googleId, 
-      imageUrl, 
-      accessToken, 
+    const {
+      email,
+      firstName,
+      lastName,
+      google_id,
+      profile_picture,
+      accessToken,
       role,
-      ...roleSpecificData 
+      ...roleSpecificData
     } = req.body;
 
     // Verify Google token
@@ -945,7 +959,10 @@ const googleRegister = async (req, res) => {
           });
         }
       } catch (tokenError) {
-        console.log("Token verification failed, proceeding without verification:", tokenError.message);
+        console.log(
+          "Token verification failed, proceeding without verification:",
+          tokenError.message
+        );
         // Continue without token verification for now
       }
     }
@@ -978,8 +995,8 @@ const googleRegister = async (req, res) => {
         interested_field: roleSpecificData.interested_field,
         other_field: roleSpecificData.other_field,
         // Add Google-specific fields if the model supports them
-        google_id: googleId,
-        profile_picture: imageUrl,
+        google_id: google_id,
+        profile_picture: profile_picture,
       });
     } else if (role === "college") {
       // Create college record directly
@@ -987,18 +1004,30 @@ const googleRegister = async (req, res) => {
         email,
         password: `google_auth_${Date.now()}`, // Dummy password for Google users
         name: roleSpecificData.college_name,
-        description: roleSpecificData.description || `${roleSpecificData.college_name} - College`,
+        description:
+          roleSpecificData.description ||
+          `${roleSpecificData.college_name} - College`,
         location: roleSpecificData.college_address,
-        established: roleSpecificData.establishment_year ? parseInt(roleSpecificData.establishment_year) : null,
+        established: roleSpecificData.establishment_year
+          ? parseInt(roleSpecificData.establishment_year)
+          : null,
         website: roleSpecificData.website,
-        campusArea: roleSpecificData.campus_area ? parseFloat(roleSpecificData.campus_area) : null,
-        nirfRank: roleSpecificData.nirf_rank ? parseInt(roleSpecificData.nirf_rank) : null,
+        campusArea: roleSpecificData.campus_area
+          ? parseFloat(roleSpecificData.campus_area)
+          : null,
+        nirfRank: roleSpecificData.nirf_rank
+          ? parseInt(roleSpecificData.nirf_rank)
+          : null,
         accreditation: roleSpecificData.accreditation,
-        totalStudents: roleSpecificData.total_students ? parseInt(roleSpecificData.total_students) : null,
-        totalFaculty: roleSpecificData.total_faculty ? parseInt(roleSpecificData.total_faculty) : null,
+        totalStudents: roleSpecificData.total_students
+          ? parseInt(roleSpecificData.total_students)
+          : null,
+        totalFaculty: roleSpecificData.total_faculty
+          ? parseInt(roleSpecificData.total_faculty)
+          : null,
         // Add Google-specific fields if the model supports them
-        google_id: googleId,
-        profile_picture: imageUrl,
+        google_id: google_id,
+        profile_picture: profile_picture,
       });
     } else {
       // For industry and startup, create student record for now (can be changed later)
@@ -1008,12 +1037,22 @@ const googleRegister = async (req, res) => {
         first_name: firstName,
         last_name: lastName,
         contact_no: roleSpecificData.contact_no || "N/A",
-        student_college_name: roleSpecificData.company_name || roleSpecificData.startup_name || "N/A",
-        interested_field: roleSpecificData.industry_type || roleSpecificData.startup_stage || "Other",
-        other_field: `${role} - ${roleSpecificData.designation || roleSpecificData.funding_status || 'N/A'}`,
+        student_college_name:
+          roleSpecificData.company_name ||
+          roleSpecificData.startup_name ||
+          "N/A",
+        interested_field:
+          roleSpecificData.industry_type ||
+          roleSpecificData.startup_stage ||
+          "Other",
+        other_field: `${role} - ${
+          roleSpecificData.designation ||
+          roleSpecificData.funding_status ||
+          "N/A"
+        }`,
         // Add Google-specific fields if the model supports them
-        google_id: googleId,
-        profile_picture: imageUrl,
+        google_id: google_id,
+        profile_picture: profile_picture,
       });
     }
 
@@ -1042,8 +1081,8 @@ const googleRegister = async (req, res) => {
           first_name: newUser.first_name || firstName,
           last_name: newUser.last_name || lastName,
           role: role,
-          googleId: newUser.googleId || googleId,
-          imageUrl: newUser.imageUrl || imageUrl,
+          google_id: newUser.google_id || google_id,
+          profile_picture: newUser.profile_picture || profile_picture,
         },
       },
     });
@@ -1173,7 +1212,14 @@ const collegeGoogleLogin = async (req, res) => {
     console.log("=== COLLEGE GOOGLE LOGIN ===");
     console.log("Request body:", req.body);
 
-    const { email, googleId, firstName, lastName, imageUrl, accessToken } = req.body;
+    const {
+      email,
+      google_id,
+      firstName,
+      lastName,
+      profile_picture,
+      accessToken,
+    } = req.body;
 
     // Verify Google token
     let googleUserInfo;
@@ -1187,7 +1233,10 @@ const collegeGoogleLogin = async (req, res) => {
           });
         }
       } catch (tokenError) {
-        console.log("Token verification failed, proceeding without verification:", tokenError.message);
+        console.log(
+          "Token verification failed, proceeding without verification:",
+          tokenError.message
+        );
       }
     }
 
@@ -1210,9 +1259,9 @@ const collegeGoogleLogin = async (req, res) => {
     }
 
     // Update college with Google information if not already set
-    if (!existingCollege.googleId) {
-      existingCollege.googleId = googleId;
-      existingCollege.imageUrl = imageUrl;
+    if (!existingCollege.google_id) {
+      existingCollege.google_id = google_id;
+      existingCollege.profile_picture = profile_picture;
       await existingCollege.save();
     }
 
@@ -1252,8 +1301,8 @@ const collegeGoogleLogin = async (req, res) => {
       role: "college",
       logoUrl: existingCollege.logoUrl,
       backgroundUrl: existingCollege.backgroundUrl,
-      googleId: existingCollege.googleId,
-      imageUrl: existingCollege.imageUrl,
+      google_id: existingCollege.google_id,
+      profile_picture: existingCollege.profile_picture,
       isEmailVerified: existingCollege.isEmailVerified,
       isActive: existingCollege.isActive,
       profileCompletion: existingCollege.getProfileCompletion(),
@@ -1287,12 +1336,12 @@ const collegeGoogleRegister = async (req, res) => {
     console.log("=== COLLEGE GOOGLE REGISTRATION ===");
     console.log("Request body:", req.body);
 
-    const { 
-      email, 
-      firstName, 
-      lastName, 
-      googleId, 
-      imageUrl, 
+    const {
+      email,
+      firstName,
+      lastName,
+      google_id,
+      profile_picture,
       accessToken,
       college_name,
       description,
@@ -1318,7 +1367,10 @@ const collegeGoogleRegister = async (req, res) => {
           });
         }
       } catch (tokenError) {
-        console.log("Token verification failed, proceeding without verification:", tokenError.message);
+        console.log(
+          "Token verification failed, proceeding without verification:",
+          tokenError.message
+        );
       }
     }
 
@@ -1346,8 +1398,8 @@ const collegeGoogleRegister = async (req, res) => {
       accreditation: accreditation || null,
       totalStudents: total_students ? parseInt(total_students) : null,
       totalFaculty: total_faculty ? parseInt(total_faculty) : null,
-      googleId: googleId,
-      imageUrl: imageUrl,
+      google_id: google_id,
+      profile_picture: profile_picture,
     };
 
     console.log("Creating college with Google data:", collegeData);
@@ -1366,7 +1418,10 @@ const collegeGoogleRegister = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
-    console.log("College Google registration successful for:", newCollege.email);
+    console.log(
+      "College Google registration successful for:",
+      newCollege.email
+    );
 
     const collegeResponse = {
       id: newCollege.id,
@@ -1384,8 +1439,8 @@ const collegeGoogleRegister = async (req, res) => {
       role: "college",
       logoUrl: newCollege.logoUrl,
       backgroundUrl: newCollege.backgroundUrl,
-      googleId: newCollege.googleId,
-      imageUrl: newCollege.imageUrl,
+      google_id: newCollege.google_id,
+      profile_picture: newCollege.profile_picture,
       isEmailVerified: newCollege.isEmailVerified,
       isActive: newCollege.isActive,
       profileCompletion: newCollege.getProfileCompletion(),

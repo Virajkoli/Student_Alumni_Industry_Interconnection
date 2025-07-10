@@ -219,7 +219,7 @@ module.exports = {
       },
 
       // Social login
-      googleId: {
+      google_id: {
         type: Sequelize.STRING,
         allowNull: true,
       },

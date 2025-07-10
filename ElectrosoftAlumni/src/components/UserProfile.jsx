@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import apiService from '../utils/apiService';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import apiService from "../utils/apiService";
 
 const UserProfile = () => {
   const { user } = useAuth();
@@ -52,13 +52,17 @@ const UserProfile = () => {
         {displayUser.imageUrl && (
           <img
             src={displayUser.imageUrl}
-            alt={displayUser.name || `${displayUser.first_name} ${displayUser.last_name}`}
+            alt={
+              displayUser.name ||
+              `${displayUser.first_name} ${displayUser.last_name}`
+            }
             className="w-24 h-24 rounded-full object-cover border-4 border-blue-500"
           />
         )}
         <div>
           <h1 className="text-3xl font-bold text-gray-800">
-            {displayUser.name || `${displayUser.first_name} ${displayUser.last_name}`}
+            {displayUser.name ||
+              `${displayUser.first_name} ${displayUser.last_name}`}
           </h1>
           <p className="text-lg text-gray-600 capitalize">{displayUser.role}</p>
           <p className="text-gray-500">{displayUser.email}</p>
@@ -68,7 +72,9 @@ const UserProfile = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Information */}
         <div className="bg-gray-50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Basic Information</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            Basic Information
+          </h2>
           <div className="space-y-3">
             <div>
               <strong className="text-gray-600">Email:</strong>
@@ -78,7 +84,7 @@ const UserProfile = () => {
               <strong className="text-gray-600">Role:</strong>
               <p className="text-gray-800 capitalize">{displayUser.role}</p>
             </div>
-            {displayUser.googleId && (
+            {displayUser.google_id && (
               <div>
                 <strong className="text-gray-600">Google Account:</strong>
                 <p className="text-gray-800">✓ Connected</p>
@@ -96,24 +102,31 @@ const UserProfile = () => {
         {/* Role-specific Information */}
         <div className="bg-gray-50 p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">
-            {displayUser.role === 'student' ? 'Academic Information' : 
-             displayUser.role === 'college' ? 'College Information' :
-             displayUser.role === 'industry' ? 'Company Information' :
-             'Startup Information'}
+            {displayUser.role === "student"
+              ? "Academic Information"
+              : displayUser.role === "college"
+              ? "College Information"
+              : displayUser.role === "industry"
+              ? "Company Information"
+              : "Startup Information"}
           </h2>
           <div className="space-y-3">
-            {displayUser.role === 'student' && (
+            {displayUser.role === "student" && (
               <>
                 {displayUser.student_college_name && (
                   <div>
                     <strong className="text-gray-600">College:</strong>
-                    <p className="text-gray-800">{displayUser.student_college_name}</p>
+                    <p className="text-gray-800">
+                      {displayUser.student_college_name}
+                    </p>
                   </div>
                 )}
                 {displayUser.interested_field && (
                   <div>
                     <strong className="text-gray-600">Interested Field:</strong>
-                    <p className="text-gray-800">{displayUser.interested_field}</p>
+                    <p className="text-gray-800">
+                      {displayUser.interested_field}
+                    </p>
                   </div>
                 )}
                 {displayUser.other_field && (
@@ -125,7 +138,7 @@ const UserProfile = () => {
               </>
             )}
 
-            {displayUser.role === 'college' && (
+            {displayUser.role === "college" && (
               <>
                 {displayUser.college_name && (
                   <div>
@@ -136,20 +149,29 @@ const UserProfile = () => {
                 {displayUser.college_address && (
                   <div>
                     <strong className="text-gray-600">Address:</strong>
-                    <p className="text-gray-800">{displayUser.college_address}</p>
+                    <p className="text-gray-800">
+                      {displayUser.college_address}
+                    </p>
                   </div>
                 )}
                 {displayUser.establishment_year && (
                   <div>
                     <strong className="text-gray-600">Established:</strong>
-                    <p className="text-gray-800">{displayUser.establishment_year}</p>
+                    <p className="text-gray-800">
+                      {displayUser.establishment_year}
+                    </p>
                   </div>
                 )}
                 {displayUser.website && (
                   <div>
                     <strong className="text-gray-600">Website:</strong>
                     <p className="text-gray-800">
-                      <a href={displayUser.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      <a
+                        href={displayUser.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
                         {displayUser.website}
                       </a>
                     </p>
@@ -158,7 +180,7 @@ const UserProfile = () => {
               </>
             )}
 
-            {displayUser.role === 'industry' && (
+            {displayUser.role === "industry" && (
               <>
                 {displayUser.company_name && (
                   <div>
@@ -187,7 +209,7 @@ const UserProfile = () => {
               </>
             )}
 
-            {displayUser.role === 'startup' && (
+            {displayUser.role === "startup" && (
               <>
                 {displayUser.startup_name && (
                   <div>
@@ -204,7 +226,9 @@ const UserProfile = () => {
                 {displayUser.funding_status && (
                   <div>
                     <strong className="text-gray-600">Funding Status:</strong>
-                    <p className="text-gray-800">{displayUser.funding_status}</p>
+                    <p className="text-gray-800">
+                      {displayUser.funding_status}
+                    </p>
                   </div>
                 )}
                 {displayUser.team_size && (
@@ -222,14 +246,18 @@ const UserProfile = () => {
       {/* Additional Information */}
       {displayUser.description && (
         <div className="mt-6 bg-gray-50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Description</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            Description
+          </h2>
           <p className="text-gray-700">{displayUser.description}</p>
         </div>
       )}
 
       {/* Account Information */}
       <div className="mt-6 bg-gray-50 p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">Account Information</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          Account Information
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <strong className="text-gray-600">User ID:</strong>
@@ -238,13 +266,17 @@ const UserProfile = () => {
           <div>
             <strong className="text-gray-600">Registration Date:</strong>
             <p className="text-gray-800">
-              {displayUser.created_at ? new Date(displayUser.created_at).toLocaleDateString() : 'N/A'}
+              {displayUser.created_at
+                ? new Date(displayUser.created_at).toLocaleDateString()
+                : "N/A"}
             </p>
           </div>
           <div>
             <strong className="text-gray-600">Last Updated:</strong>
             <p className="text-gray-800">
-              {displayUser.updated_at ? new Date(displayUser.updated_at).toLocaleDateString() : 'N/A'}
+              {displayUser.updated_at
+                ? new Date(displayUser.updated_at).toLocaleDateString()
+                : "N/A"}
             </p>
           </div>
         </div>

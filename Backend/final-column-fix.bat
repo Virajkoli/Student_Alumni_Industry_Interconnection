@@ -10,7 +10,7 @@ echo - profile_picture (for Google profile image)
 echo.
 
 echo Models updated with correct field mapping:
-echo - googleId maps to google_id
+echo - google_id maps to google_id
 echo - imageUrl maps to profile_picture
 echo.
 

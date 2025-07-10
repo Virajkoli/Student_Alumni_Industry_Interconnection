@@ -15,7 +15,7 @@ echo ✅ Dependencies checked
 echo.
 
 echo Step 3: Adding Google auth fields to database...
-echo This will add googleId and imageUrl columns to Students and Colleges tables
+echo This will add google_id and imageUrl columns to Students and Colleges tables
 echo.
 
 node add-google-fields.js

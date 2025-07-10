@@ -189,16 +189,16 @@ export const AuthProvider = ({ children }) => {
   const loginWithGoogle = async (googleUser) => {
     try {
       setIsLoading(true);
-      
+
       // Send Google user info to backend for authentication
       const response = await apiService.googleLogin({
-        googleId: googleUser.id,
+        google_id: googleUser.id,
         email: googleUser.email,
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
         name: googleUser.name,
         imageUrl: googleUser.imageUrl,
-        accessToken: googleUser.accessToken
+        accessToken: googleUser.accessToken,
       });
 
       if (response.success) {
@@ -219,16 +219,16 @@ export const AuthProvider = ({ children }) => {
   const loginCollegeWithGoogle = async (googleUser) => {
     try {
       setIsLoading(true);
-      
+
       // Send Google user info to backend for college authentication
       const response = await apiService.collegeGoogleLogin({
-        googleId: googleUser.id,
+        google_id: googleUser.id,
         email: googleUser.email,
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
         name: googleUser.name,
         imageUrl: googleUser.imageUrl,
-        accessToken: googleUser.accessToken
+        accessToken: googleUser.accessToken,
       });
 
       if (response.success) {
@@ -249,16 +249,16 @@ export const AuthProvider = ({ children }) => {
   const registerWithGoogle = async (googleUser) => {
     try {
       setIsLoading(true);
-      
+
       // Send Google user info to backend for registration
       const response = await apiService.googleRegister({
-        googleId: googleUser.id,
+        google_id: googleUser.id,
         email: googleUser.email,
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
         name: googleUser.name,
         imageUrl: googleUser.imageUrl,
-        accessToken: googleUser.accessToken
+        accessToken: googleUser.accessToken,
       });
 
       if (response.success) {
@@ -279,10 +279,10 @@ export const AuthProvider = ({ children }) => {
   const registerCollegeWithGoogle = async (googleUser) => {
     try {
       setIsLoading(true);
-      
+
       // Send Google user info to backend for college registration
       const response = await apiService.collegeGoogleRegister({
-        googleId: googleUser.id,
+        google_id: googleUser.id,
         email: googleUser.email,
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
@@ -306,7 +306,9 @@ export const AuthProvider = ({ children }) => {
         login(response.data.user, response.data.token);
         return { success: true, user: response.data.user };
       } else {
-        throw new Error(response.message || "College Google registration failed");
+        throw new Error(
+          response.message || "College Google registration failed"
+        );
       }
     } catch (error) {
       console.error("College Google registration error:", error);

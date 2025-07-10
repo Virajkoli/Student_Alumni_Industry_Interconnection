@@ -9,7 +9,7 @@ cd /d "f:\Pallavi Data\Internship\Student_Alumni_Industry_Interconnection\Backen
 
 echo.
 echo Running database column fix...
-echo This will add googleId and imageUrl columns to Students and Colleges tables
+echo This will add google_id and imageUrl columns to Students and Colleges tables
 echo.
 
 node fix-google-columns.js

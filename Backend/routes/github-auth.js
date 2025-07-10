@@ -7,12 +7,15 @@ const jwt = require("jsonwebtoken");
 // GitHub OAuth credentials
 const GITHUB_CLIENT_ID = "Ov23liJDM6B9xuTvVtBa";
 const GITHUB_CLIENT_SECRET = "01a1b0a5245ae5962397676c5b178193246513fe";
-const BACKEND_URL = process.env.BACKEND_URL || "https://scaips-backend.onrender.com";
-const FRONTEND_URL = process.env.FRONTEND_URL || "https://electrosoft-alumni.vercel.app";
+const BACKEND_URL =
+  process.env.BACKEND_URL || "https://scaips-backend.onrender.com";
+const FRONTEND_URL =
+  process.env.FRONTEND_URL || "https://electrosoft-alumni.vercel.app";
 
 // IMPORTANT: This must EXACTLY match the URL registered in your GitHub OAuth app settings
 // Don't use string interpolation here to avoid any unexpected characters
-const REDIRECT_URI = "https://scaips-backend.onrender.com/api/auth/github/callback";
+const REDIRECT_URI =
+  "https://scaips-backend.onrender.com/api/auth/github/callback";
 
 // Generate JWT Token (reusing from auth.js)
 const generateToken = (userId) => {
@@ -31,7 +34,9 @@ const generateRefreshToken = (userId) => {
 // Initiate GitHub OAuth flow
 router.get("/github", (req, res) => {
   console.log("GitHub OAuth initialization requested");
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=user:email`;
+  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    REDIRECT_URI
+  )}&scope=user:email`;
   console.log("Redirecting to GitHub:", githubAuthUrl);
   res.redirect(githubAuthUrl);
 });
@@ -39,13 +44,20 @@ router.get("/github", (req, res) => {
 // GitHub OAuth callback
 router.get("/github/callback", async (req, res) => {
   const { code } = req.query;
-  console.log("GitHub OAuth callback received with code:", code ? code.substring(0, 10) + "..." : "none");
-  
+  console.log(
+    "GitHub OAuth callback received with code:",
+    code ? code.substring(0, 10) + "..." : "none"
+  );
+
   if (!code) {
     console.error("No code provided in GitHub callback");
-    return res.redirect(`${process.env.FRONTEND_URL || FRONTEND_URL}/auth/login?error=GitHub authentication failed`);
+    return res.redirect(
+      `${
+        process.env.FRONTEND_URL || FRONTEND_URL
+      }/auth/login?error=GitHub authentication failed`
+    );
   }
-  
+
   try {
     // Exchange code for access token
     const tokenResponse = await axios.post(
@@ -62,68 +74,86 @@ router.get("/github/callback", async (req, res) => {
         },
       }
     );
-    
+
     const { access_token } = tokenResponse.data;
-    
+
     if (!access_token) {
-      return res.redirect(`${FRONTEND_URL}/auth/login?error=Failed to get GitHub access token`);
+      return res.redirect(
+        `${FRONTEND_URL}/auth/login?error=Failed to get GitHub access token`
+      );
     }
-    
+
     // Get user data from GitHub
     const userResponse = await axios.get("https://api.github.com/user", {
       headers: {
         Authorization: `token ${access_token}`,
       },
     });
-    
+
     // Get user emails (includes primary email)
-    const emailsResponse = await axios.get("https://api.github.com/user/emails", {
-      headers: {
-        Authorization: `token ${access_token}`,
-      },
-    });
-    
-    const primaryEmail = emailsResponse.data.find(email => email.primary)?.email || emailsResponse.data[0]?.email;
-    
+    const emailsResponse = await axios.get(
+      "https://api.github.com/user/emails",
+      {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      }
+    );
+
+    const primaryEmail =
+      emailsResponse.data.find((email) => email.primary)?.email ||
+      emailsResponse.data[0]?.email;
+
     if (!primaryEmail) {
-      return res.redirect(`${FRONTEND_URL}/auth/login?error=Could not retrieve GitHub email`);
+      return res.redirect(
+        `${FRONTEND_URL}/auth/login?error=Could not retrieve GitHub email`
+      );
     }
-    
+
     const githubUser = {
-      githubId: userResponse.data.id.toString(),
+      github_id: userResponse.data.id.toString(),
       email: primaryEmail,
-      firstName: userResponse.data.name ? userResponse.data.name.split(' ')[0] : '',
-      lastName: userResponse.data.name ? userResponse.data.name.split(' ').slice(1).join(' ') : '',
+      firstName: userResponse.data.name
+        ? userResponse.data.name.split(" ")[0]
+        : "",
+      lastName: userResponse.data.name
+        ? userResponse.data.name.split(" ").slice(1).join(" ")
+        : "",
       username: userResponse.data.login,
-      imageUrl: userResponse.data.avatar_url,
+      profile_picture: userResponse.data.avatar_url,
     };
-    
+
     // Check if user exists in our database
-    let existingUser = await Student.findOne({ where: { email: primaryEmail } });
+    let existingUser = await Student.findOne({
+      where: { email: primaryEmail },
+    });
     let userType = "student";
-    
+
     if (!existingUser) {
       existingUser = await College.findOne({ where: { email: primaryEmail } });
       userType = "college";
     }
-    
+
     if (existingUser) {
       // User exists - login flow
       // Update GitHub info if not already set
-      if (!existingUser.githubId) {
-        existingUser.githubId = githubUser.githubId;
-        existingUser.imageUrl = existingUser.imageUrl || githubUser.imageUrl;
+      if (!existingUser.github_id) {
+        existingUser.github_id = githubUser.github_id;
+        existingUser.profile_picture =
+          existingUser.profile_picture || githubUser.profile_picture;
         if (userType === "student") {
-          if (!existingUser.first_name) existingUser.first_name = githubUser.firstName;
-          if (!existingUser.last_name) existingUser.last_name = githubUser.lastName;
+          if (!existingUser.first_name)
+            existingUser.first_name = githubUser.firstName;
+          if (!existingUser.last_name)
+            existingUser.last_name = githubUser.lastName;
         }
         await existingUser.save();
       }
-      
+
       // Generate tokens
       const token = generateToken(existingUser.id);
       const refreshToken = generateRefreshToken(existingUser.id);
-      
+
       // Set refresh token cookie
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -131,7 +161,7 @@ router.get("/github/callback", async (req, res) => {
         sameSite: "strict",
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
-      
+
       // Prepare user data to send with token
       let userData;
       if (userType === "student") {
@@ -140,14 +170,16 @@ router.get("/github/callback", async (req, res) => {
           email: existingUser.email,
           first_name: existingUser.first_name,
           last_name: existingUser.last_name,
-          fullName: `${existingUser.first_name || ''} ${existingUser.last_name || ''}`.trim(),
+          fullName: `${existingUser.first_name || ""} ${
+            existingUser.last_name || ""
+          }`.trim(),
           contact_no: existingUser.contact_no,
           student_college_name: existingUser.student_college_name,
           interested_field: existingUser.interested_field,
           other_field: existingUser.other_field,
           role: "student",
-          githubId: existingUser.githubId,
-          imageUrl: existingUser.imageUrl,
+          github_id: existingUser.github_id,
+          profile_picture: existingUser.profile_picture,
         };
       } else {
         userData = {
@@ -155,25 +187,35 @@ router.get("/github/callback", async (req, res) => {
           email: existingUser.email,
           name: existingUser.name,
           role: "college",
-          githubId: existingUser.githubId,
-          imageUrl: existingUser.imageUrl,
+          github_id: existingUser.github_id,
+          profile_picture: existingUser.profile_picture,
         };
       }
-      
+
       // Encode user data to include in redirect URL
-      const encodedUserData = Buffer.from(JSON.stringify(userData)).toString('base64');
-      
+      const encodedUserData = Buffer.from(JSON.stringify(userData)).toString(
+        "base64"
+      );
+
       // Redirect with token and user data
-      return res.redirect(`${FRONTEND_URL}/auth/github/success?token=${token}&userData=${encodedUserData}`);
+      return res.redirect(
+        `${FRONTEND_URL}/auth/github/success?token=${token}&userData=${encodedUserData}`
+      );
     } else {
       // User doesn't exist - redirect to signup completion
       // Store GitHub data temporarily
-      const githubData = Buffer.from(JSON.stringify(githubUser)).toString('base64');
-      return res.redirect(`${FRONTEND_URL}/auth/complete-github-signup?data=${githubData}`);
+      const githubData = Buffer.from(JSON.stringify(githubUser)).toString(
+        "base64"
+      );
+      return res.redirect(
+        `${FRONTEND_URL}/auth/complete-github-signup?data=${githubData}`
+      );
     }
   } catch (error) {
     console.error("GitHub auth error:", error);
-    return res.redirect(`${FRONTEND_URL}/auth/login?error=GitHub authentication failed`);
+    return res.redirect(
+      `${FRONTEND_URL}/auth/login?error=GitHub authentication failed`
+    );
   }
 });
 
@@ -183,7 +225,8 @@ router.post("/github/login", async (req, res) => {
     console.log("=== GITHUB LOGIN ===");
     console.log("Request body:", req.body);
 
-    const { email, githubId, firstName, lastName, username, imageUrl } = req.body;
+    const { email, github_id, firstName, lastName, username, profile_picture } =
+      req.body;
 
     // Check if user exists in Student or College tables
     let existingUser = await Student.findOne({ where: { email } });
@@ -202,9 +245,10 @@ router.post("/github/login", async (req, res) => {
     }
 
     // Update user with GitHub information if not already set
-    if (!existingUser.githubId) {
-      existingUser.githubId = githubId;
-      existingUser.imageUrl = existingUser.imageUrl || imageUrl;
+    if (!existingUser.github_id) {
+      existingUser.github_id = github_id;
+      existingUser.profile_picture =
+        existingUser.profile_picture || profile_picture;
       if (userType === "student") {
         if (!existingUser.first_name) existingUser.first_name = firstName;
         if (!existingUser.last_name) existingUser.last_name = lastName;
@@ -240,8 +284,8 @@ router.post("/github/login", async (req, res) => {
         interested_field: existingUser.interested_field,
         other_field: existingUser.other_field,
         role: "student",
-        githubId: existingUser.githubId,
-        imageUrl: existingUser.imageUrl,
+        github_id: existingUser.github_id,
+        profile_picture: existingUser.profile_picture,
       };
     } else {
       userResponse = {
@@ -249,8 +293,8 @@ router.post("/github/login", async (req, res) => {
         email: existingUser.email,
         name: existingUser.name,
         role: "college",
-        githubId: existingUser.githubId,
-        imageUrl: existingUser.imageUrl,
+        github_id: existingUser.github_id,
+        profile_picture: existingUser.profile_picture,
       };
     }
 
@@ -278,19 +322,19 @@ router.post("/github/register", async (req, res) => {
     console.log("=== GITHUB REGISTRATION ===");
     console.log("Request body:", req.body);
 
-    const { 
-      email, 
-      githubId, 
-      firstName, 
-      lastName, 
-      username, 
-      imageUrl,
+    const {
+      email,
+      github_id,
+      firstName,
+      lastName,
+      username,
+      profile_picture,
       // Additional registration fields
       contact_no,
       student_college_name,
       interested_field,
       other_field,
-      userType
+      userType,
     } = req.body;
 
     // Check if user already exists
@@ -310,21 +354,21 @@ router.post("/github/register", async (req, res) => {
     if (userType === "student") {
       newUser = await Student.create({
         email,
-        githubId,
+        github_id,
         first_name: firstName,
         last_name: lastName,
         contact_no,
         student_college_name,
         interested_field,
         other_field,
-        imageUrl,
+        profile_picture,
       });
     } else if (userType === "college") {
       newUser = await College.create({
         email,
         name: `${firstName} ${lastName}`,
-        githubId,
-        imageUrl,
+        github_id,
+        profile_picture,
       });
     } else {
       return res.status(400).json({
@@ -359,8 +403,8 @@ router.post("/github/register", async (req, res) => {
         interested_field: newUser.interested_field,
         other_field: newUser.other_field,
         role: "student",
-        githubId: newUser.githubId,
-        imageUrl: newUser.imageUrl,
+        github_id: newUser.github_id,
+        profile_picture: newUser.profile_picture,
       };
     } else {
       userResponse = {
@@ -368,8 +412,8 @@ router.post("/github/register", async (req, res) => {
         email: newUser.email,
         name: newUser.name,
         role: "college",
-        githubId: newUser.githubId,
-        imageUrl: newUser.imageUrl,
+        github_id: newUser.github_id,
+        profile_picture: newUser.profile_picture,
       };
     }
 

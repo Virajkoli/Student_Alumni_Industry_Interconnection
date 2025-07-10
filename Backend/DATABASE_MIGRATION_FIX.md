@@ -1,7 +1,8 @@
 # Database Migration Fix for Google Auth
 
 ## Problem
-The error "column 'googleId' does not exist" means the database tables don't have the Google authentication fields yet.
+
+The error "column 'google_id' does not exist" means the database tables don't have the Google authentication fields yet.
 
 ## Solution: Manual Database Migration
 
@@ -9,11 +10,13 @@ The error "column 'googleId' does not exist" means the database tables don't hav
 
 1. **Open a new Command Prompt or PowerShell window**
 2. **Navigate to the Backend directory:**
+
    ```bash
    cd "f:\Pallavi Data\Internship\Student_Alumni_Industry_Interconnection\Backend"
    ```
 
 3. **Run the custom migration script:**
+
    ```bash
    node add-google-fields.js
    ```
@@ -24,9 +27,9 @@ The error "column 'googleId' does not exist" means the database tables don't hav
    const { sequelize } = require('./config/database');
    (async () => {
      try {
-       await sequelize.query('ALTER TABLE \"Students\" ADD COLUMN \"googleId\" VARCHAR(255) UNIQUE;');
+       await sequelize.query('ALTER TABLE \"Students\" ADD COLUMN \"google_id\" VARCHAR(255) UNIQUE;');
        await sequelize.query('ALTER TABLE \"Students\" ADD COLUMN \"imageUrl\" VARCHAR(500);');
-       await sequelize.query('ALTER TABLE \"Colleges\" ADD COLUMN \"googleId\" VARCHAR(255) UNIQUE;');
+       await sequelize.query('ALTER TABLE \"Colleges\" ADD COLUMN \"google_id\" VARCHAR(255) UNIQUE;');
        await sequelize.query('ALTER TABLE \"Colleges\" ADD COLUMN \"imageUrl\" VARCHAR(500);');
        console.log('✅ Google fields added successfully!');
      } catch (error) {
@@ -41,6 +44,7 @@ The error "column 'googleId' does not exist" means the database tables don't hav
 ### Option 2: Using Database Client (pgAdmin, DBeaver, etc.)
 
 1. **Connect to your PostgreSQL database** using:
+
    - Host: `dpg-d1jmef24d50c73879slg-a.oregon-postgres.render.com`
    - Database: `scaips_portal`
    - Username: `scaips`
@@ -48,30 +52,33 @@ The error "column 'googleId' does not exist" means the database tables don't hav
    - Port: `5432`
 
 2. **Run the following SQL commands:**
+
    ```sql
    -- Add Google OAuth fields to Students table
-   ALTER TABLE "Students" ADD COLUMN "googleId" VARCHAR(255) UNIQUE;
+   ALTER TABLE "Students" ADD COLUMN "google_id" VARCHAR(255) UNIQUE;
    ALTER TABLE "Students" ADD COLUMN "imageUrl" VARCHAR(500);
 
-   -- Add Google OAuth fields to Colleges table  
-   ALTER TABLE "Colleges" ADD COLUMN "googleId" VARCHAR(255) UNIQUE;
+   -- Add Google OAuth fields to Colleges table
+   ALTER TABLE "Colleges" ADD COLUMN "google_id" VARCHAR(255) UNIQUE;
    ALTER TABLE "Colleges" ADD COLUMN "imageUrl" VARCHAR(500);
    ```
 
 3. **Verify the columns were added:**
-   ```sql
-   SELECT column_name, data_type, is_nullable 
-   FROM information_schema.columns 
-   WHERE table_name = 'Students' AND column_name IN ('googleId', 'imageUrl');
 
-   SELECT column_name, data_type, is_nullable 
-   FROM information_schema.columns 
-   WHERE table_name = 'Colleges' AND column_name IN ('googleId', 'imageUrl');
+   ```sql
+   SELECT column_name, data_type, is_nullable
+   FROM information_schema.columns
+   WHERE table_name = 'Students' AND column_name IN ('google_id', 'imageUrl');
+
+   SELECT column_name, data_type, is_nullable
+   FROM information_schema.columns
+   WHERE table_name = 'Colleges' AND column_name IN ('google_id', 'imageUrl');
    ```
 
 ### Option 3: Using Sequelize CLI
 
 1. **Navigate to Backend directory:**
+
    ```bash
    cd "f:\Pallavi Data\Internship\Student_Alumni_Industry_Interconnection\Backend"
    ```
@@ -90,13 +97,15 @@ The error "column 'googleId' does not exist" means the database tables don't hav
 ## Expected Success Messages
 
 You should see:
-- "✅ Google fields added successfully!" 
+
+- "✅ Google fields added successfully!"
 - Backend logs should show Google registration working
 - Frontend should complete the registration process
 
 ## If You Still Get Errors
 
 Check if the columns exist by running:
+
 ```sql
 \d "Students"
 \d "Colleges"

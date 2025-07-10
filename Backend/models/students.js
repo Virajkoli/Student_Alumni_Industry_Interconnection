@@ -52,15 +52,15 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-      googleId: {
+      google_id: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      githubId: {
+      github_id: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      imageUrl: {
+      profile_picture: {
         type: DataTypes.STRING,
         allowNull: true,
       },

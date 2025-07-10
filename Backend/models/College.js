@@ -147,22 +147,22 @@ module.exports = (sequelize) => {
         allowNull: false,
       },
       // Google Authentication fields
-      googleId: {
+      google_id: {
         type: DataTypes.STRING(255),
         allowNull: true,
         unique: true,
-        field: 'google_id', // Map to database column name
+        field: "google_id", // Map to database column name
       },
-      githubId: {
+      github_id: {
         type: DataTypes.STRING(255),
         allowNull: true,
         unique: true,
-        field: 'github_id', // Map to database column name
+        field: "github_id", // Map to database column name
       },
-      imageUrl: {
+      profile_picture: {
         type: DataTypes.STRING(500),
         allowNull: true,
-        field: 'profile_picture', // Map to database column name
+        field: "profile_picture", // Map to database column name
       },
     },
     {

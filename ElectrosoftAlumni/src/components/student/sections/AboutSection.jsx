@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Edit, X } from "lucide-react";
+import { studentAPI } from "../../../utils/apiService";
 
 const AboutSection = ({ profileData, onProfileUpdate }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -8,27 +9,57 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
       "Add a summary to highlight your personality and work style."
   );
 
+  // Fetch about data from the backend
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const response = await studentAPI.getProfile();
+        setAboutText(
+          response.data.about ||
+            "Add a summary to highlight your personality and work style."
+        );
+      } catch (error) {
+        console.error("Failed to fetch about data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAboutData();
+  }, []);
+
   // Sync aboutText with profileData changes
   useEffect(() => {
     setAboutText(
-      profileData.about ||
+      profileData?.about ||
         "Add a summary to highlight your personality and work style."
     );
-  }, [profileData.about]);
+  }, [profileData]);
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleSave = () => {
-    onProfileUpdate({ ...profileData, about: aboutText });
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    try {
+      const response = await studentAPI.updateAbout({ about: aboutText });
+      if (response.success) {
+        setAboutText(aboutText); // Update local state
+        onProfileUpdate({ ...profileData, about: aboutText }); // Update parent state
+        setIsEditModalOpen(false);
+      } else {
+        console.error("Failed to update about data:", response.message);
+      }
+    } catch (error) {
+      console.error("Failed to update about data:", error);
+    }
   };
 
   const handleCancel = () => {
     setAboutText(
-      profileData.about ||
-        "Add a summary to highlight your personality and work style."
+      aboutText || "Add a summary to highlight your personality and work style."
     );
     setIsEditModalOpen(false);
   };
@@ -65,10 +96,14 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
         </div>
 
         <div className="p-6">
-          <p className="text-gray-700 leading-relaxed">
-            {profileData.about ||
-              "Add a summary to highlight your personality and work style."}
-          </p>
+          {loading ? (
+            <p className="text-gray-500 italic">Loading about info...</p>
+          ) : (
+            <p className="text-gray-700 leading-relaxed">
+              {aboutText ||
+                "Add a summary to highlight your personality and work style."}
+            </p>
+          )}
         </div>
       </div>
 

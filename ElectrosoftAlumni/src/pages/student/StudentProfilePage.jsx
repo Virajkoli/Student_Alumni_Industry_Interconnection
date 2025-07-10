@@ -22,6 +22,7 @@ const StudentProfilePage = () => {
 
   // State for profile data - Initialize with empty structure
   const [profileData, setProfileData] = useState({
+    id: null, // Added id field
     firstName: "",
     lastName: "",
     student_college_name: "",
@@ -68,13 +69,17 @@ const StudentProfilePage = () => {
         // Set student ID
         setStudentId(data.basicInfo.id);
 
-        // Map backend data to frontend structure
+        // Map backend data to frontend structure - include all relevant fields
         setProfileData({
+          ...data, // Include the full data structure
+          id: data.basicInfo.id, // Include student ID at root level
           firstName: data.basicInfo.first_name || "",
           lastName: data.basicInfo.last_name || "",
-          student_college_name: data.basicInfo.student_college_name || "",
+          student_college_name: data.basicInfo.college_name || "",
           interested_field: data.basicInfo.interested_field || "",
           other_field: data.basicInfo.other_field || "",
+          // Include about and other fields for backward compatibility
+          about: data.about || "",
         });
 
         // Set other sections

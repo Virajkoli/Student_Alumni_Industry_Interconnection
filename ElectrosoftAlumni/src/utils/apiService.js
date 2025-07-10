@@ -6,8 +6,7 @@ console.log("🔧 Environment variables:", {
 });
 
 // Use localhost for development
-const API_BASE_URL = "https://scaips-backend.onrender.com";
-// const API_BASE_URL = "http://localhost:5000"; // Use this for local development
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 console.log("🚀 Using API Base URL:", API_BASE_URL);
 
@@ -606,6 +605,67 @@ class ApiService {
       };
     }
   }
+
+  async uploadStudentAvatar(formData) {
+    const token = localStorage.getItem("authToken");
+    return fetch(`${this.baseURL}/api/students/avatar`, {
+      method: "POST",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData, // FormData object, don't set Content-Type header
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("Avatar upload failed");
+      }
+      return response.json();
+    });
+  }
+
+  async getStudentAdditionalInfo(studentId) {
+    return this.request(`/api/students/${studentId}/additional-info`, {
+      method: "GET",
+    });
+  }
+
+  async updateStudentAdditionalInfo(studentId, additionalInfo) {
+    return this.request(`/api/students/${studentId}/additional-info`, {
+      method: "PUT",
+      body: JSON.stringify(additionalInfo),
+    });
+  }
+
+  async uploadStudentCoverImage(formData) {
+    const token = localStorage.getItem("authToken");
+    return fetch(`${this.baseURL}/api/students/cover-image`, {
+      method: "POST",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData, // FormData object, don't set Content-Type header
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("Cover image upload failed");
+      }
+      return response.json();
+    });
+  }
+
+  async uploadStudentProfileImage(formData) {
+    const token = localStorage.getItem("authToken");
+    return fetch(`${this.baseURL}/api/students/profile-image`, {
+      method: "POST",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData, // FormData object, don't set Content-Type header
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("Profile image upload failed");
+      }
+      return response.json();
+    });
+  }
 }
 
 // Create and export a singleton instance
@@ -617,7 +677,17 @@ export const studentAPI = {
   // Profile methods
   getProfile: () => apiService.getStudentProfile(),
   updateBasicInfo: (basicInfo) => apiService.updateStudentBasicInfo(basicInfo),
+  // Additional Info methods
+  getStudentAdditionalInfo: (studentId) =>
+    apiService.getStudentAdditionalInfo(studentId),
+  updateStudentAdditionalInfo: (studentId, additionalInfo) =>
+    apiService.updateStudentAdditionalInfo(studentId, additionalInfo),
   updateAbout: (aboutData) => apiService.updateStudentAbout(aboutData),
+
+  uploadAvatar: (formData) => apiService.uploadStudentAvatar(formData),
+  uploadCoverImage: (formData) => apiService.uploadStudentCoverImage(formData),
+  uploadProfileImage: (formData) =>
+    apiService.uploadStudentProfileImage(formData),
 
   // Experience methods
   addExperience: (studentId, experienceData) =>

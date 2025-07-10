@@ -40,7 +40,7 @@ export default function CompleteGoogleSignup() {
   const [googleUser, setGoogleUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { registerWithGoogle } = useAuth();
+  const { registerWithGoogle, registerCollegeWithGoogle } = useAuth();
 
   useEffect(() => {
     // Get Google user data from navigation state
@@ -145,7 +145,14 @@ export default function CompleteGoogleSignup() {
       }
 
       // Register with Google data
-      const result = await registerWithGoogle(registrationData);
+      let result;
+      if (formData.role === "college") {
+        // Use college-specific registration
+        result = await registerCollegeWithGoogle(registrationData);
+      } else {
+        // Use general registration for other roles
+        result = await registerWithGoogle(registrationData);
+      }
 
       if (result.success) {
         const rolePage = apiService.getRoleHomePage(result.user.role);

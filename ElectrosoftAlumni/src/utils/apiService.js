@@ -89,7 +89,36 @@ class ApiService {
     });
   }
 
-  // Google authentication endpoints
+  // College-specific authentication endpoints
+  async registerCollege(collegeData) {
+    return this.request("/api/auth/register/college", {
+      method: "POST",
+      body: JSON.stringify(collegeData),
+    });
+  }
+
+  async loginCollege(credentials) {
+    return this.request("/api/auth/college/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+  }
+
+  async collegeGoogleLogin(googleData) {
+    return this.request("/api/auth/college/google/login", {
+      method: "POST",
+      body: JSON.stringify(googleData),
+    });
+  }
+
+  async collegeGoogleRegister(googleData) {
+    return this.request("/api/auth/college/google/register", {
+      method: "POST",
+      body: JSON.stringify(googleData),
+    });
+  }
+
+  // Google authentication endpoints (general)
   async googleLogin(googleData) {
     return this.request("/api/auth/google/login", {
       method: "POST",
@@ -746,6 +775,21 @@ export const studentAPI = {
     apiService.deleteStudentRecommendation(recommendationId),
 };
 
+// Create collegeAPI object for easier access to college-related methods
+export const collegeAPI = {
+  // Authentication methods
+  register: (collegeData) => apiService.registerCollege(collegeData),
+  login: (credentials) => apiService.loginCollege(credentials),
+  googleLogin: (googleData) => apiService.collegeGoogleLogin(googleData),
+  googleRegister: (googleData) => apiService.collegeGoogleRegister(googleData),
+  
+  // Profile methods (to be added as needed)
+  // getProfile: () => apiService.getCollegeProfile(),
+  // updateProfile: (profileData) => apiService.updateCollegeProfile(profileData),
+  // uploadLogo: (formData) => apiService.uploadCollegeLogo(formData),
+  // uploadBackground: (formData) => apiService.uploadCollegeBackground(formData),
+};
+
 // Export individual methods for convenience
 export const {
   register,
@@ -758,4 +802,8 @@ export const {
   uploadAvatar,
   getRoleHomePage,
   getRoleProfilePage,
+  registerCollege,
+  loginCollege,
+  collegeGoogleLogin,
+  collegeGoogleRegister,
 } = apiService;

@@ -1057,6 +1057,359 @@ const googleRegister = async (req, res) => {
   }
 };
 
+// @desc    College Login (Email/Password)
+// @route   POST /api/auth/college/login
+// @access  Public
+const collegeLogin = async (req, res) => {
+  try {
+    console.log("=== COLLEGE LOGIN ===");
+    console.log("Request body:", { ...req.body, password: "[HIDDEN]" });
+
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation errors",
+        errors: errors.array(),
+      });
+    }
+
+    const { email, password } = req.body;
+
+    // Find college by email
+    const college = await College.findOne({ where: { email } });
+
+    if (!college) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Check if college is active
+    if (!college.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: "Account is deactivated. Please contact support.",
+      });
+    }
+
+    // Check password
+    const isPasswordValid = await college.matchPassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Update login tracking
+    await college.update({
+      lastLogin: new Date(),
+      loginCount: college.loginCount + 1,
+    });
+
+    // Generate tokens
+    const token = generateToken(college.id);
+    const refreshToken = generateRefreshToken(college.id);
+
+    // Set refresh token in httpOnly cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    // Return college data
+    const collegeResponse = {
+      id: college.id,
+      name: college.name,
+      email: college.email,
+      description: college.description,
+      location: college.location,
+      established: college.established,
+      campusArea: college.campusArea,
+      nirfRank: college.nirfRank,
+      accreditation: college.accreditation,
+      totalStudents: college.totalStudents,
+      totalFaculty: college.totalFaculty,
+      website: college.website,
+      role: "college",
+      logoUrl: college.logoUrl,
+      backgroundUrl: college.backgroundUrl,
+      isEmailVerified: college.isEmailVerified,
+      isActive: college.isActive,
+      profileCompletion: college.getProfileCompletion(),
+      lastLogin: college.lastLogin,
+      createdAt: college.createdAt,
+    };
+
+    console.log("College login successful:", college.email);
+
+    res.json({
+      success: true,
+      message: "College login successful",
+      data: {
+        user: collegeResponse,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("College login error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during college login",
+    });
+  }
+};
+
+// @desc    College Google Login
+// @route   POST /api/auth/college/google/login
+// @access  Public
+const collegeGoogleLogin = async (req, res) => {
+  try {
+    console.log("=== COLLEGE GOOGLE LOGIN ===");
+    console.log("Request body:", req.body);
+
+    const { email, googleId, firstName, lastName, imageUrl, accessToken } = req.body;
+
+    // Verify Google token
+    let googleUserInfo;
+    if (accessToken) {
+      try {
+        googleUserInfo = await verifyGoogleToken(accessToken);
+        if (googleUserInfo.email !== email) {
+          return res.status(400).json({
+            success: false,
+            message: "Google token email doesn't match provided email",
+          });
+        }
+      } catch (tokenError) {
+        console.log("Token verification failed, proceeding without verification:", tokenError.message);
+      }
+    }
+
+    // Find college by email
+    const existingCollege = await College.findOne({ where: { email } });
+
+    if (!existingCollege) {
+      return res.status(404).json({
+        success: false,
+        message: "College not found. Please register first.",
+      });
+    }
+
+    // Check if college is active
+    if (!existingCollege.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: "Account is deactivated. Please contact support.",
+      });
+    }
+
+    // Update college with Google information if not already set
+    if (!existingCollege.googleId) {
+      existingCollege.googleId = googleId;
+      existingCollege.imageUrl = imageUrl;
+      await existingCollege.save();
+    }
+
+    // Update login tracking
+    await existingCollege.update({
+      lastLogin: new Date(),
+      loginCount: existingCollege.loginCount + 1,
+    });
+
+    // Generate tokens
+    const token = generateToken(existingCollege.id);
+    const refreshToken = generateRefreshToken(existingCollege.id);
+
+    // Set refresh token cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    console.log("College Google login successful for:", existingCollege.email);
+
+    const collegeResponse = {
+      id: existingCollege.id,
+      name: existingCollege.name,
+      email: existingCollege.email,
+      description: existingCollege.description,
+      location: existingCollege.location,
+      established: existingCollege.established,
+      campusArea: existingCollege.campusArea,
+      nirfRank: existingCollege.nirfRank,
+      accreditation: existingCollege.accreditation,
+      totalStudents: existingCollege.totalStudents,
+      totalFaculty: existingCollege.totalFaculty,
+      website: existingCollege.website,
+      role: "college",
+      logoUrl: existingCollege.logoUrl,
+      backgroundUrl: existingCollege.backgroundUrl,
+      googleId: existingCollege.googleId,
+      imageUrl: existingCollege.imageUrl,
+      isEmailVerified: existingCollege.isEmailVerified,
+      isActive: existingCollege.isActive,
+      profileCompletion: existingCollege.getProfileCompletion(),
+      lastLogin: existingCollege.lastLogin,
+      createdAt: existingCollege.createdAt,
+    };
+
+    res.json({
+      success: true,
+      message: "College Google login successful",
+      data: {
+        token,
+        user: collegeResponse,
+      },
+    });
+  } catch (error) {
+    console.error("College Google login error:", error);
+    res.status(500).json({
+      success: false,
+      message: "College Google login failed",
+      error: error.message,
+    });
+  }
+};
+
+// @desc    College Google Register
+// @route   POST /api/auth/college/google/register
+// @access  Public
+const collegeGoogleRegister = async (req, res) => {
+  try {
+    console.log("=== COLLEGE GOOGLE REGISTRATION ===");
+    console.log("Request body:", req.body);
+
+    const { 
+      email, 
+      firstName, 
+      lastName, 
+      googleId, 
+      imageUrl, 
+      accessToken,
+      college_name,
+      description,
+      college_address,
+      establishment_year,
+      website,
+      campus_area,
+      nirf_rank,
+      accreditation,
+      total_students,
+      total_faculty,
+    } = req.body;
+
+    // Verify Google token
+    let googleUserInfo;
+    if (accessToken) {
+      try {
+        googleUserInfo = await verifyGoogleToken(accessToken);
+        if (googleUserInfo.email !== email) {
+          return res.status(400).json({
+            success: false,
+            message: "Google token email doesn't match provided email",
+          });
+        }
+      } catch (tokenError) {
+        console.log("Token verification failed, proceeding without verification:", tokenError.message);
+      }
+    }
+
+    // Check if college already exists
+    const existingCollege = await College.findOne({ where: { email } });
+
+    if (existingCollege) {
+      return res.status(409).json({
+        success: false,
+        message: "College already exists with this email",
+      });
+    }
+
+    // Create college record
+    const collegeData = {
+      email,
+      password: `google_auth_${Date.now()}`, // Dummy password for Google users
+      name: college_name,
+      description: description || `${college_name} - College`,
+      location: college_address,
+      established: establishment_year ? parseInt(establishment_year) : null,
+      website: website || null,
+      campusArea: campus_area ? parseFloat(campus_area) : null,
+      nirfRank: nirf_rank ? parseInt(nirf_rank) : null,
+      accreditation: accreditation || null,
+      totalStudents: total_students ? parseInt(total_students) : null,
+      totalFaculty: total_faculty ? parseInt(total_faculty) : null,
+      googleId: googleId,
+      imageUrl: imageUrl,
+    };
+
+    console.log("Creating college with Google data:", collegeData);
+
+    const newCollege = await College.create(collegeData);
+
+    // Generate tokens
+    const token = generateToken(newCollege.id);
+    const refreshToken = generateRefreshToken(newCollege.id);
+
+    // Set refresh token cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    console.log("College Google registration successful for:", newCollege.email);
+
+    const collegeResponse = {
+      id: newCollege.id,
+      name: newCollege.name,
+      email: newCollege.email,
+      description: newCollege.description,
+      location: newCollege.location,
+      established: newCollege.established,
+      campusArea: newCollege.campusArea,
+      nirfRank: newCollege.nirfRank,
+      accreditation: newCollege.accreditation,
+      totalStudents: newCollege.totalStudents,
+      totalFaculty: newCollege.totalFaculty,
+      website: newCollege.website,
+      role: "college",
+      logoUrl: newCollege.logoUrl,
+      backgroundUrl: newCollege.backgroundUrl,
+      googleId: newCollege.googleId,
+      imageUrl: newCollege.imageUrl,
+      isEmailVerified: newCollege.isEmailVerified,
+      isActive: newCollege.isActive,
+      profileCompletion: newCollege.getProfileCompletion(),
+      createdAt: newCollege.createdAt,
+    };
+
+    res.status(201).json({
+      success: true,
+      message: "College Google registration successful",
+      data: {
+        token,
+        user: collegeResponse,
+      },
+    });
+  } catch (error) {
+    console.error("College Google registration error:", error);
+    res.status(500).json({
+      success: false,
+      message: "College Google registration failed",
+      error: error.message,
+    });
+  }
+};
+
 // Routes
 router.post("/register", registerValidation, registerStudent);
 router.post(
@@ -1065,6 +1418,9 @@ router.post(
   registerCollege
 );
 router.post("/login", loginValidation, login);
+router.post("/college/login", loginValidation, collegeLogin);
+router.post("/college/google/login", collegeGoogleLogin);
+router.post("/college/google/register", collegeGoogleRegister);
 router.post("/google/login", googleLogin);
 router.post("/google/register", googleRegister);
 router.post("/logout", logout);

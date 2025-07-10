@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { Student } = require("../config/database");
+const { Student, College } = require("../config/database");
 
 const auth = async (req, res, next) => {
   try {
@@ -27,7 +27,7 @@ const auth = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Try to find user in available tables
+      // Try to find user in Student or College tables
       let user = null;
       let userRole = null;
 
@@ -46,19 +46,22 @@ const auth = async (req, res, next) => {
         );
       }
 
-      // TODO: Add checks for other role tables when they are created
-      // if (!user) {
-      //   try {
-      //     user = await College.findByPk(decoded.userId, {
-      //       attributes: { exclude: ["password"] },
-      //     });
-      //     if (user) {
-      //       userRole = "college";
-      //     }
-      //   } catch (error) {
-      //     console.error("Error checking College table in auth middleware:", error.message);
-      //   }
-      // }
+      // Check College table if not found in Student
+      if (!user) {
+        try {
+          user = await College.findByPk(decoded.userId, {
+            attributes: { exclude: ["password"] },
+          });
+          if (user) {
+            userRole = "college";
+          }
+        } catch (error) {
+          console.error(
+            "Error checking College table in auth middleware:",
+            error.message
+          );
+        }
+      }
 
       if (!user) {
         return res.status(401).json({
@@ -138,7 +141,7 @@ const optionalAuth = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Try to find user in available tables
+      // Try to find user in Student or College tables
       let user = null;
       let userRole = null;
 
@@ -157,19 +160,22 @@ const optionalAuth = async (req, res, next) => {
         );
       }
 
-      // TODO: Add checks for other role tables when they are created
-      // if (!user) {
-      //   try {
-      //     user = await College.findByPk(decoded.userId, {
-      //       attributes: { exclude: ["password"] },
-      //     });
-      //     if (user) {
-      //       userRole = "college";
-      //     }
-      //   } catch (error) {
-      //     console.error("Error checking College table in optional auth:", error.message);
-      //   }
-      // }
+      // Check College table if not found in Student
+      if (!user) {
+        try {
+          user = await College.findByPk(decoded.userId, {
+            attributes: { exclude: ["password"] },
+          });
+          if (user) {
+            userRole = "college";
+          }
+        } catch (error) {
+          console.error(
+            "Error checking College table in optional auth:",
+            error.message
+          );
+        }
+      }
 
       if (user && (user.isActive === undefined || user.isActive)) {
         req.user = {

@@ -67,7 +67,7 @@ export default function CompleteGoogleSignup() {
 
     // Role-specific validation
     if (formData.role === "student") {
-      if (!formData.student_college_name.trim()) {
+      if (!formData.college_name.trim()) {
         setError("Student college name is required");
         return;
       }
@@ -257,6 +257,24 @@ export default function CompleteGoogleSignup() {
                         placeholder="Enter your contact number"
                         value={formData.contact_no}
                         onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6EA9C8] focus:border-[#6EA9C8] transition-colors bg-white text-[#1F2D3D]"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="college_name"
+                        className="block text-sm font-medium text-[#1F2D3D] mb-2"
+                      >
+                        College Name *
+                      </label>
+                      <input
+                        type="text"
+                        id="college_name"
+                        name="college_name"
+                        placeholder="Enter your college name"
+                        value={formData.college_name}
+                        onChange={handleChange}
+                        required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6EA9C8] focus:border-[#6EA9C8] transition-colors bg-white text-[#1F2D3D]"
                       />
                     </div>

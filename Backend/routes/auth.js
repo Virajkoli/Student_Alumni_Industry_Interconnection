@@ -99,8 +99,8 @@ const registerStudent = async (req, res) => {
     // Set refresh token in httpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,         // Always true for cross-origin
+      sameSite: "None",     // Must be "None" for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -224,8 +224,8 @@ const login = async (req, res) => {
     // Set refresh token in httpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,         // Always true for cross-origin
+      sameSite: "None",     // Must be "None" for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -584,8 +584,8 @@ const registerCollege = async (req, res) => {
     // Set refresh token in httpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,         // Always true for cross-origin
+      sameSite: "None",     // Must be "None" for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -875,8 +875,8 @@ const googleLogin = async (req, res) => {
     // Set refresh token cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,         // Always true for cross-origin
+      sameSite: "None",     // Must be "None" for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -1063,8 +1063,8 @@ const googleRegister = async (req, res) => {
     // Set refresh token cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,         // Always true for cross-origin
+      sameSite: "None",     // Must be "None" for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -1156,8 +1156,8 @@ const collegeLogin = async (req, res) => {
     // Set refresh token in httpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,         // Always true for cross-origin
+      sameSite: "None",     // Must be "None" for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -1278,8 +1278,8 @@ const collegeGoogleLogin = async (req, res) => {
     // Set refresh token cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,         // Always true for cross-origin
+      sameSite: "None",     // Must be "None" for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
@@ -1413,8 +1413,8 @@ const collegeGoogleRegister = async (req, res) => {
     // Set refresh token cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,         // Always true for cross-origin
+      sameSite: "None",     // Must be "None" for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 

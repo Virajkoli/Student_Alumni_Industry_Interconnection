@@ -52,6 +52,18 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
+      googleId: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      githubId: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      imageUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       isActive: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
@@ -67,18 +79,6 @@ module.exports = (sequelize) => {
       loginCount: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
-      },
-      // Google OAuth fields
-      googleId: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: true,
-        field: 'google_id', // Map to database column name
-      },
-      imageUrl: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        field: 'profile_picture', // Map to database column name
       },
     },
     {

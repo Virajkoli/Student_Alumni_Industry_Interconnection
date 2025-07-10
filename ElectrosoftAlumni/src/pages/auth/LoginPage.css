@@ -185,7 +185,7 @@
 .login-button {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(90deg, #00a5ec 0%, #0073b1 100%);
+  background: #6EA9C8;
   color: white;
   border: none;
   border-radius: 6px;
@@ -198,7 +198,7 @@
 }
 
 .login-button:hover:not(:disabled) {
-  background: linear-gradient(90deg, #0073b1 0%, #00a5ec 100%);
+ 
   box-shadow: 0 4px 16px rgba(0, 165, 236, 0.15);
 }
 

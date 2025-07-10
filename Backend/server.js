@@ -15,6 +15,7 @@ app.set("trust proxy", 1);
 
 // Import routes
 const authRoutes = require("./routes/auth");
+const githubAuthRoutes = require("./routes/github-auth");
 const userRoutes = require("./routes/users");
 const studentRoutes = require("./routes/students");
 const postRoutes = require("./routes/posts");
@@ -124,6 +125,9 @@ app.get("/health", (req, res) => {
 
  // API routes
 app.use("/api/auth", authRoutes);
+// Updated: GitHub auth routes now mounted at /api/auth to match the callback URL
+app.use("/api/auth", githubAuthRoutes);
+
 app.use("/api/users", userRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/posts", postRoutes);
@@ -198,6 +202,44 @@ app.get("/api/debug/uploads", (req, res) => {
       message: error.message,
     });
   }
+});
+
+// Debug endpoint to show all registered routes
+app.get("/api/debug/routes", (req, res) => {
+  const routes = [];
+  
+  // Get registered routes
+  app._router.stack.forEach(middleware => {
+    if (middleware.route) {
+      // Routes registered directly on the app
+      routes.push({
+        path: middleware.route.path,
+        methods: Object.keys(middleware.route.methods).join(', ')
+      });
+    } else if (middleware.name === 'router') {
+      // Routes added via router
+      middleware.handle.stack.forEach(handler => {
+        if (handler.route) {
+          const routePath = handler.route.path;
+          const basePath = middleware.regexp.toString()
+            .replace('\\^', '')
+            .replace('\\/?(?=\\/|$)', '')
+            .replace(/\\\//g, '/')
+            .replace(/\(\?:\(\[\^\\\/\]\+\?\)\)/g, ':id');
+          
+          routes.push({
+            path: basePath + routePath,
+            methods: Object.keys(handler.route.methods).join(', ')
+          });
+        }
+      });
+    }
+  });
+  
+  res.json({
+    totalRoutes: routes.length,
+    routes: routes.sort((a, b) => a.path.localeCompare(b.path))
+  });
 });
 
 // Welcome route

@@ -153,6 +153,12 @@ module.exports = (sequelize) => {
         unique: true,
         field: 'google_id', // Map to database column name
       },
+      githubId: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+        unique: true,
+        field: 'github_id', // Map to database column name
+      },
       imageUrl: {
         type: DataTypes.STRING(500),
         allowNull: true,

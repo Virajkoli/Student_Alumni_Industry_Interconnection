@@ -24,12 +24,16 @@ import SignupPage from "./pages/auth/SignupPage";
 import CompleteGoogleSignup from "./pages/auth/CompleteGoogleSignup";
 import GoogleAuthTest from "./components/GoogleAuthTest";
 
+// GitHub Auth Pages
+import GitHubAuthSuccess from "./pages/auth/github/GitHubAuthSuccess";
+import CompleteGitHubSignup from "./pages/auth/github/CompleteGitHubSignup";
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public Routes - Only accessible when NOT logged in */}
+          { /* Public Routes - Only accessible when NOT logged in */ }
           <Route
             path="/auth/login"
             element={
@@ -66,6 +70,38 @@ function App() {
               <AuthLayout>
                 <GoogleAuthTest />
               </AuthLayout>
+            }
+          />
+
+          {/* GitHub Auth Routes */}
+          <Route
+            path="/auth/github/callback"
+            element={
+              <PublicRoute>
+                <AuthLayout>
+                  <GitHubAuthSuccess />
+                </AuthLayout>
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/auth/github/success"
+            element={
+              <PublicRoute>
+                <AuthLayout>
+                  <GitHubAuthSuccess />
+                </AuthLayout>
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/auth/complete-github-signup"
+            element={
+              <PublicRoute>
+                <AuthLayout>
+                  <CompleteGitHubSignup />
+                </AuthLayout>
+              </PublicRoute>
             }
           />
 

@@ -33,7 +33,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public Routes - Only accessible when NOT logged in */}
+          { /* Public Routes - Only accessible when NOT logged in */ }
           <Route
             path="/auth/login"
             element={

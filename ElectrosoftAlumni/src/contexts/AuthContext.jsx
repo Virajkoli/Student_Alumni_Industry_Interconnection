@@ -145,6 +145,46 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // College-specific login function
+  const loginCollege = async (credentials) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.loginCollege(credentials);
+
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        throw new Error(response.message || "College login failed");
+      }
+    } catch (error) {
+      console.error("College login error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // College-specific register function
+  const registerCollege = async (collegeData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.registerCollege(collegeData);
+
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        throw new Error(response.message || "College registration failed");
+      }
+    } catch (error) {
+      console.error("College registration error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Google Login function
   const loginWithGoogle = async (googleUser) => {
     try {
@@ -169,6 +209,36 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Google login error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // College-specific Google login function
+  const loginCollegeWithGoogle = async (googleUser) => {
+    try {
+      setIsLoading(true);
+      
+      // Send Google user info to backend for college authentication
+      const response = await apiService.collegeGoogleLogin({
+        googleId: googleUser.id,
+        email: googleUser.email,
+        firstName: googleUser.firstName,
+        lastName: googleUser.lastName,
+        name: googleUser.name,
+        imageUrl: googleUser.imageUrl,
+        accessToken: googleUser.accessToken
+      });
+
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        throw new Error(response.message || "College Google login failed");
+      }
+    } catch (error) {
+      console.error("College Google login error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -205,58 +275,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login with GitHub
-  const loginWithGitHub = async (githubUserData) => {
-    setIsLoading(true);
+  // College-specific Google registration function
+  const registerCollegeWithGoogle = async (googleUser) => {
     try {
-      const response = await apiService.request("/api/auth/github/login", {
-        method: "POST",
-        body: JSON.stringify(githubUserData),
+      setIsLoading(true);
+      
+      // Send Google user info to backend for college registration
+      const response = await apiService.collegeGoogleRegister({
+        googleId: googleUser.id,
+        email: googleUser.email,
+        firstName: googleUser.firstName,
+        lastName: googleUser.lastName,
+        name: googleUser.name,
+        imageUrl: googleUser.imageUrl,
+        accessToken: googleUser.accessToken,
+        // Include college-specific fields
+        college_name: googleUser.college_name,
+        description: googleUser.description,
+        college_address: googleUser.college_address,
+        establishment_year: googleUser.establishment_year,
+        website: googleUser.website,
+        campus_area: googleUser.campus_area,
+        nirf_rank: googleUser.nirf_rank,
+        accreditation: googleUser.accreditation,
+        total_students: googleUser.total_students,
+        total_faculty: googleUser.total_faculty,
       });
 
       if (response.success) {
-        const { token, user } = response.data;
-        
-        // Save token and user data
-        localStorage.setItem("authToken", token);
-        localStorage.setItem("userData", JSON.stringify(user));
-        
-        setIsAuthenticated(true);
-        setUser(user);
-        setIsLoading(false);
-        
-        return { success: true, user };
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
       } else {
-        setIsLoading(false);
-        return { success: false, error: response.message };
+        throw new Error(response.message || "College Google registration failed");
       }
     } catch (error) {
-      console.error("GitHub login error:", error);
+      console.error("College Google registration error:", error);
+      throw error;
+    } finally {
       setIsLoading(false);
-      return { success: false, error: error.message };
-    }
-  };
-
-  // Register with GitHub
-  const registerWithGitHub = async (githubUserData) => {
-    setIsLoading(true);
-    try {
-      const response = await apiService.request("/api/auth/github/register", {
-        method: "POST",
-        body: JSON.stringify(githubUserData),
-      });
-
-      if (response.success) {
-        setIsLoading(false);
-        return { success: true, data: response.data };
-      } else {
-        setIsLoading(false);
-        return { success: false, error: response.message };
-      }
-    } catch (error) {
-      console.error("GitHub registration error:", error);
-      setIsLoading(false);
-      return { success: false, error: error.message };
     }
   };
 
@@ -268,10 +324,12 @@ export const AuthProvider = ({ children }) => {
     logout,
     register,
     loginUser,
+    loginCollege,
+    registerCollege,
     loginWithGoogle,
+    loginCollegeWithGoogle,
     registerWithGoogle,
-    loginWithGitHub,
-    registerWithGitHub,
+    registerCollegeWithGoogle,
     checkAuthStatus,
   };
 

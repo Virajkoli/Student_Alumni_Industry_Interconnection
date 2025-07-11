@@ -22,6 +22,7 @@ const postRoutes = require("./routes/posts");
 const connectionRoutes = require("./routes/connections");
 const jobRoutes = require("./routes/jobs");
 const notificationRoutes = require("./routes/notifications");
+const collegeRoutes = require("./routes/colleges");
 
 // Import middleware
 const { errorHandler } = require("./middleware/errorHandler");
@@ -134,6 +135,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/colleges", collegeRoutes);
 
 // Note: Media serving endpoint removed - files are now served directly from Cloudinary
 

@@ -71,7 +71,7 @@ module.exports = (sequelize) => {
         allowNull: true,
         validate: {
           min: {
-            args: 0,
+            args: 0.01,
             msg: "Campus area must be positive",
           },
         },
@@ -164,6 +164,20 @@ module.exports = (sequelize) => {
         allowNull: true,
         field: "profile_picture", // Map to database column name
       },
+      // Additional fields for college information
+      about: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      verifiedDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       tableName: "colleges",
@@ -210,6 +224,16 @@ module.exports = (sequelize) => {
     const values = Object.assign({}, this.get());
     delete values.password;
     return values;
+  };
+
+  // Define associations
+  College.associate = (models) => {
+    // One-to-Many: College has many Campuses
+    College.hasMany(models.CollegeCampus, {
+      foreignKey: "college_id",
+      as: "campuses",
+      onDelete: "CASCADE",
+    });
   };
 
   return College;

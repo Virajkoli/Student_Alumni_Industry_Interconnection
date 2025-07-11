@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import apiService from "../../utils/apiService";
+import { IoIosSearch } from "react-icons/io";
 
 const Navbar = () => {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -57,17 +58,17 @@ const Navbar = () => {
           </div>
 
           {/* Center - Search Bar */}
-          <div className="flex-1 max-w-lg mx-6">
-            <div className="relative">
-              {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div> */}
-              <input
-                type="text"
-                placeholder="Search for connections, jobs, posts..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none relative z-0"
-              />
+          <div className="flex-1 max-w-lg mx-6 relative">
+            {/* Search Icon Positioned Inside Input */}
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+              <IoIosSearch className="h-5 w-5 text-gray-400" />
             </div>
+
+            <input
+              type="text"
+              placeholder="Search for connections, jobs, posts..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
           </div>
 
           {/* Right side - Navigation Icons */}

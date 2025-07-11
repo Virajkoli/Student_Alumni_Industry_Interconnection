@@ -2,15 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import apiService from "../../utils/apiService";
-import { ChevronDown } from "lucide-react"
-
+import { ChevronDown } from "lucide-react";
 
 export default function CompleteGoogleSignup() {
   const [formData, setFormData] = useState({
     role: "",
     // Student fields
     contact_no: "",
-   interested_field: "",
+    interested_field: "",
     other_field: "",
     // College fields
     college_name: "",
@@ -175,7 +174,7 @@ export default function CompleteGoogleSignup() {
         {/* Decorative elements */}
         <div className="absolute -top-16 -right-16 w-32 h-32 bg-blue-200 rounded-full opacity-30 blur-2xl"></div>
         <div className="absolute -bottom-20 -left-16 w-40 h-40 bg-cyan-200 rounded-full opacity-20 blur-3xl"></div>
-        
+
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 relative z-10">
           {/* Header Section - Redesigned */}
           <div className="bg-gradient-to-r from-[#4B91C5] via-[#5A94B5] to-[#6EA9C8] px-4 py-2">
@@ -193,7 +192,9 @@ export default function CompleteGoogleSignup() {
             </h2>
             <p className="text-blue-100 text-center flex items-center justify-center gap-1">
               <span>Welcome</span>
-              <span className="bg-white/20 px-2 py-0.5 rounded-md font-medium text-white backdrop-blur-sm">{googleUser.firstName}</span>
+              <span className="bg-white/20 px-2 py-0.5 rounded-md font-medium text-white backdrop-blur-sm">
+                {googleUser.firstName}
+              </span>
               <span>! Let's set up your account</span>
             </p>
           </div>
@@ -224,16 +225,21 @@ export default function CompleteGoogleSignup() {
               <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm transition-all">
                 <label
                   htmlFor="role"
-                  className="block text-base font-semibold text-gray-800 mb-4 flex items-center"
+                  className=" text-base font-semibold text-gray-800 mb-4 flex items-center"
                 >
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#4B91C5]" viewBox="0 0 20 20" fill="currentColor">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-[#4B91C5]"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
                       <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                     </svg>
                   </div>
                   Select Your Role <span className="text-red-500 ml-1">*</span>
                 </label>
-                
+
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 rounded-lg opacity-0 group-hover:opacity-100 transition duration-200 blur"></div>
                   <div className="relative">
@@ -246,13 +252,15 @@ export default function CompleteGoogleSignup() {
                       className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4B91C5] focus:border-[#4B91C5] transition-colors bg-white text-gray-800 shadow-sm appearance-none cursor-pointer hover:border-blue-300"
                       style={{
                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234B91C5' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 1rem center',
-                        backgroundSize: '1.5em 1.5em',
-                        paddingRight: '3rem'
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "right 1rem center",
+                        backgroundSize: "1.5em 1.5em",
+                        paddingRight: "3rem",
                       }}
                     >
-                      <option value="" disabled>Choose your role</option>
+                      <option value="" disabled>
+                        Choose your role
+                      </option>
                       <option value="student">🎓 Student</option>
                       <option value="college">🏫 College</option>
                       <option value="industry">🏢 Industry</option>
@@ -260,15 +268,20 @@ export default function CompleteGoogleSignup() {
                     </select>
                   </div>
                 </div>
-                
+
                 {formData.role && (
                   <div className="mt-4 flex">
-                    <div className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center ${
-                      formData.role === "student" ? "bg-blue-100 text-blue-700" :
-                      formData.role === "college" ? "bg-green-100 text-green-700" :
-                      formData.role === "industry" ? "bg-purple-100 text-purple-700" :
-                      "bg-orange-100 text-orange-700"
-                    }`}>
+                    <div
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center ${
+                        formData.role === "student"
+                          ? "bg-blue-100 text-blue-700"
+                          : formData.role === "college"
+                          ? "bg-green-100 text-green-700"
+                          : formData.role === "industry"
+                          ? "bg-purple-100 text-purple-700"
+                          : "bg-orange-100 text-orange-700"
+                      }`}
+                    >
                       <span className="mr-1">
                         {formData.role === "student" && "🎓"}
                         {formData.role === "college" && "🏫"}
@@ -286,11 +299,18 @@ export default function CompleteGoogleSignup() {
                 <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm transition-all">
                   <div className="flex items-center mb-5">
                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#4B91C5]" viewBox="0 0 20 20" fill="currentColor">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-[#4B91C5]"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
                         <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800">Student Information</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Student Information
+                    </h3>
                   </div>
 
                   <div className="space-y-5">
@@ -364,13 +384,15 @@ export default function CompleteGoogleSignup() {
                             className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4B91C5] focus:border-[#4B91C5] transition-colors bg-white text-gray-800 shadow-sm appearance-none hover:border-blue-300"
                             style={{
                               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234B91C5' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'right 1rem center',
-                              backgroundSize: '1.5em 1.5em',
-                              paddingRight: '3rem'
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: "right 1rem center",
+                              backgroundSize: "1.5em 1.5em",
+                              paddingRight: "3rem",
                             }}
                           >
-                            <option value="">Select your field of interest</option>
+                            <option value="">
+                              Select your field of interest
+                            </option>
                             <option value="Technology">💻 Technology</option>
                             <option value="Business">💼 Business</option>
                             <option value="Healthcare">🏥 Healthcare</option>
@@ -389,7 +411,8 @@ export default function CompleteGoogleSignup() {
                           htmlFor="other_field"
                           className="block text-sm font-medium text-gray-700 mb-2"
                         >
-                          Specify Other Field <span className="text-red-500">*</span>
+                          Specify Other Field{" "}
+                          <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
                           <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 rounded-lg opacity-0 group-hover:opacity-100 transition duration-200 blur"></div>
@@ -417,11 +440,18 @@ export default function CompleteGoogleSignup() {
                 <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm transition-all">
                   <div className="flex items-center mb-5">
                     <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-green-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800">College Information</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      College Information
+                    </h3>
                   </div>
 
                   <div className="space-y-5">
@@ -532,11 +562,22 @@ export default function CompleteGoogleSignup() {
                 <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm transition-all">
                   <div className="flex items-center mb-5">
                     <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1 1h-2a1 1 0 01-1-1v-2a1 1 0 00-1-1H7a1 1 0 00-1 1v2a1 1 0 01-1 1H3a1 1 0 01-1-1V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-purple-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1 1h-2a1 1 0 01-1-1v-2a1 1 0 00-1-1H7a1 1 0 00-1 1v2a1 1 0 01-1 1H3a1 1 0 01-1-1V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800">Industry Information</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Industry Information
+                    </h3>
                   </div>
 
                   <div className="space-y-5">
@@ -609,17 +650,19 @@ export default function CompleteGoogleSignup() {
                             className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-white text-gray-800 shadow-sm appearance-none hover:border-purple-300"
                             style={{
                               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23884DFF' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'right 1rem center',
-                              backgroundSize: '1.5em 1.5em',
-                              paddingRight: '3rem'
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: "right 1rem center",
+                              backgroundSize: "1.5em 1.5em",
+                              paddingRight: "3rem",
                             }}
                           >
                             <option value="">Select Industry Type</option>
                             <option value="Technology">💻 Technology</option>
                             <option value="Healthcare">🏥 Healthcare</option>
                             <option value="Finance">💰 Finance</option>
-                            <option value="Manufacturing">🏭 Manufacturing</option>
+                            <option value="Manufacturing">
+                              🏭 Manufacturing
+                            </option>
                             <option value="Education">📚 Education</option>
                             <option value="Other">🎯 Other</option>
                           </select>
@@ -646,10 +689,10 @@ export default function CompleteGoogleSignup() {
                             className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-white text-gray-800 shadow-sm appearance-none hover:border-purple-300"
                             style={{
                               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23884DFF' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'right 1rem center',
-                              backgroundSize: '1.5em 1.5em',
-                              paddingRight: '3rem'
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: "right 1rem center",
+                              backgroundSize: "1.5em 1.5em",
+                              paddingRight: "3rem",
                             }}
                           >
                             <option value="">Select Company Size</option>
@@ -672,11 +715,22 @@ export default function CompleteGoogleSignup() {
                 <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm transition-all">
                   <div className="flex items-center mb-5">
                     <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-orange-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800">Startup Information</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Startup Information
+                    </h3>
                   </div>
 
                   <div className="space-y-5">
@@ -724,10 +778,10 @@ export default function CompleteGoogleSignup() {
                               className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white text-gray-800 shadow-sm appearance-none hover:border-orange-300"
                               style={{
                                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23F97316' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'right 1rem center',
-                                backgroundSize: '1.5em 1.5em',
-                                paddingRight: '3rem'
+                                backgroundRepeat: "no-repeat",
+                                backgroundPosition: "right 1rem center",
+                                backgroundSize: "1.5em 1.5em",
+                                paddingRight: "3rem",
                               }}
                             >
                               <option value="">Select Stage</option>
@@ -760,14 +814,16 @@ export default function CompleteGoogleSignup() {
                             className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white text-gray-800 shadow-sm appearance-none hover:border-orange-300"
                             style={{
                               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23F97316' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'right 1rem center',
-                              backgroundSize: '1.5em 1.5em',
-                              paddingRight: '3rem'
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: "right 1rem center",
+                              backgroundSize: "1.5em 1.5em",
+                              paddingRight: "3rem",
                             }}
                           >
                             <option value="">Select Funding Status</option>
-                            <option value="Bootstrapped">💪 Bootstrapped</option>
+                            <option value="Bootstrapped">
+                              💪 Bootstrapped
+                            </option>
                             <option value="Seed">🌱 Seed</option>
                             <option value="Series A">🔥 Series A</option>
                             <option value="Series B+">💎 Series B+</option>
@@ -795,10 +851,10 @@ export default function CompleteGoogleSignup() {
                             className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors bg-white text-gray-800 shadow-sm appearance-none hover:border-orange-300"
                             style={{
                               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23F97316' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                              backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'right 1rem center',
-                              backgroundSize: '1.5em 1.5em',
-                              paddingRight: '3rem'
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: "right 1rem center",
+                              backgroundSize: "1.5em 1.5em",
+                              paddingRight: "3rem",
                             }}
                           >
                             <option value="">Select Team Size</option>
@@ -824,35 +880,74 @@ export default function CompleteGoogleSignup() {
                     <button
                       type="submit"
                       className={`w-full bg-gradient-to-r from-[#4B91C5] to-[#6EA9C8] text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 ${
-                        isLoading ? "opacity-70 cursor-not-allowed" : "transform hover:translate-y-[-2px]"
+                        isLoading
+                          ? "opacity-70 cursor-not-allowed"
+                          : "transform hover:translate-y-[-2px]"
                       }`}
                       disabled={isLoading}
                     >
                       {isLoading ? (
                         <div className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           Processing...
                         </div>
                       ) : (
                         <div className="flex items-center justify-center">
                           <span>Complete Registration</span>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 ml-2"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </div>
                       )}
                     </button>
                   </div>
                 </div>
-                
+
                 <p className="mt-4 text-center text-sm text-gray-500">
-                  By completing registration, you agree to our 
-                  <a href="#" className="text-[#4B91C5] hover:text-blue-700 font-medium"> Terms of Service </a>
-                  and 
-                  <a href="#" className="text-[#4B91C5] hover:text-blue-700 font-medium"> Privacy Policy</a>
+                  By completing registration, you agree to our
+                  <a
+                    href="#"
+                    className="text-[#4B91C5] hover:text-blue-700 font-medium"
+                  >
+                    {" "}
+                    Terms of Service{" "}
+                  </a>
+                  and
+                  <a
+                    href="#"
+                    className="text-[#4B91C5] hover:text-blue-700 font-medium"
+                  >
+                    {" "}
+                    Privacy Policy
+                  </a>
                 </p>
               </div>
             </form>

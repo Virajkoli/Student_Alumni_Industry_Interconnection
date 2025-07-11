@@ -33,6 +33,7 @@
   "author": "SCAIPS Team",
   "license": "MIT",
   "dependencies": {
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.30.0",

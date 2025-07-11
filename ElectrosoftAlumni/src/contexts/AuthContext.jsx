@@ -197,7 +197,7 @@ export const AuthProvider = ({ children }) => {
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
         name: googleUser.name,
-        imageUrl: googleUser.imageUrl,
+        profile_picture: googleUser.imageUrl,
         accessToken: googleUser.accessToken,
       });
 
@@ -227,7 +227,7 @@ export const AuthProvider = ({ children }) => {
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
         name: googleUser.name,
-        imageUrl: googleUser.imageUrl,
+        profile_picture: googleUser.imageUrl,
         accessToken: googleUser.accessToken,
       });
 
@@ -251,15 +251,7 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(true);
 
       // Send Google user info to backend for registration
-      const response = await apiService.googleRegister({
-        google_id: googleUser.id,
-        email: googleUser.email,
-        firstName: googleUser.firstName,
-        lastName: googleUser.lastName,
-        name: googleUser.name,
-        imageUrl: googleUser.imageUrl,
-        accessToken: googleUser.accessToken,
-      });
+      const response = await apiService.googleRegister(googleUser);
 
       if (response.success) {
         login(response.data.user, response.data.token);
@@ -281,26 +273,7 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(true);
 
       // Send Google user info to backend for college registration
-      const response = await apiService.collegeGoogleRegister({
-        google_id: googleUser.id,
-        email: googleUser.email,
-        firstName: googleUser.firstName,
-        lastName: googleUser.lastName,
-        name: googleUser.name,
-        imageUrl: googleUser.imageUrl,
-        accessToken: googleUser.accessToken,
-        // Include college-specific fields
-        college_name: googleUser.college_name,
-        description: googleUser.description,
-        college_address: googleUser.college_address,
-        establishment_year: googleUser.establishment_year,
-        website: googleUser.website,
-        campus_area: googleUser.campus_area,
-        nirf_rank: googleUser.nirf_rank,
-        accreditation: googleUser.accreditation,
-        total_students: googleUser.total_students,
-        total_faculty: googleUser.total_faculty,
-      });
+      const response = await apiService.collegeGoogleRegister(googleUser);
 
       if (response.success) {
         login(response.data.user, response.data.token);

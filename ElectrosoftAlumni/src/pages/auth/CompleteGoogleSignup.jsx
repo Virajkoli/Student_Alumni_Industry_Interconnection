@@ -96,7 +96,7 @@ export default function CompleteGoogleSignup() {
         first_name: googleUser.firstName,
         last_name: googleUser.lastName,
         google_id: googleUser.id,
-        imageUrl: googleUser.imageUrl,
+        profile_picture: googleUser.imageUrl,
         role: formData.role,
       };
 
@@ -105,7 +105,7 @@ export default function CompleteGoogleSignup() {
         registrationData = {
           ...registrationData,
           contact_no: formData.contact_no,
-
+          student_college_name: formData.college_name,
           interested_field: formData.interested_field,
           other_field:
             formData.interested_field === "Other"

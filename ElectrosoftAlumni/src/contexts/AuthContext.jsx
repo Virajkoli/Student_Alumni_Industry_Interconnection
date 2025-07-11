@@ -197,7 +197,7 @@ export const AuthProvider = ({ children }) => {
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
         name: googleUser.name,
-        imageUrl: googleUser.imageUrl,
+        profile_picture: googleUser.imageUrl,
         accessToken: googleUser.accessToken,
       });
 
@@ -227,7 +227,7 @@ export const AuthProvider = ({ children }) => {
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
         name: googleUser.name,
-        imageUrl: googleUser.imageUrl,
+        profile_picture: googleUser.imageUrl,
         accessToken: googleUser.accessToken,
       });
 
@@ -251,15 +251,7 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(true);
 
       // Send Google user info to backend for registration
-      const response = await apiService.googleRegister({
-        google_id: googleUser.id,
-        email: googleUser.email,
-        firstName: googleUser.firstName,
-        lastName: googleUser.lastName,
-        name: googleUser.name,
-        imageUrl: googleUser.imageUrl,
-        accessToken: googleUser.accessToken,
-      });
+      const response = await apiService.googleRegister(googleUser);
 
       if (response.success) {
         login(response.data.user, response.data.token);
@@ -281,26 +273,7 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(true);
 
       // Send Google user info to backend for college registration
-      const response = await apiService.collegeGoogleRegister({
-        google_id: googleUser.id,
-        email: googleUser.email,
-        firstName: googleUser.firstName,
-        lastName: googleUser.lastName,
-        name: googleUser.name,
-        imageUrl: googleUser.imageUrl,
-        accessToken: googleUser.accessToken,
-        // Include college-specific fields
-        college_name: googleUser.college_name,
-        description: googleUser.description,
-        college_address: googleUser.college_address,
-        establishment_year: googleUser.establishment_year,
-        website: googleUser.website,
-        campus_area: googleUser.campus_area,
-        nirf_rank: googleUser.nirf_rank,
-        accreditation: googleUser.accreditation,
-        total_students: googleUser.total_students,
-        total_faculty: googleUser.total_faculty,
-      });
+      const response = await apiService.collegeGoogleRegister(googleUser);
 
       if (response.success) {
         login(response.data.user, response.data.token);
@@ -313,6 +286,94 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("College Google registration error:", error);
       throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //student registration with GitHub
+
+  const registerWithGitHub = async (githubData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.githubRegister(githubData); // Student registration
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        return {
+          success: false,
+          error: response.message || "GitHub student registration failed",
+        };
+      }
+    } catch (error) {
+      console.error("GitHub student registration error:", error);
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // student login with GitHub
+
+  const loginWithGitHub = async (githubData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.githubLogin(githubData); // Student login
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        return {
+          success: false,
+          error: response.message || "GitHub student login failed",
+        };
+      }
+    } catch (error) {
+      console.error("GitHub student login error:", error);
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const registerCollegeWithGitHub = async (githubData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.collegeGithubRegister(githubData); // College registration
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        return {
+          success: false,
+          error: response.message || "GitHub college registration failed",
+        };
+      }
+    } catch (error) {
+      console.error("GitHub college registration error:", error);
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loginCollegeWithGitHub = async (githubData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.collegeGithubLogin(githubData); // College login
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        return {
+          success: false,
+          error: response.message || "GitHub college login failed",
+        };
+      }
+    } catch (error) {
+      console.error("GitHub college login error:", error);
+      return { success: false, error: error.message };
     } finally {
       setIsLoading(false);
     }
@@ -332,6 +393,10 @@ export const AuthProvider = ({ children }) => {
     loginCollegeWithGoogle,
     registerWithGoogle,
     registerCollegeWithGoogle,
+    registerWithGitHub,
+    loginWithGitHub,
+    registerCollegeWithGitHub,
+    loginCollegeWithGitHub,
     checkAuthStatus,
   };
 

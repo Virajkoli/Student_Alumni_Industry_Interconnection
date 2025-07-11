@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { loginUser } = useAuth();
+  const { loginUser, loginWithGitHub } = useAuth();
   const navigate = useNavigate();
 
   const togglePassword = () => {
@@ -31,12 +31,13 @@ export default function LoginPage() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-const handleGithubSignIn = () => {
+  const handleGithubSignIn = () => {
     // Don't use this function - we're using the GitHubSignInButton component instead
     // This function is kept for reference only
-    console.warn("Direct handleGithubSignIn called - should use GitHubSignInButton component");
+    console.warn(
+      "Direct handleGithubSignIn called - should use GitHubSignInButton component"
+    );
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -160,16 +161,37 @@ const handleGithubSignIn = () => {
               <div className="separator">
                 <span>OR</span>
               </div>
-              
+
               {/* GitHub Login Button */}
               <GitHubSignInButton
                 isSignUp={false}
-                onSuccess={(result) => {
-                  const rolePage = apiService.getRoleHomePage(result.user.role);
-                  navigate(rolePage);
+                onSuccess={async (githubUser) => {
+                  setIsLoading(true);
+                  setError("");
+
+                  try {
+                    const result = await loginWithGitHub(githubUser);
+
+                    if (result.success) {
+                      const rolePage = apiService.getRoleHomePage(
+                        result.user.role
+                      );
+                      navigate(rolePage, {
+                        replace: true,
+                        state: { newUser: false },
+                      });
+                    } else {
+                      setError(result.error || "GitHub login failed");
+                    }
+                  } catch (err) {
+                    console.error("GitHub login error:", err);
+                    setError(err.message || "GitHub login failed");
+                  } finally {
+                    setIsLoading(false);
+                  }
                 }}
                 onError={(error) => {
-                  setError(error);
+                  setError(error || "GitHub login failed");
                 }}
               />
 

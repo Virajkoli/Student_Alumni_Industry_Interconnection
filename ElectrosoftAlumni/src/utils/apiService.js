@@ -133,6 +133,36 @@ class ApiService {
     });
   }
 
+  // GitHub Authentication for Students
+  async githubRegister(githubData) {
+    return this.request("/api/auth/github/register", {
+      method: "POST",
+      body: JSON.stringify(githubData),
+    });
+  }
+
+  async githubLogin(githubData) {
+    return this.request("/api/auth/github/login", {
+      method: "POST",
+      body: JSON.stringify(githubData),
+    });
+  }
+
+  // GitHub Authentication for Colleges
+  async collegeGithubRegister(githubData) {
+    return this.request("/api/auth/college/github/register", {
+      method: "POST",
+      body: JSON.stringify(githubData),
+    });
+  }
+
+  async collegeGithubLogin(githubData) {
+    return this.request("/api/auth/college/github/login", {
+      method: "POST",
+      body: JSON.stringify(githubData),
+    });
+  }
+
   async logout() {
     return this.request("/api/auth/logout", {
       method: "POST",
@@ -782,7 +812,7 @@ export const collegeAPI = {
   login: (credentials) => apiService.loginCollege(credentials),
   googleLogin: (googleData) => apiService.collegeGoogleLogin(googleData),
   googleRegister: (googleData) => apiService.collegeGoogleRegister(googleData),
-  
+
   // Profile methods (to be added as needed)
   // getProfile: () => apiService.getCollegeProfile(),
   // updateProfile: (profileData) => apiService.updateCollegeProfile(profileData),
@@ -806,4 +836,8 @@ export const {
   loginCollege,
   collegeGoogleLogin,
   collegeGoogleRegister,
+  githubRegister, // ✅ for students
+  githubLogin, // ✅ for students
+  collegeGithubRegister, // ✅ for colleges
+  collegeGithubLogin, // ✅ for colleges
 } = apiService;

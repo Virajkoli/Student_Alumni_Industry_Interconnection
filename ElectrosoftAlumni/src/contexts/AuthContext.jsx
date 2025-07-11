@@ -318,6 +318,94 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  //student registration with GitHub
+
+  const registerWithGitHub = async (githubData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.githubRegister(githubData); // Student registration
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        return {
+          success: false,
+          error: response.message || "GitHub student registration failed",
+        };
+      }
+    } catch (error) {
+      console.error("GitHub student registration error:", error);
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // student login with GitHub
+
+  const loginWithGitHub = async (githubData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.githubLogin(githubData); // Student login
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        return {
+          success: false,
+          error: response.message || "GitHub student login failed",
+        };
+      }
+    } catch (error) {
+      console.error("GitHub student login error:", error);
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const registerCollegeWithGitHub = async (githubData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.collegeGithubRegister(githubData); // College registration
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        return {
+          success: false,
+          error: response.message || "GitHub college registration failed",
+        };
+      }
+    } catch (error) {
+      console.error("GitHub college registration error:", error);
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loginCollegeWithGitHub = async (githubData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiService.collegeGithubLogin(githubData); // College login
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        return { success: true, user: response.data.user };
+      } else {
+        return {
+          success: false,
+          error: response.message || "GitHub college login failed",
+        };
+      }
+    } catch (error) {
+      console.error("GitHub college login error:", error);
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value = {
     isAuthenticated,
     isLoading,
@@ -332,6 +420,10 @@ export const AuthProvider = ({ children }) => {
     loginCollegeWithGoogle,
     registerWithGoogle,
     registerCollegeWithGoogle,
+    registerWithGitHub,
+    loginWithGitHub,
+    registerCollegeWithGitHub,
+    loginCollegeWithGitHub,
     checkAuthStatus,
   };
 

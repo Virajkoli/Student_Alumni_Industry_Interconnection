@@ -45,7 +45,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(50),
         allowNull: true,
         validate: {
-          isIn: [["Computer", "Electronics", "Electrical", "Other"]],
+          isIn: [["Technology","Business", "Healthcare", "Education", "Engineering","Other"]],
         },
       },
       other_field: {

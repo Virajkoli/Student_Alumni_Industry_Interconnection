@@ -253,10 +253,10 @@ export default function CompleteGoogleSignup() {
                       }}
                     >
                       <option value="" disabled>Choose your role</option>
-                      <option value="student">🎓 Student</option>
-                      <option value="college">🏫 College</option>
-                      <option value="industry">🏢 Industry</option>
-                      <option value="startup">🚀 Startup</option>
+                      <option value="student"> Student</option>
+                      <option value="college"> College</option>
+                      <option value="industry">Industry</option>
+                      <option value="startup"> Startup</option>
                     </select>
                   </div>
                 </div>
@@ -270,10 +270,10 @@ export default function CompleteGoogleSignup() {
                       "bg-orange-100 text-orange-700"
                     }`}>
                       <span className="mr-1">
-                        {formData.role === "student" && "🎓"}
-                        {formData.role === "college" && "🏫"}
-                        {formData.role === "industry" && "🏢"}
-                        {formData.role === "startup" && "🚀"}
+                        {formData.role === "student"  }
+                        {formData.role === "college" }
+                        {formData.role === "industry" }
+                        {formData.role === "startup" }
                       </span>
                       <span className="capitalize">{formData.role}</span>
                     </div>
@@ -371,12 +371,12 @@ export default function CompleteGoogleSignup() {
                             }}
                           >
                             <option value="">Select your field of interest</option>
-                            <option value="Technology">💻 Technology</option>
-                            <option value="Business">💼 Business</option>
-                            <option value="Healthcare">🏥 Healthcare</option>
-                            <option value="Education">📚 Education</option>
-                            <option value="Engineering">⚙️ Engineering</option>
-                            <option value="Other">🔍 Other</option>
+                            <option value="Technology"> Technology</option>
+                            <option value="Business">Business</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Education">Education</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Other">Other</option>
                           </select>
                         </div>
                       </div>

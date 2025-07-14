@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Code } from "lucide-react";
-import { studentAPI } from "../../../utils/apiService";
+import { studentAPI } from "../../../services/apiService";
 
 const SkillsSection = ({ skills = [], onSkillsUpdate, studentId }) => {
   const [showSkillModal, setShowSkillModal] = useState(false);

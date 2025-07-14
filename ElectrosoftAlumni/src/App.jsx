@@ -1,8 +1,14 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Layout } from "./components/layout";
 import { ProtectedRoute, PublicRoute, AuthLayout } from "./components/auth";
+import RootRoute from "./components/auth/RootRoute";
 import Home from "./pages/Home";
 
 // Profile Pages
@@ -33,7 +39,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          { /* Public Routes - Only accessible when NOT logged in */ }
+          {/* Public Routes - Only accessible when NOT logged in */}
           <Route
             path="/auth/login"
             element={
@@ -105,17 +111,8 @@ function App() {
             }
           />
 
-          {/* Protected Routes - Only accessible when logged in */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Home />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
+          {/* Root Route - Handles authentication redirect */}
+          <Route path="/" element={<RootRoute />} />
 
           {/* Role-specific Dashboard Routes */}
           <Route
@@ -262,6 +259,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Catch-all route - redirect to login if not authenticated */}
+          <Route path="*" element={<Navigate to="/auth/login" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

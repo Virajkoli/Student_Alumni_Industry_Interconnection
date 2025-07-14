@@ -13,7 +13,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import apiService from "../../utils/apiService";
+import apiService from "../../services/apiService";
 import { IoIosSearch } from "react-icons/io";
 
 const Navbar = () => {

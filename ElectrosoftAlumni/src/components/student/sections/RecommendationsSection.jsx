@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, MessageCircle, Trash2 } from "lucide-react";
-import { studentAPI } from "../../../utils/apiService";
+import { studentAPI } from "../../../services/apiService";
 
 const RecommendationsSection = ({
   recommendations = [],

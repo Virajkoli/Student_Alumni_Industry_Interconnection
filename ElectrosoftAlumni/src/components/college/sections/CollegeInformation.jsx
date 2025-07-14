@@ -20,11 +20,16 @@ import {
   BookOpen,
   Award,
 } from "lucide-react";
+import { useAuth } from "../../../contexts/AuthContext";
+import apiService from "../../../services/apiService";
 
 const CollegeInformation = () => {
+  const { user } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditLocationsModalOpen, setIsEditLocationsModalOpen] =
     useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fix leaflet default markers
   useEffect(() => {
@@ -39,90 +44,131 @@ const CollegeInformation = () => {
     });
   }, []);
 
-  const [collegeData, setCollegeData] = useState({
-    overview:
-      "A premier institution dedicated to excellence in education, research, and innovation. Our college fosters a vibrant learning environment that prepares students for successful careers and meaningful contributions to society. With world-class faculty, state-of-the-art facilities, and a strong commitment to academic excellence, we provide students with the knowledge, skills, and experiences needed to thrive in their chosen fields.",
-    website: "https://mycollege.edu/academics",
-    verified: true,
-    verifiedDate: "January 15, 2020",
-    establishmentYear: "1958",
-    location: "Kanpur, Uttar Pradesh, India",
+  // Default college data structure
+  const getDefaultCollegeData = () => ({
+    overview: "",
+    website: "",
+    verified: false,
+    verifiedDate: null,
+    establishmentYear: "",
+    location: "",
     collegeType: "Public University",
-    totalStudents: "15,000+ students",
-    faculty: "800+ faculty members",
-    accreditation: "NAAC A++ Grade",
-    nirfRank: "National Ranking: 45",
-    specialties: [
-      "Engineering",
-      "Computer Science",
-      "Management",
-      "Medicine",
-      "Law",
-      "Arts & Sciences",
-      "Research",
-      "Innovation",
-      "Industry Partnerships",
-      "Placements",
-    ],
-    customFields: [], // Array of custom fields added by user
-    campuses: [
-      {
-        name: "Main Campus",
-        address: "Kanpur, Uttar Pradesh - 200076, India",
-        type: "Main Campus",
-        students: "10,000+",
-        coordinates: [19.1136, 72.8697], 
-        dean: "Dr. Rajesh Sharma",
-        contact: {
-          phone: "+91 22 2673 0000",
-          email: "main@mycollege.edu",
-        },
-        image:
-          "https://images.unsplash.com/photo-1562774053-701939374585?w=200&h=150&fit=crop",
-        customFields: [],
-      },
-      {
-        name: "Engineering Campus",
-        address: "Mirzapur, Uttar Pradesh - 200050, India",
-        type: "Specialized Campus",
-        students: "3,500+",
-        coordinates: [19.1197, 72.9056], 
-        dean: "Dr. Priya Patel",
-        contact: {
-          phone: "+91 22 2576 7000",
-          email: "engineering@mycollege.edu",
-        },
-        image:
-          "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=200&h=150&fit=crop",
-        customFields: [],
-      },
-      {
-        name: "Medical Campus",
-        address: "Jaunpur, Uttar Pradesh - 200060, India",
-        type: "Medical Campus",
-        students: "1,500+",
-        coordinates: [19.0596, 72.8295], 
-        dean: "Dr. Amit Desai",
-        contact: {
-          phone: "+91 22 2640 5000",
-          email: "medical@mycollege.edu",
-        },
-        image:
-          "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=200&h=150&fit=crop",
-        customFields: [],
-      },
-    ],
+    totalStudents: "",
+    faculty: "",
+    accreditation: "",
+    nirfRank: "",
+    specialties: [],
+    customFields: [],
+    campuses: [],
   });
-  const [editData, setEditData] = useState({ ...collegeData });
+
+  const [collegeData, setCollegeData] = useState(getDefaultCollegeData());
+  const [editData, setEditData] = useState(getDefaultCollegeData());
+
+  // Load college data from backend
+  useEffect(() => {
+    const loadCollegeData = async () => {
+      if (!user || user.role !== "college") {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        console.log("🏫 Loading college data for user:", user.id);
+        const response = await apiService.getCollegeInformation(user.id);
+
+        if (response.success) {
+          console.log("✅ College data loaded:", response.data);
+          setCollegeData(response.data);
+        } else {
+          console.log("⚠️ No college data found, using defaults");
+          // Keep default data if no data found
+        }
+      } catch (error) {
+        console.error("❌ Error loading college data:", error);
+        setError("Failed to load college information. Please try again.");
+        // Keep default data on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCollegeData();
+  }, [user]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div
+        className="p-6 max-w-4xl mx-auto"
+        style={{ backgroundColor: "#F7FAFC" }}
+      >
+        <div className="flex justify-center items-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading college information...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div
+        className="p-6 max-w-4xl mx-auto"
+        style={{ backgroundColor: "#F7FAFC" }}
+      >
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleEditClick = () => {
     setEditData({ ...collegeData });
     setIsEditModalOpen(true);
   };
 
-  const handleSaveAbout = () => {
-    setCollegeData({ ...editData });
-    setIsEditModalOpen(false);
+  const handleSaveAbout = async () => {
+    if (!user || user.role !== "college") {
+      setError("Authentication required");
+      return;
+    }
+
+    try {
+      console.log("💾 Saving college information...", editData);
+
+      const response = await apiService.updateCollegeInformation(
+        user.id,
+        editData
+      );
+
+      if (response.success) {
+        console.log("✅ College information saved successfully");
+        setCollegeData({ ...editData });
+        setIsEditModalOpen(false);
+
+        // Show success message
+        // You can add a toast notification here if available
+      } else {
+        throw new Error(response.message || "Failed to save");
+      }
+    } catch (error) {
+      console.error("❌ Error saving college information:", error);
+      setError("Failed to save college information. Please try again.");
+    }
   };
 
   const handleCancelEdit = () => {
@@ -146,9 +192,34 @@ const CollegeInformation = () => {
     setIsEditLocationsModalOpen(true);
   };
 
-  const handleSaveCampuses = () => {
-    setCollegeData({ ...editData });
-    setIsEditLocationsModalOpen(false);
+  const handleSaveCampuses = async () => {
+    if (!user || user.role !== "college") {
+      setError("Authentication required");
+      return;
+    }
+
+    try {
+      console.log("💾 Saving college campuses...", editData.campuses);
+
+      const response = await apiService.updateCollegeCampuses(
+        user.id,
+        editData.campuses
+      );
+
+      if (response.success) {
+        console.log("✅ College campuses saved successfully");
+        setCollegeData({ ...editData });
+        setIsEditLocationsModalOpen(false);
+
+        // Show success message
+        // You can add a toast notification here if available
+      } else {
+        throw new Error(response.message || "Failed to save");
+      }
+    } catch (error) {
+      console.error("❌ Error saving college campuses:", error);
+      setError("Failed to save campus information. Please try again.");
+    }
   };
 
   const handleCancelCampusesEdit = () => {
@@ -205,7 +276,7 @@ const CollegeInformation = () => {
           },
           image:
             "https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=300&fit=crop",
-          customFields: [], // Array of custom fields for each campus
+          customFields: {}, // Object instead of array for custom fields
         },
       ],
     }));
@@ -253,10 +324,10 @@ const CollegeInformation = () => {
         i === campusIndex
           ? {
               ...campus,
-              customFields: [
-                ...(campus.customFields || []),
-                { id: Date.now(), label: "", value: "" },
-              ],
+              customFields: {
+                ...(campus.customFields || {}),
+                [`field_${Date.now()}`]: "",
+              },
             }
           : campus
       ),
@@ -265,53 +336,83 @@ const CollegeInformation = () => {
 
   const handleCampusCustomFieldChange = (
     campusIndex,
-    fieldId,
-    property,
+    fieldKey,
+    newKey,
     value
   ) => {
     setEditData((prev) => ({
       ...prev,
-      campuses: prev.campuses.map((campus, i) =>
-        i === campusIndex
-          ? {
-              ...campus,
-              customFields: campus.customFields.map((field) =>
-                field.id === fieldId ? { ...field, [property]: value } : field
-              ),
-            }
-          : campus
-      ),
+      campuses: prev.campuses.map((campus, i) => {
+        if (i === campusIndex) {
+          const updatedFields = { ...(campus.customFields || {}) };
+          if (newKey && newKey !== fieldKey) {
+            // Key changed, delete old key and add new one
+            delete updatedFields[fieldKey];
+            updatedFields[newKey] = value;
+          } else {
+            // Just update value
+            updatedFields[fieldKey] = value;
+          }
+          return {
+            ...campus,
+            customFields: updatedFields,
+          };
+        }
+        return campus;
+      }),
     }));
   };
 
-  const handleRemoveCampusCustomField = (campusIndex, fieldId) => {
+  const handleRemoveCampusCustomField = (campusIndex, fieldKey) => {
     setEditData((prev) => ({
       ...prev,
-      campuses: prev.campuses.map((campus, i) =>
-        i === campusIndex
-          ? {
-              ...campus,
-              customFields: campus.customFields.filter(
-                (field) => field.id !== fieldId
-              ),
-            }
-          : campus
-      ),
+      campuses: prev.campuses.map((campus, i) => {
+        if (i === campusIndex) {
+          const updatedFields = { ...(campus.customFields || {}) };
+          delete updatedFields[fieldKey];
+          return {
+            ...campus,
+            customFields: updatedFields,
+          };
+        }
+        return campus;
+      }),
     }));
   };
 
   return (
     <>
-      <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: '#F7FAFC' }}>
+      <div
+        className="p-6 max-w-4xl mx-auto"
+        style={{ backgroundColor: "#F7FAFC" }}
+      >
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-800">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="mt-2 text-sm text-red-600 hover:text-red-700 underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* About Section */}
-        <div className="rounded-lg mb-6" style={{ backgroundColor: '#FFFFFF' }}>
+        <div className="rounded-lg mb-6" style={{ backgroundColor: "#FFFFFF" }}>
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
-            <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>About</h2>
+          <div
+            className="flex items-center justify-between p-6 border-b"
+            style={{ borderColor: "#DCE8F2" }}
+          >
+            <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+              About
+            </h2>
             <button
               onClick={handleEditClick}
               className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
-              style={{ color: '#6EA9C8' }}
+              style={{ color: "#6EA9C8" }}
               title="Edit about section"
             >
               <Edit className="w-5 h-5" />
@@ -319,40 +420,52 @@ const CollegeInformation = () => {
           </div>
 
           <div className="p-6">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: '#1F2D3D' }}>
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{ color: "#1F2D3D" }}
+            >
               Overview
             </h3>
-            <p className="leading-relaxed mb-6" style={{ color: '#4A5568' }}>
-              {collegeData.overview}
+            <p className="leading-relaxed mb-6" style={{ color: "#4A5568" }}>
+              {collegeData.overview ||
+                "No overview available. Click edit to add college information."}
             </p>
 
             {/* Website */}
-            <div className="mb-6">
-              <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
-                Website
-              </h4>
-              <a
-                href={collegeData.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline flex items-center gap-1 transition-colors"
-                style={{ color: '#6EA9C8' }}
-              >
-                {collegeData.website}
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
+            {collegeData.website && (
+              <div className="mb-6">
+                <h4
+                  className="text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
+                  Website
+                </h4>
+                <a
+                  href={collegeData.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline flex items-center gap-1 transition-colors"
+                  style={{ color: "#6EA9C8" }}
+                >
+                  {collegeData.website}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            )}
 
             {/* Verified Page */}
             {collegeData.verified && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-sm font-medium" style={{ color: '#1F2D3D' }}>
+                  <h4
+                    className="text-sm font-medium"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Verified institution
                   </h4>
-                  <Shield className="w-4 h-4" style={{ color: '#6EA9C8' }} />
+                  <Shield className="w-4 h-4" style={{ color: "#6EA9C8" }} />
                 </div>
-                <p className="text-sm" style={{ color: '#4A5568' }}>
+                <p className="text-sm" style={{ color: "#4A5568" }}>
                   {collegeData.verifiedDate}
                 </p>
               </div>
@@ -361,96 +474,119 @@ const CollegeInformation = () => {
             {/* College Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Establishment Year */}
-              <div>
-                <h4 className="text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
-                  Established
-                </h4>
-                <p className="text-sm flex items-center gap-1" style={{ color: '#4A5568' }}>
-                  <Calendar className="w-4 h-4" />
-                  {collegeData.establishmentYear}
-                </p>
-              </div>
+              {collegeData.establishmentYear && (
+                <div>
+                  <h4
+                    className="text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
+                    Established
+                  </h4>
+                  <p
+                    className="text-sm flex items-center gap-1"
+                    style={{ color: "#4A5568" }}
+                  >
+                    <Calendar className="w-4 h-4" />
+                    {collegeData.establishmentYear}
+                  </p>
+                </div>
+              )}
 
               {/* Location */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
-                  Location
-                </h4>
-                <p className="text-sm text-gray-700 flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  {collegeData.location}
-                </p>
-              </div>
+              {collegeData.location && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-1">
+                    Location
+                  </h4>
+                  <p className="text-sm text-gray-700 flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    {collegeData.location}
+                  </p>
+                </div>
+              )}
 
               {/* College Type */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
-                  College Type
-                </h4>
-                <p className="text-sm text-gray-700 flex items-center gap-1">
-                  <Building className="w-4 h-4" />
-                  {collegeData.collegeType}
-                </p>
-              </div>
+              {collegeData.collegeType && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-1">
+                    College Type
+                  </h4>
+                  <p className="text-sm text-gray-700 flex items-center gap-1">
+                    <Building className="w-4 h-4" />
+                    {collegeData.collegeType}
+                  </p>
+                </div>
+              )}
 
               {/* Total Students */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
-                  Students
-                </h4>
-                <p className="text-sm text-gray-700 flex items-center gap-1">
-                  <Users className="w-4 h-4" />
-                  {collegeData.totalStudents}
-                </p>
-              </div>
+              {collegeData.totalStudents && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-1">
+                    Students
+                  </h4>
+                  <p className="text-sm text-gray-700 flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    {collegeData.totalStudents}
+                  </p>
+                </div>
+              )}
 
               {/* Faculty */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
-                  Faculty
-                </h4>
-                <p className="text-sm text-gray-700 flex items-center gap-1">
-                  <GraduationCap className="w-4 h-4" />
-                  {collegeData.faculty}
-                </p>
-              </div>
+              {collegeData.faculty && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-1">
+                    Faculty
+                  </h4>
+                  <p className="text-sm text-gray-700 flex items-center gap-1">
+                    <GraduationCap className="w-4 h-4" />
+                    {collegeData.faculty}
+                  </p>
+                </div>
+              )}
 
               {/* Accreditation */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
-                  Accreditation
-                </h4>
-                <p className="text-sm text-gray-700 flex items-center gap-1">
-                  <Award className="w-4 h-4" />
-                  {collegeData.accreditation}
-                </p>
-              </div>
+              {collegeData.accreditation && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-1">
+                    Accreditation
+                  </h4>
+                  <p className="text-sm text-gray-700 flex items-center gap-1">
+                    <Award className="w-4 h-4" />
+                    {collegeData.accreditation}
+                  </p>
+                </div>
+              )}
 
               {/* NIRF Rank */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
-                  NIRF Ranking
-                </h4>
-                <p className="text-sm text-gray-700 flex items-center gap-1">
-                  <TrendingUp className="w-4 h-4" />
-                  {collegeData.nirfRank}
-                </p>
-              </div>
+              {collegeData.nirfRank && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-1">
+                    NIRF Ranking
+                  </h4>
+                  <p className="text-sm text-gray-700 flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4" />
+                    {collegeData.nirfRank}
+                  </p>
+                </div>
+              )}
 
               {/* Specialties */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">
-                  Academic Programs
-                </h4>
-                <div className="flex flex-wrap gap-1">
-                  {collegeData.specialties.map((specialty, index) => (
-                    <span key={index} className="text-sm text-gray-700">
-                      {specialty}
-                      {index < collegeData.specialties.length - 1 && ", "}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              {collegeData.specialties &&
+                collegeData.specialties.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900 mb-1">
+                      Academic Programs
+                    </h4>
+                    <div className="flex flex-wrap gap-1">
+                      {collegeData.specialties.map((specialty, index) => (
+                        <span key={index} className="text-sm text-gray-700">
+                          {specialty}
+                          {index < collegeData.specialties.length - 1 && ", "}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
             </div>
 
             {/* Custom Fields Display */}
@@ -492,51 +628,73 @@ const CollegeInformation = () => {
 
           {/* Campuses List */}
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {collegeData.campuses.map((campus, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg p-4"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-medium text-gray-900">{campus.name}</h3>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                      {campus.type}
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2 mb-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-600">{campus.address}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-gray-400" />
-                    <p className="text-sm text-gray-600">
-                      {campus.students} students
-                    </p>
-                  </div>
-
-                  {/* Display Custom Fields */}
-                  {campus.customFields && campus.customFields.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-100">
-                      {campus.customFields.map((field, fieldIndex) => (
-                        <div
-                          key={field.id || fieldIndex}
-                          className="flex items-center gap-2 mb-1"
-                        >
-                          <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
-                          <span className="text-xs font-medium text-gray-700">
-                            {field.label}:
-                          </span>
-                          <span className="text-xs text-gray-600">
-                            {field.value}
-                          </span>
-                        </div>
-                      ))}
+            {collegeData.campuses && collegeData.campuses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {collegeData.campuses.map((campus, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-lg p-4"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-medium text-gray-900">
+                        {campus.name}
+                      </h3>
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        {campus.type}
+                      </span>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                    <div className="flex items-start gap-2 mb-2">
+                      <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-gray-600">{campus.address}</p>
+                    </div>
+                    {campus.students && (
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-gray-400" />
+                        <p className="text-sm text-gray-600">
+                          {campus.students} students
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Display Custom Fields */}
+                    {campus.customFields &&
+                      Object.keys(campus.customFields).length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-gray-100">
+                          {Object.entries(campus.customFields).map(
+                            ([key, value], fieldIndex) => (
+                              <div
+                                key={fieldIndex}
+                                className="flex items-center gap-2 mb-1"
+                              >
+                                <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                                <span className="text-xs font-medium text-gray-700">
+                                  {key}:
+                                </span>
+                                <span className="text-xs text-gray-600">
+                                  {value}
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Building className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">
+                  No campuses information available
+                </p>
+                <button
+                  onClick={handleEditCampusesClick}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Add Campus Information
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -554,100 +712,129 @@ const CollegeInformation = () => {
 
           {/* Map Container */}
           <div className="p-6">
-            <div className="h-96 rounded-lg overflow-hidden border border-gray-200">
-              <MapContainer
-                center={[19.076, 72.8777]} // Center on Mumbai, India
-                zoom={10}
-                style={{ height: "100%", width: "100%" }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {collegeData.campuses.map((campus, index) => (
-                  <Marker key={index} position={campus.coordinates}>
-                    <Popup
-                      maxWidth={220}
-                      minWidth={220}
-                      className="compact-popup"
-                    >
-                      <div className="p-1">
-                        <div className="flex items-start gap-2 mb-2">
-                          <img
-                            src={campus.image}
-                            alt={campus.name}
-                            className="w-12 h-12 rounded object-cover flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-gray-900 text-sm truncate">
-                              {campus.name}
-                            </h3>
-                            <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
-                              {campus.type}
-                            </span>
-                          </div>
-                        </div>
+            {collegeData.campuses && collegeData.campuses.length > 0 ? (
+              <>
+                <div className="h-96 rounded-lg overflow-hidden border border-gray-200">
+                  <MapContainer
+                    center={
+                      collegeData.campuses[0]?.coordinates || [19.076, 72.8777]
+                    } // Center on first campus or Mumbai, India
+                    zoom={10}
+                    style={{ height: "100%", width: "100%" }}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {collegeData.campuses.map(
+                      (campus, index) =>
+                        campus.coordinates &&
+                        campus.coordinates.length === 2 && (
+                          <Marker key={index} position={campus.coordinates}>
+                            <Popup
+                              maxWidth={220}
+                              minWidth={220}
+                              className="compact-popup"
+                            >
+                              <div className="p-1">
+                                <div className="flex items-start gap-2 mb-2">
+                                  <img
+                                    src={
+                                      campus.image ||
+                                      "https://images.unsplash.com/photo-1562774053-701939374585?w=200&h=150&fit=crop"
+                                    }
+                                    alt={campus.name}
+                                    className="w-12 h-12 rounded object-cover flex-shrink-0"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="font-medium text-gray-900 text-sm truncate">
+                                      {campus.name}
+                                    </h3>
+                                    <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">
+                                      {campus.type}
+                                    </span>
+                                  </div>
+                                </div>
 
-                        <div className="space-y-1 text-xs">
-                          <div className="flex items-start gap-1">
-                            <MapPin className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <p className="text-gray-600 leading-tight">
-                              {campus.address}
-                            </p>
-                          </div>
+                                <div className="space-y-1 text-xs">
+                                  <div className="flex items-start gap-1">
+                                    <MapPin className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                                    <p className="text-gray-600 leading-tight">
+                                      {campus.address}
+                                    </p>
+                                  </div>
 
-                          <div className="flex items-center gap-1">
-                            <Users className="w-3 h-3 text-gray-400" />
-                            <p className="text-gray-600">
-                              {campus.students} students
-                            </p>
-                          </div>
+                                  {campus.students && (
+                                    <div className="flex items-center gap-1">
+                                      <Users className="w-3 h-3 text-gray-400" />
+                                      <p className="text-gray-600">
+                                        {campus.students} students
+                                      </p>
+                                    </div>
+                                  )}
 
-                          <div className="border-t pt-1 mt-1">
-                            <p className="font-medium text-gray-900 text-xs">
-                              Dean: {campus.dean}
-                            </p>
-                          </div>
+                                  {campus.dean && (
+                                    <div className="border-t pt-1 mt-1">
+                                      <p className="font-medium text-gray-900 text-xs">
+                                        Dean: {campus.dean}
+                                      </p>
+                                    </div>
+                                  )}
 
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-1">
-                              <Phone className="w-3 h-3 text-gray-400" />
-                              <a
-                                href={`tel:${campus.contact.phone}`}
-                                className="text-blue-600 hover:text-blue-700 text-xs truncate"
-                              >
-                                {campus.contact.phone}
-                              </a>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Mail className="w-3 h-3 text-gray-400" />
-                              <a
-                                href={`mailto:${campus.contact.email}`}
-                                className="text-blue-600 hover:text-blue-700 text-xs truncate"
-                              >
-                                {campus.contact.email}
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
-            </div>
+                                  <div className="space-y-0.5">
+                                    {campus.contact?.phone && (
+                                      <div className="flex items-center gap-1">
+                                        <Phone className="w-3 h-3 text-gray-400" />
+                                        <a
+                                          href={`tel:${campus.contact.phone}`}
+                                          className="text-blue-600 hover:text-blue-700 text-xs truncate"
+                                        >
+                                          {campus.contact.phone}
+                                        </a>
+                                      </div>
+                                    )}
+                                    {campus.contact?.email && (
+                                      <div className="flex items-center gap-1">
+                                        <Mail className="w-3 h-3 text-gray-400" />
+                                        <a
+                                          href={`mailto:${campus.contact.email}`}
+                                          className="text-blue-600 hover:text-blue-700 text-xs truncate"
+                                        >
+                                          {campus.contact.email}
+                                        </a>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </Popup>
+                          </Marker>
+                        )
+                    )}
+                  </MapContainer>
+                </div>
 
-            {/* Map Legend */}
-            <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span>Campus Locations</span>
+                {/* Map Legend */}
+                <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span>Campus Locations</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span>Click markers for campus details</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <Globe className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No campus locations to display</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Add campus information to see them on the map
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-400" />
-                <span>Click markers for campus details</span>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -1202,60 +1389,62 @@ const CollegeInformation = () => {
                       </div>
 
                       {campus.customFields &&
-                        campus.customFields.length > 0 && (
+                        Object.keys(campus.customFields).length > 0 && (
                           <div className="space-y-2">
-                            {campus.customFields.map((field) => (
-                              <div
-                                key={field.id}
-                                className="flex gap-2 items-start"
-                              >
-                                <div className="flex-1">
-                                  <input
-                                    type="text"
-                                    value={field.label}
-                                    onChange={(e) =>
-                                      handleCampusCustomFieldChange(
-                                        index,
-                                        field.id,
-                                        "label",
-                                        e.target.value
-                                      )
-                                    }
-                                    placeholder="Label (e.g., Library, Sports Complex)"
-                                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                  />
-                                </div>
-                                <div className="flex-1">
-                                  <input
-                                    type="text"
-                                    value={field.value}
-                                    onChange={(e) =>
-                                      handleCampusCustomFieldChange(
-                                        index,
-                                        field.id,
-                                        "value",
-                                        e.target.value
-                                      )
-                                    }
-                                    placeholder="Value (e.g., 24/7 Access, Available)"
-                                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                  />
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleRemoveCampusCustomField(
-                                      index,
-                                      field.id
-                                    )
-                                  }
-                                  className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
-                                  title="Remove field"
+                            {Object.entries(campus.customFields).map(
+                              ([fieldKey, fieldValue]) => (
+                                <div
+                                  key={fieldKey}
+                                  className="flex gap-2 items-start"
                                 >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </div>
-                            ))}
+                                  <div className="flex-1">
+                                    <input
+                                      type="text"
+                                      value={fieldKey}
+                                      onChange={(e) =>
+                                        handleCampusCustomFieldChange(
+                                          index,
+                                          fieldKey,
+                                          e.target.value,
+                                          fieldValue
+                                        )
+                                      }
+                                      placeholder="Label (e.g., Library, Sports Complex)"
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <input
+                                      type="text"
+                                      value={fieldValue}
+                                      onChange={(e) =>
+                                        handleCampusCustomFieldChange(
+                                          index,
+                                          fieldKey,
+                                          fieldKey,
+                                          e.target.value
+                                        )
+                                      }
+                                      placeholder="Value (e.g., 24/7 Access, Available)"
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    />
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleRemoveCampusCustomField(
+                                        index,
+                                        fieldKey
+                                      )
+                                    }
+                                    className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                                    title="Remove field"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              )
+                            )}
                           </div>
                         )}
                     </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import apiService from "../../utils/apiService";
+import apiService from "../../services/apiService";
 import GoogleSignInButton from "../../components/GoogleSignInButton";
 import GitHubSignInButton from "../../components/GitHubSignInButton";
 import "./LoginPage.css";

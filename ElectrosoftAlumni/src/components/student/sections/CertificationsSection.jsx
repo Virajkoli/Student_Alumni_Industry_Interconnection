@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Award, Upload, FileText } from "lucide-react";
-import { studentAPI } from "../../../utils/apiService";
+import { studentAPI } from "../../../services/apiService";
 
 const CertificationsSection = ({
   certifications = [],

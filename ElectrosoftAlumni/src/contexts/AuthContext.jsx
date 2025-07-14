@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import apiService from "../utils/apiService";
-import googleAuthService from "../utils/googleAuth";
+import apiService from "../services/apiService";
 
 const AuthContext = createContext();
 
@@ -13,392 +12,489 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Initialize auth state
   useEffect(() => {
-    // Check for token in localStorage on app startup
-    checkAuthStatus();
+    initializeAuth();
   }, []);
 
-  const checkAuthStatus = async () => {
+  const initializeAuth = async () => {
     try {
-      const token = localStorage.getItem("authToken");
-      const userData = localStorage.getItem("userData");
+      if (apiService.isAuthenticated()) {
+        await getCurrentUser();
+      }
+    } catch (error) {
+      console.error("Auth initialization error:", error);
+      clearAuthState();
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      console.log("🔍 Checking auth status...", {
-        hasToken: !!token,
-        hasUserData: !!userData,
-        tokenLength: token?.length,
+  const getCurrentUser = async () => {
+    try {
+      const response = await apiService.getCurrentUser();
+      setUser(response.user);
+      setError(null);
+      return response;
+    } catch (error) {
+      console.error("Get current user error:", error);
+      clearAuthState();
+      throw error;
+    }
+  };
+
+  const clearAuthState = () => {
+    setUser(null);
+    setError(null);
+  };
+
+  // Registration methods
+  const registerStudent = async (userData) => {
+    try {
+      setError(null);
+      const response = await apiService.register({
+        ...userData,
+        role: "student",
       });
-
-      if (token && userData) {
-        // Verify token with backend
-        try {
-          console.log("🔄 Verifying token with backend...");
-          const response = await apiService.getCurrentUser();
-          console.log("✅ Backend verification response:", response);
-
-          if (response.success) {
-            setIsAuthenticated(true);
-            setUser(response.data.user);
-            // Update stored user data
-            localStorage.setItem(
-              "userData",
-              JSON.stringify(response.data.user)
-            );
-            console.log(
-              "✅ User authenticated successfully",
-              response.data.user
-            );
-          } else {
-            throw new Error("Invalid token");
-          }
-        } catch (apiError) {
-          console.error("❌ Token verification failed:", apiError);
-          // Token is invalid, clear storage
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("userData");
-          setIsAuthenticated(false);
-          setUser(null);
-        }
-      } else {
-        console.log("❌ No token or user data found");
-        setIsAuthenticated(false);
-        setUser(null);
-      }
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("❌ Error checking auth status:", error);
-      setIsAuthenticated(false);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = (userData, token) => {
-    // Store token and user data in localStorage
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("userData", JSON.stringify(userData));
-
-    setIsAuthenticated(true);
-    setUser(userData);
-  };
-
-  const logout = async () => {
-    try {
-      // Call backend logout to clear refresh token cookie
-      await apiService.logout();
-    } catch (error) {
-      console.error("Error during logout:", error);
-    } finally {
-      // Clear token and user data from localStorage
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("userData");
-
-      setIsAuthenticated(false);
-      setUser(null);
-    }
-  };
-
-  // Register function
-  const register = async (userData) => {
-    try {
-      setIsLoading(true);
-
-      // Determine the registration endpoint based on role
-      const response = await apiService.register(userData);
-
-      if (response.success) {
-        // Auto-login after successful registration
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        throw new Error(response.message || "Registration failed");
-      }
-    } catch (error) {
-      console.error("Registration error:", error);
+      setError(error.message);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // Login function
-  const loginUser = async (credentials) => {
+  const registerCollege = async (userData) => {
     try {
-      setIsLoading(true);
-      const response = await apiService.login(credentials);
-
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        throw new Error(response.message || "Login failed");
-      }
+      setError(null);
+      const response = await apiService.register({
+        ...userData,
+        role: "college",
+      });
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("Login error:", error);
+      setError(error.message);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // College-specific login function
+  const registerStartup = async (userData) => {
+    try {
+      setError(null);
+      const response = await apiService.register({
+        ...userData,
+        role: "startup",
+      });
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  const registerIndustry = async (userData) => {
+    try {
+      setError(null);
+      const response = await apiService.register({
+        ...userData,
+        role: "industry",
+      });
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  // Generic register method
+  const register = async (userData, role) => {
+    try {
+      setError(null);
+      const response = await apiService.register({ ...userData, role });
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  // Login methods
+  const loginStudent = async (credentials) => {
+    try {
+      setError(null);
+      const response = await apiService.login({
+        ...credentials,
+        role: "student",
+      });
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
   const loginCollege = async (credentials) => {
     try {
-      setIsLoading(true);
-      const response = await apiService.loginCollege(credentials);
-
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        throw new Error(response.message || "College login failed");
-      }
-    } catch (error) {
-      console.error("College login error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // College-specific register function
-  const registerCollege = async (collegeData) => {
-    try {
-      setIsLoading(true);
-      const response = await apiService.registerCollege(collegeData);
-
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        throw new Error(response.message || "College registration failed");
-      }
-    } catch (error) {
-      console.error("College registration error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Google Login function
-  const loginWithGoogle = async (googleUser) => {
-    try {
-      setIsLoading(true);
-
-      // Send Google user info to backend for authentication
-      const response = await apiService.googleLogin({
-        google_id: googleUser.id,
-        email: googleUser.email,
-        firstName: googleUser.firstName,
-        lastName: googleUser.lastName,
-        name: googleUser.name,
-        profile_picture: googleUser.imageUrl,
-        accessToken: googleUser.accessToken,
+      setError(null);
+      const response = await apiService.login({
+        ...credentials,
+        role: "college",
       });
-
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        throw new Error(response.message || "Google login failed");
-      }
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("Google login error:", error);
+      setError(error.message);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // College-specific Google login function
-  const loginCollegeWithGoogle = async (googleUser) => {
+  const loginStartup = async (credentials) => {
     try {
-      setIsLoading(true);
-
-      // Send Google user info to backend for college authentication
-      const response = await apiService.collegeGoogleLogin({
-        google_id: googleUser.id,
-        email: googleUser.email,
-        firstName: googleUser.firstName,
-        lastName: googleUser.lastName,
-        name: googleUser.name,
-        profile_picture: googleUser.imageUrl,
-        accessToken: googleUser.accessToken,
+      setError(null);
+      const response = await apiService.login({
+        ...credentials,
+        role: "startup",
       });
-
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        throw new Error(response.message || "College Google login failed");
-      }
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("College Google login error:", error);
+      setError(error.message);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // Google Registration function
-  const registerWithGoogle = async (googleUser) => {
+  const loginIndustry = async (credentials) => {
     try {
-      setIsLoading(true);
-
-      // Send Google user info to backend for registration
-      const response = await apiService.googleRegister(googleUser);
-
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        throw new Error(response.message || "Google registration failed");
-      }
+      setError(null);
+      const response = await apiService.login({
+        ...credentials,
+        role: "industry",
+      });
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("Google registration error:", error);
+      setError(error.message);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // College-specific Google registration function
-  const registerCollegeWithGoogle = async (googleUser) => {
+  // Generic login method
+  const login = async (credentials, role) => {
     try {
-      setIsLoading(true);
-
-      // Send Google user info to backend for college registration
-      const response = await apiService.collegeGoogleRegister(googleUser);
-
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        throw new Error(
-          response.message || "College Google registration failed"
-        );
-      }
+      setError(null);
+      const response = await apiService.login({ ...credentials, role });
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("College Google registration error:", error);
+      setError(error.message);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  //student registration with GitHub
-
-  const registerWithGitHub = async (githubData) => {
+  // Google OAuth methods
+  const loginWithGoogle = async (userData) => {
     try {
-      setIsLoading(true);
-      const response = await apiService.githubRegister(githubData); // Student registration
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        return {
-          success: false,
-          error: response.message || "GitHub student registration failed",
-        };
-      }
+      setError(null);
+      // Map Google user data to expected format
+      const mappedData = {
+        email: userData.email,
+        googleId: userData.id, // Map 'id' to 'googleId'
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        profilePicture: userData.imageUrl,
+        accessToken: userData.accessToken,
+      };
+      const response = await apiService.loginWithGoogle(mappedData);
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("GitHub student registration error:", error);
-      return { success: false, error: error.message };
-    } finally {
-      setIsLoading(false);
+      setError(error.message);
+      throw error;
     }
   };
 
-  // student login with GitHub
-
-  const loginWithGitHub = async (githubData) => {
+  const registerWithGoogle = async (userData) => {
     try {
-      setIsLoading(true);
-      const response = await apiService.githubLogin(githubData); // Student login
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        return {
-          success: false,
-          error: response.message || "GitHub student login failed",
-        };
-      }
+      setError(null);
+      const response = await apiService.registerWithGoogle(userData);
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("GitHub student login error:", error);
-      return { success: false, error: error.message };
-    } finally {
-      setIsLoading(false);
+      setError(error.message);
+      throw error;
     }
   };
 
-  const registerCollegeWithGitHub = async (githubData) => {
+  const registerStudentWithGoogle = async (userData) => {
     try {
-      setIsLoading(true);
-      const response = await apiService.collegeGithubRegister(githubData); // College registration
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        return {
-          success: false,
-          error: response.message || "GitHub college registration failed",
-        };
-      }
+      setError(null);
+      const response = await apiService.registerWithGoogle({
+        ...userData,
+        role: "student",
+      });
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("GitHub college registration error:", error);
-      return { success: false, error: error.message };
-    } finally {
-      setIsLoading(false);
+      setError(error.message);
+      throw error;
     }
   };
 
-  const loginCollegeWithGitHub = async (githubData) => {
+  const registerCollegeWithGoogle = async (userData) => {
     try {
-      setIsLoading(true);
-      const response = await apiService.collegeGithubLogin(githubData); // College login
-      if (response.success) {
-        login(response.data.user, response.data.token);
-        return { success: true, user: response.data.user };
-      } else {
-        return {
-          success: false,
-          error: response.message || "GitHub college login failed",
-        };
-      }
+      setError(null);
+      const response = await apiService.registerWithGoogle({
+        ...userData,
+        role: "college",
+      });
+      setUser(response.user);
+      return response;
     } catch (error) {
-      console.error("GitHub college login error:", error);
-      return { success: false, error: error.message };
-    } finally {
-      setIsLoading(false);
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  const registerStartupWithGoogle = async (userData) => {
+    try {
+      setError(null);
+      const response = await apiService.registerWithGoogle({
+        ...userData,
+        role: "startup",
+      });
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  const registerIndustryWithGoogle = async (userData) => {
+    try {
+      setError(null);
+      const response = await apiService.registerWithGoogle({
+        ...userData,
+        role: "industry",
+      });
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  // Profile management
+  const updateProfile = async (userData) => {
+    try {
+      setError(null);
+      const response = await apiService.updateProfile(userData);
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  const changePassword = async (passwordData) => {
+    try {
+      setError(null);
+      const response = await apiService.changePassword(passwordData);
+      return response;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
+  // Logout
+  const logout = async () => {
+    try {
+      await apiService.logout();
+      clearAuthState();
+      return { success: true };
+    } catch (error) {
+      console.error("Logout error:", error);
+      clearAuthState(); // Clear state even if logout fails
+      return { success: true };
+    }
+  };
+
+  // Utility methods
+  const isAuthenticated = () => {
+    return !!user && apiService.isAuthenticated();
+  };
+
+  const isStudent = () => {
+    return user?.role === "student";
+  };
+
+  const isCollege = () => {
+    return user?.role === "college";
+  };
+
+  const isStartup = () => {
+    return user?.role === "startup";
+  };
+
+  const isIndustry = () => {
+    return user?.role === "industry";
+  };
+
+  const getUserRole = () => {
+    return user?.role;
+  };
+
+  const getUserId = () => {
+    return user?.id;
+  };
+
+  const getFullName = () => {
+    if (!user) return "";
+    return `${user.firstName || ""} ${user.lastName || ""}`.trim();
+  };
+
+  const getDisplayName = () => {
+    if (!user) return "";
+
+    // For colleges, show college name
+    if (user.role === "college") {
+      return user.name || user.collegeName || getFullName();
+    }
+
+    // For startups, show startup name
+    if (user.role === "startup") {
+      return user.startupName || getFullName();
+    }
+
+    // For industries, show company name
+    if (user.role === "industry") {
+      return user.companyName || getFullName();
+    }
+
+    // For students, show full name
+    return getFullName();
+  };
+
+  const getRoleDisplayName = () => {
+    const roleNames = {
+      student: "Student",
+      college: "College",
+      startup: "Startup",
+      industry: "Industry Professional",
+    };
+    return roleNames[user?.role] || "User";
+  };
+
+  // Backward compatibility methods
+  const loginUser = async (credentials) => {
+    // Use generic login method
+    return await login(credentials, credentials.role || "student");
+  };
+
+  const registerUser = async (userData) => {
+    // Use generic register method
+    return await register(userData, userData.role || "student");
+  };
+
+  const loginWithGitHub = async (userData) => {
+    // GitHub OAuth is not implemented yet, show error
+    throw new Error(
+      "GitHub OAuth is not implemented yet. Please use Google OAuth instead."
+    );
+  };
+
+  const registerWithGitHub = async (userData) => {
+    // GitHub OAuth is not implemented yet, show error
+    throw new Error(
+      "GitHub OAuth is not implemented yet. Please use Google OAuth instead."
+    );
+  };
+
+  const checkAuthStatus = async () => {
+    // Check if user is authenticated and get current user
+    try {
+      if (isAuthenticated()) {
+        await getCurrentUser();
+        return { success: true, user };
+      }
+      return { success: false, user: null };
+    } catch (error) {
+      return { success: false, user: null, error: error.message };
     }
   };
 
   const value = {
-    isAuthenticated,
-    isLoading,
+    // State
     user,
-    login,
-    logout,
+    loading,
+    error,
+
+    // Authentication methods
     register,
-    loginUser,
-    loginCollege,
+    registerStudent,
     registerCollege,
+    registerStartup,
+    registerIndustry,
+
+    login,
+    loginStudent,
+    loginCollege,
+    loginStartup,
+    loginIndustry,
+
+    // Google OAuth methods
     loginWithGoogle,
-    loginCollegeWithGoogle,
     registerWithGoogle,
+    registerStudentWithGoogle,
     registerCollegeWithGoogle,
-    registerWithGitHub,
+    registerStartupWithGoogle,
+    registerIndustryWithGoogle,
+
+    // Backward compatibility methods
+    loginUser,
+    registerUser,
     loginWithGitHub,
-    registerCollegeWithGitHub,
-    loginCollegeWithGitHub,
+    registerWithGitHub,
     checkAuthStatus,
+
+    // Profile management
+    updateProfile,
+    changePassword,
+    getCurrentUser,
+
+    // Logout
+    logout,
+
+    // Utility methods
+    isAuthenticated,
+    isStudent,
+    isCollege,
+    isStartup,
+    isIndustry,
+    getUserRole,
+    getUserId,
+    getFullName,
+    getDisplayName,
+    getRoleDisplayName,
+
+    // Error handling
+    setError,
+    clearError: () => setError(null),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export default AuthContext;

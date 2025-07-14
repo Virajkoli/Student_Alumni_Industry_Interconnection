@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Edit, X } from "lucide-react";
-import { studentAPI } from "../../../utils/apiService";
+import { studentAPI } from "../../../services/apiService";
 
 const AboutSection = ({ profileData, onProfileUpdate }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

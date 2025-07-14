@@ -11,7 +11,7 @@ import {
   Video,
   Loader2,
 } from "lucide-react";
-import apiService from "../../utils/apiService";
+import apiService from "../../services/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
 const FeedArea = ({ refreshTrigger, onRefreshReady }) => {

@@ -193,7 +193,7 @@ import { Link } from "react-router-dom";
 import "./Home.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "../contexts/AuthContext";
-import apiService from "../utils/apiService";
+import apiService from "../services/apiService";
 import PostCreator from "../components/student/PostCreator";
 import AllPostsFeed from "../components/common/AllPostsFeed";
 
@@ -205,6 +205,7 @@ import {
   faSchool,
   faUserGear,
   faUser,
+  faCubes,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -320,12 +321,15 @@ const Home = () => {
       console.log("🔄 fetchPosts - Starting...");
 
       const token = localStorage.getItem("authToken");
-      const response = await fetch("https://scaips-backend.onrender.com/api/posts", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://scaips-backend.onrender.com/api/posts",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch posts");
@@ -530,6 +534,11 @@ const Home = () => {
                       <li>
                         <Link to="/startup">
                           <FontAwesomeIcon icon={faRocket} /> Startup
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/projects">
+                          <FontAwesomeIcon icon={faCubes} /> Projects
                         </Link>
                       </li>
                     </>

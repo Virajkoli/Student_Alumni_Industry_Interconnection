@@ -18,7 +18,12 @@
     "troubleshoot": "node scripts/troubleshootDB.js",
     "db:reset": "npm run migrate:undo && npm run migrate && npm run seed",
     "db:users": "node scripts/viewUsers.js",
-    "db:adduser": "node scripts/addUser.js"
+    "db:adduser": "node scripts/addUser.js",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:deploy": "npx prisma migrate deploy",
+    "prisma:studio": "npx prisma studio",
+    "prisma:reset": "npx prisma migrate reset"
   },
   "keywords": [
     "express",
@@ -34,6 +39,7 @@
   "license": "MIT",
   "dependencies": {
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@prisma/client": "^5.22.0",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.30.0",
@@ -62,6 +68,7 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "nodemon": "^3.1.10",
+    "prisma": "^5.22.0",
     "supertest": "^7.1.3"
   },
   "engines": {

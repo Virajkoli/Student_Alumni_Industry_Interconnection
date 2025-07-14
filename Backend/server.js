@@ -4,7 +4,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
-const { testConnection, syncDatabase } = require("./config/database");
+const prisma = require("./config/prisma");
 require("dotenv").config();
 
 const app = express();
@@ -15,14 +15,17 @@ app.set("trust proxy", 1);
 
 // Import routes
 const authRoutes = require("./routes/auth");
-const githubAuthRoutes = require("./routes/github-auth");
-const userRoutes = require("./routes/users");
-const studentRoutes = require("./routes/students");
-const postRoutes = require("./routes/posts");
-const connectionRoutes = require("./routes/connections");
-const jobRoutes = require("./routes/jobs");
-const notificationRoutes = require("./routes/notifications");
-const collegeRoutes = require("./routes/colleges");
+const studentRoutes = require("./routes/students-new");
+const collegeRoutes = require("./routes/colleges-new");
+const startupRoutes = require("./routes/startups");
+const industryRoutes = require("./routes/industries");
+// Temporarily commented out until migrated to Prisma
+// const githubAuthRoutes = require("./routes/github-auth");
+// const userRoutes = require("./routes/users");
+const postRoutes = require("./routes/posts-new");
+// const connectionRoutes = require("./routes/connections");
+// const jobRoutes = require("./routes/jobs");
+// const notificationRoutes = require("./routes/notifications");
 
 // Import middleware
 const { errorHandler } = require("./middleware/errorHandler");
@@ -55,13 +58,13 @@ app.options(
 const limiter = rateLimit({
   windowMs:
     parseInt(process.env.RATE_LIMIT_WINDOW) * 60 * 1000 || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 500, // Increased for development
+  max: parseInt(process.env.RATE_LIMIT_MAX) || 1000, // Increased for development
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    // Skip rate limiting for OPTIONS requests (CORS preflight)
-    return req.method === "OPTIONS";
+    // Skip rate limiting for OPTIONS requests (CORS preflight) and in development
+    return req.method === "OPTIONS" || process.env.NODE_ENV === "development";
   },
 });
 app.use("/api/", limiter);
@@ -83,6 +86,11 @@ app.use(
         "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
         process.env.FRONTEND_URL, // Environment variable for production
       ].filter(Boolean);
+
+      // In development, allow all origins
+      if (process.env.NODE_ENV === "development") {
+        return callback(null, true);
+      }
 
       // Check if origin is in allowed list or matches Vercel pattern
       if (
@@ -124,123 +132,59 @@ app.get("/health", (req, res) => {
   });
 });
 
- // API routes
+// API routes
 app.use("/api/auth", authRoutes);
-// Updated: GitHub auth routes now mounted at /api/auth to match the callback URL
-app.use("/api/auth", githubAuthRoutes);
-
-app.use("/api/users", userRoutes);
 app.use("/api/students", studentRoutes);
-app.use("/api/posts", postRoutes);
-app.use("/api/connections", connectionRoutes);
-app.use("/api/jobs", jobRoutes);
-app.use("/api/notifications", notificationRoutes);
 app.use("/api/colleges", collegeRoutes);
+app.use("/api/startups", startupRoutes);
+app.use("/api/industries", industryRoutes);
+// Temporarily commented out until migrated to Prisma
+// Updated: GitHub auth routes now mounted at /api/auth to match the callback URL
+// app.use("/api/auth", githubAuthRoutes);
+// app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
+// app.use("/api/connections", connectionRoutes);
+// app.use("/api/jobs", jobRoutes);
+// app.use("/api/notifications", notificationRoutes);
 
 // Note: Media serving endpoint removed - files are now served directly from Cloudinary
-
-// Debug endpoint to list uploads directory contents
-app.get("/api/debug/uploads", (req, res) => {
-  const uploadsDir = path.join(__dirname, "uploads");
-
-  if (!fs.existsSync(uploadsDir)) {
-    return res.json({
-      exists: false,
-      message: "Uploads directory does not exist",
-      path: uploadsDir,
-    });
-  }
-
-  try {
-    const listDirectory = (dirPath, relativePath = "") => {
-      const items = fs.readdirSync(dirPath, { withFileTypes: true });
-      const result = [];
-
-      for (const item of items) {
-        const itemPath = path.join(dirPath, item.name);
-        const relativeItemPath = path.join(relativePath, item.name);
-
-        if (item.isDirectory()) {
-          result.push({
-            name: item.name,
-            type: "directory",
-            path: relativeItemPath,
-            children: listDirectory(itemPath, relativeItemPath),
-          });
-        } else {
-          const stats = fs.statSync(itemPath);
-          result.push({
-            name: item.name,
-            type: "file",
-            path: relativeItemPath,
-            size: stats.size,
-            modified: stats.mtime,
-          });
-        }
-      }
-
-      return result;
-    };
-
-    const contents = listDirectory(uploadsDir);
-
-    res.json({
-      exists: true,
-      path: uploadsDir,
-      contents: contents,
-      totalFiles: contents.reduce((count, item) => {
-        if (item.type === "file") return count + 1;
-        if (item.children)
-          return (
-            count +
-            item.children.filter((child) => child.type === "file").length
-          );
-        return count;
-      }, 0),
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: "Failed to read uploads directory",
-      message: error.message,
-    });
-  }
-});
 
 // Debug endpoint to show all registered routes
 app.get("/api/debug/routes", (req, res) => {
   const routes = [];
-  
+
   // Get registered routes
-  app._router.stack.forEach(middleware => {
+  app._router.stack.forEach((middleware) => {
     if (middleware.route) {
       // Routes registered directly on the app
       routes.push({
         path: middleware.route.path,
-        methods: Object.keys(middleware.route.methods).join(', ')
+        methods: Object.keys(middleware.route.methods).join(", "),
       });
-    } else if (middleware.name === 'router') {
+    } else if (middleware.name === "router") {
       // Routes added via router
-      middleware.handle.stack.forEach(handler => {
+      middleware.handle.stack.forEach((handler) => {
         if (handler.route) {
           const routePath = handler.route.path;
-          const basePath = middleware.regexp.toString()
-            .replace('\\^', '')
-            .replace('\\/?(?=\\/|$)', '')
-            .replace(/\\\//g, '/')
-            .replace(/\(\?:\(\[\^\\\/\]\+\?\)\)/g, ':id');
-          
+          const basePath = middleware.regexp
+            .toString()
+            .replace("\\^", "")
+            .replace("\\/?(?=\\/|$)", "")
+            .replace(/\\\//g, "/")
+            .replace(/\(\?:\(\[\^\\\/\]\+\?\)\)/g, ":id");
+
           routes.push({
             path: basePath + routePath,
-            methods: Object.keys(handler.route.methods).join(', ')
+            methods: Object.keys(handler.route.methods).join(", "),
           });
         }
       });
     }
   });
-  
+
   res.json({
     totalRoutes: routes.length,
-    routes: routes.sort((a, b) => a.path.localeCompare(b.path))
+    routes: routes.sort((a, b) => a.path.localeCompare(b.path)),
   });
 });
 
@@ -261,17 +205,8 @@ app.use(errorHandler);
 // Database connection
 const connectDB = async () => {
   try {
-    const connectionSuccess = await testConnection();
-    if (!connectionSuccess) {
-      throw new Error("Failed to connect to PostgreSQL database");
-    }
-
-    // Sync database in development (create tables if they don't exist)
-    if (process.env.NODE_ENV === "development") {
-      await syncDatabase(false);
-    }
-
-    console.log("🐘 PostgreSQL Connected Successfully");
+    await prisma.$connect();
+    console.log("🐘 Prisma Connected to PostgreSQL Successfully");
   } catch (error) {
     console.error("Database connection error:", error);
     process.exit(1);
@@ -315,8 +250,7 @@ process.on("uncaughtException", (err) => {
 // Graceful shutdown
 process.on("SIGTERM", () => {
   console.log("SIGTERM received, shutting down gracefully");
-  const { sequelize } = require("./config/database");
-  sequelize.close().then(() => {
+  prisma.$disconnect().then(() => {
     console.log("Database connection closed");
     process.exit(0);
   });

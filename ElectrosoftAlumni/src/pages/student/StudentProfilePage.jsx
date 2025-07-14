@@ -4,7 +4,7 @@ import PostCreator from "../../components/student/PostCreator";
 import FeedArea from "../../components/student/FeedArea";
 import StudentSidebar from "../../components/student/StudentSidebar";
 import ContentRenderer from "../../components/student/ContentRenderer";
-import apiService from "../../utils/apiService";
+import apiService, { studentAPI } from "../../services/apiService";
 
 const StudentProfilePage = () => {
   // Navigation state
@@ -52,44 +52,43 @@ const StudentProfilePage = () => {
 
       console.log("Fetching student profile data...");
 
-      // Check if user is authenticated
-      const token = localStorage.getItem("authToken");
-      if (!token) {
+      // Check if user is authenticated using apiService
+      if (!apiService.isAuthenticated()) {
         setError("Please log in to view your profile");
         return;
       }
 
-      console.log("Token found, making API call...");
-      const response = await apiService.getStudentProfile();
+      console.log("User is authenticated, making API call...");
+      const response = await studentAPI.getProfile();
       console.log("API Response:", response);
 
       if (response.success) {
         const { data } = response;
 
         // Set student ID
-        setStudentId(data.basicInfo.id);
+        setStudentId(data.id);
 
-        // Map backend data to frontend structure - include all relevant fields
+        // Map backend data to frontend structure - use the correct field names
         setProfileData({
           ...data, // Include the full data structure
-          id: data.basicInfo.id, // Include student ID at root level
-          firstName: data.basicInfo.first_name || "",
-          lastName: data.basicInfo.last_name || "",
-          student_college_name: data.basicInfo.college_name || "",
-          interested_field: data.basicInfo.interested_field || "",
-          other_field: data.basicInfo.other_field || "",
+          id: data.id, // Include student ID at root level
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          student_college_name: data.collegeName || "",
+          interested_field: data.interestedField || "",
+          other_field: data.otherField || "",
           // Include about and other fields for backward compatibility
           about: data.about || "",
         });
 
-        // Set other sections
-        setExperiences(data.experience || []);
-        setEducation(data.education || []);
-        setSkills(data.skills || []);
-        setProjects(data.projects || []);
-        setCourses(data.courses || []);
-        setCertifications(data.certifications || []);
-        setRecommendations(data.recommendations || []);
+        // Set other sections (these might not exist in the simplified backend)
+        setExperiences([]);
+        setEducation([]);
+        setSkills([]);
+        setProjects([]);
+        setCourses([]);
+        setCertifications([]);
+        setRecommendations([]);
 
         console.log("Profile data loaded successfully");
       } else {

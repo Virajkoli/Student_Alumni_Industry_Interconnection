@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import apiService from "../utils/apiService";
+import apiService from "../services/apiService";
 
 const UserProfile = () => {
   const { user } = useAuth();

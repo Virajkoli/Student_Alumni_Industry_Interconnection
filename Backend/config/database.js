@@ -1,52 +1,29 @@
-const { Sequelize } = require("sequelize");
-const config = require("./config");
-const path = require("path");
-const fs = require("fs");
+// This file is deprecated - we now use Prisma instead of Sequelize
+// Keeping for compatibility until all routes are migrated
 
-const env = process.env.NODE_ENV || "development";
-const dbConfig = config[env];
+const { prisma } = require("./prisma");
 
-// Initialize Sequelize
-const sequelize = new Sequelize(
-  dbConfig.database,
-  dbConfig.username,
-  dbConfig.password,
-  {
-    host: dbConfig.host,
-    port: dbConfig.port,
-    dialect: dbConfig.dialect,
-    logging: false,
-    pool: dbConfig.pool,
-    dialectOptions: dbConfig.dialectOptions || {},
-  }
-);
+// Legacy compatibility - redirect to Prisma
+const db = {
+  // For any legacy code that still references these models
+  User: null, // Use prisma.student, prisma.college, etc. instead
+  Student: null,
+  College: null,
+  sequelize: null, // Use prisma instead
+  Sequelize: null,
 
-// Object to hold all models
-const db = {};
-
-// Read all model files and initialize them
-const modelsDir = path.join(__dirname, "../models");
-const modelFiles = fs
-  .readdirSync(modelsDir)
-  .filter((file) => file.endsWith(".js") && file !== "index.js");
-
-// Initialize all models
-modelFiles.forEach((file) => {
-  const modelDefiner = require(path.join(modelsDir, file));
-  const model = modelDefiner(sequelize);
-  db[model.name] = model;
-});
-
-// Set up associations
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
-});
-
-// Add sequelize instance and Sequelize constructor to db object
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+  // Connection test function
+  testConnection: async () => {
+    try {
+      await prisma.$connect();
+      console.log("✅ Database connection successful");
+      return true;
+    } catch (error) {
+      console.error("❌ Database connection failed:", error);
+      return false;
+    }
+  },
+};
 
 // Test the connection
 const testConnection = async () => {

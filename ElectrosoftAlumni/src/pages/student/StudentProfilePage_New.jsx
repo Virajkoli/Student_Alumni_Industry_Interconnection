@@ -8,7 +8,7 @@ import ProjectsSection from "../../components/student/sections/ProjectsSection";
 import CoursesSection from "../../components/student/sections/CoursesSection";
 import CertificationsSection from "../../components/student/sections/CertificationsSection";
 import RecommendationsSection from "../../components/student/sections/RecommendationsSection";
-import apiService from "../../utils/apiService";
+import apiService from "../../services/apiService";
 
 const StudentProfilePage = () => {
   // State for search bar

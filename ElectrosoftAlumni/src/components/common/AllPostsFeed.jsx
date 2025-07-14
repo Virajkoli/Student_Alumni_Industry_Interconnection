@@ -11,7 +11,7 @@ import {
   Video,
   Loader2,
 } from "lucide-react";
-import apiService from "../../utils/apiService";
+import apiService from "../../services/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
 const AllPostsFeed = ({ refreshTrigger, onRefreshReady }) => {
@@ -117,31 +117,13 @@ const AllPostsFeed = ({ refreshTrigger, onRefreshReady }) => {
     );
   };
 
-  const renderPost = (post) => {
+  const renderPost = (post, index) => {
     const user = post.user;
     const hasMedia = post.media && post.media.length > 0;
 
-    // console.log(`🎨 Rendering post ${post.post_id}:`, {
-    //   media: post.media,
-    //   hasMedia,
-    //   mediaLength: post.media?.length,
-    //   mediaType: typeof post.media,
-    // });
-
-    // Debug media URLs
-    // if (hasMedia) {
-    //   console.log(
-    //     `🖼️ Media URLs for post ${post.post_id}:`,
-    //     post.media.map((m) => ({
-    //       originalPath: m.media_url,
-    //       constructedUrl: apiService.getMediaUrl(m.media_url),
-    //     }))
-    //   );
-    // }
-
     return (
       <div
-        key={post.post_id}
+        key={post.post_id || index} // Ensure unique key for each post
         className="bg-white border border-gray-200 rounded-xl p-6 mb-4 hover:shadow-sm transition-shadow"
       >
         {/* Post Header */}
@@ -219,7 +201,7 @@ const AllPostsFeed = ({ refreshTrigger, onRefreshReady }) => {
                 <div className="grid grid-cols-2 gap-2 rounded-lg overflow-hidden">
                   {post.media.slice(0, 4).map((media, index) => (
                     <div
-                      key={media.media_id}
+                      key={media.media_id || index} // Ensure unique key for each media item
                       className="relative border border-gray-200 rounded-lg overflow-hidden"
                     >
                       {media.media_type === "image" ? (

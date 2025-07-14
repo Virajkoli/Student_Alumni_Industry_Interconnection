@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id              Int       @id @default(autoincrement())
+  firstName       String?   @map("first_name") @db.VarChar(100)
+  lastName        String?   @map("last_name") @db.VarChar(100)
+  email           String    @unique @db.VarChar(150)
+  password        String    @db.VarChar(255)
+  contactNo       String?   @map("contact_no") @db.VarChar(15)
+  collegeName     String?   @map("college_name") @db.VarChar(200)
+  interestedField String?   @map("interested_field") @db.VarChar(50)
+  otherField      String?   @map("other_field") @db.VarChar(100)
+  googleId        String?   @map("google_id") @db.VarChar(255)
+  githubId        String?   @map("github_id") @db.VarChar(255)
+  profilePicture  String?   @map("profile_picture") @db.VarChar(255)
+  isActive        Boolean   @default(true)
+  isEmailVerified Boolean   @default(false)
+  lastLogin       DateTime? @map("lastLogin")
+  loginCount      Int       @default(0)
+  createdAt       DateTime  @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @map("updated_at") @db.Timestamptz(6)
+
+  @@map("students")
+}
+
+model College {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(100)
+  email           String    @unique @db.VarChar(255)
+  password        String    @db.VarChar(255)
+  description     String?
+  location        String?   @db.VarChar(100)
+  established     Int?
+  campusArea      Decimal?  @db.Decimal(10, 2)
+  nirfRank        Int?
+  accreditation   String?   @db.VarChar(100)
+  totalStudents   Int?
+  totalFaculty    Int?
+  website         String?   @db.VarChar(255)
+  logoUrl         String?   @db.VarChar(255)
+  backgroundUrl   String?   @db.VarChar(255)
+  isActive        Boolean   @default(true)
+  isEmailVerified Boolean   @default(false)
+  lastLogin       DateTime?
+  loginCount      Int       @default(0)
+  googleId        String?   @unique @map("google_id") @db.VarChar(255)
+  githubId        String?   @unique @map("github_id") @db.VarChar(255)
+  profilePicture  String?   @map("profile_picture") @db.VarChar(500)
+  createdAt       DateTime  @map("createdAt") @db.Timestamptz(6)
+  updatedAt       DateTime  @map("updatedAt") @db.Timestamptz(6)
+
+  @@map("colleges")
+}
+
+model Startup {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique @db.VarChar(255)
+  password        String    @db.VarChar(255)
+  firstName       String?   @map("first_name") @db.VarChar(100)
+  lastName        String?   @map("last_name") @db.VarChar(100)
+  startupName     String?   @map("startup_name") @db.VarChar(200)
+  startupStage    String?   @map("startup_stage") @db.VarChar(50)
+  fundingStatus   String?   @map("funding_status") @db.VarChar(100)
+  teamSize        String?   @map("team_size") @db.VarChar(50)
+  description     String?
+  location        String?   @db.VarChar(100)
+  website         String?   @db.VarChar(255)
+  contactNo       String?   @map("contact_no") @db.VarChar(20)
+  logoUrl         String?   @db.VarChar(255)
+  backgroundUrl   String?   @db.VarChar(255)
+  isActive        Boolean   @default(true)
+  isEmailVerified Boolean   @default(false)
+  lastLogin       DateTime?
+  loginCount      Int       @default(0)
+  googleId        String?   @map("google_id") @db.VarChar(255)
+  profilePicture  String?   @map("profile_picture") @db.VarChar(255)
+  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@map("startups")
+}
+
+model Industry {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique @db.VarChar(255)
+  password        String    @db.VarChar(255)
+  firstName       String?   @map("first_name") @db.VarChar(100)
+  lastName        String?   @map("last_name") @db.VarChar(100)
+  companyName     String?   @map("company_name") @db.VarChar(200)
+  industryType    String?   @map("industry_type") @db.VarChar(100)
+  companySize     String?   @map("company_size") @db.VarChar(50)
+  designation     String?   @db.VarChar(100)
+  description     String?
+  location        String?   @db.VarChar(100)
+  website         String?   @db.VarChar(255)
+  contactNo       String?   @map("contact_no") @db.VarChar(20)
+  logoUrl         String?   @db.VarChar(255)
+  backgroundUrl   String?   @db.VarChar(255)
+  isActive        Boolean   @default(true)
+  isEmailVerified Boolean   @default(false)
+  lastLogin       DateTime?
+  loginCount      Int       @default(0)
+  googleId        String?   @map("google_id") @db.VarChar(255)
+  profilePicture  String?   @map("profile_picture") @db.VarChar(255)
+  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@map("industries")
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  title      String?  @db.VarChar(255)
+  content    String
+  authorId   Int      @map("author_id")
+  authorType String   @map("author_type") @db.VarChar(20)
+  mediaUrls  String[] @default([]) @map("media_urls")
+  likes      Int      @default(0)
+  comments   Int      @default(0)
+  shares     Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("posts")
+}

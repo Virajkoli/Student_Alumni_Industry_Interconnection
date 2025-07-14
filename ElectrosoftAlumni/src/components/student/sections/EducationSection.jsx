@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, GraduationCap } from "lucide-react";
-import { studentAPI } from "../../../utils/apiService";
+import { studentAPI } from "../../../services/apiService";
 
 const EducationSection = ({ education = [], onEducationUpdate, studentId }) => {
   const [showEducationModal, setShowEducationModal] = useState(false);

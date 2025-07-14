@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Folder, ExternalLink } from "lucide-react";
-import { studentAPI } from "../../../utils/apiService";
+import { studentAPI } from "../../../services/apiService";
 
 const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
   const [showProjectModal, setShowProjectModal] = useState(false);

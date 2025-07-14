@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Plus, X, Briefcase } from "lucide-react";
-import { studentAPI } from "../../../utils/apiService";
+import { studentAPI } from "../../../services/apiService";
 
 const ExperienceSection = ({
   experiences = [],

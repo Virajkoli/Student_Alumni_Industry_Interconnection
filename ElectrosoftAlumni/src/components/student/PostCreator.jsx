@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Image, Video, FileText, MapPin, Users, X } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import apiService from "../../utils/apiService";
+import apiService from "../../services/apiService";
 
 const PostCreator = ({ onPostCreated }) => {
   const [postText, setPostText] = useState("");

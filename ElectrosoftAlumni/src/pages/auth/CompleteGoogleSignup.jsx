@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import apiService from "../../utils/apiService";
+import apiService from "../../services/apiService";
 import { ChevronDown } from "lucide-react";
 
 export default function CompleteGoogleSignup() {

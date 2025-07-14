@@ -10,7 +10,7 @@ import {
   Plus,
   User,
 } from "lucide-react";
-import { studentAPI } from "../../utils/apiService";
+import { studentAPI } from "../../services/apiService";
 
 const StudentProfileHeader = ({
   profileData,
@@ -46,20 +46,22 @@ const StudentProfileHeader = ({
     const fetchProfileData = async () => {
       try {
         const response = await studentAPI.getProfile();
-        console.log("Fetched profile data:", response.data);
+        console.log("Fetched profile data:", response);
 
-        // Set the complete profile data
-        setEditData(response.data);
+        if (response.success) {
+          // Set the complete profile data using the correct structure
+          setEditData(response.data);
 
-        // Set image URLs from the correct data structure
-        const profilePic = response.data.basicInfo?.profile_picture || "";
-        const coverPic = response.data.basicInfo?.cover_picture || "";
+          // Set image URLs from the correct data structure (flat structure)
+          const profilePic = response.data.profilePicture || "";
+          const coverPic = response.data.coverPicture || "";
 
-        console.log("Profile pic URL:", profilePic);
-        console.log("Cover pic URL:", coverPic);
+          console.log("Profile pic URL:", profilePic);
+          console.log("Cover pic URL:", coverPic);
 
-        setProfilePicUrl(profilePic);
-        setCoverPicUrl(coverPic);
+          setProfilePicUrl(profilePic);
+          setCoverPicUrl(coverPic);
+        }
       } catch (error) {
         console.error("Failed to fetch profile data:", error);
       }
@@ -72,11 +74,15 @@ const StudentProfileHeader = ({
   useEffect(() => {
     if (profileData) {
       const profilePic =
+        profileData.profilePicture ||
         profileData.basicInfo?.profile_picture ||
         profileData.profile_picture ||
         "";
       const coverPic =
-        profileData.basicInfo?.cover_picture || profileData.cover_picture || "";
+        profileData.coverPicture ||
+        profileData.basicInfo?.cover_picture ||
+        profileData.cover_picture ||
+        "";
 
       console.log("Updated profile pic URL from props:", profilePic);
       console.log("Updated cover pic URL from props:", coverPic);
@@ -221,24 +227,11 @@ const StudentProfileHeader = ({
     }
 
     const formData = new FormData();
-    formData.append("cover_picture", file);
+    formData.append("file", file); // Ensure correct key for file upload
 
     try {
       const response = await studentAPI.uploadCoverImage(formData);
       setCoverPicUrl(response.data.cover_picture);
-
-      // Update the editData with the new cover picture
-      const updatedEditData = {
-        ...editData,
-        basicInfo: {
-          ...editData.basicInfo,
-          cover_picture: response.data.cover_picture,
-        },
-      };
-      setEditData(updatedEditData);
-
-      // Notify parent component
-      onProfileUpdate(updatedEditData);
     } catch (error) {
       console.error("Failed to upload cover picture:", error);
     }
@@ -410,29 +403,39 @@ const StudentProfileHeader = ({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex-1">
               <h3 className="text-2xl font-bold text-gray-900">
-                {editData?.basicInfo?.first_name ||
-                  profileData?.basicInfo?.first_name ||
-                  profileData?.firstName}{" "}
-                {editData?.basicInfo?.last_name ||
-                  profileData?.basicInfo?.last_name ||
-                  profileData?.lastName}
+                {editData?.firstName ||
+                  editData?.basicInfo?.first_name ||
+                  profileData?.firstName ||
+                  profileData?.basicInfo?.first_name}{" "}
+                {editData?.lastName ||
+                  editData?.basicInfo?.last_name ||
+                  profileData?.lastName ||
+                  profileData?.basicInfo?.last_name}
               </h3>
               <p className="text-md text-gray-600 mt-1">
-                {editData?.basicInfo?.interested_field ||
+                {editData?.interestedField ||
+                  editData?.basicInfo?.interested_field ||
+                  profileData?.interestedField ||
                   profileData?.basicInfo?.interested_field ||
                   profileData?.headline}
               </p>
               <div className="flex items-center text-sm text-gray-500 mt-2">
                 <MapPin className="w-4 h-4 mr-1.5" />
-                {editData?.basicInfo?.college_name ||
+                {editData?.collegeName ||
+                  editData?.basicInfo?.college_name ||
+                  profileData?.collegeName ||
                   profileData?.basicInfo?.college_name ||
                   profileData?.city}
               </div>
-              {(editData?.basicInfo?.college_name ||
+              {(editData?.collegeName ||
+                editData?.basicInfo?.college_name ||
+                profileData?.collegeName ||
                 profileData?.basicInfo?.college_name ||
                 profileData?.showSchool) && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {editData?.basicInfo?.college_name ||
+                  {editData?.collegeName ||
+                    editData?.basicInfo?.college_name ||
+                    profileData?.collegeName ||
                     profileData?.basicInfo?.college_name ||
                     profileData?.school}
                 </p>

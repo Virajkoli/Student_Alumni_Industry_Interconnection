@@ -193,7 +193,7 @@ import { Link } from "react-router-dom";
 import "./Home.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "../contexts/AuthContext";
-import apiService from "../utils/apiService";
+import apiService from "../services/apiService";
 import PostCreator from "../components/student/PostCreator";
 import AllPostsFeed from "../components/common/AllPostsFeed";
 

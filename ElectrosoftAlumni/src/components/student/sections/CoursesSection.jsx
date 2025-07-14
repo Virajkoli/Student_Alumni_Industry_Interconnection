@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, BookOpen } from "lucide-react";
-import { studentAPI } from "../../../utils/apiService";
+import { studentAPI } from "../../../services/apiService";
 
 const CoursesSection = ({ courses = [], onCoursesUpdate, studentId }) => {
   const [showCourseModal, setShowCourseModal] = useState(false);

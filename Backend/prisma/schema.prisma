@@ -8,34 +8,6 @@ datasource db {
 }
 
 model Student {
-<<<<<<< HEAD
-  id                      Int                       @id @default(autoincrement())
-  firstName               String?                   @map("first_name") @db.VarChar(100)
-  lastName                String?                   @map("last_name") @db.VarChar(100)
-  email                   String                    @unique @db.VarChar(150)
-  password                String                    @db.VarChar(255)
-  contactNo               String?                   @map("contact_no") @db.VarChar(15)
-  collegeName             String?                   @map("college_name") @db.VarChar(200)
-  interestedField         String?                   @map("interested_field") @db.VarChar(50)
-  otherField              String?                   @map("other_field") @db.VarChar(100)
-  googleId                String?                   @map("google_id") @db.VarChar(255)
-  githubId                String?                   @map("github_id") @db.VarChar(255)
-  profilePicture          String?                   @map("profile_picture") @db.VarChar(255)
-  isActive                Boolean?                  @default(true)
-  isEmailVerified         Boolean?                  @default(false)
-  lastLogin               DateTime?                 @map("lastLogin") @db.Timestamptz(6)
-  loginCount              Int?                      @default(0)
-  createdAt               DateTime                  @map("created_at") @db.Timestamptz(6)
-  updatedAt               DateTime                  @map("updated_at") @db.Timestamptz(6)
-  student_about           student_about[]
-  student_certifications  student_certifications[]
-  student_courses         student_courses[]
-  student_education       student_education[]
-  student_experience      student_experience[]
-  student_projects        student_projects[]
-  student_recommendations student_recommendations[]
-  student_skills          student_skills[]
-=======
   id              Int       @id @default(autoincrement())
   firstName       String?   @map("first_name") @db.VarChar(100)
   lastName        String?   @map("last_name") @db.VarChar(100)
@@ -55,7 +27,6 @@ model Student {
   loginCount      Int       @default(0)
   createdAt       DateTime  @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime  @map("updated_at") @db.Timestamptz(6)
->>>>>>> d328dc0a0196ba317e0b30d26319a0a5c90b146b
 
   @@map("students")
 }

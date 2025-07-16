@@ -4,6 +4,9 @@ const authController = require("../controllers/authController");
 const { authMiddleware, authorize } = require("../middleware/authMiddleware");
 
 // Public routes
+router.get("/health", (req, res) => {
+  res.json({ success: true, message: "Auth routes are working" });
+});
 router.post("/register", authController.register);
 router.post("/login", authController.login);
 router.post("/google/register", authController.registerWithGoogle);

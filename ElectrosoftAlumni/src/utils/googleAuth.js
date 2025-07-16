@@ -1,6 +1,5 @@
 // Google Authentication utility using Google Identity Services (GIS)
-const GOOGLE_CLIENT_ID =
-  "120148362755-dmisbc1usk06heg33nan4cklovcreqm6.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 class GoogleAuthService {
   constructor() {
@@ -18,29 +17,32 @@ class GoogleAuthService {
         const script = document.createElement("script");
         script.src = "https://accounts.google.com/gsi/client";
         script.onload = () => {
-          this.loadgoogle_identityServices().then(resolve).catch(reject);
+          this.loadGoogleIdentityServices().then(resolve).catch(reject);
         };
-        script.onerror = reject;
+        script.onerror = () => reject(new Error("Failed to load Google script"));
         document.head.appendChild(script);
       } else {
-        this.loadgoogle_identityServices().then(resolve).catch(reject);
+        this.loadGoogleIdentityServices().then(resolve).catch(reject);
       }
     });
   }
 
-  async loadgoogle_identityServices() {
+  async loadGoogleIdentityServices() {
     return new Promise((resolve, reject) => {
       try {
-        // Initialize Google Identity Services
+        // Initialize Google Identity Services with proper configuration
         window.google.accounts.id.initialize({
           client_id: GOOGLE_CLIENT_ID,
-          callback: this.handleCredentialResponse.bind(this),
+          auto_select: false,
+          cancel_on_tap_outside: true,
         });
 
         this.google = window.google;
         this.isInitialized = true;
+        console.log("Google Identity Services initialized successfully");
         resolve();
       } catch (error) {
+        console.error("Google Identity Services initialization error:", error);
         reject(error);
       }
     });
@@ -52,7 +54,7 @@ class GoogleAuthService {
     console.log("Credential response:", response);
   }
 
-  // Sign in with Google using popup
+  // Sign in with Google using popup (no redirect URI needed)
   async signInWithGoogle() {
     if (!this.isInitialized) {
       await this.initializeGoogleAuth();
@@ -60,36 +62,50 @@ class GoogleAuthService {
 
     return new Promise((resolve, reject) => {
       try {
-        // Use the popup flow
-        window.google.accounts.oauth2
-          .initTokenClient({
-            client_id: GOOGLE_CLIENT_ID,
-            scope: "email profile",
-            callback: async (response) => {
-              if (response.error) {
-                reject(new Error(response.error));
+        // Use OAuth 2.0 popup flow (no redirect URI required)
+        const tokenClient = window.google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'email profile openid',
+          prompt: 'select_account',
+          callback: async (response) => {
+            if (response.error) {
+              console.error('Google OAuth error:', response.error);
+              reject(new Error(response.error_description || response.error));
+              return;
+            }
+
+            try {
+              // Get user info using the access token
+              const userInfo = await this.getUserInfo(response.access_token);
+              // Ensure we have both id and googleId
+              const userId = userInfo.sub || userInfo.id;
+              
+              if (!userId || !userInfo.email) {
+                reject(new Error('Google OAuth did not return required user ID and email'));
                 return;
               }
 
-              try {
-                // Get user info using the access token
-                const userInfo = await this.getUserInfo(response.access_token);
-                resolve({
-                  id: userInfo.id,
-                  name: userInfo.name,
-                  email: userInfo.email,
-                  firstName: userInfo.given_name,
-                  lastName: userInfo.family_name,
-                  imageUrl: userInfo.picture,
-                  accessToken: response.access_token,
-                });
-              } catch (error) {
-                reject(error);
-              }
-            },
-          })
-          .requestAccessToken();
+              resolve({
+                id: userId,
+                name: userInfo.name,
+                email: userInfo.email,
+                firstName: userInfo.given_name,
+                lastName: userInfo.family_name,
+                imageUrl: userInfo.picture,
+                accessToken: response.access_token,
+                googleId: userId, // Ensure googleId is always set
+              });
+            } catch (error) {
+              console.error('Failed to get user info:', error);
+              reject(error);
+            }
+          },
+        });
+
+        // Request access token
+        tokenClient.requestAccessToken();
       } catch (error) {
+        console.error('Google sign in initialization error:', error);
         reject(error);
       }
     });

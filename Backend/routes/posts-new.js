@@ -109,6 +109,7 @@ router.get("/my", authMiddleware, async (req, res) => {
   try {
     const { userId, role } = req.user;
     const { limit = 10, offset = 0 } = req.query;
+
     const posts = await prisma.post.findMany({
       where: {
         authorId: userId,

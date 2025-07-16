@@ -95,27 +95,77 @@ class ApiService {
 
   async registerWithGoogle(userData) {
     try {
-      const response = await this.api.post("/auth/google/register", userData);
+      // Extract role from userData and send in the format backend expects
+      const { role, ...googleUserData } = userData;
+      
+      // Validate required fields before sending to backend
+      if (!googleUserData.email) {
+        throw new Error('Email is required for Google registration');
+      }
+      
+      if (!googleUserData.id && !googleUserData.googleId) {
+        throw new Error('Google ID is required for Google registration');
+      }
+      
+      // Ensure googleId is set if missing
+      if (!googleUserData.googleId && googleUserData.id) {
+        googleUserData.googleId = googleUserData.id;
+      }
+      
+      console.log('🔍 Google registration data:', { userData: googleUserData, role });
+      
+      const requestData = {
+        userData: googleUserData,
+        role: role
+      };
+      
+      const response = await this.api.post("/auth/google/register", requestData);
       if (response.data.tokens?.accessToken) {
         localStorage.setItem("accessToken", response.data.tokens.accessToken);
       }
       return response.data;
     } catch (error) {
+      console.error('❌ Google registration error:', error);
       throw new Error(
-        error.response?.data?.message || "Google registration failed"
+        error.response?.data?.message || error.message || "Google registration failed"
       );
     }
   }
 
   async loginWithGoogle(userData) {
     try {
-      const response = await this.api.post("/auth/google/login", userData);
+      // Extract role from userData and send in the format backend expects
+      const { role, ...googleUserData } = userData;
+      
+      // Validate required fields before sending to backend
+      if (!googleUserData.email) {
+        throw new Error('Email is required for Google login');
+      }
+      
+      if (!googleUserData.id && !googleUserData.googleId) {
+        throw new Error('Google ID is required for Google login');
+      }
+      
+      // Ensure googleId is set if missing
+      if (!googleUserData.googleId && googleUserData.id) {
+        googleUserData.googleId = googleUserData.id;
+      }
+      
+      console.log('🔍 Google login data:', { userData: googleUserData, role });
+      
+      const requestData = {
+        userData: googleUserData,
+        role: role
+      };
+      
+      const response = await this.api.post("/auth/google/login", requestData);
       if (response.data.tokens) {
         localStorage.setItem("accessToken", response.data.tokens.accessToken);
       }
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Google login failed");
+      console.error('❌ Google login error:', error);
+      throw new Error(error.response?.data?.message || error.message || "Google login failed");
     }
   }
 
@@ -133,6 +183,403 @@ class ApiService {
         isGoogleAccount: false,
         message: "Could not check account type",
       };
+    }
+  }
+
+  async logout() {
+    try {
+      await this.api.post("/auth/logout");
+      localStorage.removeItem("accessToken");
+      return { success: true };
+    } catch (error) {
+      // Even if logout fails on server, clear local token
+      localStorage.removeItem("accessToken");
+      throw new Error(error.response?.data?.message || "Logout failed");
+    }
+  }
+
+  // Profile API methods using the new consolidated backend
+  async getStudentProfile() {
+    try {
+      const response = await this.api.get("/profile/complete");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get student profile"
+      );
+    }
+  }
+
+  async getStudentProfileSummary() {
+    try {
+      const response = await this.api.get("/profile/summary");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get profile summary"
+      );
+    }
+  }
+
+  // About section
+  async getStudentAbout() {
+    try {
+      const response = await this.api.get("/profile/about");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get about section"
+      );
+    }
+  }
+
+  async updateStudentAbout(aboutData) {
+    try {
+      const response = await this.api.put("/profile/about", aboutData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update about section"
+      );
+    }
+  }
+
+  // Experience section
+  async getStudentExperiences() {
+    try {
+      const response = await this.api.get("/profile/experience");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get experiences"
+      );
+    }
+  }
+
+  async createStudentExperience(experienceData) {
+    try {
+      const response = await this.api.post("/profile/experience", experienceData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create experience"
+      );
+    }
+  }
+
+  async updateStudentExperience(experienceId, experienceData) {
+    try {
+      const response = await this.api.put(`/profile/experience/${experienceId}`, experienceData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update experience"
+      );
+    }
+  }
+
+  async deleteStudentExperience(experienceId) {
+    try {
+      const response = await this.api.delete(`/profile/experience/${experienceId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete experience"
+      );
+    }
+  }
+
+  // Education section
+  async getStudentEducation() {
+    try {
+      const response = await this.api.get("/profile/education");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get education"
+      );
+    }
+  }
+
+  async createStudentEducation(educationData) {
+    try {
+      const response = await this.api.post("/profile/education", educationData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create education"
+      );
+    }
+  }
+
+  async updateStudentEducation(educationId, educationData) {
+    try {
+      const response = await this.api.put(`/profile/education/${educationId}`, educationData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update education"
+      );
+    }
+  }
+
+  async deleteStudentEducation(educationId) {
+    try {
+      const response = await this.api.delete(`/profile/education/${educationId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete education"
+      );
+    }
+  }
+
+  // Skills section
+  async getStudentSkills() {
+    try {
+      const response = await this.api.get("/profile/skills");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get skills"
+      );
+    }
+  }
+
+  async createStudentSkill(skillData) {
+    try {
+      const response = await this.api.post("/profile/skills", skillData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create skill"
+      );
+    }
+  }
+
+  async createStudentSkills(skillsData) {
+    try {
+      const response = await this.api.post("/profile/skills/batch", skillsData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create skills"
+      );
+    }
+  }
+
+  async updateStudentSkill(skillId, skillData) {
+    try {
+      const response = await this.api.put(`/profile/skills/${skillId}`, skillData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update skill"
+      );
+    }
+  }
+
+  async deleteStudentSkill(skillId) {
+    try {
+      const response = await this.api.delete(`/profile/skills/${skillId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete skill"
+      );
+    }
+  }
+
+  // Projects section
+  async getStudentProjects() {
+    try {
+      const response = await this.api.get("/profile/projects");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get projects"
+      );
+    }
+  }
+
+  async createStudentProject(projectData) {
+    try {
+      const response = await this.api.post("/profile/projects", projectData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create project"
+      );
+    }
+  }
+
+  async updateStudentProject(projectId, projectData) {
+    try {
+      const response = await this.api.put(`/profile/projects/${projectId}`, projectData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update project"
+      );
+    }
+  }
+
+  async deleteStudentProject(projectId) {
+    try {
+      const response = await this.api.delete(`/profile/projects/${projectId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete project"
+      );
+    }
+  }
+
+  // Courses section
+  async getStudentCourses() {
+    try {
+      const response = await this.api.get("/profile/courses");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get courses"
+      );
+    }
+  }
+
+  async createStudentCourse(courseData) {
+    try {
+      const response = await this.api.post("/profile/courses", courseData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create course"
+      );
+    }
+  }
+
+  async updateStudentCourse(courseId, courseData) {
+    try {
+      const response = await this.api.put(`/profile/courses/${courseId}`, courseData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update course"
+      );
+    }
+  }
+
+  async deleteStudentCourse(courseId) {
+    try {
+      const response = await this.api.delete(`/profile/courses/${courseId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete course"
+      );
+    }
+  }
+
+  // Certifications section
+  async getStudentCertifications() {
+    try {
+      const response = await this.api.get("/profile/certifications");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get certifications"
+      );
+    }
+  }
+
+  async createStudentCertification(certificationData) {
+    try {
+      const response = await this.api.post("/profile/certifications", certificationData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create certification"
+      );
+    }
+  }
+
+  async updateStudentCertification(certificationId, certificationData) {
+    try {
+      const response = await this.api.put(`/profile/certifications/${certificationId}`, certificationData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update certification"
+      );
+    }
+  }
+
+  async deleteStudentCertification(certificationId) {
+    try {
+      const response = await this.api.delete(`/profile/certifications/${certificationId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete certification"
+      );
+    }
+  }
+
+  // Recommendations section
+  async getStudentRecommendations() {
+    try {
+      const response = await this.api.get("/profile/recommendations");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get recommendations"
+      );
+    }
+  }
+
+  async createStudentRecommendation(recommendationData) {
+    try {
+      const response = await this.api.post("/profile/recommendations", recommendationData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create recommendation"
+      );
+    }
+  }
+
+  async updateStudentRecommendation(recommendationId, recommendationData) {
+    try {
+      const response = await this.api.put(`/profile/recommendations/${recommendationId}`, recommendationData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update recommendation"
+      );
+    }
+  }
+
+  async deleteStudentRecommendation(recommendationId) {
+    try {
+      const response = await this.api.delete(`/profile/recommendations/${recommendationId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete recommendation"
+      );
+    }
+  }
+
+  // Legacy method for basic info update (for backward compatibility)
+  async updateStudentBasicInfo(basicInfoData) {
+    try {
+      // For basic info, we'll update the about section
+      const response = await this.api.put("/profile/about", basicInfoData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update basic info"
+      );
     }
   }
 
@@ -588,15 +1035,12 @@ const studentAPI = {
     }
   },
 
-  async updateAbout(aboutData) {
-    try {
-      const response = await apiService.api.put("/students/me", aboutData);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to update about section"
-      );
-    }
+  // About section methods (for AboutSection.jsx)
+  async getStudentAbout() {
+    return apiService.getStudentAbout();
+  },
+  async updateStudentAbout(aboutData) {
+    return apiService.updateStudentAbout(aboutData);
   },
 
   // Note: These detailed student profile features are not implemented in the simplified Prisma backend

@@ -242,9 +242,10 @@ class AuthService {
   // Google OAuth login
   async loginWithGoogle(userData) {
     try {
-      const { email, googleId } = userData;
+      const { email, googleId, id } = userData;
+      const finalGoogleId = googleId || id;
 
-      if (!email || !googleId) {
+      if (!email || !finalGoogleId) {
         throw new Error("Email and Google ID are required");
       }
 
@@ -258,7 +259,10 @@ class AuthService {
         if (model) {
           const foundUser = await model.findFirst({
             where: {
-              OR: [{ email: email }, { googleId: googleId }],
+              OR: [
+                { email: email },
+                { googleId: finalGoogleId },
+              ],
             },
           });
 
@@ -290,6 +294,7 @@ class AuthService {
           loginCount: { increment: 1 },
           // Update profile picture if provided
           profilePicture:
+            userData.imageUrl ||
             userData.profilePicture ||
             userData.profile_picture ||
             user.profilePicture,
@@ -427,12 +432,19 @@ class AuthService {
         throw new Error("Invalid role specified");
       }
 
+      const { email, googleId, id } = userData;
+      const finalGoogleId = googleId || id;
+
+      if (!email || !finalGoogleId) {
+        throw new Error("Email and Google ID are required for Google registration");
+      }
+
       // Check if user already exists
       const existingUser = await model.findFirst({
         where: {
           OR: [
             { email: userData.email },
-            { googleId: userData.googleId || userData.google_id },
+            { googleId: finalGoogleId },
           ],
         },
       });
@@ -442,8 +454,8 @@ class AuthService {
         const updatedUser = await model.update({
           where: { id: existingUser.id },
           data: {
-            googleId: userData.googleId || userData.google_id,
-            profilePicture: userData.profilePicture || userData.profile_picture,
+            googleId: finalGoogleId,
+            profilePicture: userData.imageUrl || userData.profilePicture || userData.profile_picture,
             lastLogin: new Date(),
             loginCount: { increment: 1 },
           },
@@ -463,17 +475,17 @@ class AuthService {
       const userToCreate = {
         email: userData.email,
         password: "", // Empty password for OAuth users
-        googleId: userData.googleId || userData.google_id,
-        profilePicture: userData.profilePicture || userData.profile_picture,
+        googleId: finalGoogleId,
+        profilePicture: userData.imageUrl || userData.profilePicture || userData.profile_picture,
         isEmailVerified: true, // Google emails are verified
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      // Add role-specific fields (same as regular registration)
+      // Add role-specific fields
       if (role === "student") {
-        userToCreate.firstName = userData.firstName || userData.first_name;
-        userToCreate.lastName = userData.lastName || userData.last_name;
+        userToCreate.firstName = userData.firstName || userData.first_name || userData.name?.split(' ')[0];
+        userToCreate.lastName = userData.lastName || userData.last_name || userData.name?.split(' ').slice(1).join(' ');
         userToCreate.contactNo = userData.contactNo || userData.contact_no;
         userToCreate.collegeName =
           userData.collegeName ||
@@ -523,6 +535,8 @@ class AuthService {
           ? parseInt(userToCreate.totalFaculty)
           : null;
       } else if (role === "startup") {
+        userToCreate.firstName = userData.firstName || userData.first_name || userData.name?.split(' ')[0];
+        userToCreate.lastName = userData.lastName || userData.last_name || userData.name?.split(' ').slice(1).join(' ');
         userToCreate.startupName =
           userData.startupName || userData.startup_name;
         userToCreate.startupStage =
@@ -535,6 +549,8 @@ class AuthService {
         userToCreate.website = userData.website;
         userToCreate.contactNo = userData.contactNo || userData.contact_no;
       } else if (role === "industry") {
+        userToCreate.firstName = userData.firstName || userData.first_name || userData.name?.split(' ')[0];
+        userToCreate.lastName = userData.lastName || userData.last_name || userData.name?.split(' ').slice(1).join(' ');
         userToCreate.companyName =
           userData.companyName || userData.company_name;
         userToCreate.industryType =

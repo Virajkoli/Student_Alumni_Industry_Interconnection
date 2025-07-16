@@ -10,6 +10,7 @@ import {
   Image as ImageIcon,
   Video,
   Loader2,
+  AlertCircle,
 } from "lucide-react";
 import apiService from "../../services/apiService";
 import { useAuth } from "../../contexts/AuthContext";
@@ -21,21 +22,80 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   const [failedImages, setFailedImages] = useState(new Set());
   const { isAuthenticated, user } = useAuth();
 
+  // Helper function to parse media field
+  const parseMediaField = (media) => {
+    if (!media) return [];
+    if (Array.isArray(media)) return media;
+    if (typeof media === 'string') {
+      try {
+        return JSON.parse(media);
+      } catch (e) {
+        console.error("Failed to parse media JSON:", e);
+        return [];
+      }
+    }
+    return [];
+  };
+
   // Component for image fallback
-  const ImageFallback = ({ className, size = "large" }) => (
+  const ImageFallback = ({ className, size = "large", error }) => (
     <div
       className={`${className} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center`}
     >
-      <div className="text-center">
-        <ImageIcon
-          className={`${
-            size === "large" ? "w-12 h-12" : "w-6 h-6"
-          } text-gray-400 mx-auto mb-2`}
-        />
-        <p className="text-gray-500 text-sm">Image not available</p>
+      <div className="text-center p-4">
+        <AlertCircle className={`${size === "large" ? "w-12 h-12" : "w-6 h-6"} text-red-400 mx-auto mb-2`} />
+        <p className="text-gray-500 text-sm">Image failed to load</p>
+        {error && (
+          <p className="text-red-500 text-xs mt-1 max-w-xs break-words">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );
+
+  // Enhanced image component with better error handling
+  const MediaImage = ({ media, className, alt, onError, onLoad }) => {
+    const [imageError, setImageError] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const handleError = (e) => {
+      const errorMsg = `Failed to load: ${e.target.src}`;
+      console.error("❌ Image load error:", errorMsg);
+      setImageError(errorMsg);
+      setIsLoading(false);
+      if (onError) onError(e);
+    };
+
+    const handleLoad = (e) => {
+      console.log("✅ Image loaded successfully:", e.target.src);
+      setIsLoading(false);
+      if (onLoad) onLoad(e);
+    };
+
+    const imageUrl = apiService.getMediaUrl(media.media_url);
+    
+    if (failedImages.has(media.media_url) || imageError) {
+      return <ImageFallback className={className} error={imageError} />;
+    }
+
+    return (
+      <div className="relative">
+        {isLoading && (
+          <div className={`${className} bg-gray-200 flex items-center justify-center`}>
+            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+          </div>
+        )}
+        <img
+          src={imageUrl}
+          alt={alt}
+          className={`${className} ${isLoading ? 'hidden' : ''}`}
+          onError={handleError}
+          onLoad={handleLoad}
+        />
+      </div>
+    );
+  };
 
   // Fetch posts from backend
   useEffect(() => {
@@ -59,40 +119,41 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
       setLoading(true);
       setError(null);
       console.log("🔄 Fetching my posts...");
-      console.log("🔐 Auth status:", { isAuthenticated, user: user?.id });
-      console.log(
-        "🔑 Token:",
-        localStorage.getItem("authToken")?.substring(0, 20) + "..."
-      );
-
-      // Fetch only posts by the current user
+      
       const response = await apiService.getMyPosts({
         limit: 50,
       });
-      console.log("📦 API Response:", response);
+      
+      console.log("📦 Full API Response:", response);
       console.log("📝 Posts data:", response.data);
+      
       if (response.data && response.data.length > 0) {
-        console.log("🖼️ First post media:", response.data[0].media);
-        console.log("🖼️ Media type:", typeof response.data[0].media);
-        console.log("🖼️ Media length:", response.data[0].media?.length);
-        console.log("👤 First post user:", response.data[0].user);
-        console.log("🔗 First post userType:", response.data[0].userType);
-        if (response.data[0].media && response.data[0].media.length > 0) {
-          console.log(
-            "🔗 First media URL:",
-            response.data[0].media[0].media_url
-          );
-          console.log(
-            "🔗 Constructed media URL:",
-            apiService.getMediaUrl(response.data[0].media[0].media_url)
-          );
+        const firstPost = response.data[0];
+        console.log("🔍 First post complete data:", firstPost);
+        console.log("🖼️ Media field:", firstPost.media);
+        console.log("🖼️ Media type:", typeof firstPost.media);
+        console.log("🖼️ Media is array:", Array.isArray(firstPost.media));
+        
+        const parsedMedia = parseMediaField(firstPost.media);
+        console.log("🖼️ Parsed media:", parsedMedia);
+        console.log("🖼️ Parsed media length:", parsedMedia?.length);
+        
+        if (parsedMedia && parsedMedia.length > 0) {
+          console.log("📸 First media item:", parsedMedia[0]);
+          console.log("🔗 Media URL field:", parsedMedia[0].media_url);
+          console.log("🔗 All media fields:", Object.keys(parsedMedia[0]));
+          
+          const originalUrl = parsedMedia[0].media_url;
+          const constructedUrl = apiService.getMediaUrl(originalUrl);
+          console.log("🔗 Original URL:", originalUrl);
+          console.log("🔗 Constructed URL:", constructedUrl);
+          console.log("🔗 Base URL:", apiService.baseURL);
         }
       }
+      
       setPosts(response.data || []);
     } catch (error) {
       console.error("❌ Error fetching my posts:", error);
-      console.error("❌ Error message:", error.message);
-      console.error("❌ Error stack:", error.stack);
       setError(`Failed to load posts: ${error.message}`);
     } finally {
       setLoading(false);
@@ -120,7 +181,6 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
   const handleLike = async (postId) => {
     try {
       await apiService.reactToPost(postId, { reactionType: "like" });
-      // Update local state
       setPosts(
         posts.map((post) =>
           post.post_id === postId
@@ -149,26 +209,22 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
     );
   };
 
-  const handlePollVote = (postId, option) => {
-    // Poll voting logic (to be implemented when poll feature is added)
-    console.log("Poll vote:", postId, option);
-  };
-
   const renderPost = (post) => {
     const user = post.user || {
       full_name: "Current User",
       userType: "student",
-    }; // Fallback user data
-    const hasMedia = post.media && post.media.length > 0;
-
-    // console.log(`🎨 Rendering post ${post.post_id}:`, {
-    //   media: post.media,
-    //   hasMedia,
-    //   mediaLength: post.media?.length,
-    //   mediaType: typeof post.media,
-    //   user: user,
-    //   userType: post.userType,
-    // });
+    };
+    
+    // Parse media field properly
+    const mediaArray = parseMediaField(post.post_media);
+    const hasMedia = mediaArray && mediaArray.length > 0;
+    
+    console.log(`🎨 Rendering post ${post.post_id}:`, {
+      originalMedia: post.media,
+      parsedMedia: mediaArray,
+      hasMedia,
+      mediaLength: mediaArray?.length,
+    });
 
     return (
       <div
@@ -219,84 +275,79 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
             </p>
           )}
 
-          {/* Media Display */}
+          {/* Enhanced Media Display */}
           {hasMedia && (
             <div className="mt-3">
-              {post.media.length === 1 ? (
-                // Single media item
+              <p className="text-xs text-gray-500 mb-2">
+                Media count: {mediaArray.length} | First media type: {mediaArray[0]?.media_type}
+              </p>
+              
+              {mediaArray.length === 1 ? (
                 <div className="rounded-lg overflow-hidden border border-gray-200">
-                  {post.media[0].media_type === "image" ? (
-                    failedImages.has(post.media[0].media_url) ? (
-                      <ImageFallback className="w-full h-48" size="large" />
-                    ) : (
-                      <img
-                        src={apiService.getMediaUrl(post.media[0].media_url)}
-                        alt="Post media"
-                        className="w-full max-h-96 object-cover"
-                        onError={(e) => {
-                          console.error("Failed to load image:", e.target.src);
-                          setFailedImages(
-                            (prev) =>
-                              new Set([...prev, post.media[0].media_url])
-                          );
-                        }}
-                        onLoad={() => {
-                          console.log(
-                            "Successfully loaded image:",
-                            apiService.getMediaUrl(post.media[0].media_url)
-                          );
-                        }}
-                      />
-                    )
+                  {mediaArray[0].media_type === "image" ? (
+                    <MediaImage
+                      media={mediaArray[0]}
+                      className="w-full max-h-96 object-cover"
+                      alt="Post media"
+                      onError={(e) => {
+                        setFailedImages(prev => new Set([...prev, mediaArray[0].media_url]));
+                      }}
+                    />
                   ) : (
                     <video
-                      src={apiService.getMediaUrl(post.media[0].media_url)}
+                      src={apiService.getMediaUrl(mediaArray[0].media_url)}
                       controls
                       className="w-full max-h-96"
+                      onError={(e) => {
+                        console.error("❌ Failed to load video:", e.target.src);
+                      }}
+                      onLoadedData={() => {
+                        console.log("✅ Video loaded successfully");
+                      }}
                     />
                   )}
                 </div>
               ) : (
-                // Multiple media items
                 <div className="grid grid-cols-2 gap-2 rounded-lg overflow-hidden">
-                  {post.media.slice(0, 4).map((media, index) => (
+                  {mediaArray.slice(0, 4).map((media, index) => (
                     <div
-                      key={media.media_id}
+                      key={media.media_id || index}
                       className="relative border border-gray-200 rounded-lg overflow-hidden"
                     >
                       {media.media_type === "image" ? (
-                        failedImages.has(media.media_url) ? (
-                          <ImageFallback className="w-full h-32" size="small" />
-                        ) : (
-                          <img
-                            src={apiService.getMediaUrl(media.media_url)}
-                            alt={`Post media ${index + 1}`}
-                            className="w-full h-32 object-cover"
-                            onError={(e) => {
-                              console.error(
-                                "Failed to load image:",
-                                e.target.src
-                              );
-                              setFailedImages(
-                                (prev) => new Set([...prev, media.media_url])
-                              );
-                            }}
-                          />
-                        )
+                        <MediaImage
+                          media={media}
+                          className="w-full h-32 object-cover"
+                          alt={`Post media ${index + 1}`}
+                          onError={(e) => {
+                            setFailedImages(prev => new Set([...prev, media.media_url]));
+                          }}
+                        />
                       ) : (
                         <div className="w-full h-32 bg-gray-900 flex items-center justify-center">
                           <Video className="w-8 h-8 text-white" />
                         </div>
                       )}
-                      {index === 3 && post.media.length > 4 && (
+                      {index === 3 && mediaArray.length > 4 && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-semibold">
-                          +{post.media.length - 4}
+                          +{mediaArray.length - 4}
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
               )}
+            </div>
+          )}
+          
+          {/* Debug info - remove in production */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
+              <p><strong>Debug:</strong></p>
+              <p>Media field type: {typeof post.media}</p>
+              <p>Media content: {JSON.stringify(post.media)}</p>
+              <p>Has media: {hasMedia ? 'Yes' : 'No'}</p>
+              <p>Media count: {mediaArray.length}</p>
             </div>
           )}
         </div>

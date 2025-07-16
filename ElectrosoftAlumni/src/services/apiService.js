@@ -761,7 +761,7 @@ class ApiService {
       if (postData.title) formData.append("title", postData.title);
 
       files.forEach((file, index) => {
-        formData.append(`media`, file);
+        formData.append("media", file);
       });
 
       const response = await this.api.post("/posts", formData, {
@@ -854,11 +854,61 @@ class ApiService {
   }
 
   // Media URL helper
-  getMediaUrl(mediaPath) {
-    if (!mediaPath) return "/api/placeholder/400/400";
-    if (mediaPath.startsWith("http")) return mediaPath;
-    return `${this.baseURL.replace("/api", "")}/uploads/${mediaPath}`;
+ getMediaUrl(mediaPath) {
+  console.log("🔧 getMediaUrl called with:", mediaPath);
+  
+  // Handle null/undefined
+  if (!mediaPath) {
+    console.log("🔧 No media path provided, returning placeholder");
+    return "/api/placeholder/400/400";
   }
+  
+  // Handle full URLs (already complete)
+  if (mediaPath.startsWith("http://") || mediaPath.startsWith("https://")) {
+    console.log("🔧 Media path is already a full URL:", mediaPath);
+    return mediaPath;
+  }
+  
+  // Handle data URLs (base64 encoded images)
+  if (mediaPath.startsWith("data:")) {
+    console.log("🔧 Media path is a data URL");
+    return mediaPath;
+  }
+  
+  // Handle relative paths
+  let cleanPath = mediaPath;
+  
+  // Remove leading slash if present to avoid double slashes
+  if (cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.slice(1);
+  }
+  
+  // Get base URL without /api
+  const baseUrl = this.baseURL.replace("/api", "");
+  
+    return `https://res.cloudinary.com/<your-cloud-name>/image/upload/${mediaPath}`;
+
+}
+
+// Alternative version if your backend serves files differently
+getMediaUrlAlternative(mediaPath) {
+  console.log("🔧 getMediaUrl (alternative) called with:", mediaPath);
+  
+  if (!mediaPath) {
+    return "/api/placeholder/400/400";
+  }
+  
+  if (mediaPath.startsWith("http")) {
+    return mediaPath;
+  }
+  
+  // If your backend serves files at a different endpoint
+  // Example: if files are served at /api/files/ instead of /uploads/
+  const baseUrl = this.baseURL; // Keep /api in the URL
+  const cleanPath = mediaPath.startsWith('/') ? mediaPath.slice(1) : mediaPath;
+  
+  return `${baseUrl}/files/${cleanPath}`;
+}
 
   // Profile methods for different roles
   async getStudentProfile(studentId = null) {

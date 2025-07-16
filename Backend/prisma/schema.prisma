@@ -20,7 +20,7 @@ model Student {
   googleId        String?   @map("google_id") @db.VarChar(255)
   githubId        String?   @map("github_id") @db.VarChar(255)
   profilePicture  String?   @map("profile_picture") @db.VarChar(255)
-  coverPicture  String?   @map("cover_picture") @db.VarChar(255)
+  coverPicture    String?   @map("cover_picture") @db.VarChar(255)
   location        String?   @db.VarChar(100)
   headline        String?   @db.VarChar(300)
   isActive        Boolean   @default(true)
@@ -29,6 +29,15 @@ model Student {
   loginCount      Int       @default(0)
   createdAt       DateTime  @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime  @map("updated_at") @db.Timestamptz(6)
+
+  about           student_about[]
+  certifications  student_certifications[]
+  courses         student_courses[]
+  education       student_education[]
+  experience      student_experience[]
+  projects        student_projects[]
+  recommendations student_recommendations[]
+  skills          student_skills[]
 
   @@map("students")
 }
@@ -200,6 +209,9 @@ model Industry {
 model Post {
   post_id        Int              @id @default(autoincrement())
   content        String?
+  title          String?
+  authorId       Int
+  authorType     String           @db.VarChar(50)
   createdAt      DateTime?        @default(now()) @map("created_at") @db.Timestamp(6)
   student_id     Int?
   college_id     Int?
@@ -282,6 +294,7 @@ model post_comments {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+
 model post_media {
   media_id             Int       @id @default(autoincrement())
   post_id              Int?

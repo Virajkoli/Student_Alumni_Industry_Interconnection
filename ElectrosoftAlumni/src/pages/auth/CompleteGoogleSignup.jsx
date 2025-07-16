@@ -44,23 +44,26 @@ export default function CompleteGoogleSignup() {
   useEffect(() => {
     // Get Google user data from navigation state or localStorage
     if (location.state?.googleUser) {
-      console.log('🔍 Google user data from location.state:', location.state.googleUser);
+      console.log(
+        "🔍 Google user data from location.state:",
+        location.state.googleUser
+      );
       setGoogleUser(location.state.googleUser);
     } else {
       // Try to get from localStorage as fallback
-      const storedGoogleUser = localStorage.getItem('googleUser');
+      const storedGoogleUser = localStorage.getItem("googleUser");
       if (storedGoogleUser) {
         try {
           const parsedUser = JSON.parse(storedGoogleUser);
-          console.log('🔍 Google user data from localStorage:', parsedUser);
+          console.log("🔍 Google user data from localStorage:", parsedUser);
           setGoogleUser(parsedUser);
         } catch (error) {
-          console.error('❌ Failed to parse stored Google user data:', error);
+          console.error("❌ Failed to parse stored Google user data:", error);
           navigate("/auth/signup");
         }
       } else {
         // Redirect to signup if no Google user data found
-        console.log('❌ No Google user data found, redirecting to signup');
+        console.log("❌ No Google user data found, redirecting to signup");
         navigate("/auth/signup");
       }
     }
@@ -104,8 +107,8 @@ export default function CompleteGoogleSignup() {
       setIsLoading(true);
       setError("");
 
-      console.log('🔍 Google user data before registration:', googleUser);
-      console.log('🔍 Form data:', formData);
+      console.log("🔍 Google user data before registration:", googleUser);
+      console.log("🔍 Form data:", formData);
 
       // Prepare data based on role - keep Google user data intact and add role
       let registrationData = {
@@ -113,7 +116,7 @@ export default function CompleteGoogleSignup() {
         role: formData.role,
       };
 
-      console.log('🔍 Initial registration data:', registrationData);
+      console.log("🔍 Initial registration data:", registrationData);
 
       // Add role-specific fields to the registration data
       if (formData.role === "student") {
@@ -160,12 +163,15 @@ export default function CompleteGoogleSignup() {
       }
 
       // Register with Google data
-      console.log('🔍 Final registration data before API call:', registrationData);
-      
+      console.log(
+        "🔍 Final registration data before API call:",
+        registrationData
+      );
+
       // IMPORTANT: apiService.registerWithGoogle expects { role, ...googleData } format
       // where it extracts role and puts the rest in userData: { userData: {...}, role }
       // So we pass the data in the format that apiService expects
-      
+
       let result;
       if (formData.role === "college") {
         // Use college-specific registration
@@ -191,7 +197,14 @@ export default function CompleteGoogleSignup() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#EEF5F9] to-[#F8FAFC] py-12 px-4 flex items-center justify-end">
+    <div className="min-h-screen  from-[#EEF5F9] to-[#F8FAFC] py-12 px-4 flex items-center justify-end">
+      <div className="hidden md:flex flex-1 items-center justify-center mr-20 bg-gray-50 min-w-0">
+        <img
+          src="/newlogo-removebg-preview.png"
+          alt="Logo"
+          className="max-w-96 w-11/12 h-auto block"
+        />
+      </div>
       <div className="max-w-xl w-full relative">
         {/* Decorative elements */}
         <div className="absolute -top-16 -right-16 w-32 h-32 bg-blue-200 rounded-full opacity-30 blur-2xl"></div>
@@ -200,15 +213,6 @@ export default function CompleteGoogleSignup() {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 relative z-10">
           {/* Header Section - Redesigned */}
           <div className="bg-gradient-to-r from-[#4B91C5] via-[#5A94B5] to-[#6EA9C8] px-4 py-2">
-            <div className="flex items-center justify-center mb-2">
-              <div className="bg-white/10 p-3 rounded-full backdrop-blur-sm">
-                <img
-                  src="/newlogo-removebg-preview.png"
-                  alt="Logo"
-                  className="h-14 w-auto"
-                />
-              </div>
-            </div>
             <h2 className="text-3xl font-bold text-white text-center mb-3">
               Complete Your Profile
             </h2>
@@ -262,58 +266,84 @@ export default function CompleteGoogleSignup() {
                   Select Your Role <span className="text-red-500 ml-1">*</span>
                 </label>
 
-                <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 rounded-lg opacity-0 group-hover:opacity-100 transition duration-200 blur"></div>
-                  <div className="relative">
-                    <select
-                      id="role"
-                      name="role"
-                      value={formData.role}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4B91C5] focus:border-[#4B91C5] transition-colors bg-white text-gray-800 shadow-sm appearance-none cursor-pointer hover:border-blue-300"
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234B91C5' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                        backgroundRepeat: "no-repeat",
-                        backgroundPosition: "right 1rem center",
-                        backgroundSize: "1.5em 1.5em",
-                        paddingRight: "3rem",
-                      }}
-                    >
-                      <option value="" disabled>
-                        Choose your role
-                      </option>
-                      <option value="student">🎓 Student</option>
-                      <option value="college">🏫 College</option>
-                      <option value="industry">🏢 Industry</option>
-                      <option value="startup">🚀 Startup</option>
-                    </select>
+                <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm transition-all mb-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { value: "student", icon: "🎓", label: "Student" },
+                      { value: "college", icon: "🏫", label: "College" },
+                      { value: "industry", icon: "🏢", label: "Industry" },
+                      { value: "startup", icon: "🚀", label: "Startup" },
+                    ].map((role) => (
+                      <div
+                        key={role.value}
+                        onClick={() =>
+                          handleChange({
+                            target: { name: "role", value: role.value },
+                          })
+                        }
+                        className={`relative cursor-pointer rounded-lg border-2 p-2 transition-all duration-200 hover:shadow-md ${
+                          formData.role === role.value
+                            ? "border-[#4B91C5] bg-blue-50 shadow-md"
+                            : "border-gray-200 bg-white hover:border-blue-300"
+                        }`}
+                      >
+                        <div className="flex items-center text-center gap-2">
+                          <span className="text-lg">{role.icon}</span>
+                          <span
+                            className={`text-sm font-medium  ${
+                              formData.role === role.value
+                                ? "text-[#4B91C5]"
+                                : "text-gray-700"
+                            }`}
+                          >
+                            {role.label}
+                          </span>
+                        </div>
+                        {formData.role === role.value && (
+                          <div className="absolute top-2 right-2">
+                            <div className="w-5 h-5 bg-[#4B91C5] rounded-full flex items-center justify-center">
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                </div>
 
-                {formData.role && (
-                  <div className="mt-4 flex">
-                    <div
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center ${
-                        formData.role === "student"
-                          ? "bg-blue-100 text-blue-700"
-                          : formData.role === "college"
-                          ? "bg-green-100 text-green-700"
-                          : formData.role === "industry"
-                          ? "bg-purple-100 text-purple-700"
-                          : "bg-orange-100 text-orange-700"
-                      }`}
-                    >
-                      <span className="mr-1">
-                        {formData.role === "student"  }
-                        {formData.role === "college" }
-                        {formData.role === "industry" }
-                        {formData.role === "startup" }
-                      </span>
-                      <span className="capitalize">{formData.role}</span>
+                  {formData.role && (
+                    <div className="mt-4 flex">
+                      <div
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center ${
+                          formData.role === "student"
+                            ? "bg-blue-100 text-blue-700"
+                            : formData.role === "college"
+                            ? "bg-green-100 text-green-700"
+                            : formData.role === "industry"
+                            ? "bg-purple-100 text-purple-700"
+                            : "bg-orange-100 text-orange-700"
+                        }`}
+                      >
+                        <span className="mr-1">
+                          {formData.role === "student" && "🎓"}
+                          {formData.role === "college" && "🏫"}
+                          {formData.role === "industry" && "🏢"}
+                          {formData.role === "startup" && "🚀"}
+                        </span>
+                        <span className="capitalize">{formData.role}</span>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
               {/* Student-specific fields - Enhanced & Stylish */}
@@ -389,40 +419,89 @@ export default function CompleteGoogleSignup() {
 
                     {/* Field of Interest - Stylish Dropdown */}
                     <div className="group">
-                      <label
-                        htmlFor="interested_field"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
+                      <label className="block text-sm font-medium text-gray-700 mb-4">
                         Field of Interest
                       </label>
-                      <div className="relative">
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 rounded-lg opacity-0 group-hover:opacity-100 transition duration-200 blur"></div>
-                        <div className="relative">
-                          <select
-                            id="interested_field"
-                            name="interested_field"
-                            value={formData.interested_field}
-                            onChange={handleChange}
-                            className="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4B91C5] focus:border-[#4B91C5] transition-colors bg-white text-gray-800 shadow-sm appearance-none hover:border-blue-300"
-                            style={{
-                              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234B91C5' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E")`,
-                              backgroundRepeat: "no-repeat",
-                              backgroundPosition: "right 1rem center",
-                              backgroundSize: "1.5em 1.5em",
-                              paddingRight: "3rem",
-                            }}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {[
+                          {
+                            value: "Technology",
+                            // icon: "💻",
+                            label: "Technology",
+                          },
+                          {
+                            value: "Business",
+                            // icon: "💼",
+                            label: "Business",
+                          },
+                          {
+                            value: "Healthcare",
+                            // icon: "🏥",
+                            label: "Healthcare",
+                          },
+                          {
+                            value: "Education",
+                            // icon: "📚",
+                            label: "Education",
+                          },
+                          {
+                            value: "Engineering",
+                            // icon: "⚙️",
+                            label: "Engineering",
+                          },
+                          {
+                            value: "Other",
+                            // icon: "🔍",
+                            label: "Other",
+                          },
+                        ].map((field) => (
+                          <div
+                            key={field.value}
+                            onClick={() =>
+                              handleChange({
+                                target: {
+                                  name: "interested_field",
+                                  value: field.value,
+                                },
+                              })
+                            }
+                            className={`relative cursor-pointer rounded-full border p-2  transition-all duration-200 hover:shadow-md ${
+                              formData.interested_field === field.value
+                                ? "border-[#4B91C5] bg-blue-50 shadow-md"
+                                : "border-gray-200 bg-white hover:border-blue-300"
+                            }`}
                           >
-                            <option value="">
-                              Select your field of interest
-                            </option>
-                            <option value="Technology">💻 Technology</option>
-                            <option value="Business">💼 Business</option>
-                            <option value="Healthcare">🏥 Healthcare</option>
-                            <option value="Education">📚 Education</option>
-                            <option value="Engineering">⚙️ Engineering</option>
-                            <option value="Other">🔍 Other</option>
-                          </select>
-                        </div>
+                            <div className="flex items-center justify-center">
+                              <span className="text-lg">{field.icon}</span>
+                              <span
+                                className={`text-sm font-medium ${
+                                  formData.interested_field === field.value
+                                    ? "text-[#4B91C5]"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                {field.label}
+                              </span>
+                            </div>
+                            {formData.interested_field === field.value && (
+                              <div className="absolute top-2 right-2">
+                                <div className="w-5 h-5 bg-[#4B91C5] rounded-full flex items-center justify-center">
+                                  <svg
+                                    className="w-3 h-3 text-white"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     </div>
 
@@ -504,7 +583,7 @@ export default function CompleteGoogleSignup() {
                       </div>
 
                       {/* Establishment Year - Stylish Input */}
-                      <div className="group">
+                      {/* <div className="group">
                         <label
                           htmlFor="establishment_year"
                           className="block text-sm font-medium text-gray-700 mb-2"
@@ -525,7 +604,7 @@ export default function CompleteGoogleSignup() {
                             />
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* College Address - Stylish Textarea */}
@@ -629,7 +708,7 @@ export default function CompleteGoogleSignup() {
                       </div>
 
                       {/* Designation - Stylish Input */}
-                      <div className="group">
+                      {/* <div className="group">
                         <label
                           htmlFor="designation"
                           className="block text-sm font-medium text-gray-700 mb-2"
@@ -650,7 +729,7 @@ export default function CompleteGoogleSignup() {
                             />
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Industry Type - Stylish Dropdown */}

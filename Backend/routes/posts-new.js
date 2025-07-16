@@ -77,7 +77,6 @@ router.post(
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const { limit = 10, offset = 0 } = req.query;
-
     const posts = await prisma.post.findMany({
       take: parseInt(limit),
       skip: parseInt(offset),
@@ -110,6 +109,7 @@ router.get("/my", authMiddleware, async (req, res) => {
   try {
     const { userId, role } = req.user;
     const { limit = 10, offset = 0 } = req.query;
+<<<<<<< HEAD
 
     // Build where condition based on user role
     let whereCondition = {};
@@ -126,6 +126,8 @@ router.get("/my", authMiddleware, async (req, res) => {
       whereCondition.startup_id = userId;
     }
 
+=======
+>>>>>>> d328dc0a0196ba317e0b30d26319a0a5c90b146b
     const posts = await prisma.post.findMany({
       where: whereCondition,
       take: parseInt(limit),

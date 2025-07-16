@@ -10,7 +10,9 @@ import {
   Plus,
   User,
 } from "lucide-react";
-import { studentAPI } from "../../services/apiService";
+import { toast } from "react-toastify";
+
+import apiService from "../../services/apiService";
 
 const StudentProfileHeader = ({
   profileData,
@@ -41,11 +43,26 @@ const StudentProfileHeader = ({
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [coverPicUrl, setCoverPicUrl] = useState("");
 
+  const [user, setUser] = useState(null);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await apiService.getCurrentUser();
+      setUser(response.data);
+      console.log("User refreshed after upload:", response.data);
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData(); // Fetch on mount
+  }, []);
   // Fetch profile data on mount and whenever profileData changes
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await studentAPI.getProfile();
+        const response = await apiService.getProfile();
         console.log("Fetched profile data:", response);
 
         if (response.success) {
@@ -174,66 +191,55 @@ const StudentProfileHeader = ({
   };
 
   const handleSaveProfile = async () => {
-    const studentId = profileData?.id || profileData?.basicInfo?.id;
-    if (!profileData || !studentId) {
-      console.error("Invalid profileData: Missing student ID", profileData);
-      return;
-    }
-
     try {
-      await studentAPI.updateStudentAdditionalInfo(studentId, editData);
+      const payload = {
+        firstName: editData.firstName,
+        lastName: editData.lastName,
+        contactNo: editData.contactNo,
+        collegeName: editData.collegeName,
+        interestedField: editData.interestedField,
+        otherField:
+          editData.interestedField === "Other" ? editData.otherField : null,
+      };
+
+      await apiService.updateStudentProfile(payload); // Calls PUT /api/students/me
+      toast.success("Profile updated successfully!");
       onProfileUpdate(editData);
+      setIsEditModalOpen(false);
+      fetchUserData(); // Optional to refresh data
     } catch (error) {
-      console.error("Failed to update additional information:", error);
+      console.error("Failed to update profile:", error);
+      toast.error("Failed to update profile.");
     }
   };
 
   const handleUploadProfilePic = async (file) => {
-    const studentId = profileData?.id || profileData?.basicInfo?.id;
-    if (!profileData || !studentId) {
-      console.error("Invalid profileData: Missing student ID", profileData);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("profile_picture", file);
-
     try {
-      const response = await studentAPI.uploadProfileImage(formData);
-      setProfilePicUrl(response.data.profile_picture);
+      const formData = new FormData();
+      formData.append("profileImage", file); // make sure this matches backend multer field name
 
-      // Update the editData with the new profile picture
-      const updatedEditData = {
-        ...editData,
-        basicInfo: {
-          ...editData.basicInfo,
-          profile_picture: response.data.profile_picture,
-        },
-      };
-      setEditData(updatedEditData);
+      const response = await apiService.uploadProfileImage(formData);
+      await fetchUserData(); // ✅ Refresh user data with new coverPicture
 
-      // Notify parent component
-      onProfileUpdate(updatedEditData);
+      toast.success("Profile picture updated");
     } catch (error) {
       console.error("Failed to upload profile picture:", error);
+      toast.error(error.message || "Upload failed");
     }
   };
 
   const handleUploadCoverPic = async (file) => {
-    const studentId = profileData?.id || profileData?.basicInfo?.id;
-    if (!profileData || !studentId) {
-      console.error("Invalid profileData: Missing student ID", profileData);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file); // Ensure correct key for file upload
-
     try {
-      const response = await studentAPI.uploadCoverImage(formData);
+      const formData = new FormData();
+      formData.append("coverImage", file);
+      const response = await apiService.uploadCoverImage(formData);
+      await fetchUserData(); // ✅ Refresh user data with new coverPicture
+
       setCoverPicUrl(response.data.cover_picture);
+      toast.success("Cover picture updated");
     } catch (error) {
       console.error("Failed to upload cover picture:", error);
+      toast.error(error.message || "Upload failed");
     }
   };
 

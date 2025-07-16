@@ -19,6 +19,7 @@ const studentRoutes = require("./routes/students-new");
 const collegeRoutes = require("./routes/colleges-new");
 const startupRoutes = require("./routes/startups");
 const industryRoutes = require("./routes/industries");
+const searchRoutes = require("./routes/search");
 // Temporarily commented out until migrated to Prisma
 // const githubAuthRoutes = require("./routes/github-auth");
 // const userRoutes = require("./routes/users");
@@ -142,6 +143,7 @@ app.use("/api/students", studentRoutes);
 app.use("/api/colleges", collegeRoutes);
 app.use("/api/startups", startupRoutes);
 app.use("/api/industries", industryRoutes);
+app.use('/api/search', require('./routes/search'));
 // Temporarily commented out until migrated to Prisma
 // Updated: GitHub auth routes now mounted at /api/auth to match the callback URL
 // app.use("/api/auth", githubAuthRoutes);
@@ -156,6 +158,11 @@ app.use("/api/startup-profile", startupProfileRoutes); // Startup profiles
 // app.use("/api/notifications", notificationRoutes);
 
 // Note: Media serving endpoint removed - files are now served directly from Cloudinary
+
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!' });
+});
+
 
 // Debug endpoint to show all registered routes
 app.get("/api/debug/routes", (req, res) => {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "./axiosInstance"; // Make sure this is correct path
 
 class ApiService {
   constructor() {
@@ -53,6 +54,18 @@ class ApiService {
         return Promise.reject(error);
       }
     );
+  }
+
+  async searchUsers(query) {
+    try {
+      const response = await this.api.get(
+        `/search/users?q=${encodeURIComponent(query)}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Search error:", error);
+      throw new Error(error.response?.data?.message || "Search failed");
+    }
   }
 
   // Authentication methods
@@ -871,6 +884,17 @@ class ApiService {
     }
   }
 
+  async getProfile() {
+    try {
+      const response = await this.api.get("/students/me");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch profile data"
+      );
+    }
+  }
+
   async getCollegeProfile(collegeId = null) {
     try {
       const endpoint = collegeId ? `/colleges/${collegeId}` : "/colleges/me";
@@ -941,36 +965,38 @@ class ApiService {
       );
     }
   }
-
-  // File upload methods
-  async uploadProfileImage(file) {
+  async updateStudentAdditionalInfo(studentId, data) {
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await this.api.post("/upload/profile", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await apiService.api.put(`/students/${studentId}`, data);
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to upload profile image"
+        error.response?.data?.message || "Failed to update student info"
       );
     }
   }
 
-  async uploadCoverImage(file) {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await this.api.post("/upload/cover", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to upload cover image"
-      );
+  // File upload methods
+  async uploadProfileImage(formData) {
+    if (!formData || !formData.has("profileImage")) {
+      throw new Error("No file uploaded");
     }
+    return this.api.post("/students/profile-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
+  async uploadCoverImage(formData) {
+    if (!formData || !formData.has("coverImage")) {
+      throw new Error("No file uploaded");
+    }
+    return this.api.post("/students/cover-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   }
 
   // Role-based page helpers
@@ -1015,51 +1041,6 @@ const studentAPI = {
   },
   async updateStudentAbout(aboutData) {
     return apiService.updateStudentAbout(aboutData);
-  },
-
-  async updateStudentAdditionalInfo(studentId, data) {
-    try {
-      const response = await apiService.api.put(`/students/${studentId}`, data);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to update student info"
-      );
-    }
-  },
-
-  async uploadProfileImage(formData) {
-    try {
-      const response = await apiService.api.post(
-        "/students/upload/profile",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to upload profile image"
-      );
-    }
-  },
-
-  async uploadCoverImage(formData) {
-    try {
-      const response = await apiService.api.post(
-        "/students/upload/cover",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to upload cover image"
-      );
-    }
   },
 
   // Note: These detailed student profile features are not implemented in the simplified Prisma backend

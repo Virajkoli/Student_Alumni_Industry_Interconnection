@@ -20,6 +20,7 @@ model Student {
   googleId        String?   @map("google_id") @db.VarChar(255)
   githubId        String?   @map("github_id") @db.VarChar(255)
   profilePicture  String?   @map("profile_picture") @db.VarChar(255)
+  coverPicture  String?   @map("cover_picture") @db.VarChar(255)
   isActive        Boolean   @default(true)
   isEmailVerified Boolean   @default(false)
   lastLogin       DateTime? @map("lastLogin")

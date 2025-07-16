@@ -23,6 +23,12 @@ async function testConnection() {
     const industryCount = await prisma.industry.count();
     console.log(`📊 Current industries in database: ${industryCount}`);
 
+    // Test Post model connection
+    const posts = await prisma.post.findMany({
+      take: 1,
+    });
+    console.log("Connection successful. Posts:", posts);
+
     console.log("\n🎉 Prisma setup completed successfully!");
     console.log("💡 You can now:");
     console.log("   - Use the new authentication endpoints");

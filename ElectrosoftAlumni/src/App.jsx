@@ -1,4 +1,7 @@
 import React from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -263,6 +266,7 @@ function App() {
           {/* Catch-all route - redirect to login if not authenticated */}
           <Route path="*" element={<Navigate to="/auth/login" replace />} />
         </Routes>
+        <ToastContainer position="top-right" autoClose={3000} />
       </Router>
     </AuthProvider>
   );

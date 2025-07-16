@@ -119,7 +119,7 @@ const StudentProfilePage = () => {
       };
 
       // Update basic info
-      await apiService.updateStudentBasicInfo(basicInfoData);
+      await apiService.updateStudentProfile(basicInfoData);
 
       // Update about section if it exists
       if (updatedProfileData.about) {

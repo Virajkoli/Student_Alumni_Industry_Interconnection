@@ -21,6 +21,8 @@ model Student {
   githubId        String?   @map("github_id") @db.VarChar(255)
   profilePicture  String?   @map("profile_picture") @db.VarChar(255)
   coverPicture  String?   @map("cover_picture") @db.VarChar(255)
+  location        String?   @db.VarChar(100)
+  headline        String?   @db.VarChar(300)
   isActive        Boolean   @default(true)
   isEmailVerified Boolean   @default(false)
   lastLogin       DateTime? @map("lastLogin")

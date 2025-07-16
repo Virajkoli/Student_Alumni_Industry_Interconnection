@@ -42,12 +42,27 @@ export default function CompleteGoogleSignup() {
   const { registerWithGoogle, registerCollegeWithGoogle } = useAuth();
 
   useEffect(() => {
-    // Get Google user data from navigation state
+    // Get Google user data from navigation state or localStorage
     if (location.state?.googleUser) {
+      console.log('🔍 Google user data from location.state:', location.state.googleUser);
       setGoogleUser(location.state.googleUser);
     } else {
-      // Redirect to signup if no Google user data
-      navigate("/auth/signup");
+      // Try to get from localStorage as fallback
+      const storedGoogleUser = localStorage.getItem('googleUser');
+      if (storedGoogleUser) {
+        try {
+          const parsedUser = JSON.parse(storedGoogleUser);
+          console.log('🔍 Google user data from localStorage:', parsedUser);
+          setGoogleUser(parsedUser);
+        } catch (error) {
+          console.error('❌ Failed to parse stored Google user data:', error);
+          navigate("/auth/signup");
+        }
+      } else {
+        // Redirect to signup if no Google user data found
+        console.log('❌ No Google user data found, redirecting to signup');
+        navigate("/auth/signup");
+      }
     }
   }, [location.state, navigate]);
 
@@ -89,17 +104,18 @@ export default function CompleteGoogleSignup() {
       setIsLoading(true);
       setError("");
 
-      // Prepare data based on role
+      console.log('🔍 Google user data before registration:', googleUser);
+      console.log('🔍 Form data:', formData);
+
+      // Prepare data based on role - keep Google user data intact and add role
       let registrationData = {
-        email: googleUser.email,
-        first_name: googleUser.firstName,
-        last_name: googleUser.lastName,
-        google_id: googleUser.id,
-        profile_picture: googleUser.imageUrl,
+        ...googleUser, // Keep all Google user data (id, googleId, email, etc.)
         role: formData.role,
       };
 
-      // Add role-specific fields
+      console.log('🔍 Initial registration data:', registrationData);
+
+      // Add role-specific fields to the registration data
       if (formData.role === "student") {
         registrationData = {
           ...registrationData,
@@ -144,12 +160,18 @@ export default function CompleteGoogleSignup() {
       }
 
       // Register with Google data
+      console.log('🔍 Final registration data before API call:', registrationData);
+      
+      // IMPORTANT: apiService.registerWithGoogle expects { role, ...googleData } format
+      // where it extracts role and puts the rest in userData: { userData: {...}, role }
+      // So we pass the data in the format that apiService expects
+      
       let result;
       if (formData.role === "college") {
         // Use college-specific registration
         result = await registerCollegeWithGoogle(registrationData);
       } else {
-        // Use general registration for other roles
+        // Use general registration for other roles - pass data as-is since apiService will restructure it
         result = await registerWithGoogle(registrationData);
       }
 

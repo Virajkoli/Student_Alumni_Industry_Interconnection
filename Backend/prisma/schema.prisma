@@ -20,6 +20,9 @@ model Student {
   googleId        String?   @map("google_id") @db.VarChar(255)
   githubId        String?   @map("github_id") @db.VarChar(255)
   profilePicture  String?   @map("profile_picture") @db.VarChar(255)
+  coverPicture  String?   @map("cover_picture") @db.VarChar(255)
+  location        String?   @db.VarChar(100)
+  headline        String?   @db.VarChar(300)
   isActive        Boolean   @default(true)
   isEmailVerified Boolean   @default(false)
   lastLogin       DateTime? @map("lastLogin")
@@ -28,6 +31,85 @@ model Student {
   updatedAt       DateTime  @map("updated_at") @db.Timestamptz(6)
 
   @@map("students")
+}
+
+model Experience {
+  id           String    @id @db.Uuid
+  userId       String    @db.Uuid
+  company      String    @db.VarChar(255)
+  position     String    @db.VarChar(255)
+  startDate    DateTime  @db.Timestamptz(6)
+  endDate      DateTime? @db.Timestamptz(6)
+  description  String?
+  skills       String[]  @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  achievements String[]  @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  customFields Json?     @default("[]")
+  isCurrentJob Boolean?  @default(false)
+  createdAt    DateTime  @db.Timestamptz(6)
+  updatedAt    DateTime  @db.Timestamptz(6)
+  users        users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("experiences")
+}
+
+model Project {
+  id           String    @id @db.Uuid
+  userId       String    @db.Uuid
+  title        String    @db.VarChar(255)
+  description  String?
+  technologies String[]  @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  url          String?   @db.VarChar(255)
+  githubUrl    String?   @db.VarChar(255)
+  startDate    DateTime  @db.Timestamptz(6)
+  endDate      DateTime? @db.Timestamptz(6)
+  isOngoing    Boolean?  @default(false)
+  customFields Json?     @default("[]")
+  images       String[]  @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  createdAt    DateTime  @db.Timestamptz(6)
+  updatedAt    DateTime  @db.Timestamptz(6)
+  users        users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("projects")
+}
+
+model Course {
+  id             String    @id @db.Uuid
+  userId         String    @db.Uuid
+  name           String    @db.VarChar(255)
+  provider       String    @db.VarChar(255)
+  completionDate DateTime? @db.Timestamptz(6)
+  duration       String?   @db.VarChar(255)
+  skills         String[]  @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  url            String?   @db.VarChar(255)
+  certificateUrl String?   @db.VarChar(255)
+  grade          String?   @db.VarChar(255)
+  customFields   Json?     @default("[]")
+  isCompleted    Boolean?  @default(false)
+  createdAt      DateTime  @db.Timestamptz(6)
+  updatedAt      DateTime  @db.Timestamptz(6)
+  users          users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("courses")
+}
+
+model Certification {
+  id           String    @id @db.Uuid
+  userId       String    @db.Uuid
+  name         String    @db.VarChar(255)
+  issuer       String    @db.VarChar(255)
+  issueDate    DateTime  @db.Timestamptz(6)
+  expiryDate   DateTime? @db.Timestamptz(6)
+  credentialId String?   @db.VarChar(255)
+  url          String?   @db.VarChar(255)
+  pdfFile      String?   @db.VarChar(255)
+  skills       String[]  @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  customFields Json?     @default("[]")
+  isVerified   Boolean?  @default(false)
+  createdAt    DateTime  @db.Timestamptz(6)
+  updatedAt    DateTime  @db.Timestamptz(6)
+  users        users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("certifications")
 }
 
 model College {
@@ -48,7 +130,7 @@ model College {
   backgroundUrl   String?   @db.VarChar(255)
   isActive        Boolean   @default(true)
   isEmailVerified Boolean   @default(false)
-  lastLogin       DateTime?
+  lastLogin       DateTime? @db.Timestamptz(6)
   loginCount      Int       @default(0)
   googleId        String?   @unique @map("google_id") @db.VarChar(255)
   githubId        String?   @unique @map("github_id") @db.VarChar(255)
@@ -77,8 +159,8 @@ model Startup {
   backgroundUrl   String?   @db.VarChar(255)
   isActive        Boolean   @default(true)
   isEmailVerified Boolean   @default(false)
-  lastLogin       DateTime?
-  loginCount      Int       @default(0)
+  lastLogin       DateTime? @db.Timestamptz(6)
+  loginCount      Int?      @default(0)
   googleId        String?   @map("google_id") @db.VarChar(255)
   profilePicture  String?   @map("profile_picture") @db.VarChar(255)
   createdAt       DateTime  @default(now()) @db.Timestamptz(6)
@@ -105,8 +187,8 @@ model Industry {
   backgroundUrl   String?   @db.VarChar(255)
   isActive        Boolean   @default(true)
   isEmailVerified Boolean   @default(false)
-  lastLogin       DateTime?
-  loginCount      Int       @default(0)
+  lastLogin       DateTime? @db.Timestamptz(6)
+  loginCount      Int?      @default(0)
   googleId        String?   @map("google_id") @db.VarChar(255)
   profilePicture  String?   @map("profile_picture") @db.VarChar(255)
   createdAt       DateTime  @default(now()) @db.Timestamptz(6)
@@ -116,18 +198,333 @@ model Industry {
 }
 
 model Post {
-  id         Int      @id @default(autoincrement())
-  title      String?  @db.VarChar(255)
-  content    String
-  authorId   Int      @map("author_id")
-  authorType String   @map("author_type") @db.VarChar(20)
-  mediaUrls  String[] @default([]) @map("media_urls")
-  likes      Int      @default(0)
-  comments   Int      @default(0)
-  shares     Int      @default(0)
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  post_id        Int              @id @default(autoincrement())
+  content        String?
+  createdAt      DateTime?        @default(now()) @map("created_at") @db.Timestamp(6)
+  student_id     Int?
+  college_id     Int?
+  industry_id    Int?
+  alumni_id      Int?
+  startup_id     Int?
+  post_comments  post_comments[]
+  post_media     post_media[]
+  post_polls     post_polls[]
+  post_reactions post_reactions[]
+  post_shares    post_shares[]
+  post_tags      post_tags[]
+  alumni         alumni?          @relation(fields: [alumni_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("posts")
+}
+
+model SequelizeMeta {
+  name String @id @db.VarChar(255)
+}
+
+model alumni {
+  id             Int              @id @default(autoincrement())
+  post_comments  post_comments[]
+  post_reactions post_reactions[]
+  post_shares    post_shares[]
+  posts          Post[]
+}
+
+model college_campuses {
+  id             Int       @id @default(autoincrement())
+  college_id     Int
+  name           String    @db.VarChar(100)
+  type           String    @db.VarChar(100)
+  address        String
+  student_count  String?   @db.VarChar(50)
+  latitude       Decimal?  @db.Decimal(9, 6)
+  longitude      Decimal?  @db.Decimal(9, 6)
+  dean           String?   @db.VarChar(100)
+  image_url      String?   @db.VarChar(255)
+  contact_number String?   @db.VarChar(20)
+  email          String?   @db.VarChar(100)
+  custom_fields  Json?
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model migration_history {
+  id             Int       @id @default(autoincrement())
+  migration_name String    @unique @db.VarChar(255)
+  executed_at    DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ping_networks {
+  id                    Int       @id @default(autoincrement())
+  sender_profile_id     Int
+  sender_profile_type   String
+  receiver_profile_id   Int
+  receiver_profile_type String
+  status                String    @default("pending")
+  created_at            DateTime? @default(now()) @db.Timestamp(6)
+  updated_at            DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model post_comments {
+  comment_id   Int       @id @default(autoincrement())
+  post_id      Int?
+  comment_text String
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  media_url    String?
+  student_id   Int?
+  college_id   Int?
+  industry_id  Int?
+  alumni_id    Int?
+  startup_id   Int?
+  alumni       alumni?   @relation(fields: [alumni_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  posts        Post?     @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model post_media {
+  media_id             Int       @id @default(autoincrement())
+  post_id              Int?
+  media_type           String?   @db.VarChar(10)
+  media_url            String
+  uploaded_at          DateTime? @default(now()) @db.Timestamp(6)
+  cloudinary_public_id String?   @db.VarChar(255)
+  posts                Post?     @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model post_polls {
+  poll_id     Int       @id @default(autoincrement())
+  post_id     Int?
+  option_text String    @db.VarChar(500)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  posts       Post?     @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model post_reactions {
+  reaction_id   Int       @id @default(autoincrement())
+  post_id       Int?
+  reaction_type String?   @db.VarChar(10)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  student_id    Int?
+  college_id    Int?
+  industry_id   Int?
+  alumni_id     Int?
+  startup_id    Int?
+  alumni        alumni?   @relation(fields: [alumni_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  posts         Post?     @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model post_shares {
+  share_id              Int       @id @default(autoincrement())
+  post_id               Int?
+  shared_at             DateTime? @default(now()) @db.Timestamp(6)
+  shared_by_student_id  Int?
+  shared_by_college_id  Int?
+  shared_by_industry_id Int?
+  shared_by_alumni_id   Int?
+  shared_by_startup_id  Int?
+  posts                 Post?     @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+  alumni                alumni?   @relation(fields: [shared_by_alumni_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model post_tags {
+  tag_id     Int       @id @default(autoincrement())
+  post_id    Int?
+  tag_name   String    @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  posts      Post?     @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student_about {
+  id         Int     @id @default(autoincrement())
+  student_id Int
+  summary    String?
+  students   Student @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student_certifications {
+  id                   Int       @id @default(autoincrement())
+  student_id           Int
+  certificate_name     String?   @db.VarChar(150)
+  issuing_organization String?   @db.VarChar(150)
+  issue_date           DateTime? @db.Date
+  expiry_date          DateTime? @db.Date
+  credential_id        String?   @db.VarChar(100)
+  credential_url       String?
+  students             Student   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student_courses {
+  id              Int       @id @default(autoincrement())
+  student_id      Int
+  course_name     String?   @db.VarChar(150)
+  provider        String?   @db.VarChar(150)
+  completion_date DateTime? @db.Date
+  students        Student   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student_education {
+  id             Int     @id @default(autoincrement())
+  student_id     Int
+  institution    String? @db.VarChar(200)
+  degree         String? @db.VarChar(100)
+  field_of_study String? @db.VarChar(100)
+  start_year     Int?
+  end_year       Int?
+  grade          String? @db.VarChar(20)
+  students       Student @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student_experience {
+  id                Int       @id @default(autoincrement())
+  student_id        Int
+  title             String?   @db.VarChar(150)
+  company           String?   @db.VarChar(150)
+  start_date        DateTime? @db.Date
+  end_date          DateTime? @db.Date
+  description       String?
+  location          String?   @db.VarChar(100)
+  employment_type   String?   @default("Full-time") @db.VarChar(50)
+  currently_working Boolean?  @default(false)
+  students          Student   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student_projects {
+  id           Int       @id @default(autoincrement())
+  student_id   Int
+  title        String    @db.VarChar(150)
+  description  String?
+  technologies String?
+  start_date   DateTime? @db.Date
+  end_date     DateTime? @db.Date
+  project_link String?
+  students     Student   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student_recommendations {
+  id               Int     @id @default(autoincrement())
+  student_id       Int
+  recommender_name String? @db.VarChar(100)
+  relationship     String? @db.VarChar(100)
+  message          String?
+  students         Student @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model student_skills {
+  id          Int     @id @default(autoincrement())
+  student_id  Int
+  skill_name  String? @db.VarChar(100)
+  proficiency String? @db.VarChar(50)
+  students    Student @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model students_additional_information {
+  id           Int       @id @default(autoincrement())
+  student_id   Int?
+  headline     String?   @db.VarChar(255)
+  location     String?   @db.VarChar(150)
+  college_name String?   @db.VarChar(200)
+  contact_no   String?   @db.VarChar(15)
+  other_field  String?   @db.VarChar(100)
+  updated_at   DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model users {
+  id                       String                        @id @db.Uuid
+  email                    String                        @unique @db.VarChar(255)
+  password                 String?                       @db.VarChar(255)
+  role                     enum_users_role               @default(student)
+  fullName                 String                        @db.VarChar(255)
+  first_name               String?                       @db.VarChar(255)
+  last_name                String?                       @db.VarChar(255)
+  avatar                   String?                       @db.VarChar(255)
+  bio                      String?
+  location                 String?                       @db.VarChar(255)
+  phone                    String?                       @db.VarChar(255)
+  website                  String?                       @db.VarChar(255)
+  linkedinUrl              String?                       @db.VarChar(255)
+  twitterUrl               String?                       @db.VarChar(255)
+  collegeName              String?                       @db.VarChar(255)
+  course                   String?                       @db.VarChar(255)
+  year                     Int?
+  graduationYear           Int?
+  cgpa                     Decimal?                      @db.Decimal(3, 2)
+  skills                   String[]                      @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  deanName                 String?                       @db.VarChar(255)
+  establishedYear          Int?
+  accreditation            String[]                      @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  departments              String[]                      @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+  studentCount             Int?
+  facultyCount             Int?
+  companyName              String?                       @db.VarChar(255)
+  company_name             String?                       @db.VarChar(255)
+  industry_type            String?                       @db.VarChar(255)
+  company_size             String?                       @db.VarChar(255)
+  designation              String?                       @db.VarChar(255)
+  sector                   String?                       @db.VarChar(255)
+  contactPerson            String?                       @db.VarChar(255)
+  employeeCount            Int?
+  headquarters             String?                       @db.VarChar(255)
+  companyDescription       String?
+  startupName              String?                       @db.VarChar(255)
+  startup_name             String?                       @db.VarChar(255)
+  startup_stage            String?                       @db.VarChar(255)
+  funding_status           String?                       @db.VarChar(255)
+  team_size                String?                       @db.VarChar(255)
+  domain                   String?                       @db.VarChar(255)
+  founderName              String?                       @db.VarChar(255)
+  foundedYear              Int?
+  stage                    enum_users_stage?
+  fundingStatus            String?                       @db.VarChar(255)
+  teamSize                 Int?
+  startupDescription       String?
+  isActive                 Boolean?                      @default(true)
+  isEmailVerified          Boolean?                      @default(false)
+  emailVerificationToken   String?                       @db.VarChar(255)
+  emailVerificationExpires DateTime?                     @db.Timestamptz(6)
+  passwordResetToken       String?                       @db.VarChar(255)
+  passwordResetExpires     DateTime?                     @db.Timestamptz(6)
+  lastLogin                DateTime?                     @db.Timestamptz(6)
+  loginCount               Int?                          @default(0)
+  google_id                String?                       @unique @db.VarChar(255)
+  microsoftId              String?                       @db.VarChar(255)
+  emailNotifications       Boolean?                      @default(true)
+  pushNotifications        Boolean?                      @default(true)
+  profileVisibility        enum_users_profileVisibility? @default(public)
+  customFields             Json?                         @default("[]")
+  createdAt                DateTime                      @db.Timestamptz(6)
+  updatedAt                DateTime                      @db.Timestamptz(6)
+  certifications           Certification[]
+  courses                  Course[]
+  experiences              Experience[]
+  projects                 Project[]
+
+  @@index([createdAt], map: "users_created_at")
+  @@index([email], map: "users_email")
+  @@index([fullName], map: "users_full_name")
+  @@index([role], map: "users_role")
+}
+
+enum enum_users_profileVisibility {
+  public
+  connections
+  private
+}
+
+enum enum_users_role {
+  student
+  alumni
+  college
+  industry
+  startup
+}
+
+enum enum_users_stage {
+  idea
+  prototype
+  mvp
+  growth
+  scale
 }

@@ -92,7 +92,7 @@ class AuthController {
   // Google OAuth registration
   async registerWithGoogle(req, res) {
     try {
-      const { role } = req.body;
+      const { userData, role } = req.body;
 
       if (!role) {
         return res.status(400).json({
@@ -101,7 +101,14 @@ class AuthController {
         });
       }
 
-      const result = await authService.registerWithGoogle(req.body, role);
+      if (!userData) {
+        return res.status(400).json({
+          success: false,
+          message: "User data is required",
+        });
+      }
+
+      const result = await authService.registerWithGoogle(userData, role);
 
       // Set cookies
       res.cookie("accessToken", result.tokens.accessToken, {
@@ -136,7 +143,17 @@ class AuthController {
   // Google OAuth login
   async loginWithGoogle(req, res) {
     try {
-      const result = await authService.loginWithGoogle(req.body);
+      const { userData, role } = req.body;
+
+      if (!userData) {
+        return res.status(400).json({
+          success: false,
+          message: "User data is required",
+        });
+      }
+
+      // Add role to userData for service method
+      const result = await authService.loginWithGoogle({ ...userData, role });
 
       // Set cookies
       res.cookie("accessToken", result.tokens.accessToken, {

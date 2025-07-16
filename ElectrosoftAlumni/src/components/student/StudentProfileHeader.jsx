@@ -10,7 +10,9 @@ import {
   Plus,
   User,
 } from "lucide-react";
-import { studentAPI } from "../../services/apiService";
+import { toast } from "react-toastify";
+
+import apiService from "../../services/apiService";
 
 const StudentProfileHeader = ({
   profileData,
@@ -41,34 +43,49 @@ const StudentProfileHeader = ({
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [coverPicUrl, setCoverPicUrl] = useState("");
 
-  // Fetch profile data on mount and whenever profileData changes
+  const [user, setUser] = useState(null);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await apiService.getCurrentUser();
+      setUser(response.data);
+      console.log("User refreshed after upload:", response.data);
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const response = await studentAPI.getProfile();
-        console.log("Fetched profile data:", response);
+    fetchUserData(); // Fetch on mount
+  }, []);
+  // Fetch profile data on mount and whenever profileData changes
+  // useEffect(() => {
+  //   const fetchProfileData = async () => {
+  //     try {
+  //       const response = await apiService.getProfile();
+  //       console.log("Fetched profile data:", response);
 
-        if (response.success) {
-          // Set the complete profile data using the correct structure
-          setEditData(response.data);
+  //       if (response.success) {
+  //         // Set the complete profile data using the correct structure
+  //         onProfileUpdate(response.data);
 
-          // Set image URLs from the correct data structure (flat structure)
-          const profilePic = response.data.profilePicture || "";
-          const coverPic = response.data.coverPicture || "";
+  //         // Set image URLs from the correct data structure (flat structure)
+  //         const profilePic = response.data.profilePicture || "";
+  //         const coverPic = response.data.coverPicture || "";
 
-          console.log("Profile pic URL:", profilePic);
-          console.log("Cover pic URL:", coverPic);
+  //         console.log("Profile pic URL:", profilePic);
+  //         console.log("Cover pic URL:", coverPic);
 
-          setProfilePicUrl(profilePic);
-          setCoverPicUrl(coverPic);
-        }
-      } catch (error) {
-        console.error("Failed to fetch profile data:", error);
-      }
-    };
+  //         setProfilePicUrl(profilePic);
+  //         setCoverPicUrl(coverPic);
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to fetch profile data:", error);
+  //     }
+  //   };
 
-    fetchProfileData();
-  }, [profileData]);
+  //   fetchProfileData();
+  // }, [profileData]);
 
   // Update image URLs when profileData changes
   useEffect(() => {
@@ -165,7 +182,14 @@ const StudentProfileHeader = ({
 
   // Profile handlers
   const handleEditClick = () => {
-    setEditData({ ...profileData });
+    const normalizedData = {
+      ...profileData,
+      headline: profileData.headline || profileData.interestedField || "",
+      interestedField: profileData.interestedField || "",
+      location: profileData.location || profileData.city || "",
+      // Don't link headline and interestedField
+    };
+    setEditData(normalizedData);
     setIsEditModalOpen(true);
   };
 
@@ -174,66 +198,57 @@ const StudentProfileHeader = ({
   };
 
   const handleSaveProfile = async () => {
-    const studentId = profileData?.id || profileData?.basicInfo?.id;
-    if (!profileData || !studentId) {
-      console.error("Invalid profileData: Missing student ID", profileData);
-      return;
-    }
-
     try {
-      await studentAPI.updateStudentAdditionalInfo(studentId, editData);
+      const payload = {
+        firstName: editData.firstName,
+        lastName: editData.lastName,
+        contactNo: editData.contactNo,
+        collegeName: editData.collegeName,
+        interestedField: editData.interestedField, // ✅ Separate field
+        location: editData.location,
+        headline: editData.headline, // ✅ Separate field
+        otherField:
+          editData.interestedField === "Other" ? editData.otherField : null,
+      };
+
+      await apiService.updateStudentProfile(payload);
+      toast.success("Profile updated successfully!");
       onProfileUpdate(editData);
+      setIsEditModalOpen(false);
+      // Only fetch user data if needed, not always
+      // fetchUserData();
     } catch (error) {
-      console.error("Failed to update additional information:", error);
+      console.error("Failed to update profile:", error);
+      toast.error("Failed to update profile.");
     }
   };
-
   const handleUploadProfilePic = async (file) => {
-    const studentId = profileData?.id || profileData?.basicInfo?.id;
-    if (!profileData || !studentId) {
-      console.error("Invalid profileData: Missing student ID", profileData);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("profile_picture", file);
-
     try {
-      const response = await studentAPI.uploadProfileImage(formData);
-      setProfilePicUrl(response.data.profile_picture);
+      const formData = new FormData();
+      formData.append("profileImage", file); // make sure this matches backend multer field name
 
-      // Update the editData with the new profile picture
-      const updatedEditData = {
-        ...editData,
-        basicInfo: {
-          ...editData.basicInfo,
-          profile_picture: response.data.profile_picture,
-        },
-      };
-      setEditData(updatedEditData);
+      const response = await apiService.uploadProfileImage(formData);
+      await fetchUserData(); // ✅ Refresh user data with new coverPicture
 
-      // Notify parent component
-      onProfileUpdate(updatedEditData);
+      toast.success("Profile picture updated");
     } catch (error) {
       console.error("Failed to upload profile picture:", error);
+      toast.error(error.message || "Upload failed");
     }
   };
 
   const handleUploadCoverPic = async (file) => {
-    const studentId = profileData?.id || profileData?.basicInfo?.id;
-    if (!profileData || !studentId) {
-      console.error("Invalid profileData: Missing student ID", profileData);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file); // Ensure correct key for file upload
-
     try {
-      const response = await studentAPI.uploadCoverImage(formData);
+      const formData = new FormData();
+      formData.append("coverImage", file);
+      const response = await apiService.uploadCoverImage(formData);
+      await fetchUserData(); // ✅ Refresh user data with new coverPicture
+
       setCoverPicUrl(response.data.cover_picture);
+      toast.success("Cover picture updated");
     } catch (error) {
       console.error("Failed to upload cover picture:", error);
+      toast.error(error.message || "Upload failed");
     }
   };
 
@@ -413,30 +428,33 @@ const StudentProfileHeader = ({
                   profileData?.basicInfo?.last_name}
               </h3>
               <p className="text-md text-gray-600 mt-1">
-                {editData?.interestedField ||
+                {editData?.headline ||
+                  editData?.interestedField ||
                   editData?.basicInfo?.interested_field ||
+                  profileData?.headline ||
                   profileData?.interestedField ||
-                  profileData?.basicInfo?.interested_field ||
-                  profileData?.headline}
+                  profileData?.basicInfo?.interested_field}
               </p>
               <div className="flex items-center text-sm text-gray-500 mt-2">
                 <MapPin className="w-4 h-4 mr-1.5" />
-                {editData?.collegeName ||
-                  editData?.basicInfo?.college_name ||
+                {editData?.city ||
+                  editData?.location ||
+                  profileData?.city ||
+                  profileData?.location ||
+                  editData?.collegeName ||
                   profileData?.collegeName ||
-                  profileData?.basicInfo?.college_name ||
-                  profileData?.city}
+                  "Location not specified"}
               </div>
               {(editData?.collegeName ||
-                editData?.basicInfo?.college_name ||
+                editData?.basicInfo?.collegeName ||
                 profileData?.collegeName ||
-                profileData?.basicInfo?.college_name ||
+                profileData?.basicInfo?.collegeName ||
                 profileData?.showSchool) && (
                 <p className="text-sm text-gray-600 mt-1">
                   {editData?.collegeName ||
-                    editData?.basicInfo?.college_name ||
+                    editData?.basicInfo?.collegeName ||
                     profileData?.collegeName ||
-                    profileData?.basicInfo?.college_name ||
+                    profileData?.basicInfo?.collegeName ||
                     profileData?.school}
                 </p>
               )}
@@ -671,7 +689,6 @@ const StudentProfileHeader = ({
                   </p>
                 </div>
               </div>
-
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -680,7 +697,7 @@ const StudentProfileHeader = ({
                   </label>
                   <input
                     type="text"
-                    value={editData.firstName}
+                    value={editData.firstName || ""}
                     onChange={(e) =>
                       handleInputChange("firstName", e.target.value)
                     }
@@ -694,7 +711,7 @@ const StudentProfileHeader = ({
                   </label>
                   <input
                     type="text"
-                    value={editData.lastName}
+                    value={editData.lastName || ""}
                     onChange={(e) =>
                       handleInputChange("lastName", e.target.value)
                     }
@@ -703,7 +720,6 @@ const StudentProfileHeader = ({
                   />
                 </div>
               </div>
-
               {/* Headline */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -711,7 +727,7 @@ const StudentProfileHeader = ({
                 </label>
                 <input
                   type="text"
-                  value={editData.headline}
+                  value={editData.headline || ""}
                   onChange={(e) =>
                     handleInputChange("headline", e.target.value)
                   }
@@ -719,38 +735,37 @@ const StudentProfileHeader = ({
                   placeholder="Enter your professional headline"
                 />
               </div>
-
               {/* Location and School */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Location *
-                  </label>
-                  <input
-                    type="text"
-                    value={editData.city}
-                    onChange={(e) => handleInputChange("city", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    placeholder="Enter location"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    College Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={editData.college_name || editData.school}
-                    onChange={(e) => {
-                      handleInputChange("college_name", e.target.value);
-                      handleInputChange("school", e.target.value);
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    placeholder="Enter college name"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location *
+                </label>
+                <input
+                  type="text"
+                  value={editData.location || editData.city || ""}
+                  onChange={(e) => {
+                    handleInputChange("location", e.target.value);
+                    handleInputChange("city", e.target.value); // Update both fields
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter location"
+                />
               </div>
-
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  College Name *
+                </label>
+                <input
+                  type="text"
+                  value={editData.collegeName || editData.school || ""}
+                  onChange={(e) => {
+                    handleInputChange("collegeName", e.target.value);
+                    handleInputChange("school", e.target.value);
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter college name"
+                />
+              </div>
               {/* Contact and Field */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -773,17 +788,15 @@ const StudentProfileHeader = ({
                   </label>
                   <input
                     type="text"
-                    value={editData.interested_field || editData.headline}
-                    onChange={(e) => {
-                      handleInputChange("interested_field", e.target.value);
-                      handleInputChange("headline", e.target.value);
-                    }}
+                    value={editData.interestedField || ""}
+                    onChange={(e) =>
+                      handleInputChange("interestedField", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     placeholder="Enter interested field"
                   />
                 </div>
               </div>
-
               {/* Other Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -799,7 +812,6 @@ const StudentProfileHeader = ({
                   placeholder="Enter other field of interest"
                 />
               </div>
-
               {/* About Section */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -813,13 +825,12 @@ const StudentProfileHeader = ({
                   placeholder="Tell us about yourself..."
                 />
               </div>
-
               {/* Show School Toggle */}
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="showSchool"
-                  checked={editData.showSchool}
+                  checked={editData.showSchool || ""}
                   onChange={(e) =>
                     handleInputChange("showSchool", e.target.checked)
                   }

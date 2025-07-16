@@ -2,14 +2,11 @@ const express = require("express");
 const prisma = require("../config/prisma");
 const { authMiddleware } = require("../middleware/authMiddleware");
 const router = express.Router();
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
-const cloudinary = require("cloudinary").v2; // Ensure correct import
+const { uploadProfileImage } = require("../config/cloudinary");
 
-// GET /api/students/me - Get current student profile
+// ✅ GET Current Student Profile
 router.get("/me", authMiddleware, async (req, res) => {
   try {
-    // Check if user is a student
     if (req.user.role !== "student") {
       return res.status(403).json({
         success: false,
@@ -19,50 +16,26 @@ router.get("/me", authMiddleware, async (req, res) => {
 
     const student = await prisma.student.findUnique({
       where: { id: req.user.userId },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        contactNo: true,
-        collegeName: true,
-        interestedField: true,
-        otherField: true,
-        profilePicture: true,
-        isActive: true,
-        isEmailVerified: true,
-        lastLogin: true,
-        loginCount: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: studentSelectFields(),
     });
 
-    if (!student) {
-      return res.status(404).json({
-        success: false,
-        message: "Student profile not found",
-      });
-    }
+    if (!student)
+      return res
+        .status(404)
+        .json({ success: false, message: "Student profile not found" });
 
-    res.json({
-      success: true,
-      data: student,
-    });
+    res.json({ success: true, data: student });
   } catch (error) {
     console.error("Error fetching student profile:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch student profile",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch student profile" });
   }
 });
 
-// PUT /api/students/me - Update current student profile
+// ✅ Update Current Student Profile
 router.put("/me", authMiddleware, async (req, res) => {
   try {
-    // Check if user is a student
     if (req.user.role !== "student") {
       return res.status(403).json({
         success: false,
@@ -77,6 +50,8 @@ router.put("/me", authMiddleware, async (req, res) => {
       collegeName,
       interestedField,
       otherField,
+      location,
+      headline,
       profilePicture,
     } = req.body;
 
@@ -89,43 +64,24 @@ router.put("/me", authMiddleware, async (req, res) => {
         collegeName,
         interestedField,
         otherField,
+        location,
+        headline,
         profilePicture,
         updatedAt: new Date(),
       },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        contactNo: true,
-        collegeName: true,
-        interestedField: true,
-        otherField: true,
-        profilePicture: true,
-        isActive: true,
-        isEmailVerified: true,
-        lastLogin: true,
-        loginCount: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: studentSelectFields(),
     });
 
-    res.json({
-      success: true,
-      data: updatedStudent,
-    });
+    res.json({ success: true, data: updatedStudent });
   } catch (error) {
     console.error("Error updating student profile:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update student profile",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update student profile" });
   }
 });
 
-// GET /api/students - Get all students with pagination and search
+// ✅ Get All Students with Pagination + Search
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const {
@@ -137,55 +93,29 @@ router.get("/", authMiddleware, async (req, res) => {
     } = req.query;
     const offset = (page - 1) * limit;
 
-    // Build search filter
     const searchFilter = search
       ? {
           OR: [
-            { firstName: { contains: search, mode: "insensitive" } },
-            { lastName: { contains: search, mode: "insensitive" } },
-            { email: { contains: search, mode: "insensitive" } },
-            { collegeName: { contains: search, mode: "insensitive" } },
-            { interestedField: { contains: search, mode: "insensitive" } },
-          ],
+            "firstName",
+            "lastName",
+            "email",
+            "collegeName",
+            "interestedField",
+          ].map((field) => ({
+            [field]: { contains: search, mode: "insensitive" },
+          })),
         }
       : {};
 
-    // Get students with pagination
     const [students, total] = await Promise.all([
       prisma.student.findMany({
-        where: {
-          isActive: true,
-          ...searchFilter,
-        },
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-          contactNo: true,
-          collegeName: true,
-          interestedField: true,
-          otherField: true,
-          profilePicture: true,
-          isActive: true,
-          isEmailVerified: true,
-          lastLogin: true,
-          loginCount: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-        orderBy: {
-          [sortBy]: sortOrder,
-        },
+        where: { isActive: true, ...searchFilter },
+        select: studentSelectFields(),
+        orderBy: { [sortBy]: sortOrder },
         take: parseInt(limit),
         skip: parseInt(offset),
       }),
-      prisma.student.count({
-        where: {
-          isActive: true,
-          ...searchFilter,
-        },
-      }),
+      prisma.student.count({ where: { isActive: true, ...searchFilter } }),
     ]);
 
     res.json({
@@ -200,67 +130,40 @@ router.get("/", authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching students:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch students",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch students" });
   }
 });
 
-// GET /api/students/:id - Get student by ID
+// ✅ Get Student by ID
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
     const student = await prisma.student.findUnique({
       where: { id: parseInt(id) },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        contactNo: true,
-        collegeName: true,
-        interestedField: true,
-        otherField: true,
-        profilePicture: true,
-        isActive: true,
-        isEmailVerified: true,
-        lastLogin: true,
-        loginCount: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: studentSelectFields(),
     });
 
-    if (!student) {
-      return res.status(404).json({
-        success: false,
-        message: "Student not found",
-      });
-    }
+    if (!student)
+      return res
+        .status(404)
+        .json({ success: false, message: "Student not found" });
 
-    res.json({
-      success: true,
-      data: student,
-    });
+    res.json({ success: true, data: student });
   } catch (error) {
     console.error("Error fetching student:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch student",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch student" });
   }
 });
 
-// PUT /api/students/:id - Update student by ID (admin only)
+// ✅ Admin or Self Update Student by ID
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Only allow admins or the student themselves to update
     if (req.user.role !== "admin" && req.user.userId !== parseInt(id)) {
       return res.status(403).json({
         success: false,
@@ -277,6 +180,8 @@ router.put("/:id", authMiddleware, async (req, res) => {
       otherField,
       profilePicture,
       isActive,
+      location,
+      headline,
       isEmailVerified,
     } = req.body;
 
@@ -291,48 +196,26 @@ router.put("/:id", authMiddleware, async (req, res) => {
         otherField,
         profilePicture,
         isActive,
+        headline: headline?.trim() || null,
+        location: location?.trim() || null,
         isEmailVerified,
         updatedAt: new Date(),
       },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        contactNo: true,
-        collegeName: true,
-        interestedField: true,
-        otherField: true,
-        profilePicture: true,
-        isActive: true,
-        isEmailVerified: true,
-        lastLogin: true,
-        loginCount: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: studentSelectFields(),
     });
 
-    res.json({
-      success: true,
-      data: updatedStudent,
-    });
+    res.json({ success: true, data: updatedStudent });
   } catch (error) {
     console.error("Error updating student:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update student",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update student" });
   }
 });
 
-// DELETE /api/students/:id - Delete student by ID (admin only)
+// ✅ Delete (Soft) Student by ID (Admin Only)
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
-    const { id } = req.params;
-
-    // Only allow admins to delete
     if (req.user.role !== "admin") {
       return res.status(403).json({
         success: false,
@@ -341,11 +224,8 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     }
 
     await prisma.student.update({
-      where: { id: parseInt(id) },
-      data: {
-        isActive: false,
-        updatedAt: new Date(),
-      },
+      where: { id: parseInt(req.params.id) },
+      data: { isActive: false, updatedAt: new Date() },
     });
 
     res.json({
@@ -354,68 +234,96 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error("Error deleting student:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete student",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to delete student" });
   }
 });
 
-// POST /api/students/upload/cover - Upload cover picture
+// ✅ Upload Profile Image
 router.post(
-  "/upload/cover",
+  "/profile-image",
   authMiddleware,
-  upload.single("file"),
+  uploadProfileImage.single("profileImage"),
   async (req, res) => {
     try {
-      if (req.user.role !== "student") {
-        return res.status(403).json({
-          success: false,
-          message: "Only students can upload cover pictures",
-        });
-      }
+      if (!req.file)
+        return res
+          .status(400)
+          .json({ success: false, message: "No file uploaded" });
 
-      const file = req.file;
-      if (!file) {
-        return res.status(400).json({
-          success: false,
-          message: "No file uploaded",
-        });
-      }
-
-      // Verify Cloudinary configuration
-      cloudinary.config({
-        cloud_name: process.env.CLOUD_NAME,
-        api_key: process.env.API_KEY,
-        api_secret: process.env.API_SECRET,
-      });
-
-      // Upload file to Cloudinary
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: "cover_pictures",
-      });
-
-      // Update student profile with cover picture URL
       const updatedStudent = await prisma.student.update({
         where: { id: req.user.userId },
-        data: { profilePicture: result.secure_url },
+        data: { profilePicture: req.file.path },
       });
 
       res.json({
         success: true,
-        message: "Cover picture uploaded successfully",
+        message: "Profile picture updated",
         data: updatedStudent,
       });
     } catch (error) {
-      console.error("Error uploading cover picture:", error);
-      res.status(500).json({
-        success: false,
-        message: "Failed to upload cover picture",
-        error: error.message,
-      });
+      console.error("Upload profile picture error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to upload profile picture" });
     }
   }
 );
+
+// ✅ Upload Cover Image
+router.post(
+  "/cover-image",
+  authMiddleware,
+  uploadProfileImage.single("coverImage"),
+  async (req, res) => {
+    try {
+      if (!req.file)
+        return res
+          .status(400)
+          .json({ success: false, message: "No file uploaded" });
+
+      const updatedStudent = await prisma.student.update({
+        where: { id: req.user.userId },
+        data: { coverPicture: req.file.path },
+      });
+
+      res.json({
+        success: true,
+        message: "Cover image updated",
+        data: updatedStudent,
+      });
+    } catch (error) {
+      console.error("Upload cover image error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to upload cover image" });
+    }
+  }
+);
+
+// ✅ Helper: Common Prisma Select Fields
+function studentSelectFields() {
+  return {
+    id: true,
+    firstName: true,
+    lastName: true,
+    email: true,
+    contactNo: true,
+    collegeName: true,
+    interestedField: true,
+    location: true,
+    headline: true,
+    otherField: true,
+    profilePicture: true,
+    coverPicture: true,
+    isActive: true,
+    isEmailVerified: true,
+    lastLogin: true,
+    loginCount: true,
+    createdAt: true,
+    updatedAt: true,
+  };
+}
 
 module.exports = router;

@@ -13,9 +13,6 @@ const StudentProfilePage = () => {
   const [activeCustomContent, setActiveCustomContent] = useState(null);
   const [customNavigations, setCustomNavigations] = useState([]);
 
-  // State for search bar
-  const [searchQuery, setSearchQuery] = useState("");
-
   // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -122,7 +119,7 @@ const StudentProfilePage = () => {
       };
 
       // Update basic info
-      await apiService.updateStudentBasicInfo(basicInfoData);
+      await apiService.updateStudentProfile(basicInfoData);
 
       // Update about section if it exists
       if (updatedProfileData.about) {

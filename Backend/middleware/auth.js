@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { Student, College } = require("../config/database");
+const prisma = require("../config/prisma");
 
 const auth = async (req, res, next) => {
   try {
@@ -27,37 +27,54 @@ const auth = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Try to find user in Student or College tables
+      // Try to find user in students or colleges tables using Prisma
       let user = null;
       let userRole = null;
 
-      // Check Student table first
+      // Check students table first
       try {
-        user = await Student.findByPk(decoded.userId, {
-          attributes: { exclude: ["password"] },
+        user = await prisma.student.findUnique({
+          where: { id: decoded.userId },
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            profilePicture: true,
+            isActive: true,
+            // Exclude password for security
+          },
         });
         if (user) {
           userRole = "student";
         }
       } catch (error) {
         console.error(
-          "Error checking Student table in auth middleware:",
+          "Error checking students table in auth middleware:",
           error.message
         );
       }
 
-      // Check College table if not found in Student
+      // Check colleges table if not found in students
       if (!user) {
         try {
-          user = await College.findByPk(decoded.userId, {
-            attributes: { exclude: ["password"] },
+          user = await prisma.college.findUnique({
+            where: { id: decoded.userId },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              logoUrl: true,
+              isActive: true,
+              // Exclude password for security
+            },
           });
           if (user) {
             userRole = "college";
           }
         } catch (error) {
           console.error(
-            "Error checking College table in auth middleware:",
+            "Error checking colleges table in auth middleware:",
             error.message
           );
         }
@@ -79,7 +96,8 @@ const auth = async (req, res, next) => {
 
       // Add user to request object with role
       req.user = {
-        ...user.dataValues,
+        ...user,
+        userId: user.id,
         role: userRole,
       };
       next();
@@ -141,37 +159,54 @@ const optionalAuth = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Try to find user in Student or College tables
+      // Try to find user in students or colleges tables using Prisma
       let user = null;
       let userRole = null;
 
-      // Check Student table first
+      // Check students table first
       try {
-        user = await Student.findByPk(decoded.userId, {
-          attributes: { exclude: ["password"] },
+        user = await prisma.student.findUnique({
+          where: { id: decoded.userId },
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            profilePicture: true,
+            isActive: true,
+            // Exclude password for security
+          },
         });
         if (user) {
           userRole = "student";
         }
       } catch (error) {
         console.error(
-          "Error checking Student table in optional auth:",
+          "Error checking students table in optional auth:",
           error.message
         );
       }
 
-      // Check College table if not found in Student
+      // Check colleges table if not found in students
       if (!user) {
         try {
-          user = await College.findByPk(decoded.userId, {
-            attributes: { exclude: ["password"] },
+          user = await prisma.college.findUnique({
+            where: { id: decoded.userId },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              logoUrl: true,
+              isActive: true,
+              // Exclude password for security
+            },
           });
           if (user) {
             userRole = "college";
           }
         } catch (error) {
           console.error(
-            "Error checking College table in optional auth:",
+            "Error checking colleges table in optional auth:",
             error.message
           );
         }
@@ -179,7 +214,8 @@ const optionalAuth = async (req, res, next) => {
 
       if (user && (user.isActive === undefined || user.isActive)) {
         req.user = {
-          ...user.dataValues,
+          ...user,
+          userId: user.id,
           role: userRole,
         };
       } else {

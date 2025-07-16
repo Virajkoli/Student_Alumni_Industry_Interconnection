@@ -325,7 +325,14 @@ class StudentProfileService {
         where: { student_id: studentId },
         orderBy: { start_date: 'desc' }
       });
-      return projects;
+      
+      // Parse technologies JSON string back to array
+      return projects.map(project => ({
+        ...project,
+        technologies: project.technologies ? 
+          (project.technologies.startsWith('[') ? JSON.parse(project.technologies) : project.technologies.split(','))
+          : []
+      }));
     } catch (error) {
       throw new Error(`Failed to get projects: ${error.message}`);
     }
@@ -335,12 +342,17 @@ class StudentProfileService {
     try {
       const { title, description, technologies, start_date, end_date, project_link } = projectData;
       
+      // Convert technologies array to JSON string if it's an array
+      const technologiesString = Array.isArray(technologies) 
+        ? JSON.stringify(technologies) 
+        : technologies;
+      
       const project = await prisma.student_projects.create({
         data: {
           student_id: studentId,
           title,
           description,
-          technologies,
+          technologies: technologiesString,
           start_date: start_date ? new Date(start_date) : null,
           end_date: end_date ? new Date(end_date) : null,
           project_link
@@ -356,12 +368,17 @@ class StudentProfileService {
     try {
       const { title, description, technologies, start_date, end_date, project_link } = projectData;
       
+      // Convert technologies array to JSON string if it's an array
+      const technologiesString = Array.isArray(technologies) 
+        ? JSON.stringify(technologies) 
+        : technologies;
+      
       const project = await prisma.student_projects.updateMany({
         where: { id: parseInt(projectId), student_id: studentId },
         data: {
           title,
           description,
-          technologies,
+          technologies: technologiesString,
           start_date: start_date ? new Date(start_date) : null,
           end_date: end_date ? new Date(end_date) : null,
           project_link

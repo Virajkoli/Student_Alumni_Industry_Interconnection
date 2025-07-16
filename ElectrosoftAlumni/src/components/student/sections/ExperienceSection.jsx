@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Plus, X, Briefcase } from "lucide-react";
-import { studentAPI } from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const ExperienceSection = ({
   experiences = [],
@@ -142,20 +142,25 @@ const ExperienceSection = ({
 
       if (editingExperience) {
         // Update existing experience
-        await studentAPI.updateExperience(
-          studentId,
+        await apiService.updateStudentExperience(
           editingExperience.id,
           experiencePayload
         );
       } else {
         // Add new experience
-        await studentAPI.addExperience(studentId, experiencePayload);
+        await apiService.createStudentExperience(experiencePayload);
       }
       closeModal();
-      // Reload the page to reflect changes
-      window.location.reload();
+      
+      // Update the parent component's state instead of reloading
+      if (onExperienceUpdate) {
+        // Fetch fresh experience data
+        const updatedExperiences = await apiService.getStudentExperiences();
+        onExperienceUpdate(updatedExperiences.data || updatedExperiences);
+      }
     } catch (error) {
       console.error("Error saving experience:", error);
+      alert("Error saving experience. Please try again.");
     }
   };
 
@@ -193,12 +198,22 @@ const ExperienceSection = ({
   };
 
   const handleDeleteExperience = async (experienceId) => {
+    if (!confirm('Are you sure you want to delete this experience?')) {
+      return;
+    }
+    
     try {
-      await studentAPI.deleteExperience(studentId, experienceId);
-      // Reload the page to reflect changes
-      window.location.reload();
+      await apiService.deleteStudentExperience(experienceId);
+      
+      // Update the parent component's state instead of reloading
+      if (onExperienceUpdate) {
+        // Fetch fresh experience data
+        const updatedExperiences = await apiService.getStudentExperiences();
+        onExperienceUpdate(updatedExperiences.data || updatedExperiences);
+      }
     } catch (error) {
       console.error("Error deleting experience:", error);
+      alert("Error deleting experience. Please try again.");
     }
   };
 

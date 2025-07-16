@@ -111,11 +111,23 @@ router.get("/my", authMiddleware, async (req, res) => {
     const { userId, role } = req.user;
     const { limit = 10, offset = 0 } = req.query;
 
+    // Build where condition based on user role
+    let whereCondition = {};
+    
+    if (role === 'student') {
+      whereCondition.student_id = userId;
+    } else if (role === 'college') {
+      whereCondition.college_id = userId;
+    } else if (role === 'industry') {
+      whereCondition.industry_id = userId;
+    } else if (role === 'alumni') {
+      whereCondition.alumni_id = userId;
+    } else if (role === 'startup') {
+      whereCondition.startup_id = userId;
+    }
+
     const posts = await prisma.post.findMany({
-      where: {
-        authorId: userId,
-        authorType: role.toUpperCase(),
-      },
+      where: whereCondition,
       take: parseInt(limit),
       skip: parseInt(offset),
       orderBy: {

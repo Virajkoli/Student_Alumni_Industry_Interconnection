@@ -23,6 +23,10 @@ const industryRoutes = require("./routes/industries");
 // const githubAuthRoutes = require("./routes/github-auth");
 // const userRoutes = require("./routes/users");
 const postRoutes = require("./routes/posts-new");
+const profileRoutes = require("./routes/profile");
+const collegeProfileRoutes = require("./routes/collegeProfile");
+const industryProfileRoutes = require("./routes/industryProfile");
+const startupProfileRoutes = require("./routes/startupProfile");
 // const connectionRoutes = require("./routes/connections");
 // const jobRoutes = require("./routes/jobs");
 // const notificationRoutes = require("./routes/notifications");
@@ -143,6 +147,10 @@ app.use("/api/industries", industryRoutes);
 // app.use("/api/auth", githubAuthRoutes);
 // app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/profile", profileRoutes); // Student profiles
+app.use("/api/college-profile", collegeProfileRoutes); // College profiles
+app.use("/api/industry-profile", industryProfileRoutes); // Industry profiles
+app.use("/api/startup-profile", startupProfileRoutes); // Startup profiles
 // app.use("/api/connections", connectionRoutes);
 // app.use("/api/jobs", jobRoutes);
 // app.use("/api/notifications", notificationRoutes);

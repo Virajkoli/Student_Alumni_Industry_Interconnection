@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Award, Upload, FileText } from "lucide-react";
-import { studentAPI } from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const CertificationsSection = ({
   certifications = [],
@@ -85,20 +85,25 @@ const CertificationsSection = ({
 
       if (editingCertification) {
         // Update existing certification
-        await studentAPI.updateCertification(
-          studentId,
+        await apiService.updateStudentCertification(
           editingCertification.id,
           certificationPayload
         );
       } else {
         // Add new certification
-        await studentAPI.addCertification(studentId, certificationPayload);
+        await apiService.createStudentCertification(certificationPayload);
       }
       closeModal();
-      // Reload the page to reflect changes
-      window.location.reload();
+      
+      // Update the parent component's state instead of reloading
+      if (onCertificationsUpdate) {
+        // Fetch fresh certifications data
+        const updatedCertifications = await apiService.getStudentCertifications();
+        onCertificationsUpdate(updatedCertifications.data || updatedCertifications);
+      }
     } catch (error) {
       console.error("Error saving certification:", error);
+      alert("Error saving certification. Please try again.");
     }
   };
 
@@ -119,12 +124,22 @@ const CertificationsSection = ({
   };
 
   const handleDeleteCertification = async (certificationId) => {
+    if (!confirm('Are you sure you want to delete this certification?')) {
+      return;
+    }
+    
     try {
-      await studentAPI.deleteCertification(studentId, certificationId);
-      // Reload the page to reflect changes
-      window.location.reload();
+      await apiService.deleteStudentCertification(certificationId);
+      
+      // Update the parent component's state instead of reloading
+      if (onCertificationsUpdate) {
+        // Fetch fresh certifications data
+        const updatedCertifications = await apiService.getStudentCertifications();
+        onCertificationsUpdate(updatedCertifications.data || updatedCertifications);
+      }
     } catch (error) {
       console.error("Error deleting certification:", error);
+      alert("Error deleting certification. Please try again.");
     }
   };
 

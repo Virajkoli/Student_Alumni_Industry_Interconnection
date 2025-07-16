@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, MessageCircle, Trash2 } from "lucide-react";
-import { studentAPI } from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const RecommendationsSection = ({
   recommendations = [],
@@ -69,20 +69,25 @@ const RecommendationsSection = ({
 
       if (editingRecommendation) {
         // Update existing recommendation
-        await studentAPI.updateRecommendation(
-          studentId,
+        await apiService.updateStudentRecommendation(
           editingRecommendation.id,
           recommendationPayload
         );
       } else {
         // Add new recommendation
-        await studentAPI.addRecommendation(studentId, recommendationPayload);
+        await apiService.createStudentRecommendation(recommendationPayload);
       }
       closeModal();
-      // Reload the page to reflect changes
-      window.location.reload();
+      
+      // Update the parent component's state instead of reloading
+      if (onRecommendationsUpdate) {
+        // Fetch fresh recommendations data
+        const updatedRecommendations = await apiService.getStudentRecommendations();
+        onRecommendationsUpdate(updatedRecommendations.data || updatedRecommendations);
+      }
     } catch (error) {
       console.error("Error saving recommendation:", error);
+      alert("Error saving recommendation. Please try again.");
     }
   };
 
@@ -102,12 +107,22 @@ const RecommendationsSection = ({
   };
 
   const handleDeleteRecommendation = async (recommendationId) => {
+    if (!confirm('Are you sure you want to delete this recommendation?')) {
+      return;
+    }
+    
     try {
-      await studentAPI.deleteRecommendation(studentId, recommendationId);
-      // Reload the page to reflect changes
-      window.location.reload();
+      await apiService.deleteStudentRecommendation(recommendationId);
+      
+      // Update the parent component's state instead of reloading
+      if (onRecommendationsUpdate) {
+        // Fetch fresh recommendations data
+        const updatedRecommendations = await apiService.getStudentRecommendations();
+        onRecommendationsUpdate(updatedRecommendations.data || updatedRecommendations);
+      }
     } catch (error) {
       console.error("Error deleting recommendation:", error);
+      alert("Error deleting recommendation. Please try again.");
     }
   };
 

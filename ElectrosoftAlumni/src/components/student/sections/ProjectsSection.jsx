@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Folder, ExternalLink } from "lucide-react";
-import { studentAPI } from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -82,20 +82,25 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
 
       if (editingProject) {
         // Update existing project
-        await studentAPI.updateProject(
-          studentId,
+        await apiService.updateStudentProject(
           editingProject.id,
           projectPayload
         );
       } else {
         // Add new project
-        await studentAPI.addProject(studentId, projectPayload);
+        await apiService.createStudentProject(projectPayload);
       }
       closeModal();
-      // Reload the page to reflect changes
-      window.location.reload();
+      
+      // Update the parent component's state instead of reloading
+      if (onProjectsUpdate) {
+        // Fetch fresh projects data
+        const updatedProjects = await apiService.getStudentProjects();
+        onProjectsUpdate(updatedProjects.data || updatedProjects);
+      }
     } catch (error) {
       console.error("Error saving project:", error);
+      alert("Error saving project. Please try again.");
     }
   };
 
@@ -115,12 +120,22 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
   };
 
   const handleDeleteProject = async (projectId) => {
+    if (!confirm('Are you sure you want to delete this project?')) {
+      return;
+    }
+    
     try {
-      await studentAPI.deleteProject(studentId, projectId);
-      // Reload the page to reflect changes
-      window.location.reload();
+      await apiService.deleteStudentProject(projectId);
+      
+      // Update the parent component's state instead of reloading
+      if (onProjectsUpdate) {
+        // Fetch fresh projects data
+        const updatedProjects = await apiService.getStudentProjects();
+        onProjectsUpdate(updatedProjects.data || updatedProjects);
+      }
     } catch (error) {
       console.error("Error deleting project:", error);
+      alert("Error deleting project. Please try again.");
     }
   };
 

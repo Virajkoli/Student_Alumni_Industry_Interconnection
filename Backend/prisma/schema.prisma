@@ -30,6 +30,16 @@ model Student {
   createdAt       DateTime  @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime  @map("updated_at") @db.Timestamptz(6)
 
+  // Relations to profile sections
+  about           student_about[]
+  certifications  student_certifications[]
+  courses         student_courses[]
+  education       student_education[]
+  experience      student_experience[]
+  projects        student_projects[]
+  recommendations student_recommendations[]
+  skills          student_skills[]
+
   @@map("students")
 }
 

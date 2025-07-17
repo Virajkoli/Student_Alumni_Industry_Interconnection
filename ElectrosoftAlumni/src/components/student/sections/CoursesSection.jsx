@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit, Plus, X, BookOpen } from "lucide-react";
 import { studentAPI } from "../../../services/apiService";
 
-const CoursesSection = ({ courses = [], onCoursesUpdate, studentId }) => {
+const CoursesSection = ({ courses = [], onCoursesUpdate, studentId, isOwner }) => {
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
   const [courseData, setCourseData] = useState({
@@ -130,13 +130,15 @@ const CoursesSection = ({ courses = [], onCoursesUpdate, studentId }) => {
       <div className="bg-white rounded-lg mb-6">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Courses</h2>
-          <button
-            onClick={() => setShowCourseModal(true)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-            title="Add course"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowCourseModal(true)}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Add course"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6">
@@ -144,12 +146,12 @@ const CoursesSection = ({ courses = [], onCoursesUpdate, studentId }) => {
             <div className="text-center py-8">
               <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">No courses added yet</p>
-              <button
+              {isOwner &&<button
                 onClick={() => setShowCourseModal(true)}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 Add your first course
-              </button>
+              </button>}
             </div>
           ) : (
             <div className="space-y-4">
@@ -218,13 +220,15 @@ const CoursesSection = ({ courses = [], onCoursesUpdate, studentId }) => {
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={() => handleDeleteCourse(course.id)}
-                      className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                      title="Delete course"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                    {isOwner && (
+                      <button
+                        onClick={() => handleDeleteCourse(course.id)}
+                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Delete course"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

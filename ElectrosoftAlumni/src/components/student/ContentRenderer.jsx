@@ -105,7 +105,7 @@ const TextContent = ({ data }) => {
 };
 
 // Custom Navigation Content Renderer
-const CustomNavigationContent = ({ customNavItem, onEditCustomContent }) => {
+const CustomNavigationContent = ({ customNavItem, onEditCustomContent, isOwner }) => {
   if (!customNavItem) return null;
 
   const handleEdit = () => {
@@ -117,15 +117,17 @@ const CustomNavigationContent = ({ customNavItem, onEditCustomContent }) => {
   return (
     <div className="relative">
       {/* Edit Button */}
-      <div className="absolute top-4 right-4 z-10">
-        <button
-          onClick={handleEdit}
-          className="p-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200"
-          title="Edit this content"
-        >
-          <Edit3 className="w-4 h-4 text-gray-600" />
-        </button>
-      </div>
+      {isOwner && (
+        <div className="absolute top-4 right-4 z-10">
+          <button
+            onClick={handleEdit}
+            className="p-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200"
+            title="Edit this content"
+          >
+            <Edit3 className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
+      )}
 
       {/* Content based on type */}
       {customNavItem.contentType === "dashboard" && (
@@ -163,6 +165,7 @@ const ContentRenderer = ({
   recommendations,
   onRecommendationsUpdate,
   studentId,
+  isOwner = false,
 }) => {
   // If it's a custom navigation item, render its content
   if (customNavItem) {
@@ -170,6 +173,7 @@ const ContentRenderer = ({
       <CustomNavigationContent
         customNavItem={customNavItem}
         onEditCustomContent={onEditCustomContent}
+        isOwner={isOwner}
       />
     );
   }
@@ -200,6 +204,7 @@ const ContentRenderer = ({
           <AboutSection
             profileData={profileData}
             onProfileUpdate={onProfileUpdate}
+            isOwner={isOwner}
           />
         );
 
@@ -209,6 +214,7 @@ const ContentRenderer = ({
             experiences={experiences}
             onExperienceUpdate={onExperienceUpdate}
             studentId={studentId}
+            isOwner={isOwner}
           />
         );
 
@@ -218,6 +224,7 @@ const ContentRenderer = ({
             education={education}
             onEducationUpdate={onEducationUpdate}
             studentId={studentId}
+            isOwner={isOwner}
           />
         );
 
@@ -227,6 +234,7 @@ const ContentRenderer = ({
             skills={skills}
             onSkillsUpdate={onSkillsUpdate}
             studentId={studentId}
+            isOwner={isOwner}
           />
         );
 
@@ -236,6 +244,7 @@ const ContentRenderer = ({
             projects={projects}
             onProjectsUpdate={onProjectsUpdate}
             studentId={studentId}
+            isOwner={isOwner}
           />
         );
 
@@ -245,6 +254,7 @@ const ContentRenderer = ({
             courses={courses}
             onCoursesUpdate={onCoursesUpdate}
             studentId={studentId}
+            isOwner={isOwner}
           />
         );
 
@@ -254,6 +264,7 @@ const ContentRenderer = ({
             certifications={certifications}
             onCertificationsUpdate={onCertificationsUpdate}
             studentId={studentId}
+            isOwner={isOwner}
           />
         );
 
@@ -263,6 +274,7 @@ const ContentRenderer = ({
             recommendations={recommendations}
             onRecommendationsUpdate={onRecommendationsUpdate}
             studentId={studentId}
+            isOwner={isOwner}
           />
         );
 

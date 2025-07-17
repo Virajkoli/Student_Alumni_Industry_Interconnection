@@ -6,6 +6,7 @@ const CertificationsSection = ({
   certifications = [],
   onCertificationsUpdate,
   studentId,
+  isOwner,
 }) => {
   const [showCertificationModal, setShowCertificationModal] = useState(false);
   const [editingCertification, setEditingCertification] = useState(null);
@@ -187,13 +188,15 @@ const CertificationsSection = ({
           <h2 className="text-xl font-semibold text-gray-900">
             Certifications
           </h2>
-          <button
-            onClick={() => setShowCertificationModal(true)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-            title="Add certification"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowCertificationModal(true)}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Add certification"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6">
@@ -201,12 +204,12 @@ const CertificationsSection = ({
             <div className="text-center py-8">
               <Award className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">No certifications added yet</p>
-              <button
+              {isOwner &&<button
                 onClick={() => setShowCertificationModal(true)}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 Add your first certification
-              </button>
+              </button>}
             </div>
           ) : (
             <div className="space-y-4">
@@ -314,15 +317,15 @@ const CertificationsSection = ({
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={() =>
-                        handleDeleteCertification(certification.id)
-                      }
-                      className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                      title="Delete certification"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                    {isOwner && (
+                      <button
+                        onClick={() => handleDeleteCertification(certification.id)}
+                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Delete certification"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

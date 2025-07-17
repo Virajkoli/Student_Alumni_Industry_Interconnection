@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit, Plus, X, Folder, ExternalLink } from "lucide-react";
 import { studentAPI } from "../../../services/apiService";
 
-const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
+const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId, isOwner }) => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [projectData, setProjectData] = useState({
@@ -142,13 +142,15 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
       <div className="bg-white rounded-lg mb-6">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Projects</h2>
-          <button
-            onClick={() => setShowProjectModal(true)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-            title="Add project"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowProjectModal(true)}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Add project"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6">
@@ -156,12 +158,12 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
             <div className="text-center py-8">
               <Folder className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">No projects added yet</p>
-              <button
+              {isOwner &&<button
                 onClick={() => setShowProjectModal(true)}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 Add your first project
-              </button>
+              </button>}
             </div>
           ) : (
             <div className="space-y-6">
@@ -193,13 +195,15 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId }) => {
                       >
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleDeleteProject(project.id)}
-                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Delete project"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      {isOwner && (
+                        <button
+                          onClick={() => handleDeleteProject(project.id)}
+                          className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete project"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </div>
                   <p className="text-gray-600 mb-2">{project.description}</p>

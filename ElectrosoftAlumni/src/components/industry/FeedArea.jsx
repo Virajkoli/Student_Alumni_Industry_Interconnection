@@ -14,7 +14,7 @@ import {
 import apiService from "../../services/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
-const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
+const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -168,9 +168,11 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
               </div>
             </div>
           </div>
-          <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
+          {isOwner && (
+            <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Post Content */}
@@ -260,20 +262,21 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
               <span>{post.share_count || 0}</span>
             </button>
           </div>
-
-          <button
-            onClick={() => handleBookmark(post.post_id)}
-            className={`p-2 rounded-full transition-colors ${
-              post.bookmarked
-                ? "text-blue-500 bg-blue-50 hover:bg-blue-100"
-                : "text-gray-400 hover:text-blue-500 hover:bg-blue-50"
-            }`}
-            title={post.bookmarked ? "Remove bookmark" : "Bookmark post"}
-          >
-            <BookmarkPlus
-              className={`w-4 h-4 ${post.bookmarked ? "fill-current" : ""}`}
-            />
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => handleBookmark(post.post_id)}
+              className={`p-2 rounded-full transition-colors ${
+                post.bookmarked
+                  ? "text-blue-500 bg-blue-50 hover:bg-blue-100"
+                  : "text-gray-400 hover:text-blue-500 hover:bg-blue-50"
+              }`}
+              title={post.bookmarked ? "Remove bookmark" : "Bookmark post"}
+            >
+              <BookmarkPlus
+                className={`w-4 h-4 ${post.bookmarked ? "fill-current" : ""}`}
+              />
+            </button>
+          )}
         </div>
       </div>
     );

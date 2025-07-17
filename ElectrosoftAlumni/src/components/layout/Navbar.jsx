@@ -92,7 +92,23 @@ const Navbar = () => {
     setSearchResults([]);
     
     // Navigate to user profile based on type
-    const profileRoute = `/profile/${result.type}/${result.id}`;
+    let profileRoute;
+    switch (result.type) {
+      case 'student':
+        profileRoute = `/student-profile/${result.id}`;
+        break;
+      case 'college':
+        profileRoute = `/college-profile/${result.id}`;
+        break;
+      case 'startup':
+        profileRoute = `/startup-profile/${result.id}`;
+        break;
+      case 'industry':
+        profileRoute = `/industry-profile/${result.id}`;
+        break;
+      default:
+        profileRoute = `/student-profile/${result.id}`;
+    }
     navigate(profileRoute);
   };
 

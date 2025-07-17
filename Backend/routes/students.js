@@ -1055,6 +1055,100 @@ const uploadCoverImage = async (req, res) => {
   }
 };
 
+// @desc    Get specific student profile by ID
+// @route   GET /api/students/:id
+// @access  Private
+const getStudentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get main student info
+    const student = await Student.findByPk(id, {
+      attributes: { exclude: ["password"] },
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    // Get all profile sections
+    const [
+      about,
+      experience,
+      education,
+      skills,
+      courses,
+      certifications,
+      projects,
+      recommendations,
+    ] = await Promise.all([
+      StudentAbout.findOne({ where: { student_id: id } }),
+      StudentExperience.findAll({
+        where: { student_id: id },
+        order: [["created_at", "DESC"]],
+      }),
+      StudentEducation.findAll({
+        where: { student_id: id },
+        order: [["created_at", "DESC"]],
+      }),
+      StudentSkills.findAll({
+        where: { student_id: id },
+        order: [["created_at", "DESC"]],
+      }),
+      StudentCourses.findAll({
+        where: { student_id: id },
+        order: [["created_at", "DESC"]],
+      }),
+      StudentCertifications.findAll({
+        where: { student_id: id },
+        order: [["created_at", "DESC"]],
+      }),
+      StudentProjects.findAll({
+        where: { student_id: id },
+        order: [["created_at", "DESC"]],
+      }),
+      StudentRecommendations.findAll({
+        where: { student_id: id },
+        order: [["created_at", "DESC"]],
+      }),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        id: student.id,
+        firstName: student.first_name,
+        lastName: student.last_name,
+        email: student.email,
+        contactNo: student.contact_no,
+        collegeName: student.college_name,
+        interestedField: student.interested_field,
+        otherField: student.other_field,
+        profilePicture: student.profile_picture,
+        coverPicture: student.cover_picture,
+        about: about?.summary || "",
+        experience: experience || [],
+        education: education || [],
+        skills: skills || [],
+        courses: courses || [],
+        certifications: certifications || [],
+        projects: projects || [],
+        recommendations: recommendations || [],
+        createdAt: student.created_at,
+      },
+    });
+  } catch (error) {
+    console.error("Get student by ID error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching student profile",
+    });
+  }
+};
+
 // @desc    Get student additional information
 // @route   GET /api/students/:id/additional-info
 // @access  Private
@@ -1171,6 +1265,7 @@ const updateStudentAdditionalInfo = async (req, res) => {
 
 // Routes
 router.get("/profile", auth, getStudentProfile);
+router.get("/:id", auth, getStudentById);
 router.get("/:id/additional-info", auth, getStudentAdditionalInfo);
 router.put("/:id/additional-info", auth, updateStudentAdditionalInfo);
 router.put("/basic-info", auth, updateBasicInfo);

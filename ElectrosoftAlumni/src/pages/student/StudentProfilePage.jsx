@@ -5,14 +5,17 @@ import FeedArea from "../../components/student/FeedArea";
 import StudentSidebar from "../../components/student/StudentSidebar";
 import ContentRenderer from "../../components/student/ContentRenderer";
 import apiService, { studentAPI } from "../../services/apiService";
-
+import { useAuth } from "../../contexts/AuthContext";
+import { useParams } from "react-router-dom";
 const StudentProfilePage = () => {
   // Navigation state
   const [activeContent, setActiveContent] = useState("posts");
   const [activeContentName, setActiveContentName] = useState("Posts");
   const [activeCustomContent, setActiveCustomContent] = useState(null);
   const [customNavigations, setCustomNavigations] = useState([]);
-
+  const { id: routeId } = useParams();
+  
+  const { user } = useAuth();
   // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,70 +40,76 @@ const StudentProfilePage = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [studentId, setStudentId] = useState(null);
 
+  const isOwner = user?.id === profileData?.id;
+
   // Fetch profile data on component mount
   useEffect(() => {
     fetchProfileData();
-  }, []);
+  }, [routeId]); // Add routeId as dependency
 
   const fetchProfileData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  try {
+    setIsLoading(true);
+    setError(null);
 
-      console.log("Fetching student profile data...");
+    console.log("Fetching student profile data...");
 
-      // Check if user is authenticated using apiService
-      if (!apiService.isAuthenticated()) {
-        setError("Please log in to view your profile");
-        return;
-      }
-
-      console.log("User is authenticated, making API call...");
-      const response = await studentAPI.getProfile();
-      console.log("API Response:", response);
-
-      if (response.success) {
-        const { data } = response;
-
-        // Set student ID
-        setStudentId(data.id);
-
-        // Map backend data to frontend structure - use the correct field names
-        setProfileData({
-          ...data, // Include the full data structure
-          id: data.id, // Include student ID at root level
-          firstName: data.firstName || "",
-          lastName: data.lastName || "",
-          student_college_name: data.collegeName || "",
-          interested_field: data.interestedField || "",
-          other_field: data.otherField || "",
-          // Include about and other fields for backward compatibility
-          about: data.about || "",
-        });
-
-        // Set other sections (these might not exist in the simplified backend)
-        setExperiences([]);
-        setEducation([]);
-        setSkills([]);
-        setProjects([]);
-        setCourses([]);
-        setCertifications([]);
-        setRecommendations([]);
-
-        console.log("Profile data loaded successfully");
-      } else {
-        console.error("API returned error:", response.message);
-        setError(response.message || "Failed to load profile data");
-      }
-    } catch (error) {
-      console.error("Error fetching profile data:", error);
-      setError(
-        error.message || "Failed to load profile data. Please try again."
-      );
-    } finally {
-      setIsLoading(false);
+    if (!apiService.isAuthenticated()) {
+      setError("Please log in to view this profile");
+      return;
     }
-  };
+
+    let response;
+
+    if (!routeId) {
+      // Apna profile
+      response = await studentAPI.getProfile();
+    } else {
+      // Dusre ka profile
+      response = await apiService.getStudentProfile(routeId);
+    }
+
+    console.log("API Response:", response);
+
+    if (response.success) {
+      const { data } = response;
+
+      setStudentId(data.id);
+
+      setProfileData({
+        ...data,
+        id: data.id,
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        student_college_name: data.collegeName || "",
+        interested_field: data.interestedField || "",
+        other_field: data.otherField || "",
+        about: data.about || "",
+      });
+
+      setExperiences([]);
+      setEducation([]);
+      setSkills([]);
+      setProjects([]);
+      setCourses([]);
+      setCertifications([]);
+      setRecommendations([]);
+
+      console.log("Profile data loaded successfully");
+    } else {
+      console.error("API returned error:", response.message);
+      setError(response.message || "Failed to load profile data");
+    }
+  } catch (error) {
+    console.error("Error fetching profile data:", error);
+    setError(
+      error.message || "Failed to load profile data. Please try again."
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleProfileUpdate = async (updatedProfileData) => {
     try {
@@ -250,10 +259,11 @@ const StudentProfilePage = () => {
             <div className="w-full mb-6">
               <StudentProfileHeader
                 profileData={profileData}
-                onProfileUpdate={handleProfileUpdate}
+                onProfileUpdate={isOwner ? handleProfileUpdate : null}
                 onNavigationChange={handleNavigationChange}
                 customNavigations={customNavigations}
-                onCustomNavigationUpdate={setCustomNavigations}
+                onCustomNavigationUpdate={isOwner ? setCustomNavigations : null}
+                isOwner={isOwner}
               />
             </div>
 
@@ -262,36 +272,37 @@ const StudentProfilePage = () => {
               <div className="w-full lg:w-[70%] flex flex-col">
                 <div className="space-y-6 w-full">
                   {/* Post Creator - Only show when on posts view */}
-                  {activeContent === "posts" && <PostCreator />}
+                  {activeContent === "posts" && isOwner && <PostCreator />}
 
                   {/* Content Area */}
                   {activeContent === "posts" ? (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                      <FeedArea />
+                      <FeedArea isOwner={isOwner} />
                     </div>
                   ) : (
                     <ContentRenderer
                       activeContent={activeContent}
                       activeContentName={activeContentName}
                       customNavItem={activeCustomContent}
-                      onEditCustomContent={handleEditCustomContent}
+                      onEditCustomContent={isOwner ? handleEditCustomContent : null}
                       profileData={profileData}
-                      onProfileUpdate={handleProfileUpdate}
+                      onProfileUpdate={isOwner ? handleProfileUpdate : null}
                       experiences={experiences}
-                      onExperienceUpdate={setExperiences}
+                      onExperienceUpdate={isOwner ? setExperiences : null}
                       education={education}
-                      onEducationUpdate={setEducation}
+                      onEducationUpdate={isOwner ? setEducation : null}
                       skills={skills}
-                      onSkillsUpdate={setSkills}
+                      onSkillsUpdate={isOwner ? setSkills : null}
                       projects={projects}
-                      onProjectsUpdate={setProjects}
+                      onProjectsUpdate={isOwner ? setProjects : null}
                       courses={courses}
-                      onCoursesUpdate={setCourses}
+                      onCoursesUpdate={isOwner ? setCourses : null}
                       certifications={certifications}
-                      onCertificationsUpdate={setCertifications}
+                      onCertificationsUpdate={isOwner ? setCertifications : null}
                       recommendations={recommendations}
-                      onRecommendationsUpdate={setRecommendations}
+                      onRecommendationsUpdate={isOwner ? setRecommendations : null}
                       studentId={studentId}
+                      isOwner={isOwner}
                     />
                   )}
                 </div>

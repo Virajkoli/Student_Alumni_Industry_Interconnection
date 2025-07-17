@@ -6,6 +6,7 @@ const ExperienceSection = ({
   experiences = [],
   onExperienceUpdate,
   studentId,
+  isOwner = false,
 }) => {
   const [showExperienceModal, setShowExperienceModal] = useState(false);
   const [editingExperience, setEditingExperience] = useState(null);
@@ -228,13 +229,15 @@ const ExperienceSection = ({
       <div className="bg-white rounded-lg">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Experience</h2>
-          <button
-            onClick={() => setShowExperienceModal(true)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-            title="Add experience"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowExperienceModal(true)}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Add experience"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6">
@@ -242,12 +245,14 @@ const ExperienceSection = ({
             <div className="text-center py-8">
               <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">No experience added yet</p>
-              <button
-                onClick={() => setShowExperienceModal(true)}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Add your first experience
-              </button>
+              {isOwner && (
+                <button
+                  onClick={() => setShowExperienceModal(true)}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Add your first experience
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-6">
@@ -361,22 +366,24 @@ const ExperienceSection = ({
                         </div>
                       )}
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEditExperience(experience)}
-                      className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      title="Edit experience"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteExperience(experience.id)}
-                      className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                      title="Delete experience"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
+                  {isOwner && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditExperience(experience)}
+                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        title="Edit experience"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteExperience(experience.id)}
+                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Delete experience"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -15,7 +15,7 @@ import ProjectSuccessStories from "./sections/ProjectSuccessStories";
 import UploadProject from "./sections/UploadProject";
 import AddUniversityProject from "./sections/AddUniversityProject";
 
-const ContentRenderer = ({ activeContent, activeContentName }) => {
+const ContentRenderer = ({ activeContent, activeContentName, isOwner }) => {
   const renderContent = () => {
     switch (activeContent) {
       case "industry-overview":
@@ -31,7 +31,7 @@ const ContentRenderer = ({ activeContent, activeContentName }) => {
       case "success-stories":
         return <SuccessStories />;
       case "post-news-jobs":
-        return <PostNewsJobs />;
+        return isOwner ? <PostNewsJobs /> : <p>You do not have permission to post news or jobs.</p>;
       case "expert-opinions-interview":
         return <ExpertOpinionsInterview />;
       case "poll-comment-section":
@@ -45,9 +45,9 @@ const ContentRenderer = ({ activeContent, activeContentName }) => {
       case "project-success-stories":
         return <ProjectSuccessStories />;
       case "upload-project":
-        return <UploadProject />;
+        return isOwner ? <UploadProject /> : <p>You do not have permission to upload projects.</p>;
       case "add-university-project":
-        return <AddUniversityProject />;
+        return isOwner ? <AddUniversityProject /> : <p>You do not have permission to add university projects.</p>;
       default:
         return (
           <div className="p-8 text-center">

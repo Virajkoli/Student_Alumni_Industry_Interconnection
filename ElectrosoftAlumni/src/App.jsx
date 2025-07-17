@@ -233,7 +233,7 @@ function App() {
             }
           />
           <Route
-            path="/industry-profile"
+            path="/profile/industry/:id"
             element={
               <ProtectedRoute>
                 <Layout>
@@ -253,7 +253,7 @@ function App() {
             }
           />
           <Route
-            path="/student-profile"
+            path="/student-profile/:id"
             element={
               <ProtectedRoute>
                 <Layout>

@@ -6,6 +6,7 @@ const RecommendationsSection = ({
   recommendations = [],
   onRecommendationsUpdate,
   studentId,
+  isOwner, // <-- Add isOwner prop
 }) => {
   console.log(
     "🔍 RecommendationsSection - received recommendations:",
@@ -133,13 +134,15 @@ const RecommendationsSection = ({
           <h2 className="text-xl font-semibold text-gray-900">
             Recommendations
           </h2>
-          <button
-            onClick={() => setShowRecommendationModal(true)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-            title="Request recommendation"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowRecommendationModal(true)}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Request recommendation"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6">
@@ -147,12 +150,14 @@ const RecommendationsSection = ({
             <div className="text-center py-8">
               <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">No recommendations yet</p>
-              <button
-                onClick={() => setShowRecommendationModal(true)}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Request a recommendation
-              </button>
+              {isOwner && (
+                <button
+                  onClick={() => setShowRecommendationModal(true)}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Request a recommendation
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-6">
@@ -193,15 +198,17 @@ const RecommendationsSection = ({
                         >
                           <Edit className="w-4 h-4" />
                         </button>
-                        <button
-                          onClick={() =>
-                            handleDeleteRecommendation(recommendation.id)
-                          }
-                          className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="Delete recommendation"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {isOwner && (
+                          <button
+                            onClick={() =>
+                              handleDeleteRecommendation(recommendation.id)
+                            }
+                            className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title="Delete recommendation"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                     <blockquote className="text-gray-700 italic border-l-4 border-blue-200 pl-4">

@@ -20,6 +20,7 @@ const StudentProfileHeader = ({
   onNavigationChange,
   customNavigations,
   onCustomNavigationUpdate,
+  isOwner = false,
 }) => {
   // Profile edit state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -368,14 +369,16 @@ const StudentProfileHeader = ({
           ></div>
 
           {/* Edit Background/Profile Image Button - Top right of background */}
-          <button
-            // onClick={() => document.getElementById("coverPicInput").click()}
-            onClick={handleImageEditClick}
-            className="absolute top-4 right-4 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
-            title="Edit Background & Profile Image"
-          >
-            <Camera className="w-7 h-7 invert" />
-          </button>
+          {isOwner && (
+            <button
+              // onClick={() => document.getElementById("coverPicInput").click()}
+              onClick={handleImageEditClick}
+              className="absolute top-4 right-4 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
+              title="Edit Background & Profile Image"
+            >
+              <Camera className="w-7 h-7 invert" />
+            </button>
+          )}
           <input
             type="file"
             id="coverPicInput"
@@ -398,12 +401,12 @@ const StudentProfileHeader = ({
                 )}
               </div>
             </div>
-            <button
+            {isOwner&&<button
               onClick={() => document.getElementById("profilePicInput").click()}
               className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
             >
               <Camera className="w-3 h-3" />
-            </button>
+            </button>}
             <input
               type="file"
               id="profilePicInput"
@@ -461,14 +464,16 @@ const StudentProfileHeader = ({
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
               {/* Profile Info Edit Button - Above Connect button */}
-              <button
-                onClick={handleEditClick}
-                className="py-1.5 px-3 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors duration-200 flex items-center gap-1.5"
-                title="Edit Profile Info"
+              {isOwner && (
+                <button
+                  onClick={handleEditClick}
+                  className="py-1.5 px-3 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors duration-200 flex items-center gap-1.5"
+                  title="Edit Profile Info"
               >
                 <User className="w-4 h-4" />
                 Edit Info
               </button>
+              )}
               <button
                 className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90"
                 style={{ backgroundColor: "#6EA9CB" }}
@@ -609,36 +614,40 @@ const StudentProfileHeader = ({
 
             <div className="flex items-center space-x-2">
               {/* Add Custom Navigation Button */}
-              <button
-                onClick={() => setIsNewNavModalOpen(true)}
-                className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-70"
-                style={{ color: "#1F2D3D" }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#DCE8F2";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-                title="Add Custom Section"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              {isOwner && (
+                <button
+                  onClick={() => setIsNewNavModalOpen(true)}
+                  className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-70"
+                  style={{ color: "#1F2D3D" }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#DCE8F2";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "transparent";
+                  }}
+                  title="Add Custom Section"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              )}
 
               {/* Settings Button */}
-              <button
-                onClick={() => setIsNavEditModalOpen(true)}
-                className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-70"
-                style={{ color: "#1F2D3D" }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#DCE8F2";
-                }}
-                onMouseLeave={(e) => {
+              {isOwner && (
+                <button
+                  onClick={() => setIsNavEditModalOpen(true)}
+                  className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-70"
+                  style={{ color: "#1F2D3D" }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#DCE8F2";
+                  }}
+                  onMouseLeave={(e) => {
                   e.target.style.backgroundColor = "transparent";
                 }}
                 title="Navigation Settings"
               >
                 <Edit3 className="w-4 h-4" />
               </button>
+              )}
             </div>
           </div>
         </div>
@@ -676,9 +685,9 @@ const StudentProfileHeader = ({
                       }}
                     />
                   </div>
-                  <button className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                 {isOwner&& <button className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
                     <Camera className="w-3 h-3" />
-                  </button>
+                  </button>}
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-900">
@@ -901,14 +910,14 @@ const StudentProfileHeader = ({
                       backgroundImage: `url(${coverPicUrl})`,
                     }}
                   ></div>
-                  <button
+                  {isOwner&&<button
                     onClick={() =>
                       document.getElementById("coverPicInputModal").click()
                     }
                     className="absolute bottom-2 right-2 p-2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-700 rounded-full transition-all duration-200"
                   >
                     <Camera className="w-4 h-4" />
-                  </button>
+                  </button>}
                   <input
                     type="file"
                     id="coverPicInputModal"
@@ -949,14 +958,14 @@ const StudentProfileHeader = ({
                         }}
                       />
                     </div>
-                    <button
+                    {isOwner&&<button
                       onClick={() =>
                         document.getElementById("profilePicInputModal").click()
                       }
                       className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
                     >
                       <Camera className="w-3 h-3" />
-                    </button>
+                    </button>}
                     <input
                       type="file"
                       id="profilePicInputModal"

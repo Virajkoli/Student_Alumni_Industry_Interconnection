@@ -14,7 +14,7 @@ import {
 import apiService from "../../services/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
-const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
+const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -206,9 +206,11 @@ const FeedArea = ({ refreshTrigger, onRefreshReady }) => {
               </div>
             </div>
           </div>
-          <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
+          {isOwner && (
+            <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Post Content */}

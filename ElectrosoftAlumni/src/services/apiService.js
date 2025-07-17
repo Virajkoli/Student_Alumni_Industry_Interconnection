@@ -97,37 +97,45 @@ class ApiService {
     try {
       // Extract role from userData and send in the format backend expects
       const { role, ...googleUserData } = userData;
-      
+
       // Validate required fields before sending to backend
       if (!googleUserData.email) {
-        throw new Error('Email is required for Google registration');
+        throw new Error("Email is required for Google registration");
       }
-      
+
       if (!googleUserData.id && !googleUserData.googleId) {
-        throw new Error('Google ID is required for Google registration');
+        throw new Error("Google ID is required for Google registration");
       }
-      
+
       // Ensure googleId is set if missing
       if (!googleUserData.googleId && googleUserData.id) {
         googleUserData.googleId = googleUserData.id;
       }
-      
-      console.log('🔍 Google registration data:', { userData: googleUserData, role });
-      
+
+      console.log("🔍 Google registration data:", {
+        userData: googleUserData,
+        role,
+      });
+
       const requestData = {
         userData: googleUserData,
-        role: role
+        role: role,
       };
-      
-      const response = await this.api.post("/auth/google/register", requestData);
+
+      const response = await this.api.post(
+        "/auth/google/register",
+        requestData
+      );
       if (response.data.tokens?.accessToken) {
         localStorage.setItem("accessToken", response.data.tokens.accessToken);
       }
       return response.data;
     } catch (error) {
-      console.error('❌ Google registration error:', error);
+      console.error("❌ Google registration error:", error);
       throw new Error(
-        error.response?.data?.message || error.message || "Google registration failed"
+        error.response?.data?.message ||
+          error.message ||
+          "Google registration failed"
       );
     }
   }
@@ -136,36 +144,38 @@ class ApiService {
     try {
       // Extract role from userData and send in the format backend expects
       const { role, ...googleUserData } = userData;
-      
+
       // Validate required fields before sending to backend
       if (!googleUserData.email) {
-        throw new Error('Email is required for Google login');
+        throw new Error("Email is required for Google login");
       }
-      
+
       if (!googleUserData.id && !googleUserData.googleId) {
-        throw new Error('Google ID is required for Google login');
+        throw new Error("Google ID is required for Google login");
       }
-      
+
       // Ensure googleId is set if missing
       if (!googleUserData.googleId && googleUserData.id) {
         googleUserData.googleId = googleUserData.id;
       }
-      
-      console.log('🔍 Google login data:', { userData: googleUserData, role });
-      
+
+      console.log("🔍 Google login data:", { userData: googleUserData, role });
+
       const requestData = {
         userData: googleUserData,
-        role: role
+        role: role,
       };
-      
+
       const response = await this.api.post("/auth/google/login", requestData);
       if (response.data.tokens) {
         localStorage.setItem("accessToken", response.data.tokens.accessToken);
       }
       return response.data;
     } catch (error) {
-      console.error('❌ Google login error:', error);
-      throw new Error(error.response?.data?.message || error.message || "Google login failed");
+      console.error("❌ Google login error:", error);
+      throw new Error(
+        error.response?.data?.message || error.message || "Google login failed"
+      );
     }
   }
 
@@ -258,7 +268,10 @@ class ApiService {
 
   async createStudentExperience(experienceData) {
     try {
-      const response = await this.api.post("/profile/experience", experienceData);
+      const response = await this.api.post(
+        "/profile/experience",
+        experienceData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -269,7 +282,10 @@ class ApiService {
 
   async updateStudentExperience(experienceId, experienceData) {
     try {
-      const response = await this.api.put(`/profile/experience/${experienceId}`, experienceData);
+      const response = await this.api.put(
+        `/profile/experience/${experienceId}`,
+        experienceData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -280,7 +296,9 @@ class ApiService {
 
   async deleteStudentExperience(experienceId) {
     try {
-      const response = await this.api.delete(`/profile/experience/${experienceId}`);
+      const response = await this.api.delete(
+        `/profile/experience/${experienceId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -314,7 +332,10 @@ class ApiService {
 
   async updateStudentEducation(educationId, educationData) {
     try {
-      const response = await this.api.put(`/profile/education/${educationId}`, educationData);
+      const response = await this.api.put(
+        `/profile/education/${educationId}`,
+        educationData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -325,7 +346,9 @@ class ApiService {
 
   async deleteStudentEducation(educationId) {
     try {
-      const response = await this.api.delete(`/profile/education/${educationId}`);
+      const response = await this.api.delete(
+        `/profile/education/${educationId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -340,9 +363,7 @@ class ApiService {
       const response = await this.api.get("/profile/skills");
       return response.data;
     } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to get skills"
-      );
+      throw new Error(error.response?.data?.message || "Failed to get skills");
     }
   }
 
@@ -370,7 +391,10 @@ class ApiService {
 
   async updateStudentSkill(skillId, skillData) {
     try {
-      const response = await this.api.put(`/profile/skills/${skillId}`, skillData);
+      const response = await this.api.put(
+        `/profile/skills/${skillId}`,
+        skillData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -415,7 +439,10 @@ class ApiService {
 
   async updateStudentProject(projectId, projectData) {
     try {
-      const response = await this.api.put(`/profile/projects/${projectId}`, projectData);
+      const response = await this.api.put(
+        `/profile/projects/${projectId}`,
+        projectData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -441,9 +468,7 @@ class ApiService {
       const response = await this.api.get("/profile/courses");
       return response.data;
     } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to get courses"
-      );
+      throw new Error(error.response?.data?.message || "Failed to get courses");
     }
   }
 
@@ -460,7 +485,10 @@ class ApiService {
 
   async updateStudentCourse(courseId, courseData) {
     try {
-      const response = await this.api.put(`/profile/courses/${courseId}`, courseData);
+      const response = await this.api.put(
+        `/profile/courses/${courseId}`,
+        courseData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -494,7 +522,10 @@ class ApiService {
 
   async createStudentCertification(certificationData) {
     try {
-      const response = await this.api.post("/profile/certifications", certificationData);
+      const response = await this.api.post(
+        "/profile/certifications",
+        certificationData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -505,7 +536,10 @@ class ApiService {
 
   async updateStudentCertification(certificationId, certificationData) {
     try {
-      const response = await this.api.put(`/profile/certifications/${certificationId}`, certificationData);
+      const response = await this.api.put(
+        `/profile/certifications/${certificationId}`,
+        certificationData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -516,7 +550,9 @@ class ApiService {
 
   async deleteStudentCertification(certificationId) {
     try {
-      const response = await this.api.delete(`/profile/certifications/${certificationId}`);
+      const response = await this.api.delete(
+        `/profile/certifications/${certificationId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -539,7 +575,10 @@ class ApiService {
 
   async createStudentRecommendation(recommendationData) {
     try {
-      const response = await this.api.post("/profile/recommendations", recommendationData);
+      const response = await this.api.post(
+        "/profile/recommendations",
+        recommendationData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -550,7 +589,10 @@ class ApiService {
 
   async updateStudentRecommendation(recommendationId, recommendationData) {
     try {
-      const response = await this.api.put(`/profile/recommendations/${recommendationId}`, recommendationData);
+      const response = await this.api.put(
+        `/profile/recommendations/${recommendationId}`,
+        recommendationData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -561,7 +603,9 @@ class ApiService {
 
   async deleteStudentRecommendation(recommendationId) {
     try {
-      const response = await this.api.delete(`/profile/recommendations/${recommendationId}`);
+      const response = await this.api.delete(
+        `/profile/recommendations/${recommendationId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -861,16 +905,20 @@ class ApiService {
   }
 
   // Profile methods for different roles
-  async getStudentProfile(studentId = null) {
-    try {
-      const endpoint = studentId ? `/students/${studentId}` : "/students/me";
-      const response = await this.api.get(endpoint);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to get student profile"
-      );
-    }
+  // async getStudentProfile(studentId = null) {
+  //   try {
+  //     const endpoint = studentId ? `/students/${studentId}` : "/students/me";
+  //     const response = await this.api.get(endpoint);
+  //     return response.data;
+  //   } catch (error) {
+  //     throw new Error(
+  //       error.response?.data?.message || "Failed to get student profile"
+  //     );
+  //   }
+  // }
+
+  getStudentProfile(id) {
+    return this.api.get(`/students/${id}`).then((res) => res.data);
   }
 
   async updateStudentProfile(studentData) {

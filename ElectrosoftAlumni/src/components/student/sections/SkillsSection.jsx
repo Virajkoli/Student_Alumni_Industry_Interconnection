@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit, Plus, X, Code } from "lucide-react";
 import { studentAPI } from "../../../services/apiService";
 
-const SkillsSection = ({ skills = [], onSkillsUpdate, studentId }) => {
+const SkillsSection = ({ skills = [], onSkillsUpdate, studentId, isOwner }) => {
   const [showSkillModal, setShowSkillModal] = useState(false);
   const [skillInput, setSkillInput] = useState("");
 
@@ -95,22 +95,24 @@ const SkillsSection = ({ skills = [], onSkillsUpdate, studentId }) => {
           <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
             Skills
           </h2>
-          <button
-            onClick={() => setShowSkillModal(true)}
-            className="p-2 rounded-full transition-colors"
-            style={{ color: "#1F2D3D", opacity: 0.7 }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#B5D3E7";
-              e.target.style.opacity = "1";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "transparent";
-              e.target.style.opacity = "0.7";
-            }}
-            title="Add skill"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowSkillModal(true)}
+              className="p-2 rounded-full transition-colors"
+              style={{ color: "#1F2D3D", opacity: 0.7 }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#B5D3E7";
+                e.target.style.opacity = "1";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "transparent";
+                e.target.style.opacity = "0.7";
+              }}
+              title="Add skill"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6">
@@ -118,12 +120,14 @@ const SkillsSection = ({ skills = [], onSkillsUpdate, studentId }) => {
             <div className="text-center py-8">
               <Code className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">No skills added yet</p>
-              <button
-                onClick={() => setShowSkillModal(true)}
-                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-              >
-                Add your skills
-              </button>
+              {isOwner && (
+                <button
+                  onClick={() => setShowSkillModal(true)}
+                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                >
+                  Add your skills
+                </button>
+              )}
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
@@ -133,12 +137,14 @@ const SkillsSection = ({ skills = [], onSkillsUpdate, studentId }) => {
                   className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                 >
                   {getSkillName(skill)}
-                  <button
-                    onClick={() => handleRemoveSkill(skill)}
-                    className="text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
+                  {isOwner && (
+                    <button
+                      onClick={() => handleRemoveSkill(skill)}
+                      className="text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
                 </span>
               ))}
             </div>

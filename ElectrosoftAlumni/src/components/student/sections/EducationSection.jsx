@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Edit, Plus, X, GraduationCap } from "lucide-react";
 import { studentAPI } from "../../../services/apiService";
 
-const EducationSection = ({ education = [], onEducationUpdate, studentId }) => {
+const EducationSection = ({ education = [], onEducationUpdate, studentId, isOwner }) => {
   const [showEducationModal, setShowEducationModal] = useState(false);
   const [editingEducation, setEditingEducation] = useState(null);
   const [educationData, setEducationData] = useState({
@@ -157,13 +157,15 @@ const EducationSection = ({ education = [], onEducationUpdate, studentId }) => {
       <div className="bg-white rounded-lg">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Education</h2>
-          <button
-            onClick={() => setShowEducationModal(true)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-            title="Add education"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setShowEducationModal(true)}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="Add education"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6">
@@ -230,20 +232,24 @@ const EducationSection = ({ education = [], onEducationUpdate, studentId }) => {
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEditEducation(edu)}
-                      className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      title="Edit education"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteEducation(edu.id)}
-                      className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                      title="Delete education"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                    {isOwner && (
+                      <button
+                        onClick={() => handleEditEducation(edu)}
+                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        title="Edit education"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
+                    {isOwner && (
+                      <button
+                        onClick={() => handleDeleteEducation(edu.id)}
+                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Delete education"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

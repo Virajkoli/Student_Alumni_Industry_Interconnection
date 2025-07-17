@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Edit, X } from "lucide-react";
 import { studentAPI } from "../../../services/apiService";
 
-const AboutSection = ({ profileData, onProfileUpdate }) => {
+const AboutSection = ({ profileData, onProfileUpdate, isOwner = false }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [aboutText, setAboutText] = useState(
     profileData.about ||
@@ -37,7 +37,7 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
         "Add a summary to highlight your personality and work style."
     );
   }, [profileData]);
-
+isOwner
   const handleEditClick = () => {
     setIsEditModalOpen(true);
   };
@@ -77,22 +77,24 @@ const AboutSection = ({ profileData, onProfileUpdate }) => {
           <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
             About
           </h2>
-          <button
-            onClick={handleEditClick}
-            className="p-2 rounded-full transition-colors"
-            style={{ color: "#1F2D3D", opacity: 0.7 }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#B5D3E7";
-              e.target.style.opacity = "1";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "transparent";
-              e.target.style.opacity = "0.7";
-            }}
-            title="Edit about section"
-          >
-            <Edit className="w-5 h-5" />
-          </button>
+          {isOwner && (
+            <button
+              onClick={handleEditClick}
+              className="p-2 rounded-full transition-colors"
+              style={{ color: "#1F2D3D", opacity: 0.7 }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#B5D3E7";
+                e.target.style.opacity = "1";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "transparent";
+                e.target.style.opacity = "0.7";
+              }}
+              title="Edit about section"
+            >
+              <Edit className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="p-6">

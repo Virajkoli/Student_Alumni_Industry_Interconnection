@@ -237,12 +237,12 @@ const EducationSection = ({ education = [], onEducationUpdate, studentId, isOwne
             <div className="text-center py-8">
               <GraduationCap className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">No education added yet</p>
-              <button
+               {isOwner && <button
                 onClick={() => setShowEducationModal(true)}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 Add your education
-              </button>
+              </button>}
             </div>
           ) : (
             <div className="space-y-6">

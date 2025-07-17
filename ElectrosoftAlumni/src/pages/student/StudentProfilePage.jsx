@@ -40,7 +40,15 @@ const StudentProfilePage = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [studentId, setStudentId] = useState(null);
 
-  const isOwner = user?.id === profileData?.id;
+  // Check if current user is the owner of this profile
+  const isOwner = !routeId || (routeId && user?.id && parseInt(routeId) === user.id);
+  
+  console.log("👤 Profile ownership debug:");
+  console.log("👤 routeId:", routeId);
+  console.log("👤 user?.id:", user?.id);
+  console.log("👤 profileData?.id:", profileData?.id);
+  console.log("👤 routeId === user.id:", routeId && user?.id && parseInt(routeId) === user.id);
+  console.log("👤 isOwner:", isOwner);
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -53,6 +61,7 @@ const StudentProfilePage = () => {
     setError(null);
 
       console.log("📊 Fetching student profile data...");
+      console.log("📊 Route ID:", routeId);
 
     if (!apiService.isAuthenticated()) {
       setError("Please log in to view this profile");
@@ -61,34 +70,52 @@ const StudentProfilePage = () => {
 
       console.log("✅ User is authenticated, making API call...");
       
-      // Use the complete profile API to get all sections
-      const response = await apiService.getStudentProfile();
+      let response;
+      if (routeId) {
+        // Fetch specific student profile by ID
+        console.log("🔍 Fetching profile for student ID:", routeId);
+        response = await apiService.getStudentProfile(routeId);
+      } else {
+        // Fetch current user's profile using their user ID
+        console.log("🔍 Fetching current user's profile");
+        console.log("👤 Current user ID:", user?.id);
+        if (user?.id) {
+          response = await apiService.getStudentProfile(user.id);
+        } else {
+          setError("User ID not found. Please log in again.");
+          return;
+        }
+      }
+      
       console.log("📊 Complete profile data loaded:", response);
 
       if (response.success && response.data) {
         const data = response.data;
 
-      setStudentId(data.id);
+        setStudentId(data.id);
 
-        // Map backend data to frontend structure - use the correct field names
-        setProfileData({
+        // Map backend data to frontend structure - handle both old and new field names
+        const mappedData = {
           ...data, // Include the full data structure
           id: data.id, // Include student ID at root level
-          firstName: data.first_name || "",
-          lastName: data.last_name || "",
-          additionalName: data.additional_name || "",
+          firstName: data.firstName || data.first_name || "",
+          lastName: data.lastName || data.last_name || "",
+          additionalName: data.additionalName || data.additional_name || "",
           pronouns: data.pronouns || "",
           headline: data.headline || "",
           industry: data.industry || "",
           school: data.school || "",
-          showSchool: data.show_school !== false,
+          showSchool: data.showSchool !== false || data.show_school !== false,
           country: data.country || "",
           city: data.city || "",
-          student_college_name: data.collegeName || "",
-          interested_field: data.interestedField || "",
-          other_field: data.otherField || "",
+          student_college_name: data.collegeName || data.college_name || "",
+          interested_field: data.interestedField || data.interested_field || "",
+          other_field: data.otherField || data.other_field || "",
           about: data.about || "",
-        });
+        };
+        
+        console.log("📊 Mapped profile data:", mappedData);
+        setProfileData(mappedData);
 
         // Update profile sections with data from complete profile API
         console.log('📊 Profile data received:', data);
@@ -397,8 +424,8 @@ const StudentProfilePage = () => {
                       onCertificationsUpdate={handleCertificationUpdate}
                       recommendations={recommendations}
                       onRecommendationsUpdate={isOwner ? setRecommendations : null}
-                      studentId={studentId}
                       isOwner={isOwner}
+                      studentId={studentId}
                     />
                   )}
                 </div>

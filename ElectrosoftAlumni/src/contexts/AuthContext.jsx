@@ -37,6 +37,8 @@ export const AuthProvider = ({ children }) => {
   const getCurrentUser = async () => {
     try {
       const response = await apiService.getCurrentUser();
+      console.log("🔐 Auth: getCurrentUser response:", response);
+      console.log("🔐 Auth: Setting user:", response.user);
       setUser(response.user);
       setError(null);
       return response;

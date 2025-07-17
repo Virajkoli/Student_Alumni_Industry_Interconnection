@@ -140,20 +140,39 @@ router.get("/", authMiddleware, async (req, res) => {
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("🔍 Fetching student with ID:", id);
+    console.log("🔍 Current user ID:", req.user?.id);
+    console.log("🔍 Current user role:", req.user?.role);
+    
+    // Validate ID
+    const studentId = parseInt(id);
+    if (isNaN(studentId)) {
+      console.log("❌ Invalid ID format:", id);
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid student ID format" 
+      });
+    }
+    
+    console.log("🔍 Parsed ID:", studentId);
 
     const student = await prisma.student.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: studentId },
       select: studentSelectFields(),
     });
 
-    if (!student)
+    if (!student) {
+      console.log("❌ Student not found for ID:", studentId);
       return res
         .status(404)
         .json({ success: false, message: "Student not found" });
+    }
 
+    console.log("✅ Student found:", student.firstName, student.lastName);
+    console.log("✅ Student data:", student);
     res.json({ success: true, data: student });
   } catch (error) {
-    console.error("Error fetching student:", error);
+    console.error("❌ Error fetching student:", error);
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch student" });

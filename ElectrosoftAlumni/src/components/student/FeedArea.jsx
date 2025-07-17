@@ -280,9 +280,6 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
           {/* Enhanced Media Display */}
           {hasMedia && (
             <div className="mt-3">
-              <p className="text-xs text-gray-500 mb-2">
-                Media count: {mediaArray.length} | First media type: {mediaArray[0]?.media_type}
-              </p>
               
               {mediaArray.length === 1 ? (
                 <div className="rounded-lg overflow-hidden border border-gray-200">
@@ -342,16 +339,6 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
             </div>
           )}
           
-          {/* Debug info - remove in production */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
-              <p><strong>Debug:</strong></p>
-              <p>Media field type: {typeof post.media}</p>
-              <p>Media content: {JSON.stringify(post.media)}</p>
-              <p>Has media: {hasMedia ? 'Yes' : 'No'}</p>
-              <p>Media count: {mediaArray.length}</p>
-            </div>
-          )}
         </div>
 
         {/* Post Actions */}

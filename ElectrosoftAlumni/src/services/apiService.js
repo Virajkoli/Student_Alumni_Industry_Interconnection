@@ -209,7 +209,7 @@ class ApiService {
   }
 
   // Profile API methods using the new consolidated backend
-  async getStudentProfile() {
+  async getStudentProfileComplete() {
     try {
       const response = await this.api.get("/profile/complete");
       return response.data;
@@ -967,8 +967,27 @@ getMediaUrlAlternative(mediaPath) {
   //   }
   // }
 
-  getStudentProfile(id) {
-    return this.api.get(`/students/${id}`).then((res) => res.data);
+  async getStudentProfile(id = null) {
+    try {
+      let endpoint;
+      if (id) {
+        // Fetch specific student profile by ID
+        endpoint = `/students/${id}`;
+      } else {
+        // Fetch current user's profile
+        endpoint = "/profile/complete";
+      }
+      
+      console.log("🔍 Fetching student profile from:", endpoint);
+      const response = await this.api.get(endpoint);
+      console.log("✅ Student profile response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error fetching student profile:", error);
+      throw new Error(
+        error.response?.data?.message || "Failed to get student profile"
+      );
+    }
   }
 
   async updateStudentProfile(studentData) {

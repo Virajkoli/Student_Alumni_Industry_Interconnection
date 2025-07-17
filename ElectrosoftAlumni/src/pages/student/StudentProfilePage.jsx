@@ -52,68 +52,130 @@ const StudentProfilePage = () => {
     setIsLoading(true);
     setError(null);
 
-    console.log("Fetching student profile data...");
+      console.log("📊 Fetching student profile data...");
 
     if (!apiService.isAuthenticated()) {
       setError("Please log in to view this profile");
       return;
     }
 
-    let response;
+      console.log("✅ User is authenticated, making API call...");
+      
+      // Use the complete profile API to get all sections
+      const response = await apiService.getStudentProfile();
+      console.log("📊 Complete profile data loaded:", response);
 
-    if (!routeId) {
-      // Apna profile
-      response = await studentAPI.getProfile();
-    } else {
-      // Dusre ka profile
-      response = await apiService.getStudentProfile(routeId);
-    }
-
-    console.log("API Response:", response);
-
-    if (response.success) {
-      const { data } = response;
+      if (response.success && response.data) {
+        const data = response.data;
 
       setStudentId(data.id);
 
-      setProfileData({
-        ...data,
-        id: data.id,
-        firstName: data.firstName || "",
-        lastName: data.lastName || "",
-        student_college_name: data.collegeName || "",
-        interested_field: data.interestedField || "",
-        other_field: data.otherField || "",
-        about: data.about || "",
-      });
+        // Map backend data to frontend structure - use the correct field names
+        setProfileData({
+          ...data, // Include the full data structure
+          id: data.id, // Include student ID at root level
+          firstName: data.first_name || "",
+          lastName: data.last_name || "",
+          additionalName: data.additional_name || "",
+          pronouns: data.pronouns || "",
+          headline: data.headline || "",
+          industry: data.industry || "",
+          school: data.school || "",
+          showSchool: data.show_school !== false,
+          country: data.country || "",
+          city: data.city || "",
+          student_college_name: data.collegeName || "",
+          interested_field: data.interestedField || "",
+          other_field: data.otherField || "",
+          about: data.about || "",
+        });
 
-      setExperiences([]);
-      setEducation([]);
-      setSkills([]);
-      setProjects([]);
-      setCourses([]);
-      setCertifications([]);
-      setRecommendations([]);
+        // Update profile sections with data from complete profile API
+        console.log('📊 Profile data received:', data);
+        if (data.experiences) {
+          console.log('👔 Setting experiences:', data.experiences);
+          setExperiences(data.experiences);
+        }
+        if (data.education) {
+          console.log('🎓 Setting education:', data.education);
+          setEducation(data.education);
+        }
+        if (data.skills) {
+          console.log('🛠️ Setting skills:', data.skills);
+          setSkills(data.skills);
+        }
+        if (data.projects) {
+          console.log('📁 Setting projects:', data.projects);
+          setProjects(data.projects);
+        }
+        if (data.courses) {
+          console.log('📚 Setting courses:', data.courses);
+          setCourses(data.courses);
+        }
+        if (data.certifications) {
+          console.log('🏆 Setting certifications:', data.certifications);
+          setCertifications(data.certifications);
+        }
+        if (data.recommendations) {
+          console.log('💬 Setting recommendations:', data.recommendations);
+          setRecommendations(data.recommendations);
+        }
 
-      console.log("Profile data loaded successfully");
-    } else {
-      console.error("API returned error:", response.message);
-      setError(response.message || "Failed to load profile data");
+        console.log("✅ Profile data loaded successfully");
+      } else {
+        console.error("❌ API returned error:", response.message);
+        setError(response.message || "Failed to load profile data");
+      }
+    } catch (error) {
+      console.error("❌ Error fetching profile data:", error);
+      
+      // Try fallback to basic profile API
+      try {
+        console.log("🔄 Trying fallback basic profile API...");
+        const fallbackResponse = await studentAPI.getProfile();
+        console.log("📊 Fallback API Response:", fallbackResponse);
+
+        if (fallbackResponse.success) {
+          const { data } = fallbackResponse;
+          setStudentId(data.id);
+          setProfileData({
+            ...data,
+            id: data.id,
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
+            student_college_name: data.collegeName || "",
+            interested_field: data.interestedField || "",
+            other_field: data.otherField || "",
+            about: data.about || "",
+          });
+          
+          // Initialize empty arrays for sections
+          setExperiences([]);
+          setEducation([]);
+          setSkills([]);
+          setProjects([]);
+          setCourses([]);
+          setCertifications([]);
+          setRecommendations([]);
+          
+          console.log("✅ Fallback profile data loaded successfully");
+        } else {
+          throw new Error(fallbackResponse.message || "Fallback API also failed");
+        }
+      } catch (fallbackError) {
+        console.error("❌ Fallback also failed:", fallbackError);
+        setError(
+          error.message || "Failed to load profile data. Please try again."
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching profile data:", error);
-    setError(
-      error.message || "Failed to load profile data. Please try again."
-    );
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const handleProfileUpdate = async (updatedProfileData) => {
     try {
-      console.log("Updating profile data:", updatedProfileData);
+      console.log("💾 Updating profile data:", updatedProfileData);
 
       // Map frontend data back to backend structure
       const basicInfoData = {
@@ -130,21 +192,55 @@ const StudentProfilePage = () => {
       // Update basic info
       await apiService.updateStudentProfile(basicInfoData);
 
-      // Update about section if it exists
-      if (updatedProfileData.about) {
-        await apiService.updateStudentAbout({
-          summary: updatedProfileData.about,
+      // Update about section specifically if it exists
+      if (updatedProfileData.about !== undefined) {
+        const aboutResponse = await apiService.updateStudentAbout({
+          about: updatedProfileData.about,
         });
+        console.log("✅ About section updated:", aboutResponse);
       }
 
       // Update local state
       setProfileData(updatedProfileData);
 
-      console.log("Profile updated successfully");
+      console.log("✅ Profile updated successfully");
     } catch (error) {
-      console.error("Error updating profile:", error);
-      setError("Failed to update profile. Please try again.");
+      console.error("❌ Error updating profile:", error);
+      alert("Failed to update profile: " + error.message);
     }
+  };
+
+  // Handler for education section updates
+  const handleEducationUpdate = (updatedEducation) => {
+    console.log("📚 Education update received:", updatedEducation);
+    setProfileData((prevData) => ({
+      ...prevData,
+      education: updatedEducation,
+    }));
+  };
+
+  // Handler for experience section updates
+  const handleExperienceUpdate = (updatedExperience) => {
+    console.log("💼 Experience update received:", updatedExperience);
+    setExperiences(updatedExperience);
+  };
+
+  // Handler for skills section updates
+  const handleSkillsUpdate = (updatedSkills) => {
+    console.log("🛠️ Skills update received:", updatedSkills);
+    setSkills(updatedSkills);
+  };
+
+  // Handler for certification section updates
+  const handleCertificationUpdate = (updatedCertifications) => {
+    console.log("🎓 Certifications update received:", updatedCertifications);
+    setCertifications(updatedCertifications);
+  };
+
+  // Handler for project section updates
+  const handleProjectUpdate = (updatedProjects) => {
+    console.log("📂 Projects update received:", updatedProjects);
+    setProjects(updatedProjects);
   };
 
   // Navigation handlers
@@ -288,17 +384,17 @@ const StudentProfilePage = () => {
                       profileData={profileData}
                       onProfileUpdate={isOwner ? handleProfileUpdate : null}
                       experiences={experiences}
-                      onExperienceUpdate={isOwner ? setExperiences : null}
+                      onExperienceUpdate={handleExperienceUpdate}
                       education={education}
-                      onEducationUpdate={isOwner ? setEducation : null}
+                      onEducationUpdate={handleEducationUpdate}
                       skills={skills}
-                      onSkillsUpdate={isOwner ? setSkills : null}
+                      onSkillsUpdate={handleSkillsUpdate}
                       projects={projects}
-                      onProjectsUpdate={isOwner ? setProjects : null}
+                      onProjectsUpdate={handleProjectUpdate}
                       courses={courses}
                       onCoursesUpdate={isOwner ? setCourses : null}
                       certifications={certifications}
-                      onCertificationsUpdate={isOwner ? setCertifications : null}
+                      onCertificationsUpdate={handleCertificationUpdate}
                       recommendations={recommendations}
                       onRecommendationsUpdate={isOwner ? setRecommendations : null}
                       studentId={studentId}

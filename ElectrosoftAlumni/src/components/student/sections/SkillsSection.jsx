@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, Code } from "lucide-react";
-import { studentAPI } from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const SkillsSection = ({ skills = [], onSkillsUpdate, studentId, isOwner }) => {
   const [showSkillModal, setShowSkillModal] = useState(false);
@@ -28,30 +28,40 @@ const SkillsSection = ({ skills = [], onSkillsUpdate, studentId, isOwner }) => {
     e.preventDefault();
     if (skillInput.trim()) {
       try {
-        await studentAPI.addSkill(studentId, {
+        await apiService.createStudentSkill({
           skill_name: skillInput.trim(),
           proficiency: "Beginner",
         });
         setSkillInput("");
         setShowSkillModal(false);
-        // Reload the page to reflect changes
-        window.location.reload();
+        
+        // Update the parent component's state instead of reloading
+        if (onSkillsUpdate) {
+          const updatedSkills = await apiService.getStudentSkills();
+          onSkillsUpdate(updatedSkills.data || updatedSkills);
+        }
       } catch (error) {
         console.error("Error adding skill:", error);
+        alert("Error adding skill. Please try again.");
       }
     }
   };
 
   const handleAddSuggestedSkill = async (skill) => {
     try {
-      await studentAPI.addSkill(studentId, {
+      await apiService.createStudentSkill({
         skill_name: skill,
         proficiency: "Beginner",
       });
-      // Reload the page to reflect changes
-      window.location.reload();
+      
+      // Update the parent component's state instead of reloading
+      if (onSkillsUpdate) {
+        const updatedSkills = await apiService.getStudentSkills();
+        onSkillsUpdate(updatedSkills.data || updatedSkills);
+      }
     } catch (error) {
       console.error("Error adding skill:", error);
+      alert("Error adding skill. Please try again.");
     }
   };
 
@@ -63,12 +73,17 @@ const SkillsSection = ({ skills = [], onSkillsUpdate, studentId, isOwner }) => {
           : skills.find((s) => (s.skill_name || s) === skillToRemove)?.id;
 
       if (skillId) {
-        await studentAPI.deleteSkill(studentId, skillId);
+        await apiService.deleteStudentSkill(skillId);
       }
-      // Reload the page to reflect changes
-      window.location.reload();
+      
+      // Update the parent component's state instead of reloading
+      if (onSkillsUpdate) {
+        const updatedSkills = await apiService.getStudentSkills();
+        onSkillsUpdate(updatedSkills.data || updatedSkills);
+      }
     } catch (error) {
       console.error("Error removing skill:", error);
+      alert("Error removing skill. Please try again.");
     }
   };
 

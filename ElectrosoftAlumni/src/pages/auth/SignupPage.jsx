@@ -23,7 +23,7 @@ export default function SignupPage() {
       <div className="flex-1 flex items-center justify-center md:justify-end md:pr-20 bg-gray-50">
         <div className="w-full max-w-md flex flex-col items-center gap-6">
           
-          {/* Mobile Logo */}
+          {/* Logo */}
           <div className="md:hidden flex justify-center pt-8 min-h-44">
             <img
               src="/newlogo-removebg-preview.png"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Edit, X } from "lucide-react";
-import { studentAPI } from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const AboutSection = ({ profileData, onProfileUpdate, isOwner = false }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -15,11 +15,10 @@ const AboutSection = ({ profileData, onProfileUpdate, isOwner = false }) => {
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
-        const response = await studentAPI.getProfile();
-        setAboutText(
-          response.data.about ||
-            "Add a summary to highlight your personality and work style."
-        );
+        const response = await apiService.getStudentAbout();
+        if (response.success && response.data) {
+          setAboutText(response.data.summary || "Add a summary to highlight your personality and work style.");
+        }
       } catch (error) {
         console.error("Failed to fetch about data:", error);
       } finally {
@@ -44,7 +43,7 @@ isOwner
 
   const handleSave = async () => {
     try {
-      const response = await studentAPI.updateAbout({ about: aboutText });
+      const response = await apiService.updateStudentAbout({ summary: aboutText });
       if (response.success) {
         setAboutText(aboutText); // Update local state
         onProfileUpdate({ ...profileData, about: aboutText }); // Update parent state

@@ -15,31 +15,31 @@ router.post(
       const { content, title } = req.body;
 
       if (!content || !content.trim()) {
-        return res.status(400).json({
-          success: false,
-          message: "Content is required",
-        });
+        return res
+          .status(400)
+          .json({ success: false, message: "Content is required" });
       }
 
-      // Process uploaded files
-      const mediaUrls = [];
-      if (req.files && req.files.length > 0) {
-        req.files.forEach((file) => {
-          mediaUrls.push(file.path); // Cloudinary URL
-        });
-      }
-
-      const postData = {
-        content: content.trim(),
-        title: title || null,
-        authorId: userId,
-        authorType: role.toUpperCase(),
-        mediaUrls: mediaUrls,
-      };
-
+      // Create Post First
       const newPost = await prisma.post.create({
-        data: postData,
+        data: {
+          content: content.trim(),
+          title: title || null,
+          authorId: userId,
+          authorType: role.toUpperCase(),
+        },
       });
+
+      // Add Media if any
+      if (req.files && req.files.length > 0) {
+        const mediaData = req.files.map((file) => ({
+          post_id: newPost.post_id,
+          media_url: file.path, // ✅ No braces
+          media_type: "image", // ✅ You can add logic for file type here
+        }));
+
+        await prisma.post_media.createMany({ data: mediaData });
+      }
 
       res.status(201).json({
         success: true,
@@ -48,22 +48,6 @@ router.post(
       });
     } catch (error) {
       console.error("Create post error:", error);
-
-      // Handle multer errors
-      if (error.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({
-          success: false,
-          message: "File size too large. Maximum 50MB per file.",
-        });
-      }
-
-      if (error.message.includes("Only .jpg, .jpeg, .png")) {
-        return res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-      }
-
       res.status(500).json({
         success: false,
         message: "Failed to create post",
@@ -82,6 +66,9 @@ router.get("/", authMiddleware, async (req, res) => {
       skip: parseInt(offset),
       orderBy: {
         createdAt: "desc",
+      },
+      include: {
+        post_media: true, // ✅ Include related media
       },
     });
 
@@ -120,6 +107,9 @@ router.get("/my", authMiddleware, async (req, res) => {
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        post_media: true, // ✅ Include related media
+      },
     });
 
     res.status(200).json({
@@ -148,6 +138,9 @@ router.get("/:id", authMiddleware, async (req, res) => {
 
     const post = await prisma.post.findUnique({
       where: { id: parseInt(id) },
+      include: {
+        post_media: true, // ✅ Include related media
+      },
     });
 
     if (!post) {

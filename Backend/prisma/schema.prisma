@@ -30,12 +30,11 @@ model Student {
   createdAt       DateTime  @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime  @map("updated_at") @db.Timestamptz(6)
 
-  // ✅ Reverse relations:
-  abouts          student_about[]
+  about           student_about[]
   certifications  student_certifications[]
   courses         student_courses[]
   education       student_education[]
-  experiences     student_experience[]
+  experience      student_experience[]
   projects        student_projects[]
   recommendations student_recommendations[]
   skills          student_skills[]
@@ -210,6 +209,9 @@ model Industry {
 model Post {
   post_id        Int              @id @default(autoincrement())
   content        String?
+  title          String?
+  authorId       Int
+  authorType     String           @db.VarChar(50)
   createdAt      DateTime?        @default(now()) @map("created_at") @db.Timestamp(6)
   student_id     Int?
   college_id     Int?
@@ -292,6 +294,7 @@ model post_comments {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+
 model post_media {
   media_id             Int       @id @default(autoincrement())
   post_id              Int?

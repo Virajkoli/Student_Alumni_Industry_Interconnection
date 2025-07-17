@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit, Plus, X, BookOpen } from "lucide-react";
-import { studentAPI } from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const CoursesSection = ({ courses = [], onCoursesUpdate, studentId, isOwner }) => {
   const [showCourseModal, setShowCourseModal] = useState(false);
@@ -74,20 +74,25 @@ const CoursesSection = ({ courses = [], onCoursesUpdate, studentId, isOwner }) =
 
       if (editingCourse) {
         // Update existing course
-        await studentAPI.updateCourse(
-          studentId,
+        await apiService.updateStudentCourse(
           editingCourse.id,
           coursePayload
         );
       } else {
         // Add new course
-        await studentAPI.addCourse(studentId, coursePayload);
+        await apiService.createStudentCourse(coursePayload);
       }
       closeModal();
-      // Reload the page to reflect changes
-      window.location.reload();
+      
+      // Update the parent component's state instead of reloading
+      if (onCoursesUpdate) {
+        // Fetch fresh courses data
+        const updatedCourses = await apiService.getStudentCourses();
+        onCoursesUpdate(updatedCourses.data || updatedCourses);
+      }
     } catch (error) {
       console.error("Error saving course:", error);
+      alert("Error saving course. Please try again.");
     }
   };
 
@@ -104,12 +109,22 @@ const CoursesSection = ({ courses = [], onCoursesUpdate, studentId, isOwner }) =
   };
 
   const handleDeleteCourse = async (courseId) => {
+    if (!confirm('Are you sure you want to delete this course?')) {
+      return;
+    }
+    
     try {
-      await studentAPI.deleteCourse(studentId, courseId);
-      // Reload the page to reflect changes
-      window.location.reload();
+      await apiService.deleteStudentCourse(courseId);
+      
+      // Update the parent component's state instead of reloading
+      if (onCoursesUpdate) {
+        // Fetch fresh courses data
+        const updatedCourses = await apiService.getStudentCourses();
+        onCoursesUpdate(updatedCourses.data || updatedCourses);
+      }
     } catch (error) {
       console.error("Error deleting course:", error);
+      alert("Error deleting course. Please try again.");
     }
   };
 

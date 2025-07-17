@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit, Plus, X, GraduationCap } from "lucide-react";
-import { studentAPI } from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const EducationSection = ({ education = [], onEducationUpdate, studentId, isOwner }) => {
   const [showEducationModal, setShowEducationModal] = useState(false);
@@ -72,6 +72,8 @@ const EducationSection = ({ education = [], onEducationUpdate, studentId, isOwne
     e.preventDefault();
 
     try {
+      console.log('📝 Submitting education data:', educationData);
+      
       const educationPayload = {
         institution: educationData.school,
         degree: educationData.degree,
@@ -85,22 +87,54 @@ const EducationSection = ({ education = [], onEducationUpdate, studentId, isOwne
         grade: educationData.grade,
       };
 
+      console.log('📤 Education payload:', educationPayload);
+
+      let response;
       if (editingEducation) {
         // Update existing education
-        await studentAPI.updateEducation(
-          studentId,
+        console.log('✏️ Updating education with ID:', editingEducation.id);
+        response = await apiService.updateStudentEducation(
           editingEducation.id,
           educationPayload
         );
       } else {
         // Add new education
-        await studentAPI.addEducation(studentId, educationPayload);
+        console.log('➕ Creating new education entry');
+        response = await apiService.createStudentEducation(educationPayload);
       }
+      
+      console.log('✅ API response:', response);
+      
+      // Close modal first
       closeModal();
-      // Reload the page to reflect changes
-      window.location.reload();
+      
+      // Add a small delay to ensure backend operation completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Update the parent component's state
+      if (onEducationUpdate) {
+        console.log('🔄 Fetching updated education data...');
+        try {
+          const updatedEducation = await apiService.getStudentEducation();
+          console.log('📚 Fresh education data:', updatedEducation);
+          
+          // Handle different response formats
+          const educationArray = updatedEducation.data || updatedEducation;
+          if (Array.isArray(educationArray)) {
+            onEducationUpdate(educationArray);
+            console.log('✅ State updated with', educationArray.length, 'education entries');
+          } else {
+            console.error('❌ Unexpected education data format:', educationArray);
+          }
+        } catch (fetchError) {
+          console.error('❌ Error fetching updated education:', fetchError);
+          // Show user-friendly message
+          alert('Education saved successfully, but unable to refresh the list. Please refresh the page to see changes.');
+        }
+      }
     } catch (error) {
-      console.error("Error saving education:", error);
+      console.error("❌ Error saving education:", error);
+      alert(`Error saving education: ${error.message}. Please try again.`);
     }
   };
 
@@ -124,12 +158,42 @@ const EducationSection = ({ education = [], onEducationUpdate, studentId, isOwne
   };
 
   const handleDeleteEducation = async (educationId) => {
+    if (!confirm('Are you sure you want to delete this education entry?')) {
+      return;
+    }
+    
     try {
-      await studentAPI.deleteEducation(studentId, educationId);
-      // Reload the page to reflect changes
-      window.location.reload();
+      console.log('🗑️ Deleting education with ID:', educationId);
+      const response = await apiService.deleteStudentEducation(educationId);
+      console.log('✅ Delete response:', response);
+      
+      // Add a small delay to ensure backend operation completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Update the parent component's state
+      if (onEducationUpdate) {
+        console.log('🔄 Fetching updated education data after delete...');
+        try {
+          const updatedEducation = await apiService.getStudentEducation();
+          console.log('📚 Fresh education data after delete:', updatedEducation);
+          
+          // Handle different response formats
+          const educationArray = updatedEducation.data || updatedEducation;
+          if (Array.isArray(educationArray)) {
+            onEducationUpdate(educationArray);
+            console.log('✅ State updated with', educationArray.length, 'education entries after delete');
+          } else {
+            console.error('❌ Unexpected education data format:', educationArray);
+          }
+        } catch (fetchError) {
+          console.error('❌ Error fetching updated education:', fetchError);
+          // Show user-friendly message
+          alert('Education deleted successfully, but unable to refresh the list. Please refresh the page to see changes.');
+        }
+      }
     } catch (error) {
-      console.error("Error deleting education:", error);
+      console.error("❌ Error deleting education:", error);
+      alert(`Error deleting education: ${error.message}. Please try again.`);
     }
   };
 

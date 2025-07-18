@@ -26,7 +26,7 @@ const Navbar = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const searchRef = useRef(null);
@@ -35,13 +35,15 @@ const Navbar = () => {
   // Get appropriate icon for user type
   const getUserTypeIcon = (userType) => {
     switch (userType) {
-      case 'student':
-        return <GraduationCap className="w-4 h-4" style={{ color: "#6EA9CB" }} />;
-      case 'college':
+      case "student":
+        return (
+          <GraduationCap className="w-4 h-4" style={{ color: "#6EA9CB" }} />
+        );
+      case "college":
         return <Building className="w-4 h-4" style={{ color: "#6EA9CB" }} />;
-      case 'startup':
+      case "startup":
         return <Rocket className="w-4 h-4" style={{ color: "#6EA9CB" }} />;
-      case 'industry':
+      case "industry":
         return <Factory className="w-4 h-4" style={{ color: "#6EA9CB" }} />;
       default:
         return <User className="w-4 h-4" style={{ color: "#6EA9CB" }} />;
@@ -62,7 +64,7 @@ const Navbar = () => {
       setSearchResults(response.data || []);
       setShowSearchResults(true);
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -90,21 +92,21 @@ const Navbar = () => {
     setSearchQuery("");
     setShowSearchResults(false);
     setSearchResults([]);
-    
+
     // Navigate to user profile based on type
     let profileRoute;
     switch (result.type) {
-      case 'student':
+      case "student":
         profileRoute = `/student-profile/${result.id}`;
         break;
-      case 'college':
-        profileRoute = `/college-profile/${result.id}`;
+      case "college":
+        profileRoute = `/profile/college/${result.id}`;
         break;
-      case 'startup':
-        profileRoute = `/startup-profile/${result.id}`;
+      case "startup":
+        profileRoute = `/profile/startup/${result.id}`;
         break;
-      case 'industry':
-        profileRoute = `/industry-profile/${result.id}`;
+      case "industry":
+        profileRoute = `/profile/industry/${result.id}`;
         break;
       default:
         profileRoute = `/student-profile/${result.id}`;
@@ -120,9 +122,9 @@ const Navbar = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 

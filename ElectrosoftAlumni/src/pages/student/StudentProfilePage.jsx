@@ -40,6 +40,15 @@ const StudentProfilePage = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [studentId, setStudentId] = useState(null);
 
+  // State for refreshing posts
+  const [postRefreshTrigger, setPostRefreshTrigger] = useState(0);
+
+  // Function to refresh posts when a new post is created
+  const handlePostCreated = (newPost) => {
+    console.log("✅ New post created:", newPost);
+    setPostRefreshTrigger((prev) => prev + 1);
+  };
+
   // Check if current user is the owner of this profile
   const isOwner =
     !routeId || (routeId && user?.id && parseInt(routeId) === user.id);
@@ -378,7 +387,9 @@ const StudentProfilePage = () => {
               <div className="w-full lg:w-[70%] flex flex-col">
                 <div className="space-y-6 w-full">
                   {/* Post Creator - Only show when on posts view */}
-                  {activeContent === "posts" && isOwner && <PostCreator />}
+                  {activeContent === "posts" && isOwner && (
+                    <PostCreator onPostCreated={handlePostCreated} />
+                  )}
 
                   {/* Content Area */}
                   {activeContent === "posts" ? (
@@ -391,6 +402,7 @@ const StudentProfilePage = () => {
                         userRole={
                           !isOwner && profileData?.id ? "student" : null
                         }
+                        refreshTrigger={postRefreshTrigger}
                       />
                     </div>
                   ) : (

@@ -9,6 +9,11 @@ import {
   Camera,
   Plus,
   User,
+  Bell,
+  Users,
+  Check,
+  UserPlus,
+  Clock,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -45,6 +50,13 @@ const StudentProfileHeader = ({
   // Profile picture and cover photo URLs
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [coverPicUrl, setCoverPicUrl] = useState("");
+
+  // Ping/Connection state
+  const [pingStatus, setPingStatus] = useState("none"); // none, sent, received, accepted
+  const [connectionCount, setConnectionCount] = useState(0);
+  const [pingRequests, setPingRequests] = useState([]);
+  const [isPingRequestsModalOpen, setIsPingRequestsModalOpen] = useState(false);
+  const [isLoadingPing, setIsLoadingPing] = useState(false);
 
   const [user, setUser] = useState(null);
 
@@ -268,6 +280,87 @@ const StudentProfileHeader = ({
     }
   };
 
+  // Ping/Connection functions
+  const fetchPingStatus = async () => {
+    if (!profileData?.id || isOwner) return;
+    
+    try {
+      const response = await apiService.checkPingStatus(profileData.id);
+      setPingStatus(response.data.status);
+    } catch (error) {
+      console.error("Failed to fetch ping status:", error);
+    }
+  };
+
+  const fetchConnectionCount = async () => {
+    try {
+      const response = await apiService.getConnectionCount();
+      setConnectionCount(response.data.count);
+    } catch (error) {
+      console.error("Failed to fetch connection count:", error);
+    }
+  };
+
+  const fetchPingRequests = async () => {
+    try {
+      const response = await apiService.getPingRequests();
+      setPingRequests(response.data);
+    } catch (error) {
+      console.error("Failed to fetch ping requests:", error);
+      toast.error("Failed to load ping requests");
+    }
+  };
+
+  const handleSendPing = async () => {
+    if (!profileData?.id) return;
+    
+    setIsLoadingPing(true);
+    try {
+      await apiService.sendPingRequest(profileData.id);
+      setPingStatus("sent");
+      toast.success("Ping request sent successfully!");
+    } catch (error) {
+      console.error("Failed to send ping:", error);
+      toast.error(error.message || "Failed to send ping request");
+    } finally {
+      setIsLoadingPing(false);
+    }
+  };
+
+  const handleAcceptPing = async (requestId) => {
+    try {
+      await apiService.acceptPingRequest(requestId);
+      await fetchPingRequests();
+      await fetchConnectionCount();
+      toast.success("Ping request accepted!");
+    } catch (error) {
+      console.error("Failed to accept ping:", error);
+      toast.error("Failed to accept ping request");
+    }
+  };
+
+  const handleRejectPing = async (requestId) => {
+    try {
+      await apiService.rejectPingRequest(requestId);
+      await fetchPingRequests();
+      toast.success("Ping request rejected");
+    } catch (error) {
+      console.error("Failed to reject ping:", error);
+      toast.error("Failed to reject ping request");
+    }
+  };
+
+  const openPingRequestsModal = () => {
+    setIsPingRequestsModalOpen(true);
+    fetchPingRequests();
+  };
+
+  // Fetch ping status and connection count when component mounts or profileData changes
+  useEffect(() => {
+    fetchPingStatus();
+    fetchConnectionCount();
+  }, [profileData?.id, isOwner]);
+
   const handleCancelEdit = () => {
     setEditData({ ...profileData });
     setIsEditModalOpen(false);
@@ -483,12 +576,74 @@ const StudentProfileHeader = ({
                   <Edit3 className="w-5 h-5" />
                 </button>
               )}
-              <button
-                className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90"
-                style={{ backgroundColor: "#6EA9CB" }}
-              >
-                Ping
-              </button>
+              
+              {/* Dynamic Ping/Connect Button */}
+              {!isOwner && (
+                <>
+                  {pingStatus === "none" && (
+                    <button
+                      onClick={handleSendPing}
+                      disabled={isLoadingPing}
+                      className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90 flex items-center gap-2"
+                      style={{ backgroundColor: "#6EA9CB" }}
+                    >
+                      {isLoadingPing ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <UserPlus className="w-4 h-4" />
+                      )}
+                      {isLoadingPing ? "Sending..." : "Ping"}
+                    </button>
+                  )}
+                  
+                  {pingStatus === "sent" && (
+                    <button
+                      disabled
+                      className="py-2 px-5 bg-gray-400 text-white rounded-lg text-sm font-semibold flex items-center gap-2"
+                    >
+                      <Clock className="w-4 h-4" />
+                      Ping Sent
+                    </button>
+                  )}
+                  
+                  {pingStatus === "received" && (
+                    <button
+                      onClick={openPingRequestsModal}
+                      className="py-2 px-5 bg-orange-500 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-orange-600 flex items-center gap-2"
+                    >
+                      <Bell className="w-4 h-4" />
+                      Respond to Ping
+                    </button>
+                  )}
+                  
+                  {pingStatus === "accepted" && (
+                    <button
+                      disabled
+                      className="py-2 px-5 bg-green-500 text-white rounded-lg text-sm font-semibold flex items-center gap-2"
+                    >
+                      <Check className="w-4 h-4" />
+                      Connected
+                    </button>
+                  )}
+                </>
+              )}
+              
+              {/* Ping Requests Button for Owner */}
+              {isOwner && (
+                <button
+                  onClick={openPingRequestsModal}
+                  className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90 flex items-center gap-2"
+                  style={{ backgroundColor: "#6EA9CB" }}
+                >
+                  <Bell className="w-4 h-4" />
+                  Ping Requests
+                  {pingRequests.length > 0 && (
+                    <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {pingRequests.length}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
@@ -510,7 +665,7 @@ const StudentProfileHeader = ({
             </div>
             <div className="text-left">
               <span className="font-bold" style={{ color: "#1F2D3D" }}>
-                150+
+                {connectionCount}
               </span>
               <span
                 className="text-sm ml-1.5"
@@ -1270,6 +1425,95 @@ const StudentProfileHeader = ({
                 style={{ backgroundColor: "#6EA9CB" }}
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ping Requests Modal */}
+      {isPingRequestsModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Ping Requests
+                </h2>
+                <button
+                  onClick={() => setIsPingRequestsModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {pingRequests.length === 0 ? (
+                <div className="text-center py-8">
+                  <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">No ping requests</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {pingRequests.map((request) => (
+                    <div
+                      key={request.id}
+                      className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
+                        <img
+                          src={request.sender?.profilePicture || "/default-avatar.png"}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/default-avatar.png";
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 truncate">
+                          {request.sender?.firstName} {request.sender?.lastName}
+                        </h4>
+                        <p className="text-sm text-gray-500 truncate">
+                          {request.sender?.headline || request.sender?.collegeName}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(request.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleAcceptPing(request.id)}
+                          className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                          title="Accept"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleRejectPing(request.id)}
+                          className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                          title="Reject"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+              <button
+                onClick={() => setIsPingRequestsModalOpen(false)}
+                className="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+              >
+                Close
               </button>
             </div>
           </div>

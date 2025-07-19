@@ -1153,6 +1153,84 @@ class ApiService {
     });
   }
 
+  // Ping/Connection methods
+  async sendPingRequest(studentId) {
+    try {
+      const response = await this.api.post(`/students/ping/${studentId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to send ping request"
+      );
+    }
+  }
+
+  async getPingRequests() {
+    try {
+      const response = await this.api.get("/students/ping-requests");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch ping requests"
+      );
+    }
+  }
+
+  async acceptPingRequest(requestId) {
+    try {
+      const response = await this.api.put(`/students/ping/${requestId}/accept`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to accept ping request"
+      );
+    }
+  }
+
+  async rejectPingRequest(requestId) {
+    try {
+      const response = await this.api.put(`/students/ping/${requestId}/reject`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to reject ping request"
+      );
+    }
+  }
+
+  async getConnections() {
+    try {
+      const response = await this.api.get("/students/connections");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch connections"
+      );
+    }
+  }
+
+  async getConnectionCount() {
+    try {
+      const response = await this.api.get("/students/connections/count");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch connection count"
+      );
+    }
+  }
+
+  async checkPingStatus(studentId) {
+    try {
+      const response = await this.api.get(`/students/ping-status/${studentId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to check ping status"
+      );
+    }
+  }
+
   // Role-based page helpers
   getRoleProfilePage(role) {
     const rolePages = {

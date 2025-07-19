@@ -4,6 +4,45 @@ const { authMiddleware } = require("../middleware/authMiddleware");
 const { uploadPostMedia } = require("../config/cloudinary");
 const prisma = require("../config/prisma");
 
+// Helper function to add interaction data to posts
+const addInteractionData = async (posts, currentUserId, currentUserRole) => {
+  return Promise.all(
+    posts.map(async (post) => {
+      // Count reactions
+      const reactionCount = await prisma.post_reactions.count({
+        where: { post_id: post.post_id },
+      });
+
+      // Count comments
+      const commentCount = await prisma.post_comments.count({
+        where: { post_id: post.post_id },
+      });
+
+      // Count shares
+      const shareCount = await prisma.post_shares.count({
+        where: { post_id: post.post_id },
+      });
+
+      // Check if current user has liked this post
+      const userReaction = await prisma.post_reactions.findFirst({
+        where: {
+          post_id: post.post_id,
+          [`${currentUserRole.toLowerCase()}_id`]: currentUserId,
+        },
+      });
+
+      return {
+        ...post,
+        reaction_count: reactionCount,
+        comment_count: commentCount,
+        share_count: shareCount,
+        liked: !!userReaction,
+        user_reaction_type: userReaction?.reaction_type || null,
+      };
+    })
+  );
+};
+
 // Create a new post
 router.post(
   "/",
@@ -83,6 +122,8 @@ router.post(
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const { limit = 10, offset = 0 } = req.query;
+    const { userId, role } = req.user;
+
     const posts = await prisma.post.findMany({
       take: parseInt(limit),
       skip: parseInt(offset),
@@ -91,9 +132,6 @@ router.get("/", authMiddleware, async (req, res) => {
       },
       include: {
         post_media: true, // ✅ Include related media
-        post_reactions: true,
-        post_comments: true,
-        post_shares: true,
       },
     });
 
@@ -195,13 +233,20 @@ router.get("/", authMiddleware, async (req, res) => {
       })
     );
 
+    // Add interaction data (likes, comments, shares, user's like status)
+    const postsWithInteractions = await addInteractionData(
+      enhancedPosts,
+      userId,
+      role
+    );
+
     res.status(200).json({
       success: true,
-      data: enhancedPosts,
+      data: postsWithInteractions,
       pagination: {
         limit: parseInt(limit),
         offset: parseInt(offset),
-        total: enhancedPosts.length,
+        total: postsWithInteractions.length,
       },
     });
   } catch (error) {
@@ -333,13 +378,20 @@ router.get("/my", authMiddleware, async (req, res) => {
       })
     );
 
+    // Add interaction data
+    const postsWithInteractions = await addInteractionData(
+      enhancedPosts,
+      userId,
+      role
+    );
+
     res.status(200).json({
       success: true,
-      data: enhancedPosts,
+      data: postsWithInteractions,
       pagination: {
         limit: parseInt(limit),
         offset: parseInt(offset),
-        total: enhancedPosts.length,
+        total: postsWithInteractions.length,
       },
     });
   } catch (error) {
@@ -483,13 +535,21 @@ router.get("/user/:userId/:role", authMiddleware, async (req, res) => {
       })
     );
 
+    // Add interaction data for the requesting user
+    const { userId: requestingUserId, role: requestingUserRole } = req.user;
+    const postsWithInteractions = await addInteractionData(
+      enhancedPosts,
+      requestingUserId,
+      requestingUserRole
+    );
+
     res.status(200).json({
       success: true,
-      data: enhancedPosts,
+      data: postsWithInteractions,
       pagination: {
         limit: parseInt(limit),
         offset: parseInt(offset),
-        total: enhancedPosts.length,
+        total: postsWithInteractions.length,
       },
     });
   } catch (error) {
@@ -695,15 +755,97 @@ router.get("/:id/reactions", authMiddleware, async (req, res) => {
     const { id } = req.params;
     const reactions = await prisma.post_reactions.findMany({
       where: { post_id: parseInt(id) },
-      include: {
-        alumni: true,
-        // Add other relations if needed (student, industry, etc.)
-      },
     });
+
+    // Enhance reactions with author information
+    const enhancedReactions = await Promise.all(
+      reactions.map(async (reaction) => {
+        let authorInfo = null;
+
+        // Determine which user type and get their info
+        if (reaction.student_id) {
+          authorInfo = await prisma.student.findUnique({
+            where: { id: reaction.student_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = `${authorInfo.firstName || ""} ${
+              authorInfo.lastName || ""
+            }`.trim();
+            authorInfo.userType = "student";
+          }
+        } else if (reaction.college_id) {
+          authorInfo = await prisma.college.findUnique({
+            where: { id: reaction.college_id },
+            select: { id: true, name: true, profilePicture: true },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = authorInfo.name;
+            authorInfo.userType = "college";
+          }
+        } else if (reaction.industry_id) {
+          authorInfo = await prisma.industry.findUnique({
+            where: { id: reaction.industry_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              companyName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.companyName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "industry";
+          }
+        } else if (reaction.startup_id) {
+          authorInfo = await prisma.startup.findUnique({
+            where: { id: reaction.startup_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              startupName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.startupName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "startup";
+          }
+        } else if (reaction.alumni_id) {
+          authorInfo = await prisma.alumni.findUnique({
+            where: { id: reaction.alumni_id },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = "Alumni User";
+            authorInfo.userType = "alumni";
+          }
+        }
+
+        return {
+          ...reaction,
+          author: authorInfo,
+        };
+      })
+    );
 
     res.status(200).json({
       success: true,
-      data: reactions,
+      data: enhancedReactions,
     });
   } catch (error) {
     console.error("Get post reactions error:", error);
@@ -725,15 +867,97 @@ router.get("/:id/comments", authMiddleware, async (req, res) => {
       orderBy: { created_at: "desc" },
       take: parseInt(limit),
       skip: parseInt(offset),
-      include: {
-        alumni: true,
-        // Include other relations if needed (student, industry, etc.)
-      },
     });
+
+    // Enhance comments with author information
+    const enhancedComments = await Promise.all(
+      comments.map(async (comment) => {
+        let authorInfo = null;
+
+        // Determine which user type and get their info
+        if (comment.student_id) {
+          authorInfo = await prisma.student.findUnique({
+            where: { id: comment.student_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = `${authorInfo.firstName || ""} ${
+              authorInfo.lastName || ""
+            }`.trim();
+            authorInfo.userType = "student";
+          }
+        } else if (comment.college_id) {
+          authorInfo = await prisma.college.findUnique({
+            where: { id: comment.college_id },
+            select: { id: true, name: true, profilePicture: true },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = authorInfo.name;
+            authorInfo.userType = "college";
+          }
+        } else if (comment.industry_id) {
+          authorInfo = await prisma.industry.findUnique({
+            where: { id: comment.industry_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              companyName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.companyName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "industry";
+          }
+        } else if (comment.startup_id) {
+          authorInfo = await prisma.startup.findUnique({
+            where: { id: comment.startup_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              startupName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.startupName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "startup";
+          }
+        } else if (comment.alumni_id) {
+          authorInfo = await prisma.alumni.findUnique({
+            where: { id: comment.alumni_id },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = "Alumni User";
+            authorInfo.userType = "alumni";
+          }
+        }
+
+        return {
+          ...comment,
+          author: authorInfo,
+        };
+      })
+    );
 
     res.status(200).json({
       success: true,
-      data: comments,
+      data: enhancedComments,
     });
   } catch (error) {
     console.error("Get comments error:", error);
@@ -767,10 +991,89 @@ router.post("/:id/comments", authMiddleware, async (req, res) => {
 
     const newComment = await prisma.post_comments.create({ data: commentData });
 
+    // Get author info for the new comment
+    let authorInfo = null;
+    try {
+      switch (role.toLowerCase()) {
+        case "student":
+          authorInfo = await prisma.student.findUnique({
+            where: { id: userId },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = `${authorInfo.firstName || ""} ${
+              authorInfo.lastName || ""
+            }`.trim();
+            authorInfo.userType = "student";
+          }
+          break;
+        case "college":
+          authorInfo = await prisma.college.findUnique({
+            where: { id: userId },
+            select: { id: true, name: true, profilePicture: true },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = authorInfo.name;
+            authorInfo.userType = "college";
+          }
+          break;
+        case "industry":
+          authorInfo = await prisma.industry.findUnique({
+            where: { id: userId },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              companyName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.companyName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "industry";
+          }
+          break;
+        case "startup":
+          authorInfo = await prisma.startup.findUnique({
+            where: { id: userId },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              startupName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.startupName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "startup";
+          }
+          break;
+      }
+    } catch (error) {
+      console.error("Error fetching comment author info:", error);
+    }
+
     res.status(201).json({
       success: true,
       message: "Comment added successfully",
-      data: newComment,
+      data: {
+        ...newComment,
+        author: authorInfo,
+      },
     });
   } catch (error) {
     console.error("Add comment error:", error);

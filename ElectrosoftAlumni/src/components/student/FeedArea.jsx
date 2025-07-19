@@ -26,6 +26,10 @@ const FeedArea = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [failedImages, setFailedImages] = useState(new Set());
+  const [commentInputs, setCommentInputs] = useState({}); // Store comment text for each post
+  const [showComments, setShowComments] = useState({}); // Show/hide comments for each post
+  const [postComments, setPostComments] = useState({}); // Store comments for each post
+  const [commentLoading, setCommentLoading] = useState({}); // Loading state for comments
   const { isAuthenticated, user } = useAuth();
 
   // Helper functions for author display
@@ -259,6 +263,72 @@ const FeedArea = ({
     );
   };
 
+  const handleCommentToggle = async (postId) => {
+    const isCurrentlyShown = showComments[postId];
+
+    // Toggle visibility
+    setShowComments((prev) => ({
+      ...prev,
+      [postId]: !isCurrentlyShown,
+    }));
+
+    // If we're showing comments for the first time, fetch them
+    if (!isCurrentlyShown && !postComments[postId]) {
+      await fetchComments(postId);
+    }
+  };
+
+  const fetchComments = async (postId) => {
+    try {
+      setCommentLoading((prev) => ({ ...prev, [postId]: true }));
+      const response = await apiService.getPostComments(postId);
+
+      setPostComments((prev) => ({
+        ...prev,
+        [postId]: response.data || [],
+      }));
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    } finally {
+      setCommentLoading((prev) => ({ ...prev, [postId]: false }));
+    }
+  };
+
+  const handleCommentSubmit = async (postId) => {
+    const commentText = commentInputs[postId];
+    if (!commentText || !commentText.trim()) return;
+
+    try {
+      const response = await apiService.addComment(postId, {
+        commentText: commentText.trim(),
+      });
+
+      // Add the new comment to the local state
+      setPostComments((prev) => ({
+        ...prev,
+        [postId]: [response.data, ...(prev[postId] || [])],
+      }));
+
+      // Update the comment count in posts
+      setPosts(
+        posts.map((post) =>
+          post.post_id === postId
+            ? { ...post, comment_count: (post.comment_count || 0) + 1 }
+            : post
+        )
+      );
+
+      // Clear the input
+      setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+
+  const handleCommentInputChange = (postId, value) => {
+    setCommentInputs((prev) => ({ ...prev, [postId]: value }));
+  };
+
   const renderPost = (post) => {
     // Use the author information from backend instead of placeholder
     const author = post.author || {
@@ -442,7 +512,14 @@ const FeedArea = ({
               <span>{post.reaction_count || 0}</span>
             </button>
 
-            <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-blue-500 transition-colors">
+            <button
+              onClick={() => handleCommentToggle(post.post_id)}
+              className={`flex items-center gap-2 text-sm transition-colors ${
+                showComments[post.post_id]
+                  ? "text-blue-500 hover:text-blue-600"
+                  : "text-gray-500 hover:text-blue-500"
+              }`}
+            >
               <MessageCircle className="w-4 h-4" />
               <span>{post.comment_count || 0}</span>
             </button>
@@ -467,6 +544,100 @@ const FeedArea = ({
             />
           </button>
         </div>
+
+        {/* Comments Section */}
+        {showComments[post.post_id] && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            {/* Comment Input */}
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                {user?.firstName?.charAt(0).toUpperCase() || "U"}
+              </div>
+              <div className="flex-1 flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Write a comment..."
+                  value={commentInputs[post.post_id] || ""}
+                  onChange={(e) =>
+                    handleCommentInputChange(post.post_id, e.target.value)
+                  }
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleCommentSubmit(post.post_id);
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button
+                  onClick={() => handleCommentSubmit(post.post_id)}
+                  disabled={!commentInputs[post.post_id]?.trim()}
+                  className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Post
+                </button>
+              </div>
+            </div>
+
+            {/* Comments List */}
+            <div className="space-y-3">
+              {commentLoading[post.post_id] ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                  <span className="ml-2 text-gray-500 text-sm">
+                    Loading comments...
+                  </span>
+                </div>
+              ) : (
+                postComments[post.post_id]?.map((comment) => (
+                  <div
+                    key={comment.comment_id}
+                    className="flex items-start gap-3"
+                  >
+                    <div className="w-7 h-7 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-white font-semibold text-xs overflow-hidden">
+                      {comment.author?.profilePicture ? (
+                        <img
+                          src={apiService.getMediaUrl(
+                            comment.author.profilePicture
+                          )}
+                          alt={comment.author.fullName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        getAuthorInitials(comment.author)
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="bg-gray-50 rounded-lg px-3 py-2">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-sm text-gray-900">
+                            {getAuthorDisplayName(comment.author)}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {getAuthorRole(comment.author)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-800">
+                          {comment.comment_text}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4 mt-1 ml-3">
+                        <span className="text-xs text-gray-500">
+                          {formatTimeAgo(comment.created_at)}
+                        </span>
+                        <button className="text-xs text-gray-500 hover:text-blue-500 font-medium">
+                          Like
+                        </button>
+                        <button className="text-xs text-gray-500 hover:text-blue-500 font-medium">
+                          Reply
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   };

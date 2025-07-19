@@ -139,7 +139,7 @@ class AuthController {
       });
     }
   }
-
+  
   // Google OAuth login
   async loginWithGoogle(req, res) {
     try {

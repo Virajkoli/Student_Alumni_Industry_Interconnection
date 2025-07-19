@@ -15,7 +15,7 @@ import {
 import apiService from "../../services/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
-const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
+const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false}) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +26,7 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
   const parseMediaField = (media) => {
     if (!media) return [];
     if (Array.isArray(media)) return media;
-    if (typeof media === 'string') {
+    if (typeof media === "string") {
       try {
         return JSON.parse(media);
       } catch (e) {
@@ -43,7 +43,11 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
       className={`${className} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center`}
     >
       <div className="text-center p-4">
-        <AlertCircle className={`${size === "large" ? "w-12 h-12" : "w-6 h-6"} text-red-400 mx-auto mb-2`} />
+        <AlertCircle
+          className={`${
+            size === "large" ? "w-12 h-12" : "w-6 h-6"
+          } text-red-400 mx-auto mb-2`}
+        />
         <p className="text-gray-500 text-sm">Image failed to load</p>
         {error && (
           <p className="text-red-500 text-xs mt-1 max-w-xs break-words">
@@ -74,7 +78,7 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
     };
 
     const imageUrl = apiService.getMediaUrl(media.media_url);
-    
+
     if (failedImages.has(media.media_url) || imageError) {
       return <ImageFallback className={className} error={imageError} />;
     }
@@ -82,14 +86,16 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
     return (
       <div className="relative">
         {isLoading && (
-          <div className={`${className} bg-gray-200 flex items-center justify-center`}>
+          <div
+            className={`${className} bg-gray-200 flex items-center justify-center`}
+          >
             <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
           </div>
         )}
         <img
           src={imageUrl}
           alt={alt}
-          className={`${className} ${isLoading ? 'hidden' : ''}`}
+          className={`${className} ${isLoading ? "hidden" : ""}`}
           onError={handleError}
           onLoad={handleLoad}
         />
@@ -118,39 +124,22 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
     try {
       setLoading(true);
       setError(null);
-      console.log("🔄 Fetching my posts...");
-      
+
       const response = await apiService.getMyPosts({
         limit: 50,
       });
-      
-      console.log("📦 Full API Response:", response);
-      console.log("📝 Posts data:", response.data);
-      
+
       if (response.data && response.data.length > 0) {
         const firstPost = response.data[0];
-        console.log("🔍 First post complete data:", firstPost);
-        console.log("🖼️ Media field:", firstPost.media);
-        console.log("🖼️ Media type:", typeof firstPost.media);
-        console.log("🖼️ Media is array:", Array.isArray(firstPost.media));
-        
+
         const parsedMedia = parseMediaField(firstPost.media);
-        console.log("🖼️ Parsed media:", parsedMedia);
-        console.log("🖼️ Parsed media length:", parsedMedia?.length);
-        
+
         if (parsedMedia && parsedMedia.length > 0) {
-          console.log("📸 First media item:", parsedMedia[0]);
-          console.log("🔗 Media URL field:", parsedMedia[0].media_url);
-          console.log("🔗 All media fields:", Object.keys(parsedMedia[0]));
-          
           const originalUrl = parsedMedia[0].media_url;
           const constructedUrl = apiService.getMediaUrl(originalUrl);
-          console.log("🔗 Original URL:", originalUrl);
-          console.log("🔗 Constructed URL:", constructedUrl);
-          console.log("🔗 Base URL:", apiService.baseURL);
         }
       }
-      
+
       setPosts(response.data || []);
     } catch (error) {
       console.error("❌ Error fetching my posts:", error);
@@ -214,11 +203,11 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
       full_name: "Current User",
       userType: "student",
     };
-    
+
     // Parse media field properly
     const mediaArray = parseMediaField(post.post_media);
     const hasMedia = mediaArray && mediaArray.length > 0;
-    
+
     console.log(`🎨 Rendering post ${post.post_id}:`, {
       originalMedia: post.media,
       parsedMedia: mediaArray,
@@ -280,7 +269,6 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
           {/* Enhanced Media Display */}
           {hasMedia && (
             <div className="mt-3">
-              
               {mediaArray.length === 1 ? (
                 <div className="rounded-lg overflow-hidden border border-gray-200">
                   {mediaArray[0].media_type === "image" ? (
@@ -289,7 +277,9 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
                       className="w-full max-h-96 object-cover"
                       alt="Post media"
                       onError={(e) => {
-                        setFailedImages(prev => new Set([...prev, mediaArray[0].media_url]));
+                        setFailedImages(
+                          (prev) => new Set([...prev, mediaArray[0].media_url])
+                        );
                       }}
                     />
                   ) : (
@@ -319,7 +309,9 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
                           className="w-full h-32 object-cover"
                           alt={`Post media ${index + 1}`}
                           onError={(e) => {
-                            setFailedImages(prev => new Set([...prev, media.media_url]));
+                            setFailedImages(
+                              (prev) => new Set([...prev, media.media_url])
+                            );
                           }}
                         />
                       ) : (
@@ -338,7 +330,6 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
               )}
             </div>
           )}
-          
         </div>
 
         {/* Post Actions */}

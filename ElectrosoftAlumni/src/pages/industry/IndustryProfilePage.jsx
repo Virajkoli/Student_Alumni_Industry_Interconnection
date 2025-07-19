@@ -11,7 +11,8 @@ import apiService from "../../services/apiService"; // ✅ Make sure this path i
 
 const IndustryProfilePage = () => {
   const [activeContent, setActiveContent] = useState("industry-overview");
-  const [activeContentName, setActiveContentName] = useState("Industry Overview");
+  const [activeContentName, setActiveContentName] =
+    useState("Industry Overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOption, setSelectedOption] = useState("Industry Overview");
 
@@ -19,9 +20,10 @@ const IndustryProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { id: routeId } = useParams(); // /profile/industry/:id
+  const { routeId } = useParams(); // /profile/industry/:id
   const { user } = useAuth();
-  const isOwner = !routeId || routeId === user?.id;
+  const isOwner =
+    !routeId || (routeId && user?.id && parseInt(routeId) === user.id);
 
   const navigationOptions = [
     "Industry Overview",
@@ -41,22 +43,22 @@ const IndustryProfilePage = () => {
     "Add University Project",
   ];
 
-  const fetchProfile = async () => {
-    try {
-      setIsLoading(true);
-      const response = await apiService.getIndustryProfile(routeId || null); // ✅ self or others
-      setIndustryData(response); // save to state
-    } catch (err) {
-      console.error("Error loading profile:", err);
-      setError("Failed to load profile");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+   useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        console.log("🔍 routeId in IndustryProfilePage:", routeId);
+        const data = await apiService.getIndustryProfile(routeId); // can pass undefined = /me
+        setIndustryData(Response.data);
+      } catch (err) {
+        console.error("❌ Error loading profile:", err);
+        setError(err.message);
+      }
+    };
 
-  useEffect(() => {
     fetchProfile();
   }, [routeId]);
+
+
 
   const handleNavigationChange = (contentId, contentName) => {
     setActiveContent(contentId);
@@ -67,7 +69,6 @@ const IndustryProfilePage = () => {
     setSelectedOption(option);
   };
 
-  if (isLoading) return <div className="text-center p-4">Loading profile...</div>;
   if (error) return <div className="text-center text-red-500 p-4">{error}</div>;
 
   return (
@@ -82,9 +83,18 @@ const IndustryProfilePage = () => {
           <div className="flex justify-center">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="h-4 w-4 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
               <input
@@ -104,6 +114,7 @@ const IndustryProfilePage = () => {
           onNavigationChange={handleNavigationChange}
           navigationOptions={navigationOptions}
           isIndustryProfile={true}
+           industryData={industryData}
         />
 
         <div className="grid grid-cols-12 gap-6">

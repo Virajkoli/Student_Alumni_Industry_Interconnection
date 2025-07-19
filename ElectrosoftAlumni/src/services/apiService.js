@@ -831,6 +831,17 @@ class ApiService {
     }
   }
 
+  async getPostReactions(postId) {
+    try {
+      const response = await this.api.get(`/posts/${postId}/reactions`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get post reactions"
+      );
+    }
+  }
+
   async deletePost(postId) {
     try {
       const response = await this.api.delete(`/posts/${postId}`);
@@ -858,6 +869,18 @@ class ApiService {
     }
   }
 
+  async addComment(postId, commentData) {
+    try {
+      const response = await this.api.post(
+        `/posts/${postId}/comments`,
+        commentData
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to add comment");
+    }
+  }
+
   async getPostComments(postId, params = {}) {
     try {
       const queryString = new URLSearchParams(params).toString();
@@ -869,18 +892,6 @@ class ApiService {
       throw new Error(
         error.response?.data?.message || "Failed to get post comments"
       );
-    }
-  }
-
-  async addComment(postId, commentData) {
-    try {
-      const response = await this.api.post(
-        `/posts/${postId}/comments`,
-        commentData
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to add comment");
     }
   }
 
@@ -1059,16 +1070,27 @@ class ApiService {
     }
   }
 
-  async getIndustryProfile(industryId = null) {
+  async getIndustryProfile(industryId) {
     try {
       const endpoint = industryId
         ? `/industries/${industryId}`
         : "/industries/me";
-      const { data } = await apiService.getIndustryProfile(routeId || null);
-      setIndustryData(data);
+      const response = await this.api.get(endpoint); // ✅ Use `this.api` properly
+      return response.data;
     } catch (error) {
       throw new Error(
         error.response?.data?.message || "Failed to get industry profile"
+      );
+    }
+  }
+
+  async getIndustryById(industryId) {
+    try {
+      const response = await this.api.get(`/industries/${industryId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch specific industry"
       );
     }
   }

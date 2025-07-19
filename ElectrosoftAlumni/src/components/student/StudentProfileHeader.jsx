@@ -26,6 +26,8 @@ const StudentProfileHeader = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isImageEditModalOpen, setIsImageEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ ...profileData });
+    const [isEditing, setIsEditing] = useState(false);
+
 
   // Navigation state
   const [activeItem, setActiveItem] = useState("posts");
@@ -102,8 +104,9 @@ const StudentProfileHeader = ({
         profileData.cover_picture ||
         "";
 
-      console.log("Updated profile pic URL from props:", profilePic);
-      console.log("Updated cover pic URL from props:", coverPic);
+      console.log("✅ PROFILE DATA RECEIVED:", profileData);
+      console.log("✅ Picked Profile Pic URL:", profilePic);
+      console.log("✅ Picked Cover Pic URL:", coverPic);
 
       setProfilePicUrl(profilePic);
       setCoverPicUrl(coverPic);
@@ -217,7 +220,7 @@ const StudentProfileHeader = ({
       onProfileUpdate(editData);
       setIsEditModalOpen(false);
       // Only fetch user data if needed, not always
-      // fetchUserData();
+      fetchUserData();
     } catch (error) {
       console.error("Failed to update profile:", error);
       toast.error("Failed to update profile.");
@@ -250,6 +253,18 @@ const StudentProfileHeader = ({
     } catch (error) {
       console.error("Failed to upload cover picture:", error);
       toast.error(error.message || "Upload failed");
+    }
+  };
+
+   const handleRemoveProfilePic = () => {
+    if (onProfileUpdate) {
+      onProfileUpdate({ ...profileData, profilePicture: "" });
+    }
+  };
+
+  const handleRemoveCoverPic = () => {
+    if (onProfileUpdate) {
+      onProfileUpdate({ ...profileData, coverPicture: "" });
     }
   };
 
@@ -390,23 +405,18 @@ const StudentProfileHeader = ({
           <div className="absolute -bottom-14 left-8">
             <div className="w-28 h-28 bg-white rounded-full p-1.5 shadow-xl">
               <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center overflow-hidden">
-                {profilePicUrl ? (
-                  <img
-                    src={profilePicUrl}
-                    alt="Profile"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <User className="w-12 h-12 text-gray-500" />
-                )}
+                <img
+                  src={profilePicUrl || "/default-avatar.png"}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null; // Prevent infinite loop
+                    e.target.src = "/default-avatar.png";
+                  }}
+                />
               </div>
             </div>
-            {isOwner&&<button
-              onClick={() => document.getElementById("profilePicInput").click()}
-              className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-            >
-              <Camera className="w-3 h-3" />
-            </button>}
+
             <input
               type="file"
               id="profilePicInput"
@@ -467,21 +477,17 @@ const StudentProfileHeader = ({
               {isOwner && (
                 <button
                   onClick={handleEditClick}
-                  className="py-1.5 px-3 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors duration-200 flex items-center gap-1.5"
+                  className="py-3 px-3 rounded-full bg-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors duration-200 flex items-center gap-1.5"
                   title="Edit Profile Info"
-              >
-                <User className="w-4 h-4" />
-                Edit Info
-              </button>
+                >
+                  <Edit3 className="w-5 h-5" />
+                </button>
               )}
               <button
                 className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90"
                 style={{ backgroundColor: "#6EA9CB" }}
               >
-                Connect
-              </button>
-              <button className="py-2 px-5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors duration-200">
-                Message
+                Ping
               </button>
             </div>
           </div>
@@ -641,12 +647,12 @@ const StudentProfileHeader = ({
                     e.target.style.backgroundColor = "#DCE8F2";
                   }}
                   onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-                title="Navigation Settings"
-              >
-                <Edit3 className="w-4 h-4" />
-              </button>
+                    e.target.style.backgroundColor = "transparent";
+                  }}
+                  title="Navigation Settings"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </button>
               )}
             </div>
           </div>
@@ -672,32 +678,6 @@ const StudentProfileHeader = ({
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Profile Photo */}
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center overflow-hidden">
-                    <img
-                      src={profilePicUrl}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                      }}
-                    />
-                  </div>
-                 {isOwner&& <button className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
-                    <Camera className="w-3 h-3" />
-                  </button>}
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-900">
-                    Profile Photo
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    JPG, PNG or GIF (max. 2MB)
-                  </p>
-                </div>
-              </div>
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -839,7 +819,7 @@ const StudentProfileHeader = ({
                 <input
                   type="checkbox"
                   id="showSchool"
-                  checked={editData.showSchool || ""}
+                  checked={!!editData.showSchool}
                   onChange={(e) =>
                     handleInputChange("showSchool", e.target.checked)
                   }
@@ -910,14 +890,16 @@ const StudentProfileHeader = ({
                       backgroundImage: `url(${coverPicUrl})`,
                     }}
                   ></div>
-                  {isOwner&&<button
-                    onClick={() =>
-                      document.getElementById("coverPicInputModal").click()
-                    }
-                    className="absolute bottom-2 right-2 p-2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-700 rounded-full transition-all duration-200"
-                  >
-                    <Camera className="w-4 h-4" />
-                  </button>}
+                  {isOwner && (
+                    <button
+                      onClick={() =>
+                        document.getElementById("coverPicInputModal").click()
+                      }
+                      className="absolute bottom-2 right-2 p-2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-700 rounded-full transition-all duration-200"
+                    >
+                      <Camera className="w-4 h-4" />
+                    </button>
+                  )}
                   <input
                     type="file"
                     id="coverPicInputModal"
@@ -948,24 +930,29 @@ const StudentProfileHeader = ({
                 </h3>
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <div className="w-20 h-20 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center overflow-hidden">
+                    <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
                       <img
-                        src={profilePicUrl}
+                        src={profilePicUrl || "/default-avatar.png"}
                         alt="Profile"
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.target.style.display = "none";
+                          e.target.onerror = null; // Prevent infinite loop
+                          e.target.src = "/default-avatar.png";
                         }}
                       />
                     </div>
-                    {isOwner&&<button
-                      onClick={() =>
-                        document.getElementById("profilePicInputModal").click()
-                      }
-                      className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-                    >
-                      <Camera className="w-3 h-3" />
-                    </button>}
+                    {isOwner && (
+                      <button
+                        onClick={() =>
+                          document
+                            .getElementById("profilePicInputModal")
+                            .click()
+                        }
+                        className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+                      >
+                        <Camera className="w-3 h-3" />
+                      </button>
+                    )}
                     <input
                       type="file"
                       id="profilePicInputModal"

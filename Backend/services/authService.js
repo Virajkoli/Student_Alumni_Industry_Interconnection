@@ -293,11 +293,11 @@ class AuthService {
           lastLogin: new Date(),
           loginCount: { increment: 1 },
           // Update profile picture if provided
-          profilePicture:
-            userData.imageUrl ||
-            userData.profilePicture ||
-            userData.profile_picture ||
-            user.profilePicture,
+          // profilePicture:
+          //   userData.imageUrl ||
+          //   userData.profilePicture ||
+          //   userData.profile_picture ||
+          //   user.profilePicture,
         },
       });
 

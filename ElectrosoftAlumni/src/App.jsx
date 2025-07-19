@@ -201,7 +201,7 @@ function App() {
             }
           />
           <Route
-            path="/industry/profile"
+            path="/industry/profile/:routeId?"
             element={
               <ProtectedRoute>
                 <Layout>

@@ -60,9 +60,7 @@ const StudentProfilePage = () => {
     setIsLoading(true);
     setError(null);
 
-      console.log("📊 Fetching student profile data...");
-      console.log("📊 Route ID:", routeId);
-
+     
     if (!apiService.isAuthenticated()) {
       setError("Please log in to view this profile");
       return;
@@ -73,12 +71,10 @@ const StudentProfilePage = () => {
       let response;
       if (routeId) {
         // Fetch specific student profile by ID
-        console.log("🔍 Fetching profile for student ID:", routeId);
         response = await apiService.getStudentProfile(routeId);
       } else {
         // Fetch current user's profile using their user ID
-        console.log("🔍 Fetching current user's profile");
-        console.log("👤 Current user ID:", user?.id);
+        
         if (user?.id) {
           response = await apiService.getStudentProfile(user.id);
         } else {
@@ -114,37 +110,28 @@ const StudentProfilePage = () => {
           about: data.about || "",
         };
         
-        console.log("📊 Mapped profile data:", mappedData);
         setProfileData(mappedData);
 
         // Update profile sections with data from complete profile API
-        console.log('📊 Profile data received:', data);
         if (data.experiences) {
-          console.log('👔 Setting experiences:', data.experiences);
           setExperiences(data.experiences);
         }
         if (data.education) {
-          console.log('🎓 Setting education:', data.education);
           setEducation(data.education);
         }
         if (data.skills) {
-          console.log('🛠️ Setting skills:', data.skills);
           setSkills(data.skills);
         }
         if (data.projects) {
-          console.log('📁 Setting projects:', data.projects);
           setProjects(data.projects);
         }
         if (data.courses) {
-          console.log('📚 Setting courses:', data.courses);
           setCourses(data.courses);
         }
         if (data.certifications) {
-          console.log('🏆 Setting certifications:', data.certifications);
           setCertifications(data.certifications);
         }
         if (data.recommendations) {
-          console.log('💬 Setting recommendations:', data.recommendations);
           setRecommendations(data.recommendations);
         }
 
@@ -158,9 +145,7 @@ const StudentProfilePage = () => {
       
       // Try fallback to basic profile API
       try {
-        console.log("🔄 Trying fallback basic profile API...");
         const fallbackResponse = await studentAPI.getProfile();
-        console.log("📊 Fallback API Response:", fallbackResponse);
 
         if (fallbackResponse.success) {
           const { data } = fallbackResponse;
@@ -185,7 +170,6 @@ const StudentProfilePage = () => {
           setCertifications([]);
           setRecommendations([]);
           
-          console.log("✅ Fallback profile data loaded successfully");
         } else {
           throw new Error(fallbackResponse.message || "Fallback API also failed");
         }
@@ -239,7 +223,6 @@ const StudentProfilePage = () => {
 
   // Handler for education section updates
   const handleEducationUpdate = (updatedEducation) => {
-    console.log("📚 Education update received:", updatedEducation);
     setProfileData((prevData) => ({
       ...prevData,
       education: updatedEducation,
@@ -248,25 +231,21 @@ const StudentProfilePage = () => {
 
   // Handler for experience section updates
   const handleExperienceUpdate = (updatedExperience) => {
-    console.log("💼 Experience update received:", updatedExperience);
     setExperiences(updatedExperience);
   };
 
   // Handler for skills section updates
   const handleSkillsUpdate = (updatedSkills) => {
-    console.log("🛠️ Skills update received:", updatedSkills);
     setSkills(updatedSkills);
   };
 
   // Handler for certification section updates
   const handleCertificationUpdate = (updatedCertifications) => {
-    console.log("🎓 Certifications update received:", updatedCertifications);
     setCertifications(updatedCertifications);
   };
 
   // Handler for project section updates
   const handleProjectUpdate = (updatedProjects) => {
-    console.log("📂 Projects update received:", updatedProjects);
     setProjects(updatedProjects);
   };
 

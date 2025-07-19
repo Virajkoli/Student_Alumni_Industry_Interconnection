@@ -6,7 +6,6 @@ const router = express.Router();
 // GET /api/industries/me - Get current industry profile
 router.get("/me", authMiddleware, async (req, res) => {
   try {
-    // Check if user is an industry
     if (req.user.role !== "industry") {
       return res.status(403).json({
         success: false,
@@ -18,17 +17,17 @@ router.get("/me", authMiddleware, async (req, res) => {
       where: { id: req.user.id },
       select: {
         id: true,
-        name: true,
+        companyName: true,
         email: true,
-        phone: true,
-        industry_type: true,
+        contactNo: true,
+        industryType: true,
         location: true,
         website: true,
-        established_year: true,
-        logo: true,
         description: true,
-        created_at: true,
-        updated_at: true,
+        logoUrl: true,
+        backgroundUrl: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -39,10 +38,7 @@ router.get("/me", authMiddleware, async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      data: industry,
-    });
+    res.json({ success: true, data: industry });
   } catch (error) {
     console.error("Error fetching industry profile:", error);
     res.status(500).json({
@@ -56,7 +52,6 @@ router.get("/me", authMiddleware, async (req, res) => {
 // PUT /api/industries/me - Update current industry profile
 router.put("/me", authMiddleware, async (req, res) => {
   try {
-    // Check if user is an industry
     if (req.user.role !== "industry") {
       return res.status(403).json({
         success: false,
@@ -65,39 +60,41 @@ router.put("/me", authMiddleware, async (req, res) => {
     }
 
     const {
-      name,
-      phone,
-      industry_type,
+      companyName,
+      contactNo,
+      industryType,
       location,
       website,
-      established_year,
       description,
+      logoUrl,
+      backgroundUrl,
     } = req.body;
 
     const updatedIndustry = await prisma.industry.update({
       where: { id: req.user.id },
       data: {
-        name,
-        phone,
-        industry_type,
+        companyName,
+        contactNo,
+        industryType,
         location,
         website,
-        established_year,
         description,
-        updated_at: new Date(),
+        logoUrl,
+        backgroundUrl,
+        updatedAt: new Date(),
       },
       select: {
         id: true,
-        name: true,
+        companyName: true,
         email: true,
-        phone: true,
-        industry_type: true,
+        contactNo: true,
+        industryType: true,
         location: true,
         website: true,
-        established_year: true,
-        logo: true,
         description: true,
-        updated_at: true,
+        logoUrl: true,
+        backgroundUrl: true,
+        updatedAt: true,
       },
     });
 
@@ -125,9 +122,9 @@ router.get("/", async (req, res) => {
     const whereClause = search
       ? {
           OR: [
-            { name: { contains: search, mode: "insensitive" } },
+            { companyName: { contains: search, mode: "insensitive" } },
             { email: { contains: search, mode: "insensitive" } },
-            { industry_type: { contains: search, mode: "insensitive" } },
+            { industryType: { contains: search, mode: "insensitive" } },
             { location: { contains: search, mode: "insensitive" } },
           ],
         }
@@ -139,15 +136,14 @@ router.get("/", async (req, res) => {
       take: parseInt(limit),
       select: {
         id: true,
-        name: true,
+        companyName: true,
         email: true,
-        phone: true,
-        industry_type: true,
+        contactNo: true,
+        industryType: true,
         location: true,
         website: true,
-        established_year: true,
-        logo: true,
-        created_at: true,
+        logoUrl: true,
+        createdAt: true,
       },
     });
 
@@ -182,17 +178,17 @@ router.get("/:id", async (req, res) => {
       where: { id: parseInt(id) },
       select: {
         id: true,
-        name: true,
+        companyName: true,
         email: true,
-        phone: true,
-        industry_type: true,
+        contactNo: true,
+        industryType: true,
         location: true,
         website: true,
-        established_year: true,
-        logo: true,
         description: true,
-        created_at: true,
-        updated_at: true,
+        logoUrl: true,
+        backgroundUrl: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -208,7 +204,7 @@ router.get("/:id", async (req, res) => {
       data: industry,
     });
   } catch (error) {
-    console.error("Error fetching industry:", error);
+    console.error("Error fetching industry by ID:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch industry",
@@ -217,21 +213,21 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// PUT /api/industries/:id - Update industry profile (requires authentication)
+// PUT /api/industries/:id - Update specific industry (admin or self)
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      name,
-      phone,
-      industry_type,
+      companyName,
+      contactNo,
+      industryType,
       location,
       website,
-      established_year,
       description,
+      logoUrl,
+      backgroundUrl,
     } = req.body;
 
-    // Check if user is updating their own profile
     if (req.user.id !== parseInt(id) && req.user.role !== "admin") {
       return res.status(403).json({
         success: false,
@@ -242,27 +238,28 @@ router.put("/:id", authMiddleware, async (req, res) => {
     const updatedIndustry = await prisma.industry.update({
       where: { id: parseInt(id) },
       data: {
-        name,
-        phone,
-        industry_type,
+        companyName,
+        contactNo,
+        industryType,
         location,
         website,
-        established_year,
         description,
-        updated_at: new Date(),
+        logoUrl,
+        backgroundUrl,
+        updatedAt: new Date(),
       },
       select: {
         id: true,
-        name: true,
+        companyName: true,
         email: true,
-        phone: true,
-        industry_type: true,
+        contactNo: true,
+        industryType: true,
         location: true,
         website: true,
-        established_year: true,
-        logo: true,
         description: true,
-        updated_at: true,
+        logoUrl: true,
+        backgroundUrl: true,
+        updatedAt: true,
       },
     });
 
@@ -275,7 +272,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
     console.error("Error updating industry:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to update industry profile",
+      message: "Failed to update industry",
       error: error.message,
     });
   }

@@ -45,23 +45,12 @@ const StudentProfilePage = () => {
 
   // Function to refresh posts when a new post is created
   const handlePostCreated = (newPost) => {
-    console.log("✅ New post created:", newPost);
     setPostRefreshTrigger((prev) => prev + 1);
   };
 
   // Check if current user is the owner of this profile
   const isOwner =
     !routeId || (routeId && user?.id && parseInt(routeId) === user.id);
-
-  console.log("👤 Profile ownership debug:");
-  console.log("👤 routeId:", routeId);
-  console.log("👤 user?.id:", user?.id);
-  console.log("👤 profileData?.id:", profileData?.id);
-  console.log(
-    "👤 routeId === user.id:",
-    routeId && user?.id && parseInt(routeId) === user.id
-  );
-  console.log("👤 isOwner:", isOwner);
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -78,29 +67,16 @@ const StudentProfilePage = () => {
         return;
       }
 
-      console.log("✅ User is authenticated, making API call...");
 
       let response;
       if (routeId) {
-        // Fetch specific student profile by ID
+        // Fetch specific student profile by ID (now includes sections data)
         response = await apiService.getStudentProfile(routeId);
-      } else {
-        // Fetch current user's profile using their user ID
-
-        if (user?.id) {
-          response = await apiService.getStudentProfile(user.id);
-        } else {
-          setError("User ID not found. Please log in again.");
-          return;
-        }
-      }
-
-      console.log("📊 Complete profile data loaded:", response);
-
-      if (response.success && response.data) {
-        const data = response.data;
-
-        setStudentId(data.id);
+        console.log("📊 Fetched other user's profile:", response);
+        
+        if (response.success && response.data) {
+          const data = response.data;
+          setStudentId(data.id);
 
         // Map backend data to frontend structure - handle both old and new field names
         const mappedData = {
@@ -122,31 +98,89 @@ const StudentProfilePage = () => {
           about: data.about || "",
         };
 
-        setProfileData(mappedData);
+          setProfileData(mappedData);
+          
+          // Set their sections data (now available from the API)
+          setExperiences(data.experiences || []);
+          setEducation(data.education || []);
+          setSkills(data.skills || []);
+          setProjects(data.projects || []);
+          setCourses(data.courses || []);
+          setCertifications(data.certifications || []);
+          setRecommendations(data.recommendations || []);
+        }
+      } else {
+        // Fetch current user's basic profile AND complete sections data
+        console.log("📊 Fetching own complete profile...");
+        
+        // First get the basic profile data
+        const basicResponse = await apiService.getProfile();
+        console.log("📊 Basic profile data:", basicResponse);
+        
+        // Then get the complete sections data
+        const sectionsResponse = await apiService.getStudentProfileComplete();
+        console.log("📊 Sections data:", sectionsResponse);
+        
+        if (basicResponse.success && basicResponse.data) {
+          const basicData = basicResponse.data;
+          const sectionsData = sectionsResponse.success ? sectionsResponse.data : {};
+          
+          setStudentId(basicData.id);
 
-        // Update profile sections with data from complete profile API
-        if (data.experiences) {
-          setExperiences(data.experiences);
-        }
-        if (data.education) {
-          setEducation(data.education);
-        }
-        if (data.skills) {
-          setSkills(data.skills);
-        }
-        if (data.projects) {
-          setProjects(data.projects);
-        }
-        if (data.courses) {
-          setCourses(data.courses);
-        }
-        if (data.certifications) {
-          setCertifications(data.certifications);
-        }
-        if (data.recommendations) {
-          setRecommendations(data.recommendations);
-        }
+          // Combine basic data with sections data
+          const mappedData = {
+            ...basicData,
+            ...sectionsData, // Include sections data
+            id: basicData.id,
+            firstName: basicData.firstName || basicData.first_name || "",
+            lastName: basicData.lastName || basicData.last_name || "",
+            additionalName: basicData.additionalName || basicData.additional_name || "",
+            pronouns: basicData.pronouns || "",
+            headline: basicData.headline || "",
+            industry: basicData.industry || "",
+            school: basicData.school || "",
+            showSchool: basicData.showSchool !== false || basicData.show_school !== false,
+            country: basicData.country || "",
+            city: basicData.city || "",
+            student_college_name: basicData.collegeName || basicData.college_name || "",
+            interested_field: basicData.interestedField || basicData.interested_field || "",
+            other_field: basicData.otherField || basicData.other_field || "",
+            about: sectionsData.about || basicData.about || "",
+          };
 
+          setProfileData(mappedData);
+
+          // Update profile sections with data from complete profile API
+          if (sectionsData.experiences) {
+            setExperiences(sectionsData.experiences);
+          }
+          if (sectionsData.education) {
+            setEducation(sectionsData.education);
+          }
+          if (sectionsData.skills) {
+            setSkills(sectionsData.skills);
+          }
+          if (sectionsData.projects) {
+            setProjects(sectionsData.projects);
+          }
+          if (sectionsData.courses) {
+            setCourses(sectionsData.courses);
+          }
+          if (sectionsData.certifications) {
+            setCertifications(sectionsData.certifications);
+          }
+          if (sectionsData.recommendations) {
+            setRecommendations(sectionsData.recommendations);
+          }
+        }
+        
+        // Set response for the success check below
+        response = basicResponse;
+      }
+
+      console.log("📊 Profile data loaded:", response);
+
+      if (response.success) {
         console.log("✅ Profile data loaded successfully");
       } else {
         console.error("❌ API returned error:", response.message);
@@ -199,7 +233,6 @@ const StudentProfilePage = () => {
 
   const handleProfileUpdate = async (updatedProfileData) => {
     try {
-      console.log("💾 Updating profile data:", updatedProfileData);
 
       // Map frontend data back to backend structure
       const basicInfoData = {
@@ -221,7 +254,6 @@ const StudentProfilePage = () => {
         const aboutResponse = await apiService.updateStudentAbout({
           about: updatedProfileData.about,
         });
-        console.log("✅ About section updated:", aboutResponse);
       }
 
       // Update local state

@@ -156,7 +156,7 @@ const StudentSidebar = () => {
       </div>
 
       {/* Trending Learning */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-gray-900 text-sm">Trending Learning</h3>
           <TrendingUp className="w-4 h-4 text-green-500" />
@@ -188,10 +188,10 @@ const StudentSidebar = () => {
         <button className="w-full mt-3 text-xs text-blue-600 hover:text-blue-700 font-medium">
           Explore More Resources
         </button>
-      </div>
+      </div> */}
 
       {/* Upcoming Events */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-gray-900 text-sm">Upcoming Events</h3>
           <Calendar className="w-4 h-4 text-blue-500" />
@@ -215,7 +215,7 @@ const StudentSidebar = () => {
         <button className="w-full mt-3 text-xs text-blue-600 hover:text-blue-700 font-medium">
           View All Events
         </button>
-      </div>
+      </div> */}
 
       {/* Quick Stats */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">

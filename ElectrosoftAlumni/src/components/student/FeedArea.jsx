@@ -105,7 +105,6 @@ const FeedArea = ({
     };
 
     const handleLoad = (e) => {
-      console.log("✅ Image loaded successfully:", e.target.src);
       setIsLoading(false);
       if (onLoad) onLoad(e);
     };
@@ -163,14 +162,11 @@ const FeedArea = ({
       // If userId and userRole are provided, fetch that user's posts
       // Otherwise, fetch current user's posts
       if (userId && userRole) {
-        console.log(
-          `🔄 Fetching posts for user ${userId} with role ${userRole}...`
-        );
+       
         response = await apiService.getUserPosts(userId, userRole, {
           limit: 50,
         });
       } else {
-        console.log("🔄 Fetching my posts...");
         response = await apiService.getMyPosts({
           limit: 50,
         });
@@ -338,25 +334,24 @@ const FeedArea = ({
     };
 
     // Debug: Log the complete post object to understand the structure
-    console.log(`🔍 Complete post object ${post.post_id}:`, post);
-    console.log(`👤 Author data:`, author);
+    
 
     // Parse media field properly
     const mediaArray = parseMediaField(post.post_media);
     const hasMedia = mediaArray && mediaArray.length > 0;
 
-    console.log(`🎨 Rendering post ${post.post_id}:`, {
-      originalMedia: post.media,
-      parsedMedia: mediaArray,
-      hasMedia,
-      mediaLength: mediaArray?.length,
-      author: author,
-      createdAt: post.createdAt || post.created_at,
-      authorName: getAuthorDisplayName(author),
-      authorInitials: getAuthorInitials(author),
-      authorRole: getAuthorRole(author),
-      authorProfilePicture: author?.profilePicture,
-    });
+    // console.log(`🎨 Rendering post ${post.post_id}:`, {
+    //   originalMedia: post.media,
+    //   parsedMedia: mediaArray,
+    //   hasMedia,
+    //   mediaLength: mediaArray?.length,
+    //   author: author,
+    //   createdAt: post.createdAt || post.created_at,
+    //   authorName: getAuthorDisplayName(author),
+    //   authorInitials: getAuthorInitials(author),
+    //   authorRole: getAuthorRole(author),
+    //   authorProfilePicture: author?.profilePicture,
+    // });
 
     return (
       <div
@@ -384,10 +379,7 @@ const FeedArea = ({
                     ).style.display = "flex";
                   }}
                   onLoad={() => {
-                    console.log(
-                      "✅ Profile picture loaded:",
-                      author.profilePicture
-                    );
+                   
                     // Hide initials when image loads
                     const initialsEl =
                       e.target.parentNode.querySelector(".initials-fallback");
@@ -454,7 +446,6 @@ const FeedArea = ({
                         console.error("❌ Failed to load video:", e.target.src);
                       }}
                       onLoadedData={() => {
-                        console.log("✅ Video loaded successfully");
                       }}
                     />
                   )}

@@ -18,6 +18,7 @@ import {
 import { toast } from "react-toastify";
 
 import apiService from "../../services/apiService";
+import ProfileCompletenessSection from "./sections/ProfileCompletenessSection";
 
 const StudentProfileHeader = ({
   profileData,
@@ -31,8 +32,7 @@ const StudentProfileHeader = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isImageEditModalOpen, setIsImageEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ ...profileData });
-    const [isEditing, setIsEditing] = useState(false);
-
+  const [isEditing, setIsEditing] = useState(false);
 
   // Navigation state
   const [activeItem, setActiveItem] = useState("posts");
@@ -268,7 +268,7 @@ const StudentProfileHeader = ({
     }
   };
 
-   const handleRemoveProfilePic = () => {
+  const handleRemoveProfilePic = () => {
     if (onProfileUpdate) {
       onProfileUpdate({ ...profileData, profilePicture: "" });
     }
@@ -283,7 +283,7 @@ const StudentProfileHeader = ({
   // Ping/Connection functions
   const fetchPingStatus = async () => {
     if (!profileData?.id || isOwner) return;
-    
+
     try {
       const response = await apiService.checkPingStatus(profileData.id);
       setPingStatus(response.data.status);
@@ -313,7 +313,7 @@ const StudentProfileHeader = ({
 
   const handleSendPing = async () => {
     if (!profileData?.id) return;
-    
+
     setIsLoadingPing(true);
     try {
       await apiService.sendPingRequest(profileData.id);
@@ -576,7 +576,7 @@ const StudentProfileHeader = ({
                   <Edit3 className="w-5 h-5" />
                 </button>
               )}
-              
+
               {/* Dynamic Ping/Connect Button */}
               {!isOwner && (
                 <>
@@ -595,7 +595,7 @@ const StudentProfileHeader = ({
                       {isLoadingPing ? "Sending..." : "Ping"}
                     </button>
                   )}
-                  
+
                   {pingStatus === "sent" && (
                     <button
                       disabled
@@ -605,7 +605,7 @@ const StudentProfileHeader = ({
                       Ping Sent
                     </button>
                   )}
-                  
+
                   {pingStatus === "received" && (
                     <button
                       onClick={openPingRequestsModal}
@@ -615,19 +615,19 @@ const StudentProfileHeader = ({
                       Respond to Ping
                     </button>
                   )}
-                  
+
                   {pingStatus === "accepted" && (
                     <button
                       disabled
                       className="py-2 px-5 bg-green-500 text-white rounded-lg text-sm font-semibold flex items-center gap-2"
                     >
                       <Check className="w-4 h-4" />
-                      Connected
+                      Pinged Back
                     </button>
                   )}
                 </>
               )}
-              
+
               {/* Ping Requests Button for Owner */}
               {isOwner && (
                 <button
@@ -647,39 +647,61 @@ const StudentProfileHeader = ({
             </div>
           </div>
 
+           {/* Profile Completeness Section - NEW */}
+        {/* <ProfileCompletenessSection
+          profileData={profileData}
+          editData={editData}
+          isOwner={isOwner}
+          onEditClick={handleEditClick}
+          onImageEditClick={handleImageEditClick}
+        /> */}
+
           {/* Quick Stats */}
           <div
             className="flex items-center gap-x-8 mt-6 pt-4 border-t"
             style={{ borderColor: "#DCE8F2" }}
           >
-            <div className="text-left">
-              <span className="font-bold" style={{ color: "#1F2D3D" }}>
+            {/* Stat 1: Projects */}
+            <div className="flex flex-col items-center">
+              {" "}
+              {/* CHANGED */}
+              <span className="font-bold text-lg" style={{ color: "#1F2D3D" }}>
+                {" "}
+                {/* Made text slightly larger for emphasis */}
                 12
               </span>
               <span
-                className="text-sm ml-1.5"
+                className="text-sm" // REMOVED ml-1.5
                 style={{ color: "#1F2D3D", opacity: 0.7 }}
               >
                 Projects
               </span>
             </div>
-            <div className="text-left">
-              <span className="font-bold" style={{ color: "#1F2D3D" }}>
+
+            {/* Stat 2: Connections */}
+            <div className="flex flex-col items-center">
+              {" "}
+              {/* CHANGED */}
+              <span className="font-bold text-lg" style={{ color: "#1F2D3D" }}>
                 {connectionCount}
               </span>
               <span
-                className="text-sm ml-1.5"
+                className="text-sm" // REMOVED ml-1.5
                 style={{ color: "#1F2D3D", opacity: 0.7 }}
               >
                 Connections
               </span>
             </div>
-            <div className="text-left">
-              <span className="font-bold" style={{ color: "#1F2D3D" }}>
+
+            {/* Stat 3: Rating */}
+            <div className="flex flex-col items-center">
+              {" "}
+              {/* CHANGED */}
+              <span className="font-bold text-lg" style={{ color: "#1F2D3D" }}>
                 4.9
               </span>
               <span
-                className="text-sm ml-1.5"
+                className="text-sm" // REMOVED ml-1.5
                 style={{ color: "#1F2D3D", opacity: 0.7 }}
               >
                 Rating
@@ -1464,7 +1486,10 @@ const StudentProfileHeader = ({
                     >
                       <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
                         <img
-                          src={request.sender?.profilePicture || "/default-avatar.png"}
+                          src={
+                            request.sender?.profilePicture ||
+                            "/default-avatar.png"
+                          }
                           alt="Profile"
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -1473,19 +1498,20 @@ const StudentProfileHeader = ({
                           }}
                         />
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">
                           {request.sender?.firstName} {request.sender?.lastName}
                         </h4>
                         <p className="text-sm text-gray-500 truncate">
-                          {request.sender?.headline || request.sender?.collegeName}
+                          {request.sender?.headline ||
+                            request.sender?.collegeName}
                         </p>
                         <p className="text-xs text-gray-400">
                           {new Date(request.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      
+
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleAcceptPing(request.id)}

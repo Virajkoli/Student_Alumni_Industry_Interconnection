@@ -112,11 +112,7 @@ class ApiService {
         googleUserData.googleId = googleUserData.id;
       }
 
-      console.log("🔍 Google registration data:", {
-        userData: googleUserData,
-        role,
-      });
-
+     
       const requestData = {
         userData: googleUserData,
         role: role,
@@ -159,7 +155,6 @@ class ApiService {
         googleUserData.googleId = googleUserData.id;
       }
 
-      console.log("🔍 Google login data:", { userData: googleUserData, role });
 
       const requestData = {
         userData: googleUserData,
@@ -187,7 +182,6 @@ class ApiService {
       });
       return response.data;
     } catch (error) {
-      console.error("Check Google account error:", error);
       return {
         success: false,
         isGoogleAccount: false,
@@ -632,7 +626,6 @@ class ApiService {
       await this.api.post("/auth/logout");
     } catch (error) {
       // Log the error but don't throw it - logout should always succeed from frontend perspective
-      console.warn("Logout request failed:", error.message);
     } finally {
       // Always clear local storage regardless of server response
       localStorage.removeItem("accessToken");
@@ -740,7 +733,6 @@ class ApiService {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     localStorage.removeItem("authToken"); // Clear any old token names
-    console.log("🧹 Cleared all authentication data");
   }
 
   // Force refresh authentication
@@ -924,23 +916,19 @@ class ApiService {
 
   // Media URL helper
   getMediaUrl(mediaPath) {
-    console.log("🔧 getMediaUrl called with:", mediaPath);
 
     // Handle null/undefined
     if (!mediaPath) {
-      console.log("🔧 No media path provided, returning placeholder");
       return "/api/placeholder/400/400";
     }
 
     // Handle full URLs (already complete)
     if (mediaPath.startsWith("http://") || mediaPath.startsWith("https://")) {
-      console.log("🔧 Media path is already a full URL:", mediaPath);
       return mediaPath;
     }
 
     // Handle data URLs (base64 encoded images)
     if (mediaPath.startsWith("data:")) {
-      console.log("🔧 Media path is a data URL");
       return mediaPath;
     }
 
@@ -960,7 +948,6 @@ class ApiService {
 
   // Alternative version if your backend serves files differently
   getMediaUrlAlternative(mediaPath) {
-    console.log("🔧 getMediaUrl (alternative) called with:", mediaPath);
 
     if (!mediaPath) {
       return "/api/placeholder/400/400";
@@ -1004,9 +991,7 @@ class ApiService {
         endpoint = "/profile/complete";
       }
 
-      console.log("🔍 Fetching student profile from:", endpoint);
       const response = await this.api.get(endpoint);
-      console.log("✅ Student profile response:", response.data);
       return response.data;
     } catch (error) {
       console.error("❌ Error fetching student profile:", error);

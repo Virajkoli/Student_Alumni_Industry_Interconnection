@@ -28,6 +28,29 @@ const FeedArea = ({
   const [failedImages, setFailedImages] = useState(new Set());
   const { isAuthenticated, user } = useAuth();
 
+  // Helper functions for author display
+  const getAuthorInitials = (author) => {
+    if (!author || !author.fullName) return "U";
+
+    return author.fullName
+      .split(" ")
+      .map((name) => name[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2); // Limit to 2 characters
+  };
+
+  const getAuthorDisplayName = (author) => {
+    if (!author) return "Unknown User";
+    return author.fullName || author.name || "Unknown User";
+  };
+
+  const getAuthorRole = (author) => {
+    if (!author) return "Student";
+    const userType = author.userType || author.role || "student";
+    return userType.charAt(0).toUpperCase() + userType.slice(1);
+  };
+
   // Helper function to parse media field
   const parseMediaField = (media) => {
     if (!media) return [];
@@ -169,21 +192,39 @@ const FeedArea = ({
     }
   };
 
-  // Format time ago
+  // Format time ago with proper validation
   const formatTimeAgo = (dateString) => {
+    if (!dateString) return "Just now";
+
     const date = new Date(dateString);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      console.warn("Invalid date string:", dateString);
+      return "Recently";
+    }
+
     const now = new Date();
     const diffInMs = now - date;
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+
+    // Handle negative differences (future dates)
+    if (diffInMs < 0) {
+      return "Just now";
+    }
+
+    const diffInSeconds = Math.floor(diffInMs / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
     const diffInDays = Math.floor(diffInHours / 24);
 
     if (diffInDays > 0) {
       return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
     } else if (diffInHours > 0) {
       return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
-    } else {
-      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    } else if (diffInMinutes > 0) {
       return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
+    } else {
+      return "Just now";
     }
   };
 
@@ -219,10 +260,16 @@ const FeedArea = ({
   };
 
   const renderPost = (post) => {
-    const user = post.user || {
-      full_name: "Current User",
+    // Use the author information from backend instead of placeholder
+    const author = post.author || {
+      fullName: "Unknown User",
       userType: "student",
+      profilePicture: null,
     };
+
+    // Debug: Log the complete post object to understand the structure
+    console.log(`🔍 Complete post object ${post.post_id}:`, post);
+    console.log(`👤 Author data:`, author);
 
     // Parse media field properly
     const mediaArray = parseMediaField(post.post_media);
@@ -233,6 +280,12 @@ const FeedArea = ({
       parsedMedia: mediaArray,
       hasMedia,
       mediaLength: mediaArray?.length,
+      author: author,
+      createdAt: post.createdAt || post.created_at,
+      authorName: getAuthorDisplayName(author),
+      authorInitials: getAuthorInitials(author),
+      authorRole: getAuthorRole(author),
+      authorProfilePicture: author?.profilePicture,
     });
 
     return (
@@ -243,31 +296,51 @@ const FeedArea = ({
         {/* Post Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
-              {user?.profile_pic ? (
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden relative">
+              {author?.profilePicture ? (
                 <img
-                  src={apiService.getMediaUrl(user.profile_pic)}
-                  alt={user.full_name}
+                  src={apiService.getMediaUrl(author.profilePicture)}
+                  alt={getAuthorDisplayName(author)}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.warn(
+                      "❌ Profile picture failed to load:",
+                      author.profilePicture
+                    );
+                    // Hide the failed image and show initials
+                    e.target.style.display = "none";
+                    e.target.parentNode.querySelector(
+                      ".initials-fallback"
+                    ).style.display = "flex";
+                  }}
+                  onLoad={() => {
+                    console.log(
+                      "✅ Profile picture loaded:",
+                      author.profilePicture
+                    );
+                    // Hide initials when image loads
+                    const initialsEl =
+                      e.target.parentNode.querySelector(".initials-fallback");
+                    if (initialsEl) initialsEl.style.display = "none";
+                  }}
                 />
-              ) : (
-                user?.full_name?.charAt(0).toUpperCase() || "U"
-              )}
+              ) : null}
+              <span
+                className={`initials-fallback absolute inset-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 ${
+                  author?.profilePicture ? "hidden" : ""
+                }`}
+              >
+                {getAuthorInitials(author)}
+              </span>
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">
-                {user?.full_name || "Current User"}
+                {getAuthorDisplayName(author)}
               </h4>
-              <p className="text-gray-600 text-xs">
-                {post.userType
-                  ? post.userType === "student"
-                    ? "Student"
-                    : post.userType
-                  : "Student"}
-              </p>
+              <p className="text-gray-600 text-xs">{getAuthorRole(author)}</p>
               <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
                 <Clock className="w-3 h-3" />
-                <span>{formatTimeAgo(post.created_at)}</span>
+                <span>{formatTimeAgo(post.createdAt || post.created_at)}</span>
               </div>
             </div>
           </div>

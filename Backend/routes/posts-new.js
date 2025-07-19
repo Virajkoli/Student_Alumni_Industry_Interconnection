@@ -97,13 +97,111 @@ router.get("/", authMiddleware, async (req, res) => {
       },
     });
 
+    // Enhance posts with author information
+    const enhancedPosts = await Promise.all(
+      posts.map(async (post) => {
+        let authorInfo = null;
+
+        // Get author info based on role and ID
+        try {
+          switch (post.authorType.toLowerCase()) {
+            case "student":
+              authorInfo = await prisma.student.findUnique({
+                where: { id: post.authorId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = `${authorInfo.firstName || ""} ${
+                  authorInfo.lastName || ""
+                }`.trim();
+                authorInfo.userType = "student";
+              }
+              break;
+            case "college":
+              authorInfo = await prisma.college.findUnique({
+                where: { id: post.authorId },
+                select: {
+                  id: true,
+                  name: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = authorInfo.name;
+                authorInfo.userType = "college";
+              }
+              break;
+            case "industry":
+              authorInfo = await prisma.industry.findUnique({
+                where: { id: post.authorId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  companyName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.companyName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "industry";
+              }
+              break;
+            case "startup":
+              authorInfo = await prisma.startup.findUnique({
+                where: { id: post.authorId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  startupName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.startupName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "startup";
+              }
+              break;
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching author info for post ${post.post_id}:`,
+            error
+          );
+        }
+
+        return {
+          ...post,
+          author: authorInfo,
+        };
+      })
+    );
+
     res.status(200).json({
       success: true,
-      data: posts,
+      data: enhancedPosts,
       pagination: {
         limit: parseInt(limit),
         offset: parseInt(offset),
-        total: posts.length,
+        total: enhancedPosts.length,
       },
     });
   } catch (error) {
@@ -140,13 +238,108 @@ router.get("/my", authMiddleware, async (req, res) => {
       },
     });
 
+    // Enhance posts with author information (current user)
+    const enhancedPosts = await Promise.all(
+      posts.map(async (post) => {
+        let authorInfo = null;
+
+        // Get current user's info based on role
+        try {
+          switch (role.toLowerCase()) {
+            case "student":
+              authorInfo = await prisma.student.findUnique({
+                where: { id: userId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = `${authorInfo.firstName || ""} ${
+                  authorInfo.lastName || ""
+                }`.trim();
+                authorInfo.userType = "student";
+              }
+              break;
+            case "college":
+              authorInfo = await prisma.college.findUnique({
+                where: { id: userId },
+                select: {
+                  id: true,
+                  name: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = authorInfo.name;
+                authorInfo.userType = "college";
+              }
+              break;
+            case "industry":
+              authorInfo = await prisma.industry.findUnique({
+                where: { id: userId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  companyName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.companyName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "industry";
+              }
+              break;
+            case "startup":
+              authorInfo = await prisma.startup.findUnique({
+                where: { id: userId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  startupName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.startupName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "startup";
+              }
+              break;
+          }
+        } catch (error) {
+          console.error(`Error fetching current user info:`, error);
+        }
+
+        return {
+          ...post,
+          author: authorInfo,
+        };
+      })
+    );
+
     res.status(200).json({
       success: true,
-      data: posts,
+      data: enhancedPosts,
       pagination: {
         limit: parseInt(limit),
         offset: parseInt(offset),
-        total: posts.length,
+        total: enhancedPosts.length,
       },
     });
   } catch (error) {
@@ -192,13 +385,111 @@ router.get("/user/:userId/:role", authMiddleware, async (req, res) => {
       },
     });
 
+    // Enhance posts with author information
+    const enhancedPosts = await Promise.all(
+      posts.map(async (post) => {
+        let authorInfo = null;
+
+        // Get author info based on role and ID
+        try {
+          switch (role.toLowerCase()) {
+            case "student":
+              authorInfo = await prisma.student.findUnique({
+                where: { id: parseInt(userId) },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = `${authorInfo.firstName || ""} ${
+                  authorInfo.lastName || ""
+                }`.trim();
+                authorInfo.userType = "student";
+              }
+              break;
+            case "college":
+              authorInfo = await prisma.college.findUnique({
+                where: { id: parseInt(userId) },
+                select: {
+                  id: true,
+                  name: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = authorInfo.name;
+                authorInfo.userType = "college";
+              }
+              break;
+            case "industry":
+              authorInfo = await prisma.industry.findUnique({
+                where: { id: parseInt(userId) },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  companyName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.companyName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "industry";
+              }
+              break;
+            case "startup":
+              authorInfo = await prisma.startup.findUnique({
+                where: { id: parseInt(userId) },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  startupName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.startupName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "startup";
+              }
+              break;
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching author info for user ${userId}:`,
+            error
+          );
+        }
+
+        return {
+          ...post,
+          author: authorInfo,
+        };
+      })
+    );
+
     res.status(200).json({
       success: true,
-      data: posts,
+      data: enhancedPosts,
       pagination: {
         limit: parseInt(limit),
         offset: parseInt(offset),
-        total: posts.length,
+        total: enhancedPosts.length,
       },
     });
   } catch (error) {

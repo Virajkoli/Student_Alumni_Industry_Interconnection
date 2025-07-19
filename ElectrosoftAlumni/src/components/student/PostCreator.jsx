@@ -181,14 +181,46 @@ const PostCreator = ({ onPostCreated }) => {
   };
 
   const getUserInitials = () => {
-    if (user && user.fullName) {
-      return user.fullName
-        .split(" ")
-        .map((name) => name[0])
-        .join("")
-        .toUpperCase();
+    if (user) {
+      // Handle different user object structures
+      const firstName = user.firstName || user.first_name || "";
+      const lastName = user.lastName || user.last_name || "";
+      const fullName =
+        user.fullName || user.full_name || `${firstName} ${lastName}`.trim();
+
+      if (fullName) {
+        return fullName
+          .split(" ")
+          .map((name) => name[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2); // Limit to 2 characters
+      }
     }
     return "U";
+  };
+
+  const getUserProfilePicture = () => {
+    if (user) {
+      return (
+        user.profilePicture || user.profile_picture || user.profilePic || null
+      );
+    }
+    return null;
+  };
+
+  const getUserFullName = () => {
+    if (user) {
+      const firstName = user.firstName || user.first_name || "";
+      const lastName = user.lastName || user.last_name || "";
+      return (
+        user.fullName ||
+        user.full_name ||
+        `${firstName} ${lastName}`.trim() ||
+        "User"
+      );
+    }
+    return "User";
   };
 
   return (
@@ -196,8 +228,26 @@ const PostCreator = ({ onPostCreated }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Profile Picture and Text Input */}
         <div className="flex gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-            {getUserInitials()}
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+            {getUserProfilePicture() ? (
+              <img
+                src={apiService.getMediaUrl(getUserProfilePicture())}
+                alt={getUserFullName()}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to initials if image fails to load
+                  e.target.style.display = "none";
+                  e.target.nextSibling.style.display = "flex";
+                }}
+              />
+            ) : null}
+            <span
+              className={`w-full h-full flex items-center justify-center ${
+                getUserProfilePicture() ? "hidden" : ""
+              }`}
+            >
+              {getUserInitials()}
+            </span>
           </div>
           <div className="flex-1">
             <textarea

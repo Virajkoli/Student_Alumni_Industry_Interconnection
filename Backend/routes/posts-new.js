@@ -159,6 +159,58 @@ router.get("/my", authMiddleware, async (req, res) => {
   }
 });
 
+// Get posts by user ID and role
+router.get("/user/:userId/:role", authMiddleware, async (req, res) => {
+  try {
+    const { userId, role } = req.params;
+    const { limit = 10, offset = 0 } = req.query;
+
+    // Validate role
+    const validRoles = ["STUDENT", "COLLEGE", "INDUSTRY", "STARTUP", "ALUMNI"];
+    if (!validRoles.includes(role.toUpperCase())) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role specified",
+      });
+    }
+
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: parseInt(userId),
+        authorType: role.toUpperCase(),
+      },
+      take: parseInt(limit),
+      skip: parseInt(offset),
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        post_media: true, // ✅ Include related media
+        post_reactions: true,
+        post_comments: true,
+        post_shares: true,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: posts,
+      pagination: {
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        total: posts.length,
+      },
+    });
+  } catch (error) {
+    console.error("Get user posts error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get user posts",
+      error: error.message,
+    });
+  }
+});
+
 // Get a specific post
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
@@ -402,7 +454,6 @@ router.get("/:id/comments", authMiddleware, async (req, res) => {
   }
 });
 
-
 router.post("/:id/comments", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
@@ -440,46 +491,49 @@ router.post("/:id/comments", authMiddleware, async (req, res) => {
   }
 });
 
-router.delete("/:postId/comments/:commentId", authMiddleware, async (req, res) => {
-  try {
-    const { commentId } = req.params;
-    const { userId, role } = req.user;
+router.delete(
+  "/:postId/comments/:commentId",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const { commentId } = req.params;
+      const { userId, role } = req.user;
 
-    const comment = await prisma.post_comments.findUnique({
-      where: { comment_id: parseInt(commentId) },
-    });
+      const comment = await prisma.post_comments.findUnique({
+        where: { comment_id: parseInt(commentId) },
+      });
 
-    if (!comment) {
-      return res.status(404).json({
+      if (!comment) {
+        return res.status(404).json({
+          success: false,
+          message: "Comment not found",
+        });
+      }
+
+      if (comment[`${role.toLowerCase()}_id`] !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: "You can only delete your own comments",
+        });
+      }
+
+      await prisma.post_comments.delete({
+        where: { comment_id: parseInt(commentId) },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Comment deleted successfully",
+      });
+    } catch (error) {
+      console.error("Delete comment error:", error);
+      res.status(500).json({
         success: false,
-        message: "Comment not found",
+        message: "Failed to delete comment",
+        error: error.message,
       });
     }
-
-    if (comment[`${role.toLowerCase()}_id`] !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: "You can only delete your own comments",
-      });
-    }
-
-    await prisma.post_comments.delete({
-      where: { comment_id: parseInt(commentId) },
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Comment deleted successfully",
-    });
-  } catch (error) {
-    console.error("Delete comment error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete comment",
-      error: error.message,
-    });
   }
-});
-
+);
 
 module.exports = router;

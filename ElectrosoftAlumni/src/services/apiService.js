@@ -798,6 +798,20 @@ class ApiService {
     }
   }
 
+  async getUserPosts(userId, role, params = {}) {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const response = await this.api.get(
+        `/posts/user/${userId}/${role}?${queryString}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get user posts"
+      );
+    }
+  }
+
   async createPost(postData, files = []) {
     try {
       const formData = new FormData();

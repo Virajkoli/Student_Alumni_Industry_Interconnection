@@ -14,7 +14,7 @@ const StudentProfilePage = () => {
   const [activeCustomContent, setActiveCustomContent] = useState(null);
   const [customNavigations, setCustomNavigations] = useState([]);
   const { id: routeId } = useParams();
-  
+
   const { user } = useAuth();
   // Loading and error states
   const [isLoading, setIsLoading] = useState(true);
@@ -41,13 +41,17 @@ const StudentProfilePage = () => {
   const [studentId, setStudentId] = useState(null);
 
   // Check if current user is the owner of this profile
-  const isOwner = !routeId || (routeId && user?.id && parseInt(routeId) === user.id);
-  
+  const isOwner =
+    !routeId || (routeId && user?.id && parseInt(routeId) === user.id);
+
   console.log("👤 Profile ownership debug:");
   console.log("👤 routeId:", routeId);
   console.log("👤 user?.id:", user?.id);
   console.log("👤 profileData?.id:", profileData?.id);
-  console.log("👤 routeId === user.id:", routeId && user?.id && parseInt(routeId) === user.id);
+  console.log(
+    "👤 routeId === user.id:",
+    routeId && user?.id && parseInt(routeId) === user.id
+  );
   console.log("👤 isOwner:", isOwner);
 
   // Fetch profile data on component mount
@@ -56,25 +60,24 @@ const StudentProfilePage = () => {
   }, [routeId]); // Add routeId as dependency
 
   const fetchProfileData = async () => {
-  try {
-    setIsLoading(true);
-    setError(null);
+    try {
+      setIsLoading(true);
+      setError(null);
 
-     
-    if (!apiService.isAuthenticated()) {
-      setError("Please log in to view this profile");
-      return;
-    }
+      if (!apiService.isAuthenticated()) {
+        setError("Please log in to view this profile");
+        return;
+      }
 
       console.log("✅ User is authenticated, making API call...");
-      
+
       let response;
       if (routeId) {
         // Fetch specific student profile by ID
         response = await apiService.getStudentProfile(routeId);
       } else {
         // Fetch current user's profile using their user ID
-        
+
         if (user?.id) {
           response = await apiService.getStudentProfile(user.id);
         } else {
@@ -82,7 +85,7 @@ const StudentProfilePage = () => {
           return;
         }
       }
-      
+
       console.log("📊 Complete profile data loaded:", response);
 
       if (response.success && response.data) {
@@ -109,7 +112,7 @@ const StudentProfilePage = () => {
           other_field: data.otherField || data.other_field || "",
           about: data.about || "",
         };
-        
+
         setProfileData(mappedData);
 
         // Update profile sections with data from complete profile API
@@ -142,7 +145,7 @@ const StudentProfilePage = () => {
       }
     } catch (error) {
       console.error("❌ Error fetching profile data:", error);
-      
+
       // Try fallback to basic profile API
       try {
         const fallbackResponse = await studentAPI.getProfile();
@@ -160,7 +163,7 @@ const StudentProfilePage = () => {
             other_field: data.otherField || "",
             about: data.about || "",
           });
-          
+
           // Initialize empty arrays for sections
           setExperiences([]);
           setEducation([]);
@@ -169,9 +172,10 @@ const StudentProfilePage = () => {
           setCourses([]);
           setCertifications([]);
           setRecommendations([]);
-          
         } else {
-          throw new Error(fallbackResponse.message || "Fallback API also failed");
+          throw new Error(
+            fallbackResponse.message || "Fallback API also failed"
+          );
         }
       } catch (fallbackError) {
         console.error("❌ Fallback also failed:", fallbackError);
@@ -379,14 +383,24 @@ const StudentProfilePage = () => {
                   {/* Content Area */}
                   {activeContent === "posts" ? (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                      <FeedArea isOwner={isOwner} />
+                      <FeedArea
+                        isOwner={isOwner}
+                        userId={
+                          !isOwner && profileData?.id ? profileData.id : null
+                        }
+                        userRole={
+                          !isOwner && profileData?.id ? "student" : null
+                        }
+                      />
                     </div>
                   ) : (
                     <ContentRenderer
                       activeContent={activeContent}
                       activeContentName={activeContentName}
                       customNavItem={activeCustomContent}
-                      onEditCustomContent={isOwner ? handleEditCustomContent : null}
+                      onEditCustomContent={
+                        isOwner ? handleEditCustomContent : null
+                      }
                       profileData={profileData}
                       onProfileUpdate={isOwner ? handleProfileUpdate : null}
                       experiences={experiences}
@@ -402,7 +416,9 @@ const StudentProfilePage = () => {
                       certifications={certifications}
                       onCertificationsUpdate={handleCertificationUpdate}
                       recommendations={recommendations}
-                      onRecommendationsUpdate={isOwner ? setRecommendations : null}
+                      onRecommendationsUpdate={
+                        isOwner ? setRecommendations : null
+                      }
                       isOwner={isOwner}
                       studentId={studentId}
                     />

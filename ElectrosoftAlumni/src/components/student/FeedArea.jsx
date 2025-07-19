@@ -15,7 +15,13 @@ import {
 import apiService from "../../services/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
-const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false}) => {
+const FeedArea = ({
+  refreshTrigger,
+  onRefreshReady,
+  isOwner = false,
+  userId = null,
+  userRole = null,
+}) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -106,28 +112,42 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false}) => {
   // Fetch posts from backend
   useEffect(() => {
     if (isAuthenticated) {
-      fetchMyPosts();
+      fetchPosts();
     } else {
       setLoading(false);
       setError("Please log in to view posts");
     }
-  }, [isAuthenticated, refreshTrigger]);
+  }, [isAuthenticated, refreshTrigger, userId, userRole]);
 
   // Expose refresh function to parent component
   useEffect(() => {
     if (onRefreshReady) {
-      onRefreshReady(fetchMyPosts);
+      onRefreshReady(fetchPosts);
     }
   }, [onRefreshReady]);
 
-  const fetchMyPosts = async () => {
+  const fetchPosts = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await apiService.getMyPosts({
-        limit: 50,
-      });
+      let response;
+
+      // If userId and userRole are provided, fetch that user's posts
+      // Otherwise, fetch current user's posts
+      if (userId && userRole) {
+        console.log(
+          `🔄 Fetching posts for user ${userId} with role ${userRole}...`
+        );
+        response = await apiService.getUserPosts(userId, userRole, {
+          limit: 50,
+        });
+      } else {
+        console.log("🔄 Fetching my posts...");
+        response = await apiService.getMyPosts({
+          limit: 50,
+        });
+      }
 
       if (response.data && response.data.length > 0) {
         const firstPost = response.data[0];
@@ -142,7 +162,7 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false}) => {
 
       setPosts(response.data || []);
     } catch (error) {
-      console.error("❌ Error fetching my posts:", error);
+      console.error("❌ Error fetching posts:", error);
       setError(`Failed to load posts: ${error.message}`);
     } finally {
       setLoading(false);
@@ -395,7 +415,7 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false}) => {
           </h3>
           <p className="text-gray-500 text-sm mb-4">{error}</p>
           <button
-            onClick={fetchMyPosts}
+            onClick={fetchPosts}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             Try Again
@@ -412,7 +432,9 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false}) => {
             No posts yet
           </h3>
           <p className="text-gray-500 text-sm">
-            Start connecting with your network to see posts and updates here.
+            {isOwner
+              ? "Start connecting with your network to see posts and updates here."
+              : "This user hasn't posted anything yet."}
           </p>
         </div>
       )}

@@ -15,15 +15,15 @@ app.set("trust proxy", 1);
 
 // Import routes
 const authRoutes = require("./routes/auth");
-const studentRoutes = require("./routes/students-new");
-const collegeRoutes = require("./routes/colleges-new");
+const studentRoutes = require("./routes/students");
+const collegeRoutes = require("./routes/colleges");
 const startupRoutes = require("./routes/startups");
 const industryRoutes = require("./routes/industries");
 const searchRoutes = require("./routes/search");
 // Temporarily commented out until migrated to Prisma
 // const githubAuthRoutes = require("./routes/github-auth");
 // const userRoutes = require("./routes/users");
-const postRoutes = require("./routes/posts-new");
+const postRoutes = require("./routes/posts");
 const profileRoutes = require("./routes/profile");
 const collegeProfileRoutes = require("./routes/collegeProfile");
 const industryProfileRoutes = require("./routes/industryProfile");

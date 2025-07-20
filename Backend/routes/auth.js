@@ -15,6 +15,12 @@ router.post("/refresh-token", authController.refreshToken);
 router.post("/logout", authController.logout); // Logout should work even with invalid token
 router.post("/check-google-account", authController.checkGoogleAccount);
 
+// College-specific routes (legacy support)
+router.post("/register/college", authController.register); // Will use role from body
+router.post("/college/login", authController.login); // Legacy college login
+router.post("/college/google/login", authController.loginWithGoogle); // Legacy college Google login
+router.post("/college/google/register", authController.registerWithGoogle); // Legacy college Google register
+
 // Protected routes
 router.use(authMiddleware); // Apply auth middleware to all routes below
 

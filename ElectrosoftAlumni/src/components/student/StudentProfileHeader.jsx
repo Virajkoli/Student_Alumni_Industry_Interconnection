@@ -785,69 +785,83 @@ const StudentProfileHeader = ({
           </div>
 
           {/* Quick Stats */}
-          <div
-            className="flex items-center gap-x-8 mt-6 pt-4 border-t"
-            style={{ borderColor: "#DCE8F2" }}
-          >
-            <div className="text-left">
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={isOwner ? openProjectModal : undefined}
-                  className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
-                  title={isOwner ? "View your projects" : undefined}
-                >
-                  <span className="font-bold" style={{ color: "#1F2D3D" }}>
-                    {projectCount}
-                  </span>
-                  <span
-                    className="text-sm ml-1.5"
-                    style={{ color: "#1F2D3D", opacity: 0.7 }}
-                  >
-                    Projects
-                  </span>
-                </button>
-                {isOwner && (
-                  <button
-                    onClick={fetchProjectCount}
-                    className="p-1 hover:bg-gray-100 rounded transition-colors"
-                    title="Refresh project count"
-                  >
-                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="text-left">
-              <button
-                onClick={isOwner ? openConnectionModal : undefined}
-                className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
-                title={isOwner ? "View your connections" : undefined}
-              >
-                <span className="font-bold" style={{ color: "#1F2D3D" }}>
-                  {connectionCount}
-                </span>
-                <span
-                  className="text-sm ml-1.5"
-                  style={{ color: "#1F2D3D", opacity: 0.7 }}
-                >
-                  Connections
-                </span>
-              </button>
-            </div>
-            <div className="text-left">
-              <span className="font-bold" style={{ color: "#1F2D3D" }}>
-                4.9
-              </span>
-              <span
-                className="text-sm ml-1.5"
-                style={{ color: "#1F2D3D", opacity: 0.7 }}
-              >
-                Rating
-              </span>
-            </div>
-          </div>
+         <div
+  className="flex items-center justify-around mt-6 pt-4 border-t"
+  style={{ borderColor: "#DCE8F2" }}
+>
+  {/* Projects */}
+  <div className="flex flex-col items-center text-center">
+    <button
+      onClick={isOwner ? openProjectModal : undefined}
+      className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
+      title={isOwner ? "View your projects" : undefined}
+    >
+      <span className="block text-2xl font-bold" style={{ color: "#1F2D3D" }}>
+        {projectCount}
+      </span>
+      <span
+        className="block text-sm mt-1"
+        style={{ color: "#1F2D3D", opacity: 0.7 }}
+      >
+        Projects
+      </span>
+    </button>
+    {isOwner && (
+      <button
+        onClick={fetchProjectCount}
+        className="mt-1 p-1 hover:bg-gray-100 rounded transition-colors"
+        title="Refresh project count"
+      >
+        <svg
+          className="w-3 h-3 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
+        </svg>
+      </button>
+    )}
+  </div>
+
+  {/* Connections */}
+  <div className="flex flex-col items-center text-center">
+    <button
+      onClick={isOwner ? openConnectionModal : undefined}
+      className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
+      title={isOwner ? "View your connections" : undefined}
+    >
+      <span className="block text-2xl font-bold" style={{ color: "#1F2D3D" }}>
+        {connectionCount}
+      </span>
+      <span
+        className="block text-sm mt-1"
+        style={{ color: "#1F2D3D", opacity: 0.7 }}
+      >
+        Connections
+      </span>
+    </button>
+  </div>
+
+  {/* Rating */}
+  <div className="flex flex-col items-center text-center">
+    <span className="block text-2xl font-bold" style={{ color: "#1F2D3D" }}>
+      4.9
+    </span>
+    <span
+      className="block text-sm mt-1"
+      style={{ color: "#1F2D3D", opacity: 0.7 }}
+    >
+      Rating
+    </span>
+  </div>
+</div>
+
         </div>
 
         {/* Navigation Items - Horizontal LinkedIn Style */}

@@ -33,7 +33,6 @@ const StudentProfileHeader = ({
   const [isImageEditModalOpen, setIsImageEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ ...profileData });
   const [isEditing, setIsEditing] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   // Navigation state
   const [activeItem, setActiveItem] = useState("posts");
@@ -433,7 +432,6 @@ const StudentProfileHeader = ({
 
   // Expose refresh function via useEffect and callback
   useEffect(() => {
-    if (onProfileUpdate && typeof onProfileUpdate === "function") {
     if (onProfileUpdate && typeof onProfileUpdate === "function") {
       // Add refresh function to the callback if needed
       onProfileUpdate.refreshProjects = refreshProjectData;
@@ -1848,6 +1846,7 @@ const StudentProfileHeader = ({
                         strokeWidth={2}
                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                       />
+                      </svg>
                     <svg
                       className="w-8 h-8 text-gray-400"
                       fill="none"
@@ -1890,8 +1889,6 @@ const StudentProfileHeader = ({
                           {/* Technologies */}
                           {project.technologies && (
                             <div className="flex flex-wrap gap-1 mb-3">
-                              {(typeof project.technologies === "string"
-                                ? project.technologies.split(", ")
                               {(typeof project.technologies === "string"
                                 ? project.technologies.split(", ")
                                 : project.technologies || []

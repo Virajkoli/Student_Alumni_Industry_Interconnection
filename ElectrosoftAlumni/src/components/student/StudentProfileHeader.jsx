@@ -31,8 +31,7 @@ const StudentProfileHeader = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isImageEditModalOpen, setIsImageEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ ...profileData });
-    const [isEditing, setIsEditing] = useState(false);
-
+  const [isEditing, setIsEditing] = useState(false);
 
   // Navigation state
   const [activeItem, setActiveItem] = useState("posts");
@@ -277,7 +276,7 @@ const StudentProfileHeader = ({
     }
   };
 
-   const handleRemoveProfilePic = () => {
+  const handleRemoveProfilePic = () => {
     if (onProfileUpdate) {
       onProfileUpdate({ ...profileData, profilePicture: "" });
     }
@@ -292,7 +291,7 @@ const StudentProfileHeader = ({
   // Ping/Connection functions
   const fetchPingStatus = async () => {
     if (!profileData?.id || isOwner) return;
-    
+
     try {
       const response = await apiService.checkPingStatus(profileData.id);
       setPingStatus(response.data.status);
@@ -322,7 +321,7 @@ const StudentProfileHeader = ({
 
   const handleSendPing = async () => {
     if (!profileData?.id) return;
-    
+
     setIsLoadingPing(true);
     try {
       await apiService.sendPingRequest(profileData.id);
@@ -387,7 +386,7 @@ const StudentProfileHeader = ({
       console.log("🔍 Fetching project count...");
       const response = await apiService.getStudentProjects();
       console.log("📊 Project response:", response);
-      
+
       const count = response.data?.length || 0;
       console.log("📊 Project count:", count);
       setProjectCount(count);
@@ -403,7 +402,7 @@ const StudentProfileHeader = ({
       console.log("🔍 Fetching projects for modal...");
       const response = await apiService.getStudentProjects();
       console.log("📊 Projects response:", response);
-      
+
       setProjects(response.data || []);
     } catch (error) {
       console.error("❌ Failed to fetch projects:", error);
@@ -427,7 +426,7 @@ const StudentProfileHeader = ({
 
   // Expose refresh function via useEffect and callback
   useEffect(() => {
-    if (onProfileUpdate && typeof onProfileUpdate === 'function') {
+    if (onProfileUpdate && typeof onProfileUpdate === "function") {
       // Add refresh function to the callback if needed
       onProfileUpdate.refreshProjects = refreshProjectData;
     }
@@ -437,7 +436,7 @@ const StudentProfileHeader = ({
   useEffect(() => {
     // Store the refresh function globally so it can be called from ProjectsSection
     window.refreshStudentProfileProjects = refreshProjectData;
-    
+
     return () => {
       // Clean up
       delete window.refreshStudentProfileProjects;
@@ -452,7 +451,7 @@ const StudentProfileHeader = ({
       fetchConnectionCount();
       fetchProjectCount();
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [profileData?.id, isOwner]);
 
@@ -462,7 +461,7 @@ const StudentProfileHeader = ({
     const timer = setTimeout(() => {
       fetchProjectCount();
     }, 100);
-    
+
     return () => clearTimeout(timer);
   }, [activeItem]); // Refresh when navigation changes
 
@@ -480,12 +479,12 @@ const StudentProfileHeader = ({
       fetchProjectCount();
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
@@ -596,7 +595,7 @@ const StudentProfileHeader = ({
           overflow: hidden;
         }
       `}</style>
-      
+
       <div
         className="rounded-xl shadow-sm border overflow-hidden mb-6"
         style={{ backgroundColor: "#F7FAFC", borderColor: "#DCE8F2" }}
@@ -713,7 +712,7 @@ const StudentProfileHeader = ({
                   <Edit3 className="w-5 h-5" />
                 </button>
               )}
-              
+
               {/* Dynamic Ping/Connect Button */}
               {!isOwner && (
                 <>
@@ -732,7 +731,7 @@ const StudentProfileHeader = ({
                       {isLoadingPing ? "Sending..." : "Ping"}
                     </button>
                   )}
-                  
+
                   {pingStatus === "sent" && (
                     <button
                       disabled
@@ -742,7 +741,7 @@ const StudentProfileHeader = ({
                       Ping Sent
                     </button>
                   )}
-                  
+
                   {pingStatus === "received" && (
                     <button
                       onClick={openPingRequestsModal}
@@ -752,7 +751,7 @@ const StudentProfileHeader = ({
                       Respond to Ping
                     </button>
                   )}
-                  
+
                   {pingStatus === "accepted" && (
                     <button
                       disabled
@@ -764,7 +763,7 @@ const StudentProfileHeader = ({
                   )}
                 </>
               )}
-              
+
               {/* Ping Requests Button for Owner */}
               {isOwner && (
                 <button
@@ -785,83 +784,99 @@ const StudentProfileHeader = ({
           </div>
 
           {/* Quick Stats */}
-         <div
-  className="flex items-center justify-around mt-6 pt-4 border-t"
-  style={{ borderColor: "#DCE8F2" }}
->
-  {/* Projects */}
-  <div className="flex flex-col items-center text-center">
-    <button
-      onClick={isOwner ? openProjectModal : undefined}
-      className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
-      title={isOwner ? "View your projects" : undefined}
-    >
-      <span className="block text-2xl font-bold" style={{ color: "#1F2D3D" }}>
-        {projectCount}
-      </span>
-      <span
-        className="block text-sm mt-1"
-        style={{ color: "#1F2D3D", opacity: 0.7 }}
-      >
-        Projects
-      </span>
-    </button>
-    {isOwner && (
-      <button
-        onClick={fetchProjectCount}
-        className="mt-1 p-1 hover:bg-gray-100 rounded transition-colors"
-        title="Refresh project count"
-      >
-        <svg
-          className="w-3 h-3 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-          />
-        </svg>
-      </button>
-    )}
-  </div>
+          <div
+            className="flex items-center justify-around mt-6 pt-4 border-t"
+            style={{ borderColor: "#DCE8F2" }}
+          >
+            {/* Projects */}
+            <div className="flex flex-col items-center text-center">
+              <button
+                onClick={isOwner ? openProjectModal : undefined}
+                className={`${
+                  isOwner
+                    ? "hover:bg-gray-100 cursor-pointer"
+                    : "cursor-default"
+                } p-2 rounded-lg transition-colors`}
+                title={isOwner ? "View your projects" : undefined}
+              >
+                <span
+                  className="block text-2xl font-bold"
+                  style={{ color: "#1F2D3D" }}
+                >
+                  {projectCount}
+                </span>
+                <span
+                  className="block text-sm mt-1"
+                  style={{ color: "#1F2D3D", opacity: 0.7 }}
+                >
+                  Projects
+                </span>
+              </button>
+              {isOwner && (
+                <button
+                  onClick={fetchProjectCount}
+                  className="mt-1 p-1 hover:bg-gray-100 rounded transition-colors"
+                  title="Refresh project count"
+                >
+                  <svg
+                    className="w-3 h-3 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
 
-  {/* Connections */}
-  <div className="flex flex-col items-center text-center">
-    <button
-      onClick={isOwner ? openConnectionModal : undefined}
-      className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
-      title={isOwner ? "View your connections" : undefined}
-    >
-      <span className="block text-2xl font-bold" style={{ color: "#1F2D3D" }}>
-        {connectionCount}
-      </span>
-      <span
-        className="block text-sm mt-1"
-        style={{ color: "#1F2D3D", opacity: 0.7 }}
-      >
-        Connections
-      </span>
-    </button>
-  </div>
+            {/* Connections */}
+            <div className="flex flex-col items-center text-center">
+              <button
+                onClick={isOwner ? openConnectionModal : undefined}
+                className={`${
+                  isOwner
+                    ? "hover:bg-gray-100 cursor-pointer"
+                    : "cursor-default"
+                } p-2 rounded-lg transition-colors`}
+                title={isOwner ? "View your connections" : undefined}
+              >
+                <span
+                  className="block text-2xl font-bold"
+                  style={{ color: "#1F2D3D" }}
+                >
+                  {connectionCount}
+                </span>
+                <span
+                  className="block text-sm mt-1"
+                  style={{ color: "#1F2D3D", opacity: 0.7 }}
+                >
+                  Connections
+                </span>
+              </button>
+            </div>
 
-  {/* Rating */}
-  <div className="flex flex-col items-center text-center">
-    <span className="block text-2xl font-bold" style={{ color: "#1F2D3D" }}>
-      4.9
-    </span>
-    <span
-      className="block text-sm mt-1"
-      style={{ color: "#1F2D3D", opacity: 0.7 }}
-    >
-      Rating
-    </span>
-  </div>
-</div>
-
+            {/* Rating */}
+            <div className="flex flex-col items-center text-center">
+              <span
+                className="block text-2xl font-bold"
+                style={{ color: "#1F2D3D" }}
+              >
+                4.9
+              </span>
+              <span
+                className="block text-sm mt-1"
+                style={{ color: "#1F2D3D", opacity: 0.7 }}
+              >
+                Rating
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Navigation Items - Horizontal LinkedIn Style */}
@@ -1640,7 +1655,10 @@ const StudentProfileHeader = ({
                     >
                       <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
                         <img
-                          src={request.sender?.profilePicture || "/default-avatar.png"}
+                          src={
+                            request.sender?.profilePicture ||
+                            "/default-avatar.png"
+                          }
                           alt="Profile"
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -1649,19 +1667,20 @@ const StudentProfileHeader = ({
                           }}
                         />
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">
                           {request.sender?.firstName} {request.sender?.lastName}
                         </h4>
                         <p className="text-sm text-gray-500 truncate">
-                          {request.sender?.headline || request.sender?.collegeName}
+                          {request.sender?.headline ||
+                            request.sender?.collegeName}
                         </p>
                         <p className="text-xs text-gray-400">
                           {new Date(request.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      
+
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleAcceptPing(request.id)}
@@ -1718,13 +1737,24 @@ const StudentProfileHeader = ({
               {projects.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                      />
                     </svg>
                   </div>
                   <p className="text-gray-500 mb-4">No projects yet</p>
                   <p className="text-sm text-gray-400">
-                    Add your first project in the Projects section to showcase your work
+                    Add your first project in the Projects section to showcase
+                    your work
                   </p>
                 </div>
               ) : (
@@ -1742,35 +1772,38 @@ const StudentProfileHeader = ({
                           <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                             {project.description}
                           </p>
-                          
+
                           {/* Technologies */}
                           {project.technologies && (
                             <div className="flex flex-wrap gap-1 mb-3">
-                              {(typeof project.technologies === "string" 
-                                ? project.technologies.split(", ") 
+                              {(typeof project.technologies === "string"
+                                ? project.technologies.split(", ")
                                 : project.technologies || []
-                              ).slice(0, 3).map((tech, index) => (
-                                <span
-                                  key={index}
-                                  className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
-                              {(typeof project.technologies === "string" 
-                                ? project.technologies.split(", ").length 
-                                : project.technologies?.length || 0
-                              ) > 3 && (
+                              )
+                                .slice(0, 3)
+                                .map((tech, index) => (
+                                  <span
+                                    key={index}
+                                    className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                              {(typeof project.technologies === "string"
+                                ? project.technologies.split(", ").length
+                                : project.technologies?.length || 0) > 3 && (
                                 <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                                  +{(typeof project.technologies === "string" 
-                                    ? project.technologies.split(", ").length 
-                                    : project.technologies?.length || 0
-                                  ) - 3} more
+                                  +
+                                  {(typeof project.technologies === "string"
+                                    ? project.technologies.split(", ").length
+                                    : project.technologies?.length || 0) -
+                                    3}{" "}
+                                  more
                                 </span>
                               )}
                             </div>
                           )}
-                          
+
                           {/* Links */}
                           <div className="flex gap-3">
                             {project.project_link && (
@@ -1780,23 +1813,32 @@ const StudentProfileHeader = ({
                                 rel="noopener noreferrer"
                                 className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                  />
                                 </svg>
                                 View Project
                               </a>
                             )}
                           </div>
                         </div>
-                        
+
                         {/* Project Date */}
                         <div className="text-xs text-gray-400 ml-4">
-                          {project.start_date 
+                          {project.start_date
                             ? new Date(project.start_date).toLocaleDateString()
-                            : project.created_at 
+                            : project.created_at
                             ? new Date(project.created_at).toLocaleDateString()
-                            : 'No date'
-                          }
+                            : "No date"}
                         </div>
                       </div>
                     </div>
@@ -1854,13 +1896,24 @@ const StudentProfileHeader = ({
               {connections.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
                     </svg>
                   </div>
                   <p className="text-gray-500 mb-4">No connections yet</p>
                   <p className="text-sm text-gray-400">
-                    Connect with other students, colleges, and industry professionals to build your network
+                    Connect with other students, colleges, and industry
+                    professionals to build your network
                   </p>
                 </div>
               ) : (
@@ -1872,7 +1925,10 @@ const StudentProfileHeader = ({
                     >
                       <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
                         <img
-                          src={connection.connectionUser?.profilePicture || "/default-avatar.png"}
+                          src={
+                            connection.connectionUser?.profilePicture ||
+                            "/default-avatar.png"
+                          }
                           alt="Profile"
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -1881,23 +1937,29 @@ const StudentProfileHeader = ({
                           }}
                         />
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">
-                          {connection.connectionUser?.firstName} {connection.connectionUser?.lastName}
+                          {connection.connectionUser?.firstName}{" "}
+                          {connection.connectionUser?.lastName}
                         </h4>
                         <p className="text-sm text-gray-500 truncate">
-                          {connection.connectionUser?.headline || connection.connectionUser?.collegeName}
+                          {connection.connectionUser?.headline ||
+                            connection.connectionUser?.collegeName}
                         </p>
                         <p className="text-xs text-gray-400">
-                          Connected on {new Date(connection.updated_at).toLocaleDateString()}
+                          Connected on{" "}
+                          {new Date(connection.updated_at).toLocaleDateString()}
                         </p>
                       </div>
-                      
+
                       <button
                         onClick={() => {
                           // Navigate to their profile
-                          window.open(`/student/profile/${connection.connectionUser?.id}`, '_blank');
+                          window.open(
+                            `/student/profile/${connection.connectionUser?.id}`,
+                            "_blank"
+                          );
                         }}
                         className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
@@ -1907,7 +1969,7 @@ const StudentProfileHeader = ({
                   ))}
                 </div>
               )}
-              
+
               <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
                 <button
                   onClick={() => setIsConnectionModalOpen(false)}

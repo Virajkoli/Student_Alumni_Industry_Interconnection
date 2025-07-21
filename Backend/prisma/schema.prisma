@@ -8,28 +8,27 @@ datasource db {
 }
 
 model Student {
-  id              Int       @id @default(autoincrement())
-  firstName       String?   @map("first_name") @db.VarChar(100)
-  lastName        String?   @map("last_name") @db.VarChar(100)
-  email           String    @unique @db.VarChar(150)
-  password        String    @db.VarChar(255)
-  contactNo       String?   @map("contact_no") @db.VarChar(15)
-  collegeName     String?   @map("college_name") @db.VarChar(200)
-  interestedField String?   @map("interested_field") @db.VarChar(50)
-  otherField      String?   @map("other_field") @db.VarChar(100)
-  googleId        String?   @map("google_id") @db.VarChar(255)
-  githubId        String?   @map("github_id") @db.VarChar(255)
-  profilePicture  String?   @map("profile_picture") @db.VarChar(255)
-  coverPicture    String?   @map("cover_picture") @db.VarChar(255)
-  location        String?   @db.VarChar(100)
-  headline        String?   @db.VarChar(300)
-  isActive        Boolean   @default(true)
-  isEmailVerified Boolean   @default(false)
-  lastLogin       DateTime? @map("lastLogin")
-  loginCount      Int       @default(0)
-  createdAt       DateTime  @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime  @map("updated_at") @db.Timestamptz(6)
-
+  id              Int                       @id @default(autoincrement())
+  firstName       String?                   @map("first_name") @db.VarChar(100)
+  lastName        String?                   @map("last_name") @db.VarChar(100)
+  email           String                    @unique @db.VarChar(150)
+  password        String                    @db.VarChar(255)
+  contactNo       String?                   @map("contact_no") @db.VarChar(15)
+  collegeName     String?                   @map("college_name") @db.VarChar(200)
+  interestedField String?                   @map("interested_field") @db.VarChar(50)
+  otherField      String?                   @map("other_field") @db.VarChar(100)
+  googleId        String?                   @map("google_id") @db.VarChar(255)
+  githubId        String?                   @map("github_id") @db.VarChar(255)
+  profilePicture  String?                   @map("profile_picture") @db.VarChar(255)
+  coverPicture    String?                   @map("cover_picture") @db.VarChar(255)
+  location        String?                   @db.VarChar(100)
+  headline        String?                   @db.VarChar(300)
+  isActive        Boolean                   @default(true)
+  isEmailVerified Boolean                   @default(false)
+  lastLogin       DateTime?                 @map("lastLogin")
+  loginCount      Int                       @default(0)
+  createdAt       DateTime                  @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime                  @map("updated_at") @db.Timestamptz(6)
   about           student_about[]
   certifications  student_certifications[]
   courses         student_courses[]
@@ -122,30 +121,51 @@ model Certification {
 }
 
 model College {
-  id              Int       @id @default(autoincrement())
-  name            String    @db.VarChar(100)
-  email           String    @unique @db.VarChar(255)
-  password        String    @db.VarChar(255)
-  description     String?
-  location        String?   @db.VarChar(100)
-  established     Int?
-  campusArea      Decimal?  @db.Decimal(10, 2)
-  nirfRank        Int?
-  accreditation   String?   @db.VarChar(100)
-  totalStudents   Int?
-  totalFaculty    Int?
-  website         String?   @db.VarChar(255)
-  logoUrl         String?   @db.VarChar(255)
-  backgroundUrl   String?   @db.VarChar(255)
-  isActive        Boolean   @default(true)
-  isEmailVerified Boolean   @default(false)
-  lastLogin       DateTime? @db.Timestamptz(6)
-  loginCount      Int       @default(0)
-  googleId        String?   @unique @map("google_id") @db.VarChar(255)
-  githubId        String?   @unique @map("github_id") @db.VarChar(255)
-  profilePicture  String?   @map("profile_picture") @db.VarChar(500)
-  createdAt       DateTime  @map("createdAt") @db.Timestamptz(6)
-  updatedAt       DateTime  @map("updatedAt") @db.Timestamptz(6)
+  id                   Int                    @id @default(autoincrement())
+  name                 String                 @db.VarChar(100)
+  email                String                 @unique @db.VarChar(255)
+  password             String                 @db.VarChar(255)
+  description          String?
+  location             String?                @db.VarChar(100)
+  accreditation        String?                @db.VarChar(100)
+  website              String?                @db.VarChar(255)
+  googleId             String?                @unique @map("google_id") @db.VarChar(255)
+  githubId             String?                @unique @map("github_id") @db.VarChar(255)
+  profilePicture       String?                @map("profile_picture") @db.VarChar(500)
+  backgroundUrl        String?                @db.VarChar(255)
+  campusArea           Decimal?               @db.Decimal(10, 2)
+  createdAt            DateTime               @default(now()) @map("createdAt") @db.Timestamptz(6)
+  established          Int?
+  isActive             Boolean                @default(true)
+  isEmailVerified      Boolean                @default(false)
+  lastLogin            DateTime?              @db.Timestamptz(6)
+  loginCount           Int                    @default(0)
+  logoUrl              String?                @db.VarChar(255)
+  nirfRank             Int?
+  totalFaculty         Int?
+  totalStudents        Int?
+  updatedAt            DateTime               @default(now()) @map("updatedAt") @db.Timestamptz(6)
+  about                college_about[]
+  achievements         college_achievements[]
+  admissions           college_admissions[]
+  affiliations         college_affiliations[]
+  alumni               college_alumni[]
+  certifications       college_certifications[]
+  college_campuses_new college_campuses_new[]
+  college_courses      college_courses[]
+  departments          college_departments[]
+  college_downloads    college_downloads[]
+  events               college_events[]
+  facilities           college_facilities[]
+  faculty              college_faculty[]
+  college_fees         college_fees[]
+  history              college_history?
+  college_hostels      college_hostels[]
+  placements           college_placements[]
+  programs             college_programs[]
+  rankings             college_rankings[]
+  research             college_research[]
+  college_reviews      college_reviews[]
 
   @@map("colleges")
 }
@@ -259,6 +279,163 @@ model college_campuses {
   updated_at     DateTime? @default(now()) @db.Timestamp(6)
 }
 
+model college_about {
+  id          Int      @id @default(autoincrement())
+  college_id  Int      @unique
+  overview    String?
+  vision      String?
+  mission     String?
+  history     String?
+  specialties String[]
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  colleges    College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_achievements {
+  id          Int      @id @default(autoincrement())
+  college_id  Int
+  title       String   @db.VarChar(200)
+  description String?
+  type        String   @db.VarChar(100)
+  year        Int?
+  issued_by   String?  @db.VarChar(150)
+  image_url   String?  @db.VarChar(255)
+  url         String?  @db.VarChar(255)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  colleges    College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_alumni {
+  id               Int      @id @default(autoincrement())
+  college_id       Int
+  name             String   @db.VarChar(150)
+  graduation_year  Int
+  current_position String?  @db.VarChar(200)
+  linkedin_url     String?  @db.VarChar(255)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @db.Timestamptz(6)
+  achievement      String?
+  bio              String?
+  course           String   @db.VarChar(100)
+  current_company  String?  @db.VarChar(200)
+  image_url        String?  @db.VarChar(255)
+  is_featured      Boolean  @default(false)
+  is_notable       Boolean  @default(false)
+  colleges         College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_departments {
+  id             Int      @id @default(autoincrement())
+  college_id     Int
+  name           String   @db.VarChar(200)
+  description    String?
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  head_name      String?  @db.VarChar(100)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+  established    Int?
+  head_email     String?  @db.VarChar(150)
+  head_phone     String?  @db.VarChar(20)
+  image_url      String?  @db.VarChar(255)
+  total_faculty  Int?
+  total_students Int?
+  website        String?  @db.VarChar(255)
+  colleges       College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_events {
+  id               Int       @id @default(autoincrement())
+  college_id       Int
+  title            String    @db.VarChar(200)
+  description      String?
+  event_type       String    @db.VarChar(100)
+  end_date         DateTime? @db.Timestamptz(6)
+  image_url        String?   @db.VarChar(255)
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+  is_active        Boolean   @default(true)
+  organizer        String?   @db.VarChar(150)
+  registration_url String?   @db.VarChar(255)
+  start_date       DateTime? @db.Timestamptz(6)
+  venue            String?   @db.VarChar(200)
+  colleges         College   @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_facilities {
+  id          Int      @id @default(autoincrement())
+  college_id  Int
+  name        String   @db.VarChar(200)
+  type        String   @db.VarChar(100)
+  description String?
+  capacity    String?  @db.VarChar(50)
+  location    String?  @db.VarChar(100)
+  features    String[]
+  image_url   String?  @db.VarChar(255)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  colleges    College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_faculty {
+  id                 Int      @id @default(autoincrement())
+  college_id         Int
+  name               String   @db.VarChar(150)
+  designation        String   @db.VarChar(100)
+  specialization     String?
+  research_interests String?
+  bio                String?
+  email              String?  @db.VarChar(150)
+  phone              String?  @db.VarChar(20)
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime @default(now()) @db.Timestamptz(6)
+  department         String   @db.VarChar(100)
+  experience         String?  @db.VarChar(100)
+  image_url          String?  @db.VarChar(255)
+  publications       String?
+  qualification      String?  @db.VarChar(200)
+  colleges           College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_placements {
+  id                   Int      @id @default(autoincrement())
+  college_id           Int
+  highest_package      Decimal? @db.Decimal(12, 2)
+  average_package      Decimal? @db.Decimal(12, 2)
+  median_package       Decimal? @db.Decimal(12, 2)
+  placement_percentage Decimal? @db.Decimal(5, 2)
+  top_recruiters       String[]
+  placement_statistics Json?
+  created_at           DateTime @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime @default(now()) @db.Timestamptz(6)
+  academic_year        String   @db.VarChar(20)
+  placed_students      Int?
+  total_students       Int?
+  colleges             College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_admissions {
+  id                   Int       @id @default(autoincrement())
+  college_id           Int
+  application_fee      Decimal?  @db.Decimal(10, 2)
+  created_at           DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime  @default(now()) @db.Timestamptz(6)
+  admission_process    String?
+  admission_url        String?   @db.VarChar(255)
+  application_end      DateTime? @db.Date
+  application_start    DateTime? @db.Date
+  course_name          String    @db.VarChar(200)
+  eligibility_criteria String?
+  exam_date            DateTime? @db.Date
+  is_active            Boolean   @default(true)
+  required_documents   String[]
+  reservation_policy   String?
+  result_date          DateTime? @db.Date
+  total_seats          Int?
+  colleges             College   @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
 model migration_history {
   id             Int       @id @default(autoincrement())
   migration_name String    @unique @db.VarChar(255)
@@ -291,9 +468,6 @@ model post_comments {
   alumni       alumni?   @relation(fields: [alumni_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   posts        Post?     @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
 }
-
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 
 model post_media {
   media_id             Int       @id @default(autoincrement())
@@ -520,6 +694,133 @@ model users {
   @@index([role], map: "users_role")
 }
 
+model college_campuses_new {
+  id             Int      @id @default(autoincrement())
+  college_id     Int
+  name           String   @db.VarChar(100)
+  type           String   @db.VarChar(100)
+  address        String
+  city           String?  @db.VarChar(100)
+  state          String?  @db.VarChar(100)
+  country        String?  @db.VarChar(100)
+  pincode        String?  @db.VarChar(10)
+  student_count  Int?
+  faculty_count  Int?
+  area_acres     Decimal? @db.Decimal(10, 2)
+  latitude       Decimal? @db.Decimal(9, 6)
+  longitude      Decimal? @db.Decimal(9, 6)
+  dean           String?  @db.VarChar(100)
+  dean_email     String?  @db.VarChar(100)
+  contact_number String?  @db.VarChar(20)
+  image_url      String?  @db.VarChar(255)
+  facilities     String[]
+  departments    String[]
+  is_main_campus Boolean  @default(false)
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+  colleges       College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_courses {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(200)
+  syllabus_url  String?  @db.VarChar(255)
+  description   String?
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  college_id    Int
+  degree_type   String   @db.VarChar(50)
+  department    String?  @db.VarChar(100)
+  duration      String   @db.VarChar(50)
+  eligibility   String?
+  fees_per_year Decimal? @db.Decimal(10, 2)
+  is_active     Boolean  @default(true)
+  total_seats   Int?
+  colleges      College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_downloads {
+  id             Int      @id @default(autoincrement())
+  college_id     Int
+  title          String   @db.VarChar(200)
+  description    String?
+  file_type      String   @db.VarChar(50)
+  category       String   @db.VarChar(100)
+  file_url       String   @db.VarChar(255)
+  file_size      String?  @db.VarChar(20)
+  download_count Int      @default(0)
+  is_public      Boolean  @default(true)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+  colleges       College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_fees {
+  id            Int      @id @default(autoincrement())
+  college_id    Int
+  course_name   String   @db.VarChar(200)
+  degree_type   String   @db.VarChar(50)
+  category      String?  @db.VarChar(50)
+  tuition_fee   Decimal? @db.Decimal(10, 2)
+  hostel_fee    Decimal? @db.Decimal(10, 2)
+  mess_fee      Decimal? @db.Decimal(10, 2)
+  transport_fee Decimal? @db.Decimal(10, 2)
+  other_fees    Decimal? @db.Decimal(10, 2)
+  total_fee     Decimal? @db.Decimal(10, 2)
+  academic_year String   @db.VarChar(20)
+  fee_structure Json?
+  payment_modes String[]
+  scholarships  String[]
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  colleges      College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_hostels {
+  id             Int      @id @default(autoincrement())
+  college_id     Int
+  name           String   @db.VarChar(150)
+  type           String   @db.VarChar(50)
+  capacity       Int?
+  occupancy      Int?
+  fees_per_year  Decimal? @db.Decimal(10, 2)
+  facilities     String[]
+  mess_facility  Boolean  @default(false)
+  warden_name    String?  @db.VarChar(100)
+  warden_contact String?  @db.VarChar(20)
+  address        String?
+  image_url      String?  @db.VarChar(255)
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+  colleges       College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_reviews {
+  id                    Int      @id @default(autoincrement())
+  college_id            Int
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  is_verified           Boolean  @default(false)
+  updated_at            DateTime @default(now()) @db.Timestamptz(6)
+  academics_rating      Decimal? @db.Decimal(2, 1)
+  campus_life_rating    Decimal? @db.Decimal(2, 1)
+  cons                  String?
+  course                String?  @db.VarChar(100)
+  faculty_rating        Decimal? @db.Decimal(2, 1)
+  graduation_year       Int?
+  helpful_count         Int      @default(0)
+  infrastructure_rating Decimal? @db.Decimal(2, 1)
+  is_featured           Boolean  @default(false)
+  overall_rating        Decimal  @db.Decimal(2, 1)
+  placement_rating      Decimal? @db.Decimal(2, 1)
+  pros                  String?
+  review_text           String?
+  reviewer_name         String?  @db.VarChar(100)
+  reviewer_type         String   @db.VarChar(50)
+  colleges              College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
 enum enum_users_profileVisibility {
   public
   connections
@@ -540,4 +841,86 @@ enum enum_users_stage {
   mvp
   growth
   scale
+}
+
+model college_affiliations {
+  id           Int      @id @default(autoincrement())
+  college_id   Int
+  organization String   @db.VarChar(200)
+  type         String?  @db.VarChar(100)
+  url          String?  @db.VarChar(255)
+  description  String?
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+  colleges     College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_certifications {
+  id                Int      @id @default(autoincrement())
+  college_id        Int
+  certification     String   @db.VarChar(200)
+  issuing_authority String?  @db.VarChar(200)
+  issued_date       DateTime? @db.Date
+  expiry_date       DateTime? @db.Date
+  credential_id     String?  @db.VarChar(100)
+  url               String?  @db.VarChar(255)
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime @default(now()) @db.Timestamptz(6)
+  colleges          College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_history {
+  id          Int      @id @default(autoincrement())
+  college_id  Int      @unique
+  founded     Int?
+  founders    String[]
+  milestones  String?
+  legacy      String?
+  timeline    String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  colleges    College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_programs {
+  id          Int      @id @default(autoincrement())
+  college_id  Int
+  name        String   @db.VarChar(200)
+  degree_type String?  @db.VarChar(50)
+  duration    String?  @db.VarChar(50)
+  description String?
+  fees        String?  @db.VarChar(100)
+  eligibility String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  colleges    College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_research {
+  id             Int      @id @default(autoincrement())
+  college_id     Int
+  title          String   @db.VarChar(300)
+  description    String?
+  lead_researcher String? @db.VarChar(200)
+  funding        String?  @db.VarChar(100)
+  status         String?  @db.VarChar(50)
+  start_date     DateTime? @db.Date
+  end_date       DateTime? @db.Date
+  publications   String[]
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+  colleges       College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model college_rankings {
+  id            Int      @id @default(autoincrement())
+  college_id    Int
+  ranking_body  String   @db.VarChar(200)
+  rank_position Int?
+  year          Int?
+  category      String?  @db.VarChar(100)
+  score         String?  @db.VarChar(50)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  colleges      College  @relation(fields: [college_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }

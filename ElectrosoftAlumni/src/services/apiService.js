@@ -1061,6 +1061,318 @@ class ApiService {
     }
   }
 
+  // College Information methods
+  async getCollegeInformation(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/information/${collegeId}` 
+        : "/college-profile/information";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college information"
+      );
+    }
+  }
+
+  async updateCollegeInformation(collegeId, informationData) {
+    try {
+      console.log('🔄 API: Updating college information...');
+      console.log('Arguments length:', arguments.length);
+      
+      // If only one parameter is passed, treat it as informationData
+      if (arguments.length === 1) {
+        informationData = collegeId;
+        console.log('📤 Sending data:', informationData);
+        const response = await this.api.put("/college-profile/information", informationData);
+        console.log('✅ API Response:', response.status, response.data);
+        return response.data;
+      } else {
+        // If two parameters, include collegeId in the data or use appropriate endpoint
+        console.log('📤 Sending data for college', collegeId, ':', informationData);
+        const response = await this.api.put("/college-profile/information", informationData);
+        console.log('✅ API Response:', response.status, response.data);
+        return response.data;
+      }
+    } catch (error) {
+      console.error('❌ API Error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      // Try to get a meaningful error message
+      let errorMessage = "Failed to update college information";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.statusText) {
+        errorMessage = `${error.response.status}: ${error.response.statusText}`;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      throw new Error(errorMessage);
+    }
+  }
+
+  // College Sections methods
+  async getCollegeAbout(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/about/${collegeId}` 
+        : "/college-profile/about";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college about"
+      );
+    }
+  }
+
+  async updateCollegeAbout(aboutData) {
+    try {
+      const response = await this.api.put("/college-profile/about", aboutData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college about"
+      );
+    }
+  }
+
+  async getCollegeDepartments(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/departments/${collegeId}` 
+        : "/college-profile/departments";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college departments"
+      );
+    }
+  }
+
+  async getCollegeFaculty(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/faculty/${collegeId}` 
+        : "/college-profile/faculty";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college faculty"
+      );
+    }
+  }
+
+  async getCollegePrograms(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/programs/${collegeId}` 
+        : "/college-profile/programs";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college programs"
+      );
+    }
+  }
+
+  async getCollegeAlumni(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/alumni/${collegeId}` 
+        : "/college-profile/alumni";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college alumni"
+      );
+    }
+  }
+
+  async getCollegeEvents(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/events/${collegeId}` 
+        : "/college-profile/events";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college events"
+      );
+    }
+  }
+
+  async getCollegeFacilities(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/facilities/${collegeId}` 
+        : "/college-profile/facilities";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college facilities"
+      );
+    }
+  }
+
+  async getCollegePlacements(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/placements/${collegeId}` 
+        : "/college-profile/placements";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college placements"
+      );
+    }
+  }
+
+  async getCollegeRankings(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/rankings/${collegeId}` 
+        : "/college-profile/rankings";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college rankings"
+      );
+    }
+  }
+
+  async getCollegeAdmissions(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/admissions/${collegeId}` 
+        : "/college-profile/admissions";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college admissions"
+      );
+    }
+  }
+
+  // College Campuses methods
+  async getCollegeCampuses(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/campuses/${collegeId}` 
+        : "/college-profile/campuses";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college campuses"
+      );
+    }
+  }
+
+  async createCollegeCampus(campusData) {
+    try {
+      const response = await this.api.post("/college-profile/campuses", campusData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create campus"
+      );
+    }
+  }
+
+  async updateCollegeCampus(campusId, campusData) {
+    try {
+      const response = await this.api.put(`/college-profile/campuses/${campusId}`, campusData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update campus"
+      );
+    }
+  }
+
+  async updateCollegeCampuses(campusesData) {
+    try {
+      // If it's an array of campuses, handle bulk update
+      if (Array.isArray(campusesData)) {
+        const promises = campusesData.map(campus => {
+          if (campus.id) {
+            return this.updateCollegeCampus(campus.id, campus);
+          } else {
+            return this.createCollegeCampus(campus);
+          }
+        });
+        const results = await Promise.all(promises);
+        return { success: true, data: results };
+      } else {
+        // Single campus update
+        const response = await this.api.put("/college-profile/campuses", campusesData);
+        return response.data;
+      }
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update campuses"
+      );
+    }
+  }
+
+  async deleteCollegeCampus(campusId) {
+    try {
+      const response = await this.api.delete(`/college-profile/campuses/${campusId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete campus"
+      );
+    }
+  }
+
+  // Campus Map Location methods
+  async updateCampusLocation(campusId, locationData) {
+    try {
+      const response = await this.api.put(`/college-profile/campuses/${campusId}/location`, locationData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update campus location"
+      );
+    }
+  }
+
+  async getCampusesWithLocations() {
+    try {
+      const response = await this.api.get("/college-profile/campuses/locations");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get campuses with locations"
+      );
+    }
+  }
+
+  async getCampusesMap(collegeId) {
+    try {
+      const response = await this.api.get(`/college-profile/campuses/map/${collegeId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get campuses map"
+      );
+    }
+  }
+
   async getStartupProfile(startupId = null) {
     try {
       const endpoint = startupId ? `/startups/${startupId}` : "/startups/me";
@@ -1420,6 +1732,60 @@ const collegeAPI = {
       );
     }
   },
+
+  // College Information methods
+  async getInformation() {
+    return apiService.getCollegeInformation();
+  },
+
+  async updateInformation(informationData) {
+    return apiService.updateCollegeInformation(informationData);
+  },
+
+  // College Sections
+  async getAbout() {
+    return apiService.getCollegeAbout();
+  },
+
+  async updateAbout(aboutData) {
+    return apiService.updateCollegeAbout(aboutData);
+  },
+
+  async getDepartments() {
+    return apiService.getCollegeDepartments();
+  },
+
+  async getFaculty() {
+    return apiService.getCollegeFaculty();
+  },
+
+  async getPrograms() {
+    return apiService.getCollegePrograms();
+  },
+
+  async getAlumni() {
+    return apiService.getCollegeAlumni();
+  },
+
+  async getEvents() {
+    return apiService.getCollegeEvents();
+  },
+
+  async getFacilities() {
+    return apiService.getCollegeFacilities();
+  },
+
+  async getPlacements() {
+    return apiService.getCollegePlacements();
+  },
+
+  async getRankings() {
+    return apiService.getCollegeRankings();
+  },
+
+  async getAdmissions() {
+    return apiService.getCollegeAdmissions();
+  }
 };
 
 const startupAPI = {

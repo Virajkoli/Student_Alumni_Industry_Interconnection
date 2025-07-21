@@ -1,53 +1,55 @@
 const express = require('express');
 const router = express.Router();
 const { auth } = require('../middleware/auth');
+const CollegeProfileController = require('../controllers/collegeProfileController');
 
-// Import consolidated controller (to be created)
-// const collegeProfileController = require('../controllers/collegeProfileController');
+const collegeProfileController = new CollegeProfileController();
 
-// College profile routes
-// router.get('/profile', auth, collegeProfileController.getProfile);
-// router.put('/profile', auth, collegeProfileController.updateProfile);
-// router.delete('/profile', auth, collegeProfileController.deleteProfile);
+// College basic profile routes
+router.get('/profile', auth, collegeProfileController.getProfile);
+router.put('/profile', auth, collegeProfileController.updateProfile);
 
-// College campuses routes
-// router.get('/campuses', auth, collegeProfileController.getCampuses);
-// router.post('/campuses', auth, collegeProfileController.createCampus);
-// router.put('/campuses/:id', auth, collegeProfileController.updateCampus);
-// router.delete('/campuses/:id', auth, collegeProfileController.deleteCampus);
+// College comprehensive information routes
+router.get('/information', auth, collegeProfileController.getCollegeInformation);
+router.get('/information/:collegeId', collegeProfileController.getCollegeInformation);
+router.put('/information', auth, collegeProfileController.updateCollegeInformation);
 
-// College students routes
-// router.get('/students', auth, collegeProfileController.getStudents);
-// router.get('/students/search', auth, collegeProfileController.searchStudents);
-// router.get('/students/statistics', auth, collegeProfileController.getStudentStatistics);
+// College sections routes
+router.get('/about', auth, collegeProfileController.getAbout);
+router.put('/about', auth, collegeProfileController.updateAbout);
 
-// College posts routes
-// router.get('/posts', auth, collegeProfileController.getPosts);
-// router.post('/posts', auth, collegeProfileController.createPost);
-// router.put('/posts/:id', auth, collegeProfileController.updatePost);
-// router.delete('/posts/:id', auth, collegeProfileController.deletePost);
+router.get('/departments', auth, collegeProfileController.getDepartments);
+router.post('/departments', auth, collegeProfileController.createDepartment);
+router.put('/departments/:id', auth, collegeProfileController.updateDepartment);
+router.delete('/departments/:id', auth, collegeProfileController.deleteDepartment);
 
-// College analytics routes
-// router.get('/analytics/overview', auth, collegeProfileController.getAnalyticsOverview);
-// router.get('/analytics/engagement', auth, collegeProfileController.getEngagementMetrics);
-// router.get('/analytics/growth', auth, collegeProfileController.getGrowthMetrics);
+router.get('/faculty', auth, collegeProfileController.getFaculty);
+router.post('/faculty', auth, collegeProfileController.createFaculty);
 
-// TODO: Uncomment routes above when collegeProfileController is created
-// For now, return a placeholder response
-router.use('*', (req, res) => {
-  res.json({
-    success: false,
-    message: 'College profile routes are not yet implemented. College profile tables need to be created in the database first.',
-    availableRoutes: [
-      'GET /profile - Get college profile',
-      'PUT /profile - Update college profile', 
-      'GET /campuses - Get college campuses',
-      'POST /campuses - Create new campus',
-      'GET /students - Get college students',
-      'GET /posts - Get college posts',
-      'GET /analytics/overview - Get analytics overview'
-    ]
-  });
-});
+router.get('/programs', auth, collegeProfileController.getPrograms);
+router.post('/programs', auth, collegeProfileController.createProgram);
+
+router.get('/alumni', auth, collegeProfileController.getAlumni);
+router.get('/events', auth, collegeProfileController.getEvents);
+router.post('/events', auth, collegeProfileController.createEvent);
+
+router.get('/facilities', auth, collegeProfileController.getFacilities);
+router.get('/placements', auth, collegeProfileController.getPlacements);
+router.get('/rankings', auth, collegeProfileController.getRankings);
+router.get('/admissions', auth, collegeProfileController.getAdmissions);
+
+// College campuses routes (with map location support)
+router.get('/campuses', auth, collegeProfileController.getCampuses);
+router.post('/campuses', auth, collegeProfileController.createCampus);
+router.put('/campuses/:id', auth, collegeProfileController.updateCampus);
+router.delete('/campuses/:id', auth, collegeProfileController.deleteCampus);
+
+// Campus location and map routes
+router.put('/campuses/:id/location', auth, collegeProfileController.updateCampusLocation);
+router.get('/campuses/locations', auth, collegeProfileController.getCampusesWithLocations);
+router.get('/campuses/map/:collegeId', collegeProfileController.getCampusesMap); // Public endpoint
+
+// College students routes (legacy)
+router.get('/students', auth, collegeProfileController.getStudents);
 
 module.exports = router;

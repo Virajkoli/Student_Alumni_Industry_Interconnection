@@ -119,7 +119,7 @@ const StudentProfilePage = () => {
           student_college_name: data.collegeName || data.college_name || "",
           interested_field: data.interestedField || data.interested_field || "",
           other_field: data.otherField || data.other_field || "",
-          about: data.about || "",
+          about: data.about?.summary || data.about || "",
         };
 
         setProfileData(mappedData);

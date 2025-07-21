@@ -310,11 +310,11 @@ router.get("/connections/count", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Get Student by ID
+// ✅ Get Student by ID (Complete Profile)
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("🔍 Fetching student with ID:", id);
+    console.log("🔍 Fetching complete student profile with ID:", id);
     console.log("🔍 Current user ID:", req.user?.id);
     console.log("🔍 Current user role:", req.user?.role);
     
@@ -330,6 +330,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
     
     console.log("🔍 Parsed ID:", studentId);
 
+    // Get basic student info
     const student = await prisma.student.findUnique({
       where: { id: studentId },
       select: studentSelectFields(),
@@ -342,14 +343,26 @@ router.get("/:id", authMiddleware, async (req, res) => {
         .json({ success: false, message: "Student not found" });
     }
 
-    console.log("✅ Student found:", student.firstName, student.lastName);
-    console.log("✅ Student data:", student);
-    res.json({ success: true, data: student });
+    // Get complete profile data using the studentProfileService
+    const studentProfileService = require('../services/studentProfileService');
+    const completeProfile = await studentProfileService.getCompleteProfile(studentId);
+
+    // Combine basic student info with complete profile data
+    const completeStudentData = {
+      ...student,
+      ...completeProfile
+    };
+
+    console.log("✅ Complete student profile loaded:", student.firstName, student.lastName);
+    console.log("✅ Projects count:", completeProfile.projects?.length || 0);
+    console.log("✅ Experiences count:", completeProfile.experiences?.length || 0);
+    
+    res.json({ success: true, data: completeStudentData });
   } catch (error) {
-    console.error("❌ Error fetching student:", error);
+    console.error("❌ Error fetching complete student profile:", error);
     res
       .status(500)
-      .json({ success: false, message: "Failed to fetch student" });
+      .json({ success: false, message: "Failed to fetch complete student profile" });
   }
 });
 

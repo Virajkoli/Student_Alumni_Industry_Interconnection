@@ -58,6 +58,11 @@ const StudentProfileHeader = ({
   const [isPingRequestsModalOpen, setIsPingRequestsModalOpen] = useState(false);
   const [isLoadingPing, setIsLoadingPing] = useState(false);
 
+  // Project state
+  const [projectCount, setProjectCount] = useState(0);
+  const [projects, setProjects] = useState([]);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+
   const [user, setUser] = useState(null);
 
   const fetchUserData = async () => {
@@ -355,11 +360,113 @@ const StudentProfileHeader = ({
     fetchPingRequests();
   };
 
+  // Project functions
+  const fetchProjectCount = async () => {
+    try {
+      console.log("🔍 Fetching project count...");
+      const response = await apiService.getStudentProjects();
+      console.log("📊 Project response:", response);
+      
+      const count = response.data?.length || 0;
+      console.log("📊 Project count:", count);
+      setProjectCount(count);
+    } catch (error) {
+      console.error("❌ Failed to fetch project count:", error);
+      // Set count to 0 if there's an error
+      setProjectCount(0);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      console.log("🔍 Fetching projects for modal...");
+      const response = await apiService.getStudentProjects();
+      console.log("📊 Projects response:", response);
+      
+      setProjects(response.data || []);
+    } catch (error) {
+      console.error("❌ Failed to fetch projects:", error);
+      toast.error("Failed to load projects");
+      setProjects([]);
+    }
+  };
+
+  const openProjectModal = () => {
+    setIsProjectModalOpen(true);
+    fetchProjects();
+  };
+
+  // Refresh project data function (can be called externally)
+  const refreshProjectData = async () => {
+    await fetchProjectCount();
+    if (isProjectModalOpen) {
+      await fetchProjects();
+    }
+  };
+
+  // Expose refresh function via useEffect and callback
+  useEffect(() => {
+    if (onProfileUpdate && typeof onProfileUpdate === 'function') {
+      // Add refresh function to the callback if needed
+      onProfileUpdate.refreshProjects = refreshProjectData;
+    }
+  }, [onProfileUpdate]);
+
+  // Also create a global function that can be called from anywhere
+  useEffect(() => {
+    // Store the refresh function globally so it can be called from ProjectsSection
+    window.refreshStudentProfileProjects = refreshProjectData;
+    
+    return () => {
+      // Clean up
+      delete window.refreshStudentProfileProjects;
+    };
+  }, []);
+
   // Fetch ping status and connection count when component mounts or profileData changes
   useEffect(() => {
-    fetchPingStatus();
-    fetchConnectionCount();
+    // Add a small delay to ensure component is fully mounted
+    const timer = setTimeout(() => {
+      fetchPingStatus();
+      fetchConnectionCount();
+      fetchProjectCount();
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, [profileData?.id, isOwner]);
+
+  // Refresh project count when component becomes visible (navigation changes)
+  useEffect(() => {
+    // Add a small delay to ensure any pending updates are completed
+    const timer = setTimeout(() => {
+      fetchProjectCount();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [activeItem]); // Refresh when navigation changes
+
+  // Refresh project count when page becomes visible (user switches back to tab)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Page became visible, refresh project count
+        fetchProjectCount();
+      }
+    };
+
+    const handleFocus = () => {
+      // Window got focus, refresh project count
+      fetchProjectCount();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   const handleCancelEdit = () => {
     setEditData({ ...profileData });
@@ -460,6 +567,15 @@ const StudentProfileHeader = ({
 
   return (
     <>
+      <style jsx>{`
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
+      
       <div
         className="rounded-xl shadow-sm border overflow-hidden mb-6"
         style={{ backgroundColor: "#F7FAFC", borderColor: "#DCE8F2" }}
@@ -653,15 +769,34 @@ const StudentProfileHeader = ({
             style={{ borderColor: "#DCE8F2" }}
           >
             <div className="text-left">
-              <span className="font-bold" style={{ color: "#1F2D3D" }}>
-                12
-              </span>
-              <span
-                className="text-sm ml-1.5"
-                style={{ color: "#1F2D3D", opacity: 0.7 }}
-              >
-                Projects
-              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={isOwner ? openProjectModal : undefined}
+                  className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
+                  title={isOwner ? "View your projects" : undefined}
+                >
+                  <span className="font-bold" style={{ color: "#1F2D3D" }}>
+                    {projectCount}
+                  </span>
+                  <span
+                    className="text-sm ml-1.5"
+                    style={{ color: "#1F2D3D", opacity: 0.7 }}
+                  >
+                    Projects
+                  </span>
+                </button>
+                {isOwner && (
+                  <button
+                    onClick={fetchProjectCount}
+                    className="p-1 hover:bg-gray-100 rounded transition-colors"
+                    title="Refresh project count"
+                  >
+                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
             <div className="text-left">
               <span className="font-bold" style={{ color: "#1F2D3D" }}>
@@ -1515,6 +1650,142 @@ const StudentProfileHeader = ({
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Project Quick View Modal */}
+      {isProjectModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  My Projects ({projectCount})
+                </h2>
+                <button
+                  onClick={() => setIsProjectModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {projects.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 mb-4">No projects yet</p>
+                  <p className="text-sm text-gray-400">
+                    Add your first project in the Projects section to showcase your work
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {projects.map((project) => (
+                    <div
+                      key={project.id}
+                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 mb-2">
+                            {project.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                            {project.description}
+                          </p>
+                          
+                          {/* Technologies */}
+                          {project.technologies && (
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {(typeof project.technologies === "string" 
+                                ? project.technologies.split(", ") 
+                                : project.technologies || []
+                              ).slice(0, 3).map((tech, index) => (
+                                <span
+                                  key={index}
+                                  className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
+                                >
+                                  {tech}
+                                </span>
+                              ))}
+                              {(typeof project.technologies === "string" 
+                                ? project.technologies.split(", ").length 
+                                : project.technologies?.length || 0
+                              ) > 3 && (
+                                <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                                  +{(typeof project.technologies === "string" 
+                                    ? project.technologies.split(", ").length 
+                                    : project.technologies?.length || 0
+                                  ) - 3} more
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Links */}
+                          <div className="flex gap-3">
+                            {project.project_link && (
+                              <a
+                                href={project.project_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                View Project
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Project Date */}
+                        <div className="text-xs text-gray-400 ml-4">
+                          {project.start_date 
+                            ? new Date(project.start_date).toLocaleDateString()
+                            : project.created_at 
+                            ? new Date(project.created_at).toLocaleDateString()
+                            : 'No date'
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => setIsProjectModalOpen(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    setIsProjectModalOpen(false);
+                    // Navigate to projects section
+                    if (onNavigationChange) {
+                      onNavigationChange("projects", "Projects");
+                    }
+                  }}
+                  className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90"
+                  style={{ backgroundColor: "#6EA9CB" }}
+                >
+                  Manage Projects
+                </button>
+              </div>
             </div>
           </div>
         </div>

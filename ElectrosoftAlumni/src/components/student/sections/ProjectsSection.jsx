@@ -98,6 +98,11 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId, isOwner }
         const updatedProjects = await apiService.getStudentProjects();
         onProjectsUpdate(updatedProjects.data || updatedProjects);
       }
+      
+      // Also refresh the project count in the header
+      if (window.refreshStudentProfileProjects) {
+        window.refreshStudentProfileProjects();
+      }
     } catch (error) {
       console.error("Error saving project:", error);
       alert("Error saving project. Please try again.");
@@ -132,6 +137,11 @@ const ProjectsSection = ({ projects = [], onProjectsUpdate, studentId, isOwner }
         // Fetch fresh projects data
         const updatedProjects = await apiService.getStudentProjects();
         onProjectsUpdate(updatedProjects.data || updatedProjects);
+      }
+      
+      // Also refresh the project count in the header
+      if (window.refreshStudentProfileProjects) {
+        window.refreshStudentProfileProjects();
       }
     } catch (error) {
       console.error("Error deleting project:", error);

@@ -22,7 +22,7 @@ import {
   Mail,
 } from "lucide-react";
 
-const IndustryOverview = () => {
+const IndustryOverview = ({ isOwner, industryData }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditMarketModalOpen, setIsEditMarketModalOpen] = useState(false);
   const [isEditLocationsModalOpen, setIsEditLocationsModalOpen] =
@@ -382,45 +382,65 @@ const IndustryOverview = () => {
 
   return (
     <>
-      <div className="p-6 max-w-4xl mx-auto" style={{ backgroundColor: "#F7FAFC" }}>
+      <div
+        className="p-6 max-w-4xl mx-auto"
+        style={{ backgroundColor: "#F7FAFC" }}
+      >
         {/* About Section */}
-        <div className="rounded-lg shadow-sm mb-6" style={{ backgroundColor: "white" }}>
+        <div
+          className="rounded-lg shadow-sm mb-6"
+          style={{ backgroundColor: "white" }}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
+          <div
+            className="flex items-center justify-between p-6 border-b"
+            style={{ borderColor: "#B5D3E7" }}
+          >
             <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
               Industry Overview
             </h2>
-            <button
-              onClick={handleEditClick}
-              className="p-2 rounded-full transition-colors"
-              style={{ color: "#1F2D3D", opacity: "0.7" }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#DCE8F2";
-                e.target.style.color = "#6EA9CB";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "transparent";
-                e.target.style.color = "#1F2D3D";
-                e.target.style.opacity = "0.7";
-              }}
-              title="Edit industry overview"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
+            {isOwner && (
+              <button
+                onClick={handleEditClick}
+                className="p-2 rounded-full transition-colors"
+                style={{ color: "#1F2D3D", opacity: "0.7" }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#DCE8F2";
+                  e.target.style.color = "#6EA9CB";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#1F2D3D";
+                  e.target.style.opacity = "0.7";
+                }}
+                title="Edit industry overview"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Overview Content */}
           <div className="p-6">
-            <h3 className="text-lg font-semibold mb-4" style={{ color: "#1F2D3D" }}>
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{ color: "#1F2D3D" }}
+            >
               Overview
             </h3>
-            <p className="leading-relaxed mb-6" style={{ color: "#1F2D3D", opacity: "0.8" }}>
+            <p
+              className="leading-relaxed mb-6"
+              style={{ color: "#1F2D3D", opacity: "0.8" }}
+            >
               {aboutData.overview}
             </p>
 
             {/* Website */}
             <div className="mb-6">
-              <h4 className="text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+              <h4
+                className="text-sm font-medium mb-2"
+                style={{ color: "#1F2D3D" }}
+              >
                 Industry Portal
               </h4>
               <a
@@ -429,8 +449,8 @@ const IndustryOverview = () => {
                 rel="noopener noreferrer"
                 className="hover:underline flex items-center gap-1 transition-colors"
                 style={{ color: "#6EA9CB" }}
-                onMouseEnter={(e) => e.target.style.color = "#5a8fa8"}
-                onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
+                onMouseEnter={(e) => (e.target.style.color = "#5a8fa8")}
+                onMouseLeave={(e) => (e.target.style.color = "#6EA9CB")}
               >
                 {aboutData.website}
                 <ExternalLink className="w-3 h-3" />
@@ -441,12 +461,18 @@ const IndustryOverview = () => {
             {aboutData.verified && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-sm font-medium" style={{ color: "#1F2D3D" }}>
+                  <h4
+                    className="text-sm font-medium"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Verified Industry Data
                   </h4>
                   <Shield className="w-4 h-4" style={{ color: "#6EA9CB" }} />
                 </div>
-                <p className="text-sm" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "#1F2D3D", opacity: "0.6" }}
+                >
                   Last updated: {aboutData.verifiedDate}
                 </p>
               </div>
@@ -456,21 +482,38 @@ const IndustryOverview = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Sector */}
               <div>
-                <h4 className="text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                <h4
+                  className="text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Sector
                 </h4>
-                <p className="text-sm" style={{ color: "#1F2D3D", opacity: "0.8" }}>{aboutData.sector}</p>
+                <p
+                  className="text-sm"
+                  style={{ color: "#1F2D3D", opacity: "0.8" }}
+                >
+                  {aboutData.sector}
+                </p>
               </div>
 
               {/* Industry Size */}
               <div>
-                <h4 className="text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                <h4
+                  className="text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Industry Size
                 </h4>
-                <p className="text-sm" style={{ color: "#1F2D3D", opacity: "0.8" }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "#1F2D3D", opacity: "0.8" }}
+                >
                   {aboutData.industrySize}
                 </p>
-                <p className="text-sm flex items-center gap-1" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                <p
+                  className="text-sm flex items-center gap-1"
+                  style={{ color: "#1F2D3D", opacity: "0.6" }}
+                >
                   {aboutData.activeMembers} active professionals
                   <Users className="w-3 h-3" />
                 </p>
@@ -478,17 +521,26 @@ const IndustryOverview = () => {
 
               {/* Main Hub */}
               <div>
-                <h4 className="text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                <h4
+                  className="text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Main Hub
                 </h4>
-                <p className="text-sm" style={{ color: "#1F2D3D", opacity: "0.8" }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "#1F2D3D", opacity: "0.8" }}
+                >
                   {aboutData.headquarters}
                 </p>
               </div>
 
               {/* Specializations */}
               <div>
-                <h4 className="text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                <h4
+                  className="text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Key Specializations
                 </h4>
                 <div className="flex flex-wrap gap-1">
@@ -508,16 +560,27 @@ const IndustryOverview = () => {
             {/* Custom Fields Display */}
             {aboutData.customFields && aboutData.customFields.length > 0 && (
               <div className="mt-6">
-                <h4 className="text-sm font-medium mb-3" style={{ color: "#1F2D3D" }}>
+                <h4
+                  className="text-sm font-medium mb-3"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Additional Information
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {aboutData.customFields.map((field, index) => (
                     <div key={field.id || index}>
-                      <h5 className="text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                      <h5
+                        className="text-sm font-medium mb-1"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         {field.label}
                       </h5>
-                      <p className="text-sm" style={{ color: "#1F2D3D", opacity: "0.8" }}>{field.value}</p>
+                      <p
+                        className="text-sm"
+                        style={{ color: "#1F2D3D", opacity: "0.8" }}
+                      >
+                        {field.value}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -529,29 +592,37 @@ const IndustryOverview = () => {
         <hr className="my-4" style={{ borderColor: "#B5D3E7" }} />
 
         {/* Locations Section */}
-        <div className="rounded-lg shadow-sm mb-6" style={{ backgroundColor: "white" }}>
+        <div
+          className="rounded-lg shadow-sm mb-6"
+          style={{ backgroundColor: "white" }}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
+          <div
+            className="flex items-center justify-between p-6 border-b"
+            style={{ borderColor: "#B5D3E7" }}
+          >
             <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
               Industry Locations
             </h2>
-            <button
-              onClick={handleEditLocationsClick}
-              className="p-2 rounded-full transition-colors"
-              style={{ color: "#1F2D3D", opacity: "0.7" }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#DCE8F2";
-                e.target.style.color = "#6EA9CB";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "transparent";
-                e.target.style.color = "#1F2D3D";
-                e.target.style.opacity = "0.7";
-              }}
-              title="Edit locations"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
+            {isOwner && (
+              <button
+                onClick={handleEditLocationsClick}
+                className="p-2 rounded-full transition-colors"
+                style={{ color: "#1F2D3D", opacity: "0.7" }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#DCE8F2";
+                  e.target.style.color = "#6EA9CB";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#1F2D3D";
+                  e.target.style.opacity = "0.7";
+                }}
+                title="Edit locations"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Locations List */}
@@ -567,17 +638,34 @@ const IndustryOverview = () => {
                     <h3 className="font-medium" style={{ color: "#1F2D3D" }}>
                       {location.name}
                     </h3>
-                    <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: "#DCE8F2", color: "#1F2D3D" }}>
+                    <span
+                      className="text-xs px-2 py-1 rounded-full"
+                      style={{ backgroundColor: "#DCE8F2", color: "#1F2D3D" }}
+                    >
                       {location.type}
                     </span>
                   </div>
                   <div className="flex items-start gap-2 mb-2">
-                    <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#1F2D3D", opacity: "0.4" }} />
-                    <p className="text-sm" style={{ color: "#1F2D3D", opacity: "0.6" }}>{location.address}</p>
+                    <MapPin
+                      className="w-4 h-4 mt-0.5 flex-shrink-0"
+                      style={{ color: "#1F2D3D", opacity: "0.4" }}
+                    />
+                    <p
+                      className="text-sm"
+                      style={{ color: "#1F2D3D", opacity: "0.6" }}
+                    >
+                      {location.address}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" style={{ color: "#1F2D3D", opacity: "0.4" }} />
-                    <p className="text-sm" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                    <Users
+                      className="w-4 h-4"
+                      style={{ color: "#1F2D3D", opacity: "0.4" }}
+                    />
+                    <p
+                      className="text-sm"
+                      style={{ color: "#1F2D3D", opacity: "0.6" }}
+                    >
                       {location.employees} employees
                     </p>
                   </div>
@@ -585,17 +673,29 @@ const IndustryOverview = () => {
                   {/* Display Custom Fields */}
                   {location.customFields &&
                     location.customFields.length > 0 && (
-                      <div className="mt-3 pt-3 border-t" style={{ borderColor: "#DCE8F2" }}>
+                      <div
+                        className="mt-3 pt-3 border-t"
+                        style={{ borderColor: "#DCE8F2" }}
+                      >
                         {location.customFields.map((field, fieldIndex) => (
                           <div
                             key={field.id || fieldIndex}
                             className="flex items-center gap-2 mb-1"
                           >
-                            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "#6EA9CB" }}></div>
-                            <span className="text-xs font-medium" style={{ color: "#1F2D3D", opacity: "0.8" }}>
+                            <div
+                              className="w-2 h-2 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: "#6EA9CB" }}
+                            ></div>
+                            <span
+                              className="text-xs font-medium"
+                              style={{ color: "#1F2D3D", opacity: "0.8" }}
+                            >
                               {field.label}:
                             </span>
-                            <span className="text-xs" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                            <span
+                              className="text-xs"
+                              style={{ color: "#1F2D3D", opacity: "0.6" }}
+                            >
                               {field.value}
                             </span>
                           </div>
@@ -611,18 +711,30 @@ const IndustryOverview = () => {
         <hr className="my-4" style={{ borderColor: "#B5D3E7" }} />
 
         {/* Interactive Map Section */}
-        <div className="rounded-lg shadow-sm mb-6" style={{ backgroundColor: "white" }}>
+        <div
+          className="rounded-lg shadow-sm mb-6"
+          style={{ backgroundColor: "white" }}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
+          <div
+            className="flex items-center justify-between p-6 border-b"
+            style={{ borderColor: "#B5D3E7" }}
+          >
             <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
               Global Industry Presence Map
             </h2>
-            <Globe className="w-6 h-6" style={{ color: "#1F2D3D", opacity: "0.4" }} />
+            <Globe
+              className="w-6 h-6"
+              style={{ color: "#1F2D3D", opacity: "0.4" }}
+            />
           </div>
 
           {/* Map Container */}
           <div className="p-6">
-            <div className="h-96 rounded-lg overflow-hidden border" style={{ borderColor: "#B5D3E7" }}>
+            <div
+              className="h-96 rounded-lg overflow-hidden border"
+              style={{ borderColor: "#B5D3E7" }}
+            >
               <MapContainer
                 center={[37.4419, -122.143]} // Center on Silicon Valley
                 zoom={2}
@@ -647,10 +759,19 @@ const IndustryOverview = () => {
                             className="w-12 h-12 rounded object-cover flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-sm truncate" style={{ color: "#1F2D3D" }}>
+                            <h3
+                              className="font-medium text-sm truncate"
+                              style={{ color: "#1F2D3D" }}
+                            >
                               {location.name}
                             </h3>
-                            <span className="text-xs px-1 py-0.5 rounded" style={{ backgroundColor: "#DCE8F2", color: "#1F2D3D" }}>
+                            <span
+                              className="text-xs px-1 py-0.5 rounded"
+                              style={{
+                                backgroundColor: "#DCE8F2",
+                                color: "#1F2D3D",
+                              }}
+                            >
                               {location.type}
                             </span>
                           </div>
@@ -658,46 +779,75 @@ const IndustryOverview = () => {
 
                         <div className="space-y-1 text-xs">
                           <div className="flex items-start gap-1">
-                            <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ color: "#1F2D3D", opacity: "0.4" }} />
-                            <p className="leading-tight" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                            <MapPin
+                              className="w-3 h-3 mt-0.5 flex-shrink-0"
+                              style={{ color: "#1F2D3D", opacity: "0.4" }}
+                            />
+                            <p
+                              className="leading-tight"
+                              style={{ color: "#1F2D3D", opacity: "0.6" }}
+                            >
                               {location.address}
                             </p>
                           </div>
 
                           <div className="flex items-center gap-1">
-                            <Users className="w-3 h-3" style={{ color: "#1F2D3D", opacity: "0.4" }} />
+                            <Users
+                              className="w-3 h-3"
+                              style={{ color: "#1F2D3D", opacity: "0.4" }}
+                            />
                             <p style={{ color: "#1F2D3D", opacity: "0.6" }}>
                               {location.employees} employees
                             </p>
                           </div>
 
-                          <div className="border-t pt-1 mt-1" style={{ borderColor: "#DCE8F2" }}>
-                            <p className="font-medium text-xs" style={{ color: "#1F2D3D" }}>
+                          <div
+                            className="border-t pt-1 mt-1"
+                            style={{ borderColor: "#DCE8F2" }}
+                          >
+                            <p
+                              className="font-medium text-xs"
+                              style={{ color: "#1F2D3D" }}
+                            >
                               Regional Head: {location.ceo}
                             </p>
                           </div>
 
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-1">
-                              <Phone className="w-3 h-3" style={{ color: "#1F2D3D", opacity: "0.4" }} />
+                              <Phone
+                                className="w-3 h-3"
+                                style={{ color: "#1F2D3D", opacity: "0.4" }}
+                              />
                               <a
                                 href={`tel:${location.contact.phone}`}
                                 className="text-xs truncate transition-colors"
                                 style={{ color: "#6EA9CB" }}
-                                onMouseEnter={(e) => e.target.style.color = "#5a8fa8"}
-                                onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
+                                onMouseEnter={(e) =>
+                                  (e.target.style.color = "#5a8fa8")
+                                }
+                                onMouseLeave={(e) =>
+                                  (e.target.style.color = "#6EA9CB")
+                                }
                               >
                                 {location.contact.phone}
                               </a>
                             </div>
                             <div className="flex items-center gap-1">
-                              <Mail className="w-3 h-3" style={{ color: "#1F2D3D", opacity: "0.4" }} />
+                              <Mail
+                                className="w-3 h-3"
+                                style={{ color: "#1F2D3D", opacity: "0.4" }}
+                              />
                               <a
                                 href={`mailto:${location.contact.email}`}
                                 className="text-xs truncate transition-colors"
                                 style={{ color: "#6EA9CB" }}
-                                onMouseEnter={(e) => e.target.style.color = "#5a8fa8"}
-                                onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
+                                onMouseEnter={(e) =>
+                                  (e.target.style.color = "#5a8fa8")
+                                }
+                                onMouseLeave={(e) =>
+                                  (e.target.style.color = "#6EA9CB")
+                                }
                               >
                                 {location.contact.email}
                               </a>
@@ -712,13 +862,22 @@ const IndustryOverview = () => {
             </div>
 
             {/* Map Legend */}
-            <div className="mt-4 flex flex-wrap gap-4 text-sm" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+            <div
+              className="mt-4 flex flex-wrap gap-4 text-sm"
+              style={{ color: "#1F2D3D", opacity: "0.6" }}
+            >
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#6EA9CB" }}></div>
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: "#6EA9CB" }}
+                ></div>
                 <span>Industry Locations</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" style={{ color: "#1F2D3D", opacity: "0.4" }} />
+                <MapPin
+                  className="w-4 h-4"
+                  style={{ color: "#1F2D3D", opacity: "0.4" }}
+                />
                 <span>Click markers for location details</span>
               </div>
             </div>
@@ -728,28 +887,36 @@ const IndustryOverview = () => {
         <hr className="my-4" style={{ borderColor: "#B5D3E7" }} />
 
         {/* Market Presence Section */}
-        <div className="rounded-lg shadow-sm" style={{ backgroundColor: "white" }}>
-          <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
+        <div
+          className="rounded-lg shadow-sm"
+          style={{ backgroundColor: "white" }}
+        >
+          <div
+            className="flex items-center justify-between p-6 border-b"
+            style={{ borderColor: "#B5D3E7" }}
+          >
             <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
               Market Presence
             </h2>
-            <button
-              onClick={handleEditMarketClick}
-              className="p-2 rounded-full transition-colors"
-              style={{ color: "#1F2D3D", opacity: "0.7" }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#DCE8F2";
-                e.target.style.color = "#6EA9CB";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "transparent";
-                e.target.style.color = "#1F2D3D";
-                e.target.style.opacity = "0.7";
-              }}
-              title="Edit market data"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
+            {isOwner && (
+              <button
+                onClick={handleEditMarketClick}
+                className="p-2 rounded-full transition-colors"
+                style={{ color: "#1F2D3D", opacity: "0.7" }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#DCE8F2";
+                  e.target.style.color = "#6EA9CB";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#1F2D3D";
+                  e.target.style.opacity = "0.7";
+                }}
+                title="Edit market data"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           <div className="p-6">
@@ -761,21 +928,38 @@ const IndustryOverview = () => {
                   style={{ borderColor: "#B5D3E7" }}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium" style={{ color: "#1F2D3D" }}>{market.name}</h3>
-                    <span className="text-sm font-medium" style={{ color: "#6EA9CB" }}>
+                    <h3 className="font-medium" style={{ color: "#1F2D3D" }}>
+                      {market.name}
+                    </h3>
+                    <span
+                      className="text-sm font-medium"
+                      style={{ color: "#6EA9CB" }}
+                    >
                       {market.marketShare} Market Share
                     </span>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4" style={{ color: "#6EA9CB" }} />
-                      <span className="text-sm" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                      <TrendingUp
+                        className="w-4 h-4"
+                        style={{ color: "#6EA9CB" }}
+                      />
+                      <span
+                        className="text-sm"
+                        style={{ color: "#1F2D3D", opacity: "0.6" }}
+                      >
                         {market.growth}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Building className="w-4 h-4" style={{ color: "#1F2D3D", opacity: "0.4" }} />
-                      <span className="text-sm" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                      <Building
+                        className="w-4 h-4"
+                        style={{ color: "#1F2D3D", opacity: "0.4" }}
+                      />
+                      <span
+                        className="text-sm"
+                        style={{ color: "#1F2D3D", opacity: "0.6" }}
+                      >
                         {market.keyPlayers}
                       </span>
                     </div>
@@ -790,20 +974,33 @@ const IndustryOverview = () => {
       {/* Edit Overview Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "white" }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "white" }}
+          >
             <div className="p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Edit Industry Overview
                 </h2>
                 <button
                   onClick={handleCancelEdit}
                   className="p-2 rounded-full transition-colors"
                   style={{ backgroundColor: "transparent" }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#DCE8F2")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "transparent")
+                  }
                 >
-                  <X className="w-5 h-5" style={{ color: "#1F2D3D", opacity: "0.5" }} />
+                  <X
+                    className="w-5 h-5"
+                    style={{ color: "#1F2D3D", opacity: "0.5" }}
+                  />
                 </button>
               </div>
             </div>
@@ -811,7 +1008,10 @@ const IndustryOverview = () => {
             <div className="p-6 space-y-6">
               {/* Overview */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Overview
                 </label>
                 <textarea
@@ -821,20 +1021,23 @@ const IndustryOverview = () => {
                   }
                   rows={4}
                   className="w-full px-3 py-2 border rounded-lg outline-none"
-                  style={{ 
+                  style={{
                     backgroundColor: "white",
                     borderColor: "#B5D3E7",
-                    color: "#1F2D3D"
+                    color: "#1F2D3D",
                   }}
-                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                  onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                  onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                  onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                   placeholder="Enter industry overview"
                 />
               </div>
 
               {/* Website */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Industry Portal
                 </label>
                 <input
@@ -842,13 +1045,13 @@ const IndustryOverview = () => {
                   value={editData.website}
                   onChange={(e) => handleInputChange("website", e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg outline-none"
-                  style={{ 
+                  style={{
                     backgroundColor: "white",
                     borderColor: "#B5D3E7",
-                    color: "#1F2D3D"
+                    color: "#1F2D3D",
                   }}
-                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                  onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                  onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                  onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                   placeholder="Enter website URL"
                 />
               </div>
@@ -856,7 +1059,10 @@ const IndustryOverview = () => {
               {/* Grid Layout */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Sector
                   </label>
                   <input
@@ -866,19 +1072,22 @@ const IndustryOverview = () => {
                       handleInputChange("sector", e.target.value)
                     }
                     className="w-full px-3 py-2 border rounded-lg outline-none"
-                    style={{ 
+                    style={{
                       backgroundColor: "white",
                       borderColor: "#B5D3E7",
-                      color: "#1F2D3D"
+                      color: "#1F2D3D",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                    onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                    onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                    onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     placeholder="Enter industry sector"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Industry Size
                   </label>
                   <input
@@ -888,19 +1097,22 @@ const IndustryOverview = () => {
                       handleInputChange("industrySize", e.target.value)
                     }
                     className="w-full px-3 py-2 border rounded-lg outline-none"
-                    style={{ 
+                    style={{
                       backgroundColor: "white",
                       borderColor: "#B5D3E7",
-                      color: "#1F2D3D"
+                      color: "#1F2D3D",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                    onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                    onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                    onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     placeholder="Enter industry size"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Active Members
                   </label>
                   <input
@@ -910,19 +1122,22 @@ const IndustryOverview = () => {
                       handleInputChange("activeMembers", e.target.value)
                     }
                     className="w-full px-3 py-2 border rounded-lg outline-none"
-                    style={{ 
+                    style={{
                       backgroundColor: "white",
                       borderColor: "#B5D3E7",
-                      color: "#1F2D3D"
+                      color: "#1F2D3D",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                    onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                    onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                    onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     placeholder="Enter number of active members"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Main Hub
                   </label>
                   <input
@@ -932,13 +1147,13 @@ const IndustryOverview = () => {
                       handleInputChange("headquarters", e.target.value)
                     }
                     className="w-full px-3 py-2 border rounded-lg outline-none"
-                    style={{ 
+                    style={{
                       backgroundColor: "white",
                       borderColor: "#B5D3E7",
-                      color: "#1F2D3D"
+                      color: "#1F2D3D",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                    onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                    onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                    onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     placeholder="Enter main hub location"
                   />
                 </div>
@@ -946,7 +1161,10 @@ const IndustryOverview = () => {
 
               {/* Specializations */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Key Specializations (comma-separated)
                 </label>
                 <textarea
@@ -956,13 +1174,13 @@ const IndustryOverview = () => {
                   }
                   rows={3}
                   className="w-full px-3 py-2 border rounded-lg outline-none"
-                  style={{ 
+                  style={{
                     backgroundColor: "white",
                     borderColor: "#B5D3E7",
-                    color: "#1F2D3D"
+                    color: "#1F2D3D",
                   }}
-                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                  onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                  onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                  onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                   placeholder="Enter specializations separated by commas"
                 />
               </div>
@@ -977,20 +1195,26 @@ const IndustryOverview = () => {
                       handleInputChange("verified", e.target.checked)
                     }
                     className="rounded"
-                    style={{ 
+                    style={{
                       borderColor: "#B5D3E7",
                       color: "#6EA9CB",
-                      accentColor: "#6EA9CB"
+                      accentColor: "#6EA9CB",
                     }}
                   />
-                  <span className="text-sm font-medium" style={{ color: "#1F2D3D" }}>
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Verified Industry Data
                   </span>
                 </label>
 
                 {editData.verified && (
                   <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       Last Updated Date
                     </label>
                     <input
@@ -1000,13 +1224,13 @@ const IndustryOverview = () => {
                         handleInputChange("verifiedDate", e.target.value)
                       }
                       className="w-full px-3 py-2 border rounded-lg outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
-                        color: "#1F2D3D"
+                        color: "#1F2D3D",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       placeholder="Enter verification date"
                     />
                   </div>
@@ -1016,7 +1240,10 @@ const IndustryOverview = () => {
               {/* Custom Fields Section */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium" style={{ color: "#1F2D3D" }}>
+                  <label
+                    className="block text-sm font-medium"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Custom Fields
                   </label>
                   <button
@@ -1024,8 +1251,8 @@ const IndustryOverview = () => {
                     onClick={handleAddCustomField}
                     className="text-sm font-medium transition-colors"
                     style={{ color: "#6EA9CB" }}
-                    onMouseEnter={(e) => e.target.style.color = "#5a8fa8"}
-                    onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
+                    onMouseEnter={(e) => (e.target.style.color = "#5a8fa8")}
+                    onMouseLeave={(e) => (e.target.style.color = "#6EA9CB")}
                   >
                     + Add Custom Field
                   </button>
@@ -1048,13 +1275,17 @@ const IndustryOverview = () => {
                             }
                             placeholder="Field Label (e.g., Founded, Revenue)"
                             className="w-full px-3 py-2 border rounded-lg outline-none text-sm"
-                            style={{ 
+                            style={{
                               backgroundColor: "white",
                               borderColor: "#B5D3E7",
-                              color: "#1F2D3D"
+                              color: "#1F2D3D",
                             }}
-                            onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                            onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                            onFocus={(e) =>
+                              (e.target.style.borderColor = "#6EA9CB")
+                            }
+                            onBlur={(e) =>
+                              (e.target.style.borderColor = "#B5D3E7")
+                            }
                           />
                         </div>
                         <div className="flex-1">
@@ -1070,13 +1301,17 @@ const IndustryOverview = () => {
                             }
                             placeholder="Field Value (e.g., 2020, $50M)"
                             className="w-full px-3 py-2 border rounded-lg outline-none text-sm"
-                            style={{ 
+                            style={{
                               backgroundColor: "white",
                               borderColor: "#B5D3E7",
-                              color: "#1F2D3D"
+                              color: "#1F2D3D",
                             }}
-                            onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                            onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                            onFocus={(e) =>
+                              (e.target.style.borderColor = "#6EA9CB")
+                            }
+                            onBlur={(e) =>
+                              (e.target.style.borderColor = "#B5D3E7")
+                            }
                           />
                         </div>
                         <button
@@ -1103,17 +1338,20 @@ const IndustryOverview = () => {
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t flex justify-end gap-3" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
+            <div
+              className="px-6 py-4 border-t flex justify-end gap-3"
+              style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}
+            >
               <button
                 onClick={handleCancelEdit}
                 className="px-4 py-2 text-sm font-medium border rounded-lg transition-colors"
-                style={{ 
+                style={{
                   backgroundColor: "#DCE8F2",
                   borderColor: "#B5D3E7",
-                  color: "#1F2D3D"
+                  color: "#1F2D3D",
                 }}
-                onMouseEnter={(e) => e.target.style.opacity = "0.8"}
-                onMouseLeave={(e) => e.target.style.opacity = "1"}
+                onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+                onMouseLeave={(e) => (e.target.style.opacity = "1")}
               >
                 Cancel
               </button>
@@ -1121,8 +1359,12 @@ const IndustryOverview = () => {
                 onClick={handleSaveAbout}
                 className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
                 style={{ backgroundColor: "#6EA9CB" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#5a8fa8")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#6EA9CB")
+                }
               >
                 Save Changes
               </button>
@@ -1134,20 +1376,33 @@ const IndustryOverview = () => {
       {/* Edit Market Modal */}
       {isEditMarketModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "white" }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "white" }}
+          >
             <div className="p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Edit Market Presence
                 </h2>
                 <button
                   onClick={handleCancelMarketEdit}
                   className="p-2 rounded-full transition-colors"
                   style={{ backgroundColor: "transparent" }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#DCE8F2")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "transparent")
+                  }
                 >
-                  <X className="w-5 h-5" style={{ color: "#1F2D3D", opacity: "0.5" }} />
+                  <X
+                    className="w-5 h-5"
+                    style={{ color: "#1F2D3D", opacity: "0.5" }}
+                  />
                 </button>
               </div>
             </div>
@@ -1160,7 +1415,10 @@ const IndustryOverview = () => {
                   style={{ borderColor: "#B5D3E7" }}
                 >
                   <div className="flex justify-between items-start">
-                    <h3 className="text-lg font-medium" style={{ color: "#1F2D3D" }}>
+                    <h3
+                      className="text-lg font-medium"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       Market Region {index + 1}
                     </h3>
                     {editData.marketData.length > 1 && (
@@ -1184,7 +1442,10 @@ const IndustryOverview = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Region Name *
                       </label>
                       <input
@@ -1194,19 +1455,24 @@ const IndustryOverview = () => {
                           handleMarketChange(index, "name", e.target.value)
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="e.g., North America, Europe"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Market Share *
                       </label>
                       <input
@@ -1220,19 +1486,24 @@ const IndustryOverview = () => {
                           )
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="e.g., 35%"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Growth
                       </label>
                       <input
@@ -1242,19 +1513,24 @@ const IndustryOverview = () => {
                           handleMarketChange(index, "growth", e.target.value)
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="e.g., 12.5% YoY"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Key Players
                       </label>
                       <input
@@ -1268,13 +1544,15 @@ const IndustryOverview = () => {
                           )
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="e.g., 150+ Companies"
                       />
                     </div>
@@ -1286,10 +1564,10 @@ const IndustryOverview = () => {
               <button
                 onClick={handleAddMarket}
                 className="w-full py-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2"
-                style={{ 
+                style={{
                   borderColor: "#B5D3E7",
                   color: "#1F2D3D",
-                  opacity: "0.6"
+                  opacity: "0.6",
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.borderColor = "#6EA9CB";
@@ -1306,17 +1584,20 @@ const IndustryOverview = () => {
               </button>
             </div>
 
-            <div className="px-6 py-4 border-t flex justify-end gap-3" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
+            <div
+              className="px-6 py-4 border-t flex justify-end gap-3"
+              style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}
+            >
               <button
                 onClick={handleCancelMarketEdit}
                 className="px-4 py-2 text-sm font-medium border rounded-lg transition-colors"
-                style={{ 
+                style={{
                   backgroundColor: "#DCE8F2",
                   borderColor: "#B5D3E7",
-                  color: "#1F2D3D"
+                  color: "#1F2D3D",
                 }}
-                onMouseEnter={(e) => e.target.style.opacity = "0.8"}
-                onMouseLeave={(e) => e.target.style.opacity = "1"}
+                onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+                onMouseLeave={(e) => (e.target.style.opacity = "1")}
               >
                 Cancel
               </button>
@@ -1324,8 +1605,12 @@ const IndustryOverview = () => {
                 onClick={handleSaveMarket}
                 className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
                 style={{ backgroundColor: "#6EA9CB" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#5a8fa8")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#6EA9CB")
+                }
               >
                 Save Changes
               </button>
@@ -1337,20 +1622,33 @@ const IndustryOverview = () => {
       {/* Edit Locations Modal */}
       {isEditLocationsModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "white" }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "white" }}
+          >
             <div className="p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Edit Industry Locations
                 </h2>
                 <button
                   onClick={handleCancelLocationsEdit}
                   className="p-2 rounded-full transition-colors"
                   style={{ backgroundColor: "transparent" }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#DCE8F2")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "transparent")
+                  }
                 >
-                  <X className="w-5 h-5" style={{ color: "#1F2D3D", opacity: "0.5" }} />
+                  <X
+                    className="w-5 h-5"
+                    style={{ color: "#1F2D3D", opacity: "0.5" }}
+                  />
                 </button>
               </div>
             </div>
@@ -1363,7 +1661,10 @@ const IndustryOverview = () => {
                   style={{ borderColor: "#B5D3E7" }}
                 >
                   <div className="flex justify-between items-start">
-                    <h3 className="text-lg font-medium" style={{ color: "#1F2D3D" }}>
+                    <h3
+                      className="text-lg font-medium"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       Location {index + 1}
                     </h3>
                     {editData.locations.length > 1 && (
@@ -1388,7 +1689,10 @@ const IndustryOverview = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Location Name *
                       </label>
                       <input
@@ -1398,19 +1702,24 @@ const IndustryOverview = () => {
                           handleLocationChange(index, "name", e.target.value)
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="e.g., Headquarters, New York Office"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Type *
                       </label>
                       <select
@@ -1419,13 +1728,15 @@ const IndustryOverview = () => {
                           handleLocationChange(index, "type", e.target.value)
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       >
                         <option value="HQ">Headquarters</option>
                         <option value="Office">Office</option>
@@ -1436,7 +1747,10 @@ const IndustryOverview = () => {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Address *
                       </label>
                       <textarea
@@ -1446,19 +1760,24 @@ const IndustryOverview = () => {
                         }
                         rows={2}
                         className="w-full px-3 py-2 border rounded-lg outline-none resize-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="Enter full address"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Number of Employees
                       </label>
                       <input
@@ -1472,19 +1791,24 @@ const IndustryOverview = () => {
                           )
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="e.g., 50+, 1,000+"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Coordinates (lat, lng)
                       </label>
                       <input
@@ -1502,13 +1826,15 @@ const IndustryOverview = () => {
                           )
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="e.g., 37.4220, -122.0841"
                       />
                     </div>
@@ -1516,7 +1842,10 @@ const IndustryOverview = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Regional Head
                       </label>
                       <input
@@ -1526,19 +1855,24 @@ const IndustryOverview = () => {
                           handleLocationChange(index, "ceo", e.target.value)
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="e.g., John Doe"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Image URL
                       </label>
                       <input
@@ -1548,19 +1882,24 @@ const IndustryOverview = () => {
                           handleLocationChange(index, "image", e.target.value)
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="https://example.com/image.jpg"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Phone Number
                       </label>
                       <input
@@ -1574,19 +1913,24 @@ const IndustryOverview = () => {
                           )
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="+1 (555) 123-4567"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Email Address
                       </label>
                       <input
@@ -1600,13 +1944,15 @@ const IndustryOverview = () => {
                           )
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                         placeholder="office@company.com"
                       />
                     </div>
@@ -1615,7 +1961,10 @@ const IndustryOverview = () => {
                   {/* Custom Fields for Location */}
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-3">
-                      <label className="block text-sm font-medium" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Custom Fields for this Location
                       </label>
                       <button
@@ -1623,8 +1972,8 @@ const IndustryOverview = () => {
                         onClick={() => handleAddLocationCustomField(index)}
                         className="text-sm font-medium transition-colors"
                         style={{ color: "#6EA9CB" }}
-                        onMouseEnter={(e) => e.target.style.color = "#5a8fa8"}
-                        onMouseLeave={(e) => e.target.style.color = "#6EA9CB"}
+                        onMouseEnter={(e) => (e.target.style.color = "#5a8fa8")}
+                        onMouseLeave={(e) => (e.target.style.color = "#6EA9CB")}
                       >
                         + Add Custom Field
                       </button>
@@ -1652,14 +2001,15 @@ const IndustryOverview = () => {
                                   }
                                   placeholder="Label (e.g., Parking, Cafeteria)"
                                   className="w-full px-2 py-1 border rounded text-sm outline-none"
-                                  style={{ 
+                                  style={{
                                     backgroundColor: "#F7FAFC",
                                     borderColor: "#B5D3E7",
-                                    color: "#1F2D3D"
+                                    color: "#1F2D3D",
                                   }}
                                   onFocus={(e) => {
                                     e.target.style.borderColor = "#6EA9CB";
-                                    e.target.style.boxShadow = "0 0 0 1px #6EA9CB";
+                                    e.target.style.boxShadow =
+                                      "0 0 0 1px #6EA9CB";
                                   }}
                                   onBlur={(e) => {
                                     e.target.style.borderColor = "#B5D3E7";
@@ -1681,14 +2031,15 @@ const IndustryOverview = () => {
                                   }
                                   placeholder="Value (e.g., Available, Yes)"
                                   className="w-full px-2 py-1 border rounded text-sm outline-none"
-                                  style={{ 
+                                  style={{
                                     backgroundColor: "#F7FAFC",
                                     borderColor: "#B5D3E7",
-                                    color: "#1F2D3D"
+                                    color: "#1F2D3D",
                                   }}
                                   onFocus={(e) => {
                                     e.target.style.borderColor = "#6EA9CB";
-                                    e.target.style.boxShadow = "0 0 0 1px #6EA9CB";
+                                    e.target.style.boxShadow =
+                                      "0 0 0 1px #6EA9CB";
                                   }}
                                   onBlur={(e) => {
                                     e.target.style.borderColor = "#B5D3E7";
@@ -1711,7 +2062,8 @@ const IndustryOverview = () => {
                                   e.target.style.color = "#b91c1c";
                                 }}
                                 onMouseLeave={(e) => {
-                                  e.target.style.backgroundColor = "transparent";
+                                  e.target.style.backgroundColor =
+                                    "transparent";
                                   e.target.style.color = "#dc2626";
                                 }}
                                 title="Remove field"
@@ -1730,10 +2082,10 @@ const IndustryOverview = () => {
               <button
                 onClick={handleAddLocation}
                 className="w-full py-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2"
-                style={{ 
+                style={{
                   borderColor: "#B5D3E7",
                   color: "#1F2D3D",
-                  opacity: "0.6"
+                  opacity: "0.6",
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.borderColor = "#6EA9CB";
@@ -1751,17 +2103,20 @@ const IndustryOverview = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
+            <div
+              className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl"
+              style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}
+            >
               <button
                 onClick={handleCancelLocationsEdit}
                 className="px-4 py-2 border rounded-lg text-sm font-medium transition-colors"
-                style={{ 
+                style={{
                   backgroundColor: "#DCE8F2",
                   borderColor: "#B5D3E7",
-                  color: "#1F2D3D"
+                  color: "#1F2D3D",
                 }}
-                onMouseEnter={(e) => e.target.style.opacity = "0.8"}
-                onMouseLeave={(e) => e.target.style.opacity = "1"}
+                onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+                onMouseLeave={(e) => (e.target.style.opacity = "1")}
               >
                 Cancel
               </button>
@@ -1769,8 +2124,12 @@ const IndustryOverview = () => {
                 onClick={handleSaveLocations}
                 className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
                 style={{ backgroundColor: "#6EA9CB" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#5a8fa8")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#6EA9CB")
+                }
               >
                 Save Changes
               </button>

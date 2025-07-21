@@ -12,7 +12,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const ProjectSuccessStories = () => {
+const ProjectSuccessStories = ({ isOwner, industryData }) => {
   const [stories, setStories] = useState([
     {
       id: 1,

@@ -9,7 +9,7 @@ import {
   Play,
 } from "lucide-react";
 
-const HowItWorks = () => {
+const HowItWorks = ({ isOwner, startupData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingStepIndex, setEditingStepIndex] = useState(null);
@@ -268,47 +268,64 @@ const HowItWorks = () => {
 
   return (
     <>
-      <div className="p-6 border rounded-lg" style={{ backgroundColor: '#F7FAFC', borderColor: '#DCE8F2' }}>
+      <div
+        className="p-6 border rounded-lg"
+        style={{ backgroundColor: "#F7FAFC", borderColor: "#DCE8F2" }}
+      >
         {/* Header with Edit Button */}
-        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
+        <div
+          className="flex items-center justify-between p-6 border-b"
+          style={{ borderColor: "#DCE8F2" }}
+        >
           <div>
-            <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
+            <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
               {content.title}
             </h2>
-            <p className="text-sm mt-1" style={{ color: '#1F2D3D' }}>{content.description}</p>
+            <p className="text-sm mt-1" style={{ color: "#1F2D3D" }}>
+              {content.description}
+            </p>
           </div>
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
-            style={{ 
-              color: '#1F2D3D',
-              backgroundColor: isEditing ? '#DCE8F2' : 'transparent'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = isEditing ? '#DCE8F2' : 'transparent'}
-            title={isEditing ? "Done editing" : "Edit Steps"}
-          >
-            {isEditing ? (
-              <>
-                <Save className="w-4 h-4" />
-                <span className="text-sm font-medium">Done</span>
-              </>
-            ) : (
-              <>
-                <Edit className="w-4 h-4" />
-                <span className="text-sm font-medium">Edit</span>
-              </>
-            )}
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
+              style={{
+                color: "#1F2D3D",
+                backgroundColor: isEditing ? "#DCE8F2" : "transparent",
+              }}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#DCE8F2")}
+              onMouseLeave={(e) =>
+                (e.target.style.backgroundColor = isEditing
+                  ? "#DCE8F2"
+                  : "transparent")
+              }
+              title={isEditing ? "Done editing" : "Edit Steps"}
+            >
+              {isEditing ? (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span className="text-sm font-medium">Done</span>
+                </>
+              ) : (
+                <>
+                  <Edit className="w-4 h-4" />
+                  <span className="text-sm font-medium">Edit</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Add Step Button (when editing) */}
         {isEditing && (
-          <div className="p-4 border-b" style={{ borderColor: '#DCE8F2', backgroundColor: '#DCE8F2' }}>
+          <div
+            className="p-4 border-b"
+            style={{ borderColor: "#DCE8F2", backgroundColor: "#DCE8F2" }}
+          >
             <button
               onClick={handleAddStep}
               className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90"
-              style={{ backgroundColor: '#6EA9CB' }}
+              style={{ backgroundColor: "#6EA9CB" }}
             >
               <Plus className="w-4 h-4" />
               Add New Step
@@ -317,47 +334,68 @@ const HowItWorks = () => {
         )}
 
         {/* Process Steps */}
-        <div className="divide-y" style={{ borderColor: '#DCE8F2' }}>
+        <div className="divide-y" style={{ borderColor: "#DCE8F2" }}>
           {content.steps.map((step, index) => (
             <div key={step.id} className="group">
               <div className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl text-white font-bold shadow-lg flex-shrink-0" style={{ background: 'linear-gradient(135deg, #6EA9CB 0%, #B5D3E7 100%)' }}>
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-xl text-white font-bold shadow-lg flex-shrink-0"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #6EA9CB 0%, #B5D3E7 100%)",
+                    }}
+                  >
                     {step.icon}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <h3 className="text-lg font-semibold mb-1" style={{ color: '#1F2D3D' }}>
+                        <h3
+                          className="text-lg font-semibold mb-1"
+                          style={{ color: "#1F2D3D" }}
+                        >
                           Step {index + 1}: {step.title}
                         </h3>
-                        <p className="text-sm mb-2" style={{ color: '#1F2D3D' }}>
+                        <p
+                          className="text-sm mb-2"
+                          style={{ color: "#1F2D3D" }}
+                        >
                           {step.description}
                         </p>
-                        <p className="text-sm" style={{ color: '#1F2D3D' }}>{step.details}</p>
+                        <p className="text-sm" style={{ color: "#1F2D3D" }}>
+                          {step.details}
+                        </p>
                       </div>
                       <div className="flex items-center gap-2 ml-4">
-                        <span className="px-3 py-1 text-xs rounded-full font-medium" style={{ 
-                          backgroundColor: '#DCE8F2', 
-                          color: '#1F2D3D'
-                        }}>
+                        <span
+                          className="px-3 py-1 text-xs rounded-full font-medium"
+                          style={{
+                            backgroundColor: "#DCE8F2",
+                            color: "#1F2D3D",
+                          }}
+                        >
                           {index === 0
                             ? "Start Here"
                             : index === content.steps.length - 1
                             ? "Advanced"
                             : "Essential"}
                         </span>
-                        {isEditing && (
+                        {isEditing && isOwner && (
                           <button
                             onClick={() => handleEditClick(index)}
                             className="p-2 rounded-full transition-all hover:opacity-90"
-                            style={{ 
-                              color: '#1F2D3D',
-                              backgroundColor: 'transparent'
+                            style={{
+                              color: "#1F2D3D",
+                              backgroundColor: "transparent",
                             }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#DCE8F2'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                            onMouseEnter={(e) =>
+                              (e.target.style.backgroundColor = "#DCE8F2")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.target.style.backgroundColor = "transparent")
+                            }
                             title="Edit step"
                           >
                             <Edit className="w-4 h-4" />
@@ -368,7 +406,10 @@ const HowItWorks = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                       <div>
-                        <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                        <h4
+                          className="text-sm font-medium mb-2"
+                          style={{ color: "#1F2D3D" }}
+                        >
                           Key Features:
                         </h4>
                         <div className="space-y-1">
@@ -376,9 +417,12 @@ const HowItWorks = () => {
                             <div
                               key={featureIndex}
                               className="text-sm flex items-center"
-                              style={{ color: '#1F2D3D' }}
+                              style={{ color: "#1F2D3D" }}
                             >
-                              <CheckCircle className="w-4 h-4 mr-2 flex-shrink-0" style={{ color: '#6EA9CB' }} />
+                              <CheckCircle
+                                className="w-4 h-4 mr-2 flex-shrink-0"
+                                style={{ color: "#6EA9CB" }}
+                              />
                               {feature}
                             </div>
                           ))}
@@ -388,7 +432,10 @@ const HowItWorks = () => {
                       {/* Custom Fields Display */}
                       {step.customFields && step.customFields.length > 0 && (
                         <div>
-                          <h4 className="text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                          <h4
+                            className="text-sm font-medium mb-2"
+                            style={{ color: "#1F2D3D" }}
+                          >
                             Additional Information:
                           </h4>
                           <div className="space-y-1">
@@ -397,10 +444,13 @@ const HowItWorks = () => {
                                 key={fieldIndex}
                                 className="text-sm flex items-start"
                               >
-                                <span className="font-medium min-w-0 mr-2" style={{ color: '#1F2D3D' }}>
+                                <span
+                                  className="font-medium min-w-0 mr-2"
+                                  style={{ color: "#1F2D3D" }}
+                                >
                                   {field.label}:
                                 </span>
-                                <span style={{ color: '#1F2D3D' }}>
+                                <span style={{ color: "#1F2D3D" }}>
                                   {field.value}
                                 </span>
                               </div>
@@ -410,7 +460,10 @@ const HowItWorks = () => {
                       )}
 
                       <div className="flex items-end justify-end">
-                        <button className="flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition-colors text-sm hover:opacity-90" style={{ backgroundColor: '#6EA9CB' }}>
+                        <button
+                          className="flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition-colors text-sm hover:opacity-90"
+                          style={{ backgroundColor: "#6EA9CB" }}
+                        >
                           <Play className="w-4 h-4" />
                           <span>Learn More</span>
                         </button>
@@ -424,24 +477,33 @@ const HowItWorks = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="p-6 text-white rounded-b-lg" style={{ background: 'linear-gradient(135deg, #6EA9CB 0%, #B5D3E7 100%)' }}>
+        <div
+          className="p-6 text-white rounded-b-lg"
+          style={{
+            background: "linear-gradient(135deg, #6EA9CB 0%, #B5D3E7 100%)",
+          }}
+        >
           <h3 className="text-xl font-semibold mb-2">Ready to Get Started?</h3>
           <p className="mb-4">
             Join thousands of successful entrepreneurs who have launched their
             startups with our platform.
           </p>
           <div className="flex justify-center space-x-4">
-            <button className="px-6 py-2 bg-white rounded-lg font-medium transition-colors hover:opacity-90" style={{ color: '#6EA9CB' }}>
+            <button
+              className="px-6 py-2 bg-white rounded-lg font-medium transition-colors hover:opacity-90"
+              style={{ color: "#6EA9CB" }}
+            >
               Start Your Journey
             </button>
-            <button className="px-6 py-2 border border-white text-white rounded-lg font-medium hover:bg-white transition-colors flex items-center space-x-2"
+            <button
+              className="px-6 py-2 border border-white text-white rounded-lg font-medium hover:bg-white transition-colors flex items-center space-x-2"
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = 'white';
-                e.target.style.color = '#6EA9CB';
+                e.target.style.backgroundColor = "white";
+                e.target.style.color = "#6EA9CB";
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'transparent';
-                e.target.style.color = 'white';
+                e.target.style.backgroundColor = "transparent";
+                e.target.style.color = "white";
               }}
             >
               <span>Watch Demo</span>
@@ -454,18 +516,24 @@ const HowItWorks = () => {
       {/* Add Step Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
-            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "#F7FAFC" }}
+          >
+            <div className="p-6 border-b" style={{ borderColor: "#DCE8F2" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Add New Step
                 </h2>
                 <button
                   onClick={handleCancelAdd}
                   className="p-2 rounded-full transition-colors hover:opacity-90"
-                  style={{ backgroundColor: '#DCE8F2' }}
+                  style={{ backgroundColor: "#DCE8F2" }}
                 >
-                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
+                  <X className="w-5 h-5" style={{ color: "#1F2D3D" }} />
                 </button>
               </div>
             </div>
@@ -473,7 +541,10 @@ const HowItWorks = () => {
             <div className="p-6 space-y-6">
               {/* Icon */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Icon *
                 </label>
                 <input
@@ -481,18 +552,19 @@ const HowItWorks = () => {
                   value={newStep.icon}
                   onChange={(e) => handleInputChange("icon", e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-                  style={{ 
-                    borderColor: '#DCE8F2',
-                    backgroundColor: 'white',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "white",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#6EA9CB';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                    e.target.style.borderColor = "#6EA9CB";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(110, 169, 203, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                   placeholder="Enter emoji (e.g., 💡)"
                 />
@@ -500,7 +572,10 @@ const HowItWorks = () => {
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Step Title *
                 </label>
                 <input
@@ -508,18 +583,19 @@ const HowItWorks = () => {
                   value={newStep.title}
                   onChange={(e) => handleInputChange("title", e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-                  style={{ 
-                    borderColor: '#DCE8F2',
-                    backgroundColor: 'white',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "white",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#6EA9CB';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                    e.target.style.borderColor = "#6EA9CB";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(110, 169, 203, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                   placeholder="Enter step title"
                 />
@@ -527,7 +603,10 @@ const HowItWorks = () => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Short Description *
                 </label>
                 <textarea
@@ -537,18 +616,19 @@ const HowItWorks = () => {
                   }
                   rows={2}
                   className="w-full px-3 py-2 border rounded-lg outline-none resize-none focus:ring-2"
-                  style={{ 
-                    borderColor: '#DCE8F2',
-                    backgroundColor: 'white',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "white",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#6EA9CB';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                    e.target.style.borderColor = "#6EA9CB";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(110, 169, 203, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                   placeholder="Brief description of the step"
                 />
@@ -556,7 +636,10 @@ const HowItWorks = () => {
 
               {/* Details */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Detailed Description *
                 </label>
                 <textarea
@@ -564,18 +647,19 @@ const HowItWorks = () => {
                   onChange={(e) => handleInputChange("details", e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 border rounded-lg outline-none resize-none focus:ring-2"
-                  style={{ 
-                    borderColor: '#DCE8F2',
-                    backgroundColor: 'white',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "white",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#6EA9CB';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                    e.target.style.borderColor = "#6EA9CB";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(110, 169, 203, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                   placeholder="Detailed explanation of what this step involves"
                 />
@@ -583,7 +667,10 @@ const HowItWorks = () => {
 
               {/* Features */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Key Features *
                 </label>
                 <textarea
@@ -597,18 +684,19 @@ const HowItWorks = () => {
                   }
                   rows={3}
                   className="w-full px-3 py-2 border rounded-lg outline-none resize-none focus:ring-2"
-                  style={{ 
-                    borderColor: '#DCE8F2',
-                    backgroundColor: 'white',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "white",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#6EA9CB';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                    e.target.style.borderColor = "#6EA9CB";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(110, 169, 203, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                   placeholder="Enter features separated by commas"
                 />
@@ -617,14 +705,17 @@ const HowItWorks = () => {
               {/* Custom Fields */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium" style={{ color: '#1F2D3D' }}>
+                  <label
+                    className="block text-sm font-medium"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Custom Fields
                   </label>
                   <button
                     type="button"
                     onClick={() => handleAddCustomField(false)}
                     className="px-3 py-1 text-sm text-white rounded transition-colors hover:opacity-90"
-                    style={{ backgroundColor: '#6EA9CB' }}
+                    style={{ backgroundColor: "#6EA9CB" }}
                   >
                     Add Field
                   </button>
@@ -644,18 +735,19 @@ const HowItWorks = () => {
                       }
                       placeholder="Field name"
                       className="flex-1 px-3 py-2 border rounded-lg outline-none focus:ring-2"
-                      style={{ 
-                        borderColor: '#DCE8F2',
-                        backgroundColor: 'white',
-                        color: '#1F2D3D'
+                      style={{
+                        borderColor: "#DCE8F2",
+                        backgroundColor: "white",
+                        color: "#1F2D3D",
                       }}
                       onFocus={(e) => {
-                        e.target.style.borderColor = '#6EA9CB';
-                        e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                        e.target.style.borderColor = "#6EA9CB";
+                        e.target.style.boxShadow =
+                          "0 0 0 2px rgba(110, 169, 203, 0.2)";
                       }}
                       onBlur={(e) => {
-                        e.target.style.borderColor = '#DCE8F2';
-                        e.target.style.boxShadow = 'none';
+                        e.target.style.borderColor = "#DCE8F2";
+                        e.target.style.boxShadow = "none";
                       }}
                     />
                     <input
@@ -685,14 +777,17 @@ const HowItWorks = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
+            <div
+              className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl"
+              style={{ backgroundColor: "#DCE8F2", borderColor: "#B5D3E7" }}
+            >
               <button
                 onClick={handleCancelAdd}
                 className="px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:opacity-90"
-                style={{ 
-                  borderColor: '#B5D3E7',
-                  color: '#1F2D3D',
-                  backgroundColor: 'white'
+                style={{
+                  borderColor: "#B5D3E7",
+                  color: "#1F2D3D",
+                  backgroundColor: "white",
                 }}
               >
                 Cancel
@@ -701,7 +796,7 @@ const HowItWorks = () => {
                 onClick={handleSaveStep}
                 disabled={!newStep.title.trim() || !newStep.description.trim()}
                 className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ backgroundColor: '#6EA9CB' }}
+                style={{ backgroundColor: "#6EA9CB" }}
               >
                 Add Step
               </button>
@@ -713,18 +808,24 @@ const HowItWorks = () => {
       {/* Edit Step Modal */}
       {editingStepIndex !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#F7FAFC' }}>
-            <div className="p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "#F7FAFC" }}
+          >
+            <div className="p-6 border-b" style={{ borderColor: "#DCE8F2" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: '#1F2D3D' }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Edit Step
                 </h2>
                 <button
                   onClick={handleCancelEdit}
                   className="p-2 rounded-full transition-colors hover:opacity-90"
-                  style={{ backgroundColor: '#DCE8F2' }}
+                  style={{ backgroundColor: "#DCE8F2" }}
                 >
-                  <X className="w-5 h-5" style={{ color: '#1F2D3D' }} />
+                  <X className="w-5 h-5" style={{ color: "#1F2D3D" }} />
                 </button>
               </div>
             </div>
@@ -871,14 +972,17 @@ const HowItWorks = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl" style={{ backgroundColor: '#DCE8F2', borderColor: '#B5D3E7' }}>
+            <div
+              className="px-6 py-4 border-t flex justify-end gap-3 rounded-b-xl"
+              style={{ backgroundColor: "#DCE8F2", borderColor: "#B5D3E7" }}
+            >
               <button
                 onClick={handleCancelEdit}
                 className="px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:opacity-90"
-                style={{ 
-                  borderColor: '#B5D3E7',
-                  color: '#1F2D3D',
-                  backgroundColor: 'white'
+                style={{
+                  borderColor: "#B5D3E7",
+                  color: "#1F2D3D",
+                  backgroundColor: "white",
                 }}
               >
                 Cancel
@@ -889,7 +993,7 @@ const HowItWorks = () => {
                   !editStep.title.trim() || !editStep.description.trim()
                 }
                 className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ backgroundColor: '#6EA9CB' }}
+                style={{ backgroundColor: "#6EA9CB" }}
               >
                 Save Changes
               </button>

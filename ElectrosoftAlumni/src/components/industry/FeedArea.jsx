@@ -14,7 +14,7 @@ import {
 import apiService from "../../services/apiService";
 import { useAuth } from "../../contexts/AuthContext";
 
-const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner }) => {
+const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -316,7 +316,9 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner }) => {
             No posts yet
           </h3>
           <p className="text-gray-500 text-sm">
-            Start connecting with your network to see posts and updates here.
+            {isOwner
+              ? "Start connecting with your network to see posts and updates here."
+              : "This industry hasn't posted anything yet."}
           </p>
         </div>
       )}

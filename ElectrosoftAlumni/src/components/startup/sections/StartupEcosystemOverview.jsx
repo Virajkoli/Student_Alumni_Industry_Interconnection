@@ -19,7 +19,7 @@ import {
   EyeOff,
 } from "lucide-react";
 
-const StartupEcosystemOverview = () => {
+const StartupEcosystemOverview = ({ isOwner, startupData }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditLocationsModalOpen, setIsEditLocationsModalOpen] =
     useState(false);
@@ -309,13 +309,13 @@ const StartupEcosystemOverview = () => {
 
   const handleHideSection = () => {
     // Create a custom event to notify the parent component to hide this section
-    const event = new CustomEvent('hideNavigation', {
+    const event = new CustomEvent("hideNavigation", {
       detail: {
-        id: 'startup-ecosystem' // This matches the id in navigationItems
-      }
+        id: "startup-ecosystem", // This matches the id in navigationItems
+      },
     });
     window.dispatchEvent(event);
-    
+
     // Show a feedback to the user
     alert("This section will be hidden from the navigation bar");
   };
@@ -329,20 +329,24 @@ const StartupEcosystemOverview = () => {
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">About</h2>
             <div className="flex space-x-2">
-              <button
-                onClick={handleHideSection}
-                className="p-2 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded-full transition-colors"
-                title="Hide from navigation"
-              >
-                <EyeOff className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleEditClick}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-                title="Edit about section"
-              >
-                <Edit className="w-5 h-5" />
-              </button>
+              {isOwner && (
+                <>
+                  <button
+                    onClick={handleHideSection}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded-full transition-colors"
+                    title="Hide from navigation"
+                  >
+                    <EyeOff className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleEditClick}
+                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                    title="Edit about section"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -460,13 +464,15 @@ const StartupEcosystemOverview = () => {
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">Locations</h2>
-            <button
-              onClick={handleEditLocationsClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-              title="Edit locations"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
+            {isOwner && (
+              <button
+                onClick={handleEditLocationsClick}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                title="Edit locations"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Locations List */}

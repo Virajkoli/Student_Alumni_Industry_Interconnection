@@ -12,7 +12,7 @@ import {
   Phone,
 } from "lucide-react";
 
-const StudentLogin = () => {
+const StudentLogin = ({ isOwner, industryData }) => {
   const [editingId, setEditingId] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");

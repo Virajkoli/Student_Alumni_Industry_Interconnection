@@ -26,13 +26,13 @@ const StudentProfileHeader = ({
   customNavigations,
   onCustomNavigationUpdate,
   isOwner = false,
+  sectionsData = {}, // Add sectionsData prop
 }) => {
   // Profile edit state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isImageEditModalOpen, setIsImageEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ ...profileData });
-    const [isEditing, setIsEditing] = useState(false);
-
+  const [isEditing, setIsEditing] = useState(false);
 
   // Navigation state
   const [activeItem, setActiveItem] = useState("posts");
@@ -273,7 +273,7 @@ const StudentProfileHeader = ({
     }
   };
 
-   const handleRemoveProfilePic = () => {
+  const handleRemoveProfilePic = () => {
     if (onProfileUpdate) {
       onProfileUpdate({ ...profileData, profilePicture: "" });
     }
@@ -288,7 +288,7 @@ const StudentProfileHeader = ({
   // Ping/Connection functions
   const fetchPingStatus = async () => {
     if (!profileData?.id || isOwner) return;
-    
+
     try {
       const response = await apiService.checkPingStatus(profileData.id);
       setPingStatus(response.data.status);
@@ -318,7 +318,7 @@ const StudentProfileHeader = ({
 
   const handleSendPing = async () => {
     if (!profileData?.id) return;
-    
+
     setIsLoadingPing(true);
     try {
       await apiService.sendPingRequest(profileData.id);
@@ -366,7 +366,7 @@ const StudentProfileHeader = ({
       console.log("🔍 Fetching project count...");
       const response = await apiService.getStudentProjects();
       console.log("📊 Project response:", response);
-      
+
       const count = response.data?.length || 0;
       console.log("📊 Project count:", count);
       setProjectCount(count);
@@ -382,7 +382,7 @@ const StudentProfileHeader = ({
       console.log("🔍 Fetching projects for modal...");
       const response = await apiService.getStudentProjects();
       console.log("📊 Projects response:", response);
-      
+
       setProjects(response.data || []);
     } catch (error) {
       console.error("❌ Failed to fetch projects:", error);
@@ -406,20 +406,74 @@ const StudentProfileHeader = ({
 
   // Expose refresh function via useEffect and callback
   useEffect(() => {
-    if (onProfileUpdate && typeof onProfileUpdate === 'function') {
+    if (onProfileUpdate && typeof onProfileUpdate === "function") {
       // Add refresh function to the callback if needed
       onProfileUpdate.refreshProjects = refreshProjectData;
     }
   }, [onProfileUpdate]);
 
+  // Function to refresh profile completion - can be called externally
+  const refreshProfileCompletion = () => {
+    if (!profileData) return;
+
+    // Calculate profile completion based on basic info and all sections
+    let total = 10; // Total number of profile sections to check
+    let completed = 0;
+
+    // Basic profile information (5 fields)
+    if (profileData.firstName) completed++;
+    if (profileData.lastName) completed++;
+    if (profileData.collegeName) completed++;
+    if (profileData.location || profileData.city) completed++;
+    if (profileData.headline || profileData.interestedField) completed++;
+
+    // Profile sections (5 sections) - check if they have any data
+    if (profileData.about) completed++; // About section
+    if (sectionsData.experiences && sectionsData.experiences.length > 0)
+      completed++; // Experience
+    if (sectionsData.education && sectionsData.education.length > 0)
+      completed++; // Education
+    if (sectionsData.skills && sectionsData.skills.length > 0) completed++; // Skills
+    if (sectionsData.projects && sectionsData.projects.length > 0) completed++; // Projects
+
+    const progressPercent = Math.round((completed / total) * 100);
+    console.log(
+      `📊 Profile Completion: ${completed}/${total} = ${progressPercent}%`,
+      {
+        basic: {
+          firstName: !!profileData.firstName,
+          lastName: !!profileData.lastName,
+          collegeName: !!profileData.collegeName,
+          location: !!(profileData.location || profileData.city),
+          headline: !!(profileData.headline || profileData.interestedField),
+        },
+        sections: {
+          about: !!profileData.about,
+          experiences: sectionsData.experiences?.length || 0,
+          education: sectionsData.education?.length || 0,
+          skills: sectionsData.skills?.length || 0,
+          projects: sectionsData.projects?.length || 0,
+        },
+      }
+    );
+
+    setUser((prev) => ({ ...prev, profileCompletion: progressPercent }));
+  };
+
+  useEffect(() => {
+    refreshProfileCompletion();
+  }, [profileData, sectionsData]);
+
   // Also create a global function that can be called from anywhere
   useEffect(() => {
-    // Store the refresh function globally so it can be called from ProjectsSection
+    // Store the refresh functions globally so they can be called from section components
     window.refreshStudentProfileProjects = refreshProjectData;
-    
+    window.refreshProfileCompletion = refreshProfileCompletion;
+
     return () => {
       // Clean up
       delete window.refreshStudentProfileProjects;
+      delete window.refreshProfileCompletion;
     };
   }, []);
 
@@ -431,7 +485,7 @@ const StudentProfileHeader = ({
       fetchConnectionCount();
       fetchProjectCount();
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [profileData?.id, isOwner]);
 
@@ -441,7 +495,7 @@ const StudentProfileHeader = ({
     const timer = setTimeout(() => {
       fetchProjectCount();
     }, 100);
-    
+
     return () => clearTimeout(timer);
   }, [activeItem]); // Refresh when navigation changes
 
@@ -459,12 +513,12 @@ const StudentProfileHeader = ({
       fetchProjectCount();
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
@@ -575,7 +629,7 @@ const StudentProfileHeader = ({
           overflow: hidden;
         }
       `}</style>
-      
+
       <div
         className="rounded-xl shadow-sm border overflow-hidden mb-6"
         style={{ backgroundColor: "#F7FAFC", borderColor: "#DCE8F2" }}
@@ -638,7 +692,7 @@ const StudentProfileHeader = ({
         {/* Profile Info */}
         <div className="pt-16 px-8 pb-6 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex-1">
+            <div className="flex-col">
               <h3 className="text-2xl font-bold text-gray-900">
                 {editData?.firstName ||
                   editData?.basicInfo?.first_name ||
@@ -681,6 +735,40 @@ const StudentProfileHeader = ({
                 </p>
               )}
             </div>
+
+            {/* Center: Enhanced Progress Bar */}
+            {isOwner && (
+              <div className="flex flex-col items-center w-64">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm text-gray-700 font-medium">
+                    Profile Completion
+                  </span>
+                  <span className="text-sm font-bold text-blue-600">
+                    {user?.profileCompletion || 0}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+                  <div
+                    className={`h-3 rounded-full transition-all duration-500 ${
+                      (user?.profileCompletion || 0) < 30
+                        ? "bg-red-500"
+                        : (user?.profileCompletion || 0) < 70
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
+                    } shadow-sm`}
+                    style={{ width: `${user?.profileCompletion || 0}%` }}
+                  ></div>
+                </div>
+                <span className="text-xs text-gray-500 mt-1">
+                  {(user?.profileCompletion || 0) < 50
+                    ? "Complete your profile to get noticed!"
+                    : (user?.profileCompletion || 0) < 90
+                    ? "Almost done! Add more sections."
+                    : "Excellent! Your profile is complete."}
+                </span>
+              </div>
+            )}
+
             <div className="flex flex-col items-start gap-2 sm:items-end">
               {/* Profile Info Edit Button - Above Connect button */}
               {isOwner && (
@@ -692,7 +780,7 @@ const StudentProfileHeader = ({
                   <Edit3 className="w-5 h-5" />
                 </button>
               )}
-              
+
               {/* Dynamic Ping/Connect Button */}
               {!isOwner && (
                 <>
@@ -711,7 +799,7 @@ const StudentProfileHeader = ({
                       {isLoadingPing ? "Sending..." : "Ping"}
                     </button>
                   )}
-                  
+
                   {pingStatus === "sent" && (
                     <button
                       disabled
@@ -721,7 +809,7 @@ const StudentProfileHeader = ({
                       Ping Sent
                     </button>
                   )}
-                  
+
                   {pingStatus === "received" && (
                     <button
                       onClick={openPingRequestsModal}
@@ -731,7 +819,7 @@ const StudentProfileHeader = ({
                       Respond to Ping
                     </button>
                   )}
-                  
+
                   {pingStatus === "accepted" && (
                     <button
                       disabled
@@ -743,7 +831,7 @@ const StudentProfileHeader = ({
                   )}
                 </>
               )}
-              
+
               {/* Ping Requests Button for Owner */}
               {isOwner && (
                 <button
@@ -772,7 +860,11 @@ const StudentProfileHeader = ({
               <div className="flex items-center gap-1">
                 <button
                   onClick={isOwner ? openProjectModal : undefined}
-                  className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
+                  className={`${
+                    isOwner
+                      ? "hover:bg-gray-100 cursor-pointer"
+                      : "cursor-default"
+                  } p-2 rounded-lg transition-colors`}
                   title={isOwner ? "View your projects" : undefined}
                 >
                   <span className="font-bold" style={{ color: "#1F2D3D" }}>
@@ -791,8 +883,18 @@ const StudentProfileHeader = ({
                     className="p-1 hover:bg-gray-100 rounded transition-colors"
                     title="Refresh project count"
                   >
-                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
                     </svg>
                   </button>
                 )}
@@ -1599,7 +1701,10 @@ const StudentProfileHeader = ({
                     >
                       <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
                         <img
-                          src={request.sender?.profilePicture || "/default-avatar.png"}
+                          src={
+                            request.sender?.profilePicture ||
+                            "/default-avatar.png"
+                          }
                           alt="Profile"
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -1608,19 +1713,20 @@ const StudentProfileHeader = ({
                           }}
                         />
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">
                           {request.sender?.firstName} {request.sender?.lastName}
                         </h4>
                         <p className="text-sm text-gray-500 truncate">
-                          {request.sender?.headline || request.sender?.collegeName}
+                          {request.sender?.headline ||
+                            request.sender?.collegeName}
                         </p>
                         <p className="text-xs text-gray-400">
                           {new Date(request.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      
+
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleAcceptPing(request.id)}
@@ -1677,13 +1783,24 @@ const StudentProfileHeader = ({
               {projects.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                      />
                     </svg>
                   </div>
                   <p className="text-gray-500 mb-4">No projects yet</p>
                   <p className="text-sm text-gray-400">
-                    Add your first project in the Projects section to showcase your work
+                    Add your first project in the Projects section to showcase
+                    your work
                   </p>
                 </div>
               ) : (
@@ -1701,35 +1818,38 @@ const StudentProfileHeader = ({
                           <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                             {project.description}
                           </p>
-                          
+
                           {/* Technologies */}
                           {project.technologies && (
                             <div className="flex flex-wrap gap-1 mb-3">
-                              {(typeof project.technologies === "string" 
-                                ? project.technologies.split(", ") 
+                              {(typeof project.technologies === "string"
+                                ? project.technologies.split(", ")
                                 : project.technologies || []
-                              ).slice(0, 3).map((tech, index) => (
-                                <span
-                                  key={index}
-                                  className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
-                              {(typeof project.technologies === "string" 
-                                ? project.technologies.split(", ").length 
-                                : project.technologies?.length || 0
-                              ) > 3 && (
+                              )
+                                .slice(0, 3)
+                                .map((tech, index) => (
+                                  <span
+                                    key={index}
+                                    className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                              {(typeof project.technologies === "string"
+                                ? project.technologies.split(", ").length
+                                : project.technologies?.length || 0) > 3 && (
                                 <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                                  +{(typeof project.technologies === "string" 
-                                    ? project.technologies.split(", ").length 
-                                    : project.technologies?.length || 0
-                                  ) - 3} more
+                                  +
+                                  {(typeof project.technologies === "string"
+                                    ? project.technologies.split(", ").length
+                                    : project.technologies?.length || 0) -
+                                    3}{" "}
+                                  more
                                 </span>
                               )}
                             </div>
                           )}
-                          
+
                           {/* Links */}
                           <div className="flex gap-3">
                             {project.project_link && (
@@ -1739,23 +1859,32 @@ const StudentProfileHeader = ({
                                 rel="noopener noreferrer"
                                 className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                  />
                                 </svg>
                                 View Project
                               </a>
                             )}
                           </div>
                         </div>
-                        
+
                         {/* Project Date */}
                         <div className="text-xs text-gray-400 ml-4">
-                          {project.start_date 
+                          {project.start_date
                             ? new Date(project.start_date).toLocaleDateString()
-                            : project.created_at 
+                            : project.created_at
                             ? new Date(project.created_at).toLocaleDateString()
-                            : 'No date'
-                          }
+                            : "No date"}
                         </div>
                       </div>
                     </div>

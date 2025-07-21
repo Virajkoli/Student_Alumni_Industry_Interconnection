@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Brain, Trophy, Clock, Award, Play, RotateCcw } from "lucide-react";
 
-const StartupQuizSidebar = () => {
+const StartupQuizSidebar = ({ isOwner }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -41,7 +41,8 @@ const StartupQuizSidebar = () => {
         correct: 1,
       },
       {
-        question: "What percentage of equity is typically reserved for employees?",
+        question:
+          "What percentage of equity is typically reserved for employees?",
         options: ["5-10%", "10-20%", "20-30%", "30-40%"],
         correct: 1,
       },
@@ -92,9 +93,12 @@ const StartupQuizSidebar = () => {
 
   const getScoreMessage = (score) => {
     const percentage = (score / quizData.questions.length) * 100;
-    if (percentage >= 80) return { message: "Excellent! 🚀", color: "text-green-600" };
-    if (percentage >= 60) return { message: "Good! 📚", color: "text-[#6EA9CB]" };
-    if (percentage >= 40) return { message: "Getting there! 💪", color: "text-yellow-600" };
+    if (percentage >= 80)
+      return { message: "Excellent! 🚀", color: "text-green-600" };
+    if (percentage >= 60)
+      return { message: "Good! 📚", color: "text-[#6EA9CB]" };
+    if (percentage >= 40)
+      return { message: "Getting there! 💪", color: "text-yellow-600" };
     return { message: "Keep learning! 📖", color: "text-red-600" };
   };
 
@@ -157,11 +161,16 @@ const StartupQuizSidebar = () => {
                 <h4 className="text-lg font-bold text-gray-900">
                   {calculateScore()}/{quizData.questions.length}
                 </h4>
-                <p className={`text-sm font-medium ${getScoreMessage(calculateScore()).color}`}>
+                <p
+                  className={`text-sm font-medium ${
+                    getScoreMessage(calculateScore()).color
+                  }`}
+                >
                   {getScoreMessage(calculateScore()).message}
                 </p>
                 <p className="text-xs text-gray-600 mt-2">
-                  You got {calculateScore()} out of {quizData.questions.length} questions right!
+                  You got {calculateScore()} out of {quizData.questions.length}{" "}
+                  questions right!
                 </p>
               </div>
               <div className="space-y-2">
@@ -191,7 +200,9 @@ const StartupQuizSidebar = () => {
                     <div
                       key={index}
                       className={`w-2 h-2 rounded-full ${
-                        index <= currentQuestion ? "bg-[#6EA9CB]" : "bg-gray-300"
+                        index <= currentQuestion
+                          ? "bg-[#6EA9CB]"
+                          : "bg-gray-300"
                       }`}
                     />
                   ))}
@@ -203,19 +214,21 @@ const StartupQuizSidebar = () => {
                   {quizData.questions[currentQuestion].question}
                 </h4>
                 <div className="space-y-2">
-                  {quizData.questions[currentQuestion].options.map((option, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleAnswer(index)}
-                      className={`w-full text-left p-3 border rounded-lg text-sm transition-colors ${
-                        answers[currentQuestion] === index
-                          ? "bg-[#DCE8F2] border-[#6EA9CB] text-[#1F2D3D]"
-                          : "border-gray-200 hover:bg-gray-50 text-gray-700"
-                      }`}
-                    >
-                      {option}
-                    </button>
-                  ))}
+                  {quizData.questions[currentQuestion].options.map(
+                    (option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAnswer(index)}
+                        className={`w-full text-left p-3 border rounded-lg text-sm transition-colors ${
+                          answers[currentQuestion] === index
+                            ? "bg-[#DCE8F2] border-[#6EA9CB] text-[#1F2D3D]"
+                            : "border-gray-200 hover:bg-gray-50 text-gray-700"
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -230,10 +243,16 @@ const StartupQuizSidebar = () => {
         </div>
 
         <div className="p-4 space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: "#DCE8F2" }}>
+          <div
+            className="flex items-center justify-between p-3 rounded-lg"
+            style={{ backgroundColor: "#DCE8F2" }}
+          >
             <div className="flex items-center">
               <Brain className="w-4 h-4 text-[#6EA9CB] mr-2" />
-              <span className="text-sm font-medium" style={{ color: "#1F2D3D" }}>
+              <span
+                className="text-sm font-medium"
+                style={{ color: "#1F2D3D" }}
+              >
                 Knowledge Level
               </span>
             </div>

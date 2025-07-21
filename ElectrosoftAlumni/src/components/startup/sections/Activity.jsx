@@ -16,7 +16,7 @@ import {
   Eye,
 } from "lucide-react";
 
-const GrowthMarketing = () => {
+const GrowthMarketing = ({ isOwner, startupData }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activities, setActivities] = useState([
     {

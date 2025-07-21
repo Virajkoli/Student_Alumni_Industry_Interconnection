@@ -17,7 +17,7 @@ import {
   Archive,
 } from "lucide-react";
 
-const UploadProject = () => {
+const UploadProject = ({ isOwner, industryData }) => {
   const [projects, setProjects] = useState([
     {
       id: 1,

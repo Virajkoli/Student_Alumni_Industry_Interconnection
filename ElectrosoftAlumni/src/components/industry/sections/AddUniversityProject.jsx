@@ -20,7 +20,7 @@ import {
   Star,
 } from "lucide-react";
 
-const AddUniversityProject = () => {
+const AddUniversityProject = ({ isOwner, industryData }) => {
   const [projects, setProjects] = useState([
     {
       id: 1,

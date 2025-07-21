@@ -379,6 +379,15 @@ const StudentProfilePage = () => {
                 customNavigations={customNavigations}
                 onCustomNavigationUpdate={isOwner ? setCustomNavigations : null}
                 isOwner={isOwner}
+                sectionsData={{
+                  experiences,
+                  education,
+                  skills,
+                  projects,
+                  courses,
+                  certifications,
+                  recommendations,
+                }}
               />
             </div>
 

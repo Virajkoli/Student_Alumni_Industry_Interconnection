@@ -71,7 +71,7 @@ export default function StudentDashboard() {
           </p>
         </div>
 
-        {/* Profile Completion Card */}
+        {/*Profile Completion Card*/}
         {user?.profileCompletion < 100 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
             <div className="flex items-center justify-between">

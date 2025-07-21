@@ -58,6 +58,10 @@ const StudentProfileHeader = ({
   const [isPingRequestsModalOpen, setIsPingRequestsModalOpen] = useState(false);
   const [isLoadingPing, setIsLoadingPing] = useState(false);
 
+  // Connection modal state
+  const [connections, setConnections] = useState([]);
+  const [isConnectionModalOpen, setIsConnectionModalOpen] = useState(false);
+
   // Project state
   const [projectCount, setProjectCount] = useState(0);
   const [projects, setProjects] = useState([]);
@@ -358,6 +362,23 @@ const StudentProfileHeader = ({
   const openPingRequestsModal = () => {
     setIsPingRequestsModalOpen(true);
     fetchPingRequests();
+  };
+
+  // Connection functions
+  const fetchConnections = async () => {
+    try {
+      const response = await apiService.getConnections();
+      setConnections(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch connections:", error);
+      toast.error("Failed to load connections");
+      setConnections([]);
+    }
+  };
+
+  const openConnectionModal = () => {
+    setIsConnectionModalOpen(true);
+    fetchConnections();
   };
 
   // Project functions
@@ -799,15 +820,21 @@ const StudentProfileHeader = ({
               </div>
             </div>
             <div className="text-left">
-              <span className="font-bold" style={{ color: "#1F2D3D" }}>
-                {connectionCount}
-              </span>
-              <span
-                className="text-sm ml-1.5"
-                style={{ color: "#1F2D3D", opacity: 0.7 }}
+              <button
+                onClick={isOwner ? openConnectionModal : undefined}
+                className={`${isOwner ? 'hover:bg-gray-100 cursor-pointer' : 'cursor-default'} p-2 rounded-lg transition-colors`}
+                title={isOwner ? "View your connections" : undefined}
               >
-                Connections
-              </span>
+                <span className="font-bold" style={{ color: "#1F2D3D" }}>
+                  {connectionCount}
+                </span>
+                <span
+                  className="text-sm ml-1.5"
+                  style={{ color: "#1F2D3D", opacity: 0.7 }}
+                >
+                  Connections
+                </span>
+              </button>
             </div>
             <div className="text-left">
               <span className="font-bold" style={{ color: "#1F2D3D" }}>
@@ -1784,6 +1811,95 @@ const StudentProfileHeader = ({
                   style={{ backgroundColor: "#6EA9CB" }}
                 >
                   Manage Projects
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Connections Modal */}
+      {isConnectionModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  My Connections ({connectionCount})
+                </h2>
+                <button
+                  onClick={() => setIsConnectionModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {connections.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 mb-4">No connections yet</p>
+                  <p className="text-sm text-gray-400">
+                    Connect with other students, colleges, and industry professionals to build your network
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {connections.map((connection) => (
+                    <div
+                      key={connection.id}
+                      className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                        <img
+                          src={connection.connectionUser?.profilePicture || "/default-avatar.png"}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/default-avatar.png";
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 truncate">
+                          {connection.connectionUser?.firstName} {connection.connectionUser?.lastName}
+                        </h4>
+                        <p className="text-sm text-gray-500 truncate">
+                          {connection.connectionUser?.headline || connection.connectionUser?.collegeName}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Connected on {new Date(connection.updated_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          // Navigate to their profile
+                          window.open(`/student/profile/${connection.connectionUser?.id}`, '_blank');
+                        }}
+                        className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      >
+                        View Profile
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setIsConnectionModalOpen(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Close
                 </button>
               </div>
             </div>

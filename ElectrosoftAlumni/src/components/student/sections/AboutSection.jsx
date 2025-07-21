@@ -5,38 +5,18 @@ import apiService from "../../../services/apiService";
 const AboutSection = ({ profileData, onProfileUpdate, isOwner = false }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [aboutText, setAboutText] = useState(
-    profileData.about ||
+    profileData?.about ||
       "Add a summary to highlight your personality and work style."
   );
 
-  // Fetch about data from the backend
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAboutData = async () => {
-      try {
-        const response = await apiService.getStudentAbout();
-        if (response.success && response.data) {
-          setAboutText(response.data.summary || "Add a summary to highlight your personality and work style.");
-        }
-      } catch (error) {
-        console.error("Failed to fetch about data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAboutData();
-  }, []);
-
-  // Sync aboutText with profileData changes
+  // Only sync aboutText with profileData changes - don't fetch independently
   useEffect(() => {
     setAboutText(
       profileData?.about ||
         "Add a summary to highlight your personality and work style."
     );
   }, [profileData]);
-isOwner
+
   const handleEditClick = () => {
     setIsEditModalOpen(true);
   };
@@ -97,14 +77,10 @@ isOwner
         </div>
 
         <div className="p-6">
-          {loading ? (
-            <p className="text-gray-500 italic">Loading about info...</p>
-          ) : (
-            <p className="text-gray-700 leading-relaxed">
-              {aboutText ||
-                "Add a summary to highlight your personality and work style."}
-            </p>
-          )}
+          <p className="text-gray-700 leading-relaxed">
+            {aboutText ||
+              "Add a summary to highlight your personality and work style."}
+          </p>
         </div>
       </div>
 

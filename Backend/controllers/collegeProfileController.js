@@ -507,6 +507,22 @@ class CollegeProfileController {
       });
     }
   }
+  
+  // Bulk update campuses
+  async updateCampuses(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const campusesData = req.body;
+      if (!Array.isArray(campusesData)) {
+        return res.status(400).json({ success: false, message: 'Request body must be an array of campus objects' });
+      }
+      const updated = await collegeProfileService.updateCollegeCampuses(collegeId, campusesData);
+      res.json({ success: true, data: updated, message: 'Campuses updated successfully' });
+    } catch (error) {
+      console.error('Bulk update campuses error:', error);
+      res.status(500).json({ success: false, message: error.message || 'Failed to bulk update campuses' });
+    }
+  }
 
   async updateCampus(req, res) {
     try {
@@ -633,6 +649,248 @@ class CollegeProfileController {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to get campuses map'
+      });
+    }
+  }
+
+  // =============================================
+  // NEW COLLEGE PROFILE SECTIONS
+  // =============================================
+  
+  // College Information (New)
+  async getCollegeInformationNew(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const information = await collegeProfileService.getCollegeInformationNew(collegeId);
+      
+      res.json({
+        success: true,
+        data: information
+      });
+    } catch (error) {
+      console.error('Get college information error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get college information'
+      });
+    }
+  }
+
+  async updateCollegeInformationNew(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const informationData = req.body;
+      
+      const updatedInformation = await collegeProfileService.updateCollegeInformationNew(collegeId, informationData);
+      
+      res.json({
+        success: true,
+        data: updatedInformation,
+        message: 'College information updated successfully'
+      });
+    } catch (error) {
+      console.error('Update college information error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update college information'
+      });
+    }
+  }
+
+  // College Admissions (New)
+  async getCollegeAdmissionsNew(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const admissions = await collegeProfileService.getCollegeAdmissionsNew(collegeId);
+      
+      res.json({
+        success: true,
+        data: admissions
+      });
+    } catch (error) {
+      console.error('Get college admissions error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get college admissions'
+      });
+    }
+  }
+
+  async createCollegeAdmission(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const admissionData = req.body;
+      
+      const newAdmission = await collegeProfileService.createCollegeAdmission(collegeId, admissionData);
+      
+      res.status(201).json({
+        success: true,
+        data: newAdmission,
+        message: 'Admission record created successfully'
+      });
+    } catch (error) {
+      console.error('Create college admission error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to create admission record'
+      });
+    }
+  }
+
+  // College Infrastructure (New)
+  async getCollegeInfrastructureNew(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const infrastructure = await collegeProfileService.getCollegeInfrastructureNew(collegeId);
+      
+      res.json({
+        success: true,
+        data: infrastructure
+      });
+    } catch (error) {
+      console.error('Get college infrastructure error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get college infrastructure'
+      });
+    }
+  }
+
+  async updateCollegeInfrastructure(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const infrastructureData = req.body;
+      
+      const updatedInfrastructure = await collegeProfileService.updateCollegeInfrastructure(collegeId, infrastructureData);
+      
+      res.json({
+        success: true,
+        data: updatedInfrastructure,
+        message: 'College infrastructure updated successfully'
+      });
+    } catch (error) {
+      console.error('Update college infrastructure error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update college infrastructure'
+      });
+    }
+  }
+
+  // College Contact (New)
+  async getCollegeContactNew(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const contact = await collegeProfileService.getCollegeContactNew(collegeId);
+      
+      res.json({
+        success: true,
+        data: contact
+      });
+    } catch (error) {
+      console.error('Get college contact error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get college contact'
+      });
+    }
+  }
+
+  async updateCollegeContact(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const contactData = req.body;
+      
+      const updatedContact = await collegeProfileService.updateCollegeContact(collegeId, contactData);
+      
+      res.json({
+        success: true,
+        data: updatedContact,
+        message: 'College contact updated successfully'
+      });
+    } catch (error) {
+      console.error('Update college contact error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update college contact'
+      });
+    }
+  }
+  
+  // =============================================
+  // ACADEMICS/COURSES SECTION
+  // =============================================
+  
+  async getAcademics(req, res) {
+    try {
+      const collegeId = req.user.id;
+      
+      const academics = await collegeProfileService.getCollegeAcademics(collegeId);
+      
+      res.json(academics);
+    } catch (error) {
+      console.error('Get college academics error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get college academics'
+      });
+    }
+  }
+  
+  async createAcademic(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const academicData = req.body;
+      
+      const newAcademic = await collegeProfileService.createCollegeAcademic(collegeId, academicData);
+      
+      res.json({
+        success: true,
+        data: newAcademic,
+        message: 'Academic record created successfully'
+      });
+    } catch (error) {
+      console.error('Create college academic error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to create college academic'
+      });
+    }
+  }
+  
+  async updateAcademics(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const academicsData = req.body;
+      
+      const updatedAcademics = await collegeProfileService.updateCollegeAcademics(collegeId, academicsData);
+      
+      res.json({
+        success: true,
+        data: updatedAcademics,
+        message: 'College academics updated successfully'
+      });
+    } catch (error) {
+      console.error('Update college academics error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update college academics'
+      });
+    }
+  }
+  
+  async deleteAcademic(req, res) {
+    try {
+      const academicId = parseInt(req.params.academicId);
+      
+      const result = await collegeProfileService.deleteCollegeAcademic(academicId);
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Delete college academic error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to delete college academic'
       });
     }
   }

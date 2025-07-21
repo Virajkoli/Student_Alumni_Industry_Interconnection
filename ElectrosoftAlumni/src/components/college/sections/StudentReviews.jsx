@@ -175,12 +175,12 @@ const StudentReviews = ({ data, onEdit }) => {
 
   return (
     <>
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="p-8 max-w-4xl mx-auto">
         {/* Student Reviews Section */}
-        <div className="bg-white rounded-lg mb-6">
+        <div className="bg-white rounded-lg mb-8">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">
+          <div className="flex items-center justify-between p-8 border-b border-gray-200">
+            <h2 className="text-2xl font-semibold text-gray-900">
               Student Reviews
             </h2>
             <button
@@ -193,10 +193,10 @@ const StudentReviews = ({ data, onEdit }) => {
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-8">
             {/* Overview Stats */}
             <div className="mb-8">
-              <div className="flex items-center gap-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-6 p-6 bg-gray-50 rounded-lg">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900">
                     {reviewsData.overallRating}

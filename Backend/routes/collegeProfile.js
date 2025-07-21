@@ -41,6 +41,7 @@ router.get('/admissions', auth, collegeProfileController.getAdmissions);
 // College campuses routes (with map location support)
 router.get('/campuses', auth, collegeProfileController.getCampuses);
 router.post('/campuses', auth, collegeProfileController.createCampus);
+router.put('/campuses', auth, collegeProfileController.updateCampuses); // Bulk update
 router.put('/campuses/:id', auth, collegeProfileController.updateCampus);
 router.delete('/campuses/:id', auth, collegeProfileController.deleteCampus);
 
@@ -48,6 +49,25 @@ router.delete('/campuses/:id', auth, collegeProfileController.deleteCampus);
 router.put('/campuses/:id/location', auth, collegeProfileController.updateCampusLocation);
 router.get('/campuses/locations', auth, collegeProfileController.getCampusesWithLocations);
 router.get('/campuses/map/:collegeId', collegeProfileController.getCampusesMap); // Public endpoint
+
+// New college profile sections routes
+router.get('/information-new', auth, collegeProfileController.getCollegeInformationNew);
+router.put('/information-new', auth, collegeProfileController.updateCollegeInformationNew);
+
+router.get('/admissions-new', auth, collegeProfileController.getCollegeAdmissionsNew);
+router.post('/admissions-new', auth, collegeProfileController.createCollegeAdmission);
+
+router.get('/infrastructure-new', auth, collegeProfileController.getCollegeInfrastructureNew);
+router.put('/infrastructure-new', auth, collegeProfileController.updateCollegeInfrastructure);
+
+router.get('/contact-new', auth, collegeProfileController.getCollegeContactNew);
+router.put('/contact-new', auth, collegeProfileController.updateCollegeContact);
+
+// College academics/courses routes
+router.get('/academics', auth, collegeProfileController.getAcademics);
+router.post('/academics', auth, collegeProfileController.createAcademic);
+router.put('/academics', auth, collegeProfileController.updateAcademics);
+router.delete('/academics/:academicId', auth, collegeProfileController.deleteAcademic);
 
 // College students routes (legacy)
 router.get('/students', auth, collegeProfileController.getStudents);

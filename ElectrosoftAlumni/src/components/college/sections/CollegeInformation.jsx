@@ -82,7 +82,28 @@ const CollegeInformation = () => {
 
         if (response.success) {
           console.log("✅ College data loaded:", response.data);
-          setCollegeData(response.data);
+          
+          // Transform backend data to frontend format
+          const transformedData = {
+            ...response.data,
+            campuses: response.data.campuses?.map(campus => ({
+              ...campus,
+              // Convert latitude/longitude to coordinates array for frontend
+              coordinates: campus.latitude && campus.longitude 
+                ? [parseFloat(campus.latitude), parseFloat(campus.longitude)]
+                : [19.076, 72.8777], // Default to Mumbai if no coordinates
+              // Map backend fields to frontend fields
+              students: campus.student_count || '',
+              contact: {
+                phone: campus.contact_number || '',
+                email: campus.dean_email || ''
+              },
+              image: campus.image_url || 'https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=300&fit=crop'
+            })) || []
+          };
+          
+          console.log("🔄 Transformed data for frontend:", transformedData);
+          setCollegeData(transformedData);
         } else {
           console.log("⚠️ No college data found, using defaults");
           // Keep default data if no data found
@@ -201,9 +222,26 @@ const CollegeInformation = () => {
     try {
       console.log("💾 Saving college campuses...", editData.campuses);
 
+      // Transform campus data to match backend expectations
+      const transformedCampuses = editData.campuses.map(campus => ({
+        ...campus,
+        // Convert coordinates array [lat, lng] to separate latitude/longitude fields
+        latitude: campus.coordinates && campus.coordinates.length >= 2 ? campus.coordinates[0] : null,
+        longitude: campus.coordinates && campus.coordinates.length >= 2 ? campus.coordinates[1] : null,
+        // Map frontend fields to backend fields
+        student_count: campus.students || null,
+        contact_number: campus.contact?.phone || null,
+        dean_email: campus.contact?.email || null,
+        image_url: campus.image || null,
+        // Remove the coordinates array as we've converted it
+        coordinates: undefined
+      }));
+
+      console.log("🔄 Transformed campus data:", transformedCampuses);
+
       const response = await apiService.updateCollegeCampuses(
         user.id,
-        editData.campuses
+        transformedCampuses
       );
 
       if (response.success) {
@@ -243,12 +281,19 @@ const CollegeInformation = () => {
             };
           } else if (field === "coordinates") {
             // Parse coordinates from string "lat,lng"
+            if (!value || value.trim() === "") {
+              return {
+                ...campus,
+                [field]: []
+              };
+            }
             const coords = value
               .split(",")
-              .map((coord) => parseFloat(coord.trim()));
+              .map((coord) => parseFloat(coord.trim()))
+              .filter(coord => !isNaN(coord));
             return {
               ...campus,
-              [field]: coords.length === 2 ? coords : [0, 0],
+              [field]: coords.length === 2 ? coords : []
             };
           }
           return { ...campus, [field]: value };
@@ -1286,9 +1331,9 @@ const CollegeInformation = () => {
                         <input
                           type="text"
                           value={
-                            campus.coordinates
+                            campus.coordinates && campus.coordinates.length === 2
                               ? campus.coordinates.join(", ")
-                              : "0, 0"
+                              : ""
                           }
                           onChange={(e) =>
                             handleCampusChange(

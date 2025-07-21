@@ -1373,6 +1373,150 @@ class ApiService {
     }
   }
 
+  // =============================================
+  // NEW COLLEGE PROFILE SECTIONS
+  // =============================================
+  
+  // College Information (New)
+  async getCollegeInformationNew() {
+    try {
+      const response = await this.api.get("/college-profile/information-new");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college information"
+      );
+    }
+  }
+
+  async updateCollegeInformationNew(informationData) {
+    try {
+      const response = await this.api.put("/college-profile/information-new", informationData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college information"
+      );
+    }
+  }
+
+  // College Admissions (New)
+  async getCollegeAdmissionsNew() {
+    try {
+      const response = await this.api.get("/college-profile/admissions-new");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college admissions"
+      );
+    }
+  }
+
+  async createCollegeAdmission(admissionData) {
+    try {
+      const response = await this.api.post("/college-profile/admissions-new", admissionData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create admission record"
+      );
+    }
+  }
+
+  // College Infrastructure (New)
+  async getCollegeInfrastructureNew() {
+    try {
+      const response = await this.api.get("/college-profile/infrastructure-new");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college infrastructure"
+      );
+    }
+  }
+
+  async updateCollegeInfrastructure(infrastructureData) {
+    try {
+      const response = await this.api.put("/college-profile/infrastructure-new", infrastructureData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college infrastructure"
+      );
+    }
+  }
+
+  // College Contact (New)
+  async getCollegeContactNew() {
+    try {
+      const response = await this.api.get("/college-profile/contact-new");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college contact"
+      );
+    }
+  }
+
+  async updateCollegeContact(contactData) {
+    try {
+      const response = await this.api.put("/college-profile/contact-new", contactData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college contact"
+      );
+    }
+  }
+
+  // =============================================
+  // COLLEGE ACADEMICS/COURSES SECTION
+  // =============================================
+
+  async getCollegeAcademics() {
+    try {
+      const response = await this.api.get("/college-profile/academics");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college academics"
+      );
+    }
+  }
+
+  async createCollegeAcademic(academicData) {
+    try {
+      const response = await this.api.post("/college-profile/academics", academicData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create college academic"
+      );
+    }
+  }
+
+  async updateCollegeAcademics(academicsData) {
+    try {
+      const response = await this.api.put("/college-profile/academics", academicsData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college academics"
+      );
+    }
+  }
+
+  async deleteCollegeAcademic(academicId) {
+    try {
+      const response = await this.api.delete(`/college-profile/academics/${academicId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete college academic"
+      );
+    }
+  }
+
   async getStartupProfile(startupId = null) {
     try {
       const endpoint = startupId ? `/startups/${startupId}` : "/startups/me";

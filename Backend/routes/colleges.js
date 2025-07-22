@@ -1,7 +1,112 @@
 const express = require("express");
 const router = express.Router();
 const { College, CollegeCampus } = require("../config/database");
+const prisma = require("../config/prisma");
 const { auth } = require("../middleware/auth");
+const { authMiddleware } = require("../middleware/authMiddleware");
+
+// GET /api/colleges/me - Get current college profile (Prisma-based)
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    // Check if user is a college
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const college = await prisma.college.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        location: true,
+        website: true,
+        established_year: true,
+        logo: true,
+        description: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+
+    if (!college) {
+      return res.status(404).json({
+        success: false,
+        message: "College profile not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: college,
+    });
+  } catch (error) {
+    console.error("Error fetching college profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch college profile",
+      error: error.message,
+    });
+  }
+});
+
+// PUT /api/colleges/me - Update current college profile (Prisma-based)
+router.put("/me", authMiddleware, async (req, res) => {
+  try {
+    // Check if user is a college
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const { name, phone, location, website, established_year, description } =
+      req.body;
+
+    const updatedCollege = await prisma.college.update({
+      where: { id: req.user.id },
+      data: {
+        name,
+        phone,
+        location,
+        website,
+        established_year,
+        description,
+        updated_at: new Date(),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        location: true,
+        website: true,
+        established_year: true,
+        logo: true,
+        description: true,
+        updated_at: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "College profile updated successfully",
+      data: updatedCollege,
+    });
+  } catch (error) {
+    console.error("Error updating college profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update college profile",
+      error: error.message,
+    });
+  }
+});
 
 // GET /api/colleges/:id - Get college information (main endpoint)
 router.get("/:id", async (req, res) => {

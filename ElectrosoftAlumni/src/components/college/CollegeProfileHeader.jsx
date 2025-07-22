@@ -27,6 +27,7 @@ const CollegeProfileHeader = ({
   onCustomNavigationUpdate,
   isOwner = false,
   sectionsData = {},
+  activeTab = "college-info", // Add activeTab prop
 }) => {
   // Profile edit state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -34,8 +35,8 @@ const CollegeProfileHeader = ({
   const [editData, setEditData] = useState({ ...profileData });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Navigation state
-  const [activeItem, setActiveItem] = useState("posts");
+  // Navigation state - sync with parent activeTab
+  const [activeItem, setActiveItem] = useState(activeTab);
   const [isNavEditModalOpen, setIsNavEditModalOpen] = useState(false);
   const [isNewNavModalOpen, setIsNewNavModalOpen] = useState(false);
   const [hiddenNavItems, setHiddenNavItems] = useState([]);
@@ -46,6 +47,11 @@ const CollegeProfileHeader = ({
   });
   const [editingCustomNav, setEditingCustomNav] = useState(null);
   const [isEditingCustomNav, setIsEditingCustomNav] = useState(false);
+
+  // Sync activeItem with activeTab prop
+  useEffect(() => {
+    setActiveItem(activeTab);
+  }, [activeTab]);
 
   // Profile picture and cover photo URLs
   const [profilePicUrl, setProfilePicUrl] = useState("");

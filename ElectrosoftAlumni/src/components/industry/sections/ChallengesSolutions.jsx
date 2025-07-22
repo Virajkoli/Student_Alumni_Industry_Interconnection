@@ -279,14 +279,14 @@ const ChallengesSolutions = ({ isOwner, industryData }) => {
             transformation
           </p>
         </div>
-        <button
+        {isOwner &&<button
           onClick={() => setIsAddModalOpen(true)}
           className="text-white px-4 py-2 rounded-lg hover:opacity-90 transition-colors flex items-center space-x-2"
           style={{ backgroundColor: "#6EA9CB" }}
         >
           <Plus className="w-4 h-4" />
           <span>Add Challenge</span>
-        </button>
+        </button>}
       </div>
 
       {/* Edit Modal */}

@@ -36,8 +36,7 @@ const IndustryProfilePage = () => {
   const { user } = useAuth();
 
   // Check if current user is the owner of this profile
-  const isOwner =
-    !routeId || (routeId && user?.id && parseInt(routeId) === user.id);
+  const isOwner = user?.id === profileData?.owner_id;
 
   // Function to refresh posts when a new post is created
   const handlePostCreated = (newPost) => {
@@ -78,7 +77,9 @@ const IndustryProfilePage = () => {
         const mappedData = {
           ...data,
           id: data.id,
-          industry_name: data.industry_name || data.industryName || "",
+          owner_id: data.owner_id || data.user_id || null,
+          companyName: data.companyName || data.industry_name || "",
+          industryType: data.industryType || "",
           email: data.email || "",
           contact_no: data.contact_no || data.contactNo || "",
           location: data.location || "",

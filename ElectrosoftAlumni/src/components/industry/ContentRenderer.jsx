@@ -45,11 +45,7 @@ const ContentRenderer = ({
       case "success-stories":
         return <SuccessStories isOwner={isOwner} industryData={industryData} />;
       case "post-news-jobs":
-        return isOwner ? (
-          <PostNewsJobs isOwner={isOwner} industryData={industryData} />
-        ) : (
-          <p>You do not have permission to post news or jobs.</p>
-        );
+        return <PostNewsJobs isOwner={isOwner} industryData={industryData} />;
       case "expert-opinions-interview":
         return (
           <ExpertOpinionsInterview

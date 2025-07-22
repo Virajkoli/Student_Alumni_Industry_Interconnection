@@ -159,16 +159,14 @@ const JobCareerOpportunities = ({ isOwner, industryData }) => {
               Discover your next career move with leading companies
             </p>
           </div>
-          <button
-            onClick={handleAddNew}
-            className="inline-flex items-center px-4 py-2 text-white rounded-lg transition-colors gap-2 self-start"
-            style={{ backgroundColor: "#6EA9CB" }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#5A8BA8")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#6EA9CB")}
-          >
-            <Plus className="w-4 h-4" />
-            Post New Job
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md"
+            >
+              Post New Job
+            </button>
+          )}
         </div>
 
         {/* Search and Filter Bar */}

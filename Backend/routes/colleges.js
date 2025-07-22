@@ -4,6 +4,8 @@ const { College, CollegeCampus } = require("../config/database");
 const prisma = require("../config/prisma");
 const { auth } = require("../middleware/auth");
 const { authMiddleware } = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
+const { cloudinary } = require("../config/cloudinary");
 
 // GET /api/colleges/me - Get current college profile (Prisma-based)
 router.get("/me", authMiddleware, async (req, res) => {
@@ -22,14 +24,21 @@ router.get("/me", authMiddleware, async (req, res) => {
         id: true,
         name: true,
         email: true,
-        phone: true,
         location: true,
         website: true,
-        established_year: true,
-        logo: true,
+        established: true,
+        profilePicture: true,
+        logoUrl: true,
+        backgroundUrl: true,
         description: true,
-        created_at: true,
-        updated_at: true,
+        accreditation: true,
+        nirfRank: true,
+        totalStudents: true,
+        totalFaculty: true,
+        universityAffiliation: true,
+        naacRating: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -65,31 +74,54 @@ router.put("/me", authMiddleware, async (req, res) => {
       });
     }
 
-    const { name, phone, location, website, established_year, description } =
-      req.body;
+    const { 
+      name, 
+      location, 
+      website, 
+      established, 
+      description,
+      accreditation,
+      nirfRank,
+      totalStudents,
+      totalFaculty,
+      universityAffiliation,
+      naacRating
+    } = req.body;
 
     const updatedCollege = await prisma.college.update({
       where: { id: req.user.id },
       data: {
         name,
-        phone,
         location,
         website,
-        established_year,
+        established: established ? parseInt(established) : undefined,
         description,
-        updated_at: new Date(),
+        accreditation,
+        nirfRank: nirfRank ? parseInt(nirfRank) : undefined,
+        totalStudents: totalStudents ? parseInt(totalStudents) : undefined,
+        totalFaculty: totalFaculty ? parseInt(totalFaculty) : undefined,
+        universityAffiliation,
+        naacRating,
+        updatedAt: new Date(),
       },
       select: {
         id: true,
         name: true,
         email: true,
-        phone: true,
         location: true,
         website: true,
-        established_year: true,
-        logo: true,
+        established: true,
+        profilePicture: true,
+        logoUrl: true,
+        backgroundUrl: true,
         description: true,
-        updated_at: true,
+        accreditation: true,
+        nirfRank: true,
+        totalStudents: true,
+        totalFaculty: true,
+        universityAffiliation: true,
+        naacRating: true,
+        updatedAt: true,
       },
     });
 
@@ -103,6 +135,290 @@ router.put("/me", authMiddleware, async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to update college profile",
+      error: error.message,
+    });
+  }
+});
+
+// GET /api/colleges/programs - Get college programs (Prisma-based)
+router.get("/programs", authMiddleware, async (req, res) => {
+  try {
+    // Check if user is a college
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    console.log("🔍 Fetching programs for college ID:", req.user.id);
+
+    const programs = await prisma.college_programs.findMany({
+      where: { college_id: req.user.id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        duration: true,
+        degree_type: true,
+        eligibility: true,
+        fees: true,
+        created_at: true,
+        updated_at: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+
+    console.log("📊 Found programs:", programs.length);
+
+    res.json({
+      success: true,
+      data: programs,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching college programs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch college programs",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/programs - Create college program (Prisma-based)
+router.post("/programs", authMiddleware, async (req, res) => {
+  try {
+    // Check if user is a college
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can create programs",
+      });
+    }
+
+    const {
+      name,
+      description,
+      duration,
+      degree_type,
+      eligibility,
+      fees,
+    } = req.body;
+
+    console.log("➕ Creating new program for college ID:", req.user.id);
+
+    const newProgram = await prisma.college_programs.create({
+      data: {
+        college_id: req.user.id,
+        name,
+        description,
+        duration,
+        degree_type,
+        eligibility,
+        fees,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        duration: true,
+        degree_type: true,
+        eligibility: true,
+        fees: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+
+    console.log("✅ Program created successfully:", newProgram.id);
+
+    res.status(201).json({
+      success: true,
+      message: "Program created successfully",
+      data: newProgram,
+    });
+  } catch (error) {
+    console.error("❌ Error creating college program:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create program",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/logo-image - Upload college logo (Prisma-based)
+router.post("/logo-image", authMiddleware, upload.single("logoImage"), async (req, res) => {
+  try {
+    // Check if user is a college
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can upload logo images",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No logo image file provided",
+      });
+    }
+
+    console.log("📸 Uploading college logo for college ID:", req.user.id);
+
+    // Upload to Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "college_logos",
+        public_id: `college_logo_${req.user.id}_${Date.now()}`,
+        transformation: [
+          { width: 400, height: 400, crop: "fill", gravity: "face" },
+          { quality: "auto" },
+          { fetch_format: "auto" }
+        ]
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("❌ Cloudinary upload error:", error);
+          return res.status(500).json({
+            success: false,
+            message: "Failed to upload logo image",
+            error: error.message,
+          });
+        }
+
+        try {
+          // Update college with new logo URL
+          const updatedCollege = await prisma.college.update({
+            where: { id: req.user.id },
+            data: {
+              profilePicture: result.secure_url,
+              logoUrl: result.secure_url, // Also update logoUrl for compatibility
+              updatedAt: new Date(),
+            },
+            select: {
+              id: true,
+              profilePicture: true,
+              logoUrl: true,
+            },
+          });
+
+          console.log("✅ College logo updated successfully");
+
+          res.json({
+            success: true,
+            message: "College logo uploaded successfully",
+            data: {
+              profile_picture: updatedCollege.profilePicture,
+              logo_url: updatedCollege.logoUrl,
+            },
+          });
+        } catch (dbError) {
+          console.error("❌ Database error:", dbError);
+          res.status(500).json({
+            success: false,
+            message: "Failed to update college logo in database",
+            error: dbError.message,
+          });
+        }
+      }
+    );
+
+    uploadStream.end(req.file.buffer);
+  } catch (error) {
+    console.error("❌ Error uploading college logo:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to upload college logo",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/cover-image - Upload college cover image (Prisma-based)
+router.post("/cover-image", authMiddleware, upload.single("coverImage"), async (req, res) => {
+  try {
+    // Check if user is a college
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can upload cover images",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No cover image file provided",
+      });
+    }
+
+    console.log("📸 Uploading college cover image for college ID:", req.user.id);
+
+    // Upload to Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "college_covers",
+        public_id: `college_cover_${req.user.id}_${Date.now()}`,
+        transformation: [
+          { width: 1200, height: 400, crop: "fill" },
+          { quality: "auto" },
+          { fetch_format: "auto" }
+        ]
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("❌ Cloudinary upload error:", error);
+          return res.status(500).json({
+            success: false,
+            message: "Failed to upload cover image",
+            error: error.message,
+          });
+        }
+
+        try {
+          // Update college with new cover URL
+          const updatedCollege = await prisma.college.update({
+            where: { id: req.user.id },
+            data: {
+              backgroundUrl: result.secure_url, // Use existing backgroundUrl field
+              updatedAt: new Date(),
+            },
+            select: {
+              id: true,
+              backgroundUrl: true,
+            },
+          });
+
+          console.log("✅ College cover image updated successfully");
+
+          res.json({
+            success: true,
+            message: "College cover image uploaded successfully",
+            data: {
+              background_url: updatedCollege.backgroundUrl,
+            },
+          });
+        } catch (dbError) {
+          console.error("❌ Database error:", dbError);
+          res.status(500).json({
+            success: false,
+            message: "Failed to update college cover image in database",
+            error: dbError.message,
+          });
+        }
+      }
+    );
+
+    uploadStream.end(req.file.buffer);
+  } catch (error) {
+    console.error("❌ Error uploading college cover image:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to upload college cover image",
       error: error.message,
     });
   }

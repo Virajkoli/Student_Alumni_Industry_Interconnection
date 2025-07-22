@@ -87,21 +87,19 @@ const CollegeProfileHeader = ({
   const [programs, setPrograms] = useState([]);
   const [isProgramModalOpen, setIsProgramModalOpen] = useState(false);
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(profileData);
 
-  const fetchUserData = async () => {
-    try {
-      const response = await apiService.getCurrentUser();
-      setUser(response.data);
-      console.log("College user refreshed after upload:", response.data);
-    } catch (error) {
-      console.error("Failed to fetch college user data:", error);
-    }
-  };
-
+  // Sync with profileData prop changes
   useEffect(() => {
-    fetchUserData(); // Fetch on mount
-  }, []);
+    if (profileData) {
+      setUser(profileData);
+      console.log("✅ COLLEGE PROFILE HEADER - Updated user from props:", profileData);
+      // Notify parent of any updates
+      if (onProfileUpdate) {
+        onProfileUpdate(profileData);
+      }
+    }
+  }, [profileData, onProfileUpdate]);
 
   // Update image URLs when profileData changes
   useEffect(() => {
@@ -113,10 +111,10 @@ const CollegeProfileHeader = ({
         profileData.profile_picture ||
         "";
       const coverPic =
-        profileData.coverPicture ||
+        profileData.backgroundUrl ||
         profileData.background ||
-        profileData.basicInfo?.cover_picture ||
-        profileData.cover_picture ||
+        profileData.basicInfo?.background_url ||
+        profileData.background_url ||
         "";
 
       console.log("✅ COLLEGE PROFILE DATA RECEIVED:", profileData);
@@ -234,20 +232,30 @@ const CollegeProfileHeader = ({
   const handleSaveProfile = async () => {
     try {
       const payload = {
-        collegeName: editData.collegeName,
+        name: editData.collegeName || editData.name,
         location: editData.location,
-        universityAffiliation: editData.universityAffiliation,
-        naacRating: editData.naacRating,
-        contactNo: editData.contactNo,
         email: editData.email,
         website: editData.website,
+        description: editData.description,
+        established: editData.established,
+        accreditation: editData.accreditation,
+        nirfRank: editData.nirfRank,
+        totalStudents: editData.totalStudents,
+        totalFaculty: editData.totalFaculty,
+        universityAffiliation: editData.universityAffiliation,
+        naacRating: editData.naacRating,
       };
 
       await apiService.updateCollegeProfile(payload);
+      
+      // Refresh profile data and notify parent
+      if (onProfileUpdate) {
+        const updatedProfile = await apiService.getCollegeProfile();
+        onProfileUpdate(updatedProfile.data || updatedProfile);
+      }
+      
       toast.success("College profile updated successfully!");
-      onProfileUpdate(editData);
       setIsEditModalOpen(false);
-      fetchUserData();
     } catch (error) {
       console.error("Failed to update college profile:", error);
       toast.error("Failed to update college profile.");
@@ -260,7 +268,13 @@ const CollegeProfileHeader = ({
       formData.append("logoImage", file); // college logo
 
       const response = await apiService.uploadCollegeLogo(formData);
-      await fetchUserData(); // Refresh user data with new logo
+      
+      // Refresh profile data and notify parent
+      if (onProfileUpdate) {
+        const updatedProfile = await apiService.getCollegeProfile();
+        onProfileUpdate(updatedProfile.data || updatedProfile);
+      }
+      
       toast.success("College logo updated");
     } catch (error) {
       console.error("Failed to upload college logo:", error);
@@ -273,9 +287,14 @@ const CollegeProfileHeader = ({
       const formData = new FormData();
       formData.append("coverImage", file);
       const response = await apiService.uploadCollegeCover(formData);
-      await fetchUserData(); // Refresh user data with new cover
+      
+      // Refresh profile data and notify parent
+      if (onProfileUpdate) {
+        const updatedProfile = await apiService.getCollegeProfile();
+        onProfileUpdate(updatedProfile.data || updatedProfile);
+      }
 
-      setCoverPicUrl(response.data.cover_picture);
+      setCoverPicUrl(response.data.background_url);
       toast.success("College cover picture updated");
     } catch (error) {
       console.error("Failed to upload college cover picture:", error);
@@ -655,7 +674,8 @@ const CollegeProfileHeader = ({
 
         {/* College Info */}
         <div className="pt-16 px-8 pb-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            {/* Left Section - College Name and Location */}
             <div className="flex-1">
               <h3 className="text-2xl font-bold text-gray-900">
                 {editData?.collegeName ||
@@ -663,11 +683,6 @@ const CollegeProfileHeader = ({
                   profileData?.name ||
                   "College Name"}
               </h3>
-              <p className="text-md text-gray-600 mt-1">
-                {editData?.universityAffiliation ||
-                  profileData?.universityAffiliation ||
-                  "University Affiliation"}
-              </p>
               <div className="flex items-center text-sm text-gray-500 mt-2">
                 <MapPin className="w-4 h-4 mr-1.5" />
                 {editData?.location ||
@@ -675,13 +690,31 @@ const CollegeProfileHeader = ({
                   profileData?.city ||
                   "Location not specified"}
               </div>
+            </div>
+
+            {/* Middle Section - Affiliation and NAAC Rating */}
+            <div className="flex flex-col items-center justify-center gap-2 px-4">
+              {(editData?.universityAffiliation ||
+                profileData?.universityAffiliation) && (
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Affiliated to</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    {editData?.universityAffiliation || profileData?.universityAffiliation}
+                  </p>
+                </div>
+              )}
               {(editData?.naacRating ||
                 profileData?.naacRating) && (
-                <p className="text-sm text-gray-600 mt-1">
-                  NAAC Accredited: {editData?.naacRating || profileData?.naacRating}
-                </p>
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">NAAC Grade</p>
+                  <p className="text-sm font-semibold text-blue-600">
+                    {editData?.naacRating || profileData?.naacRating}
+                  </p>
+                </div>
               )}
             </div>
+
+            {/* Right Section - Action Buttons */}
             <div className="flex flex-col items-start gap-2 sm:items-end">
               {/* Profile Info Edit Button */}
               {isOwner && (
@@ -694,7 +727,24 @@ const CollegeProfileHeader = ({
                 </button>
               )}
 
-              {/* Dynamic Ping/Connect Button */}
+              {/* Connection Requests Button for Owner */}
+              {isOwner && (
+                <button
+                  onClick={openPingRequestsModal}
+                  className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90 flex items-center gap-2"
+                  style={{ backgroundColor: "#6EA9CB" }}
+                >
+                  <Bell className="w-4 h-4" />
+                  Connection Requests
+                  {pingRequests.length > 0 && (
+                    <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {pingRequests.length}
+                    </span>
+                  )}
+                </button>
+              )}
+
+              {/* Dynamic Ping/Connect Button for non-owners */}
               {!isOwner && (
                 <>
                   {pingStatus === "none" && (
@@ -743,23 +793,6 @@ const CollegeProfileHeader = ({
                     </button>
                   )}
                 </>
-              )}
-
-              {/* Connection Requests Button for Owner */}
-              {isOwner && (
-                <button
-                  onClick={openPingRequestsModal}
-                  className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90 flex items-center gap-2"
-                  style={{ backgroundColor: "#6EA9CB" }}
-                >
-                  <Bell className="w-4 h-4" />
-                  Connection Requests
-                  {pingRequests.length > 0 && (
-                    <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {pingRequests.length}
-                    </span>
-                  )}
-                </button>
               )}
             </div>
           </div>
@@ -1236,6 +1269,38 @@ const CollegeProfileHeader = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     placeholder="https://college-website.com"
                   />
+                </div>
+                <div className="md:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    University Affiliation
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.universityAffiliation || ""}
+                    onChange={(e) => handleInputChange("universityAffiliation", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="e.g., University of Mumbai"
+                  />
+                </div>
+                <div className="md:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    NAAC Rating
+                  </label>
+                  <select
+                    value={editData.naacRating || ""}
+                    onChange={(e) => handleInputChange("naacRating", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    <option value="">Select NAAC Grade</option>
+                    <option value="A++">A++ (3.51 - 4.00)</option>
+                    <option value="A+">A+ (3.26 - 3.50)</option>
+                    <option value="A">A (3.01 - 3.25)</option>
+                    <option value="B++">B++ (2.76 - 3.00)</option>
+                    <option value="B+">B+ (2.51 - 2.75)</option>
+                    <option value="B">B (2.26 - 2.50)</option>
+                    <option value="C">C (1.51 - 2.25)</option>
+                    <option value="Not Accredited">Not Accredited</option>
+                  </select>
                 </div>
               </div>
             </div>

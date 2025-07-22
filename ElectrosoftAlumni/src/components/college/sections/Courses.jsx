@@ -26,7 +26,8 @@ const Courses = () => {
         const response = await apiService.getCollegeAcademics();
         
         if (response.success) {
-          setCourseData(response.data);
+          // Response should now have consistent structure: { success: true, data: [...] }
+          setCourseData(Array.isArray(response.data) ? response.data : []);
         } else {
           setCourseData([]);
         }
@@ -43,7 +44,7 @@ const Courses = () => {
   }, [user]);
 
   const handleEditClick = () => {
-    setEditData([...courseData]);
+    setEditData(Array.isArray(courseData) ? [...courseData] : []);
     setIsEditModalOpen(true);
   };
 
@@ -101,21 +102,42 @@ const Courses = () => {
   };
 
   const handleRemoveCourse = (index) => {
-    setEditData((prev) => {
-      const newData = [...prev];
-      newData.splice(index, 1);
-      return newData;
-    });
+    // Add confirmation dialog
+    const courseName = editData[index]?.course_name || `Course ${index + 1}`;
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${courseName}"? This action cannot be undone.`
+    );
+    
+    if (confirmDelete) {
+      setEditData((prev) => {
+        const newData = [...prev];
+        
+        // If the course has an ID, it exists in the database
+        // Mark it as deleted instead of removing it completely
+        if (newData[index].id) {
+          newData[index] = { ...newData[index], is_active: false, _markForDeletion: true };
+        } else {
+          // If it's a new course (no ID), just remove it from the array
+          newData.splice(index, 1);
+        }
+        
+        return newData;
+      });
+    }
   };
 
   const handleSave = async () => {
     try {
       setError(null);
       
-      const response = await apiService.updateCollegeAcademics(editData);
+      // Filter out courses marked for deletion before sending to backend
+      const coursesToSave = editData.filter(course => !course._markForDeletion);
+      
+      const response = await apiService.updateCollegeAcademics(coursesToSave);
       
       if (response.success) {
-        setCourseData(response.data);
+        // Response should now have consistent structure: { success: true, data: [...] }
+        setCourseData(Array.isArray(response.data) ? response.data : []);
         setIsEditModalOpen(false);
       } else {
         throw new Error(response.message || "Failed to save courses");
@@ -127,7 +149,7 @@ const Courses = () => {
   };
 
   const handleCancel = () => {
-    setEditData([...courseData]);
+    setEditData(Array.isArray(courseData) ? [...courseData] : []);
     setIsEditModalOpen(false);
   };
 
@@ -197,7 +219,7 @@ const Courses = () => {
               </div>
             )}
             
-            {courseData.length === 0 ? (
+            {(!Array.isArray(courseData) || courseData.length === 0) ? (
               <div className="text-center py-12">
                 <p className="text-gray-500 text-lg">No course information available</p>
                 {user && user.role === "college" && (
@@ -223,7 +245,7 @@ const Courses = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {courseData.map((course, index) => renderTableRow(course, index))}
+                    {Array.isArray(courseData) ? courseData.map((course, index) => renderTableRow(course, index)) : null}
                   </tbody>
                 </table>
               </div>
@@ -251,19 +273,22 @@ const Courses = () => {
             )}
             
             <form className="space-y-6" onSubmit={e => { e.preventDefault(); handleSave(); }}>
-              {editData.map((course, courseIndex) => (
-                <div key={courseIndex} className="border border-gray-200 rounded-lg p-4">
+              {editData.filter(course => !course._markForDeletion).map((course, courseIndex) => {
+                // Get the actual index in the original array for proper handling
+                const actualIndex = editData.indexOf(course);
+                return (
+                <div key={actualIndex} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
                     <h4 className="font-semibold text-blue-800 text-lg">
                       Course {courseIndex + 1}
                     </h4>
                     <button
                       type="button"
-                      onClick={() => handleRemoveCourse(courseIndex)}
-                      className="text-red-600 hover:text-red-800"
-                      disabled={editData.length === 1}
+                      onClick={() => handleRemoveCourse(actualIndex)}
+                      className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors"
+                      title="Delete this course"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
                   
@@ -273,7 +298,7 @@ const Courses = () => {
                       <input 
                         type="text" 
                         value={course.course_name || ''} 
-                        onChange={e => handleInputChange(courseIndex, 'course_name', e.target.value)} 
+                        onChange={e => handleInputChange(actualIndex, 'course_name', e.target.value)} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
                         placeholder="e.g., Bachelor of Technology"
                       />
@@ -283,7 +308,7 @@ const Courses = () => {
                       <input 
                         type="text" 
                         value={course.degree_type || ''} 
-                        onChange={e => handleInputChange(courseIndex, 'degree_type', e.target.value)} 
+                        onChange={e => handleInputChange(actualIndex, 'degree_type', e.target.value)} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
                         placeholder="e.g., B.Tech, M.Tech, MBA"
                       />
@@ -293,7 +318,7 @@ const Courses = () => {
                       <input 
                         type="text" 
                         value={course.duration || ''} 
-                        onChange={e => handleInputChange(courseIndex, 'duration', e.target.value)} 
+                        onChange={e => handleInputChange(actualIndex, 'duration', e.target.value)} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
                         placeholder="e.g., 4 Years, 2 Years"
                       />
@@ -303,7 +328,7 @@ const Courses = () => {
                       <input 
                         type="number" 
                         value={course.total_seats || ''} 
-                        onChange={e => handleInputChange(courseIndex, 'total_seats', e.target.value)} 
+                        onChange={e => handleInputChange(actualIndex, 'total_seats', e.target.value)} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
                         placeholder="e.g., 120"
                       />
@@ -312,7 +337,7 @@ const Courses = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Curriculum</label>
                       <textarea 
                         value={course.curriculum || ''} 
-                        onChange={e => handleInputChange(courseIndex, 'curriculum', e.target.value)} 
+                        onChange={e => handleInputChange(actualIndex, 'curriculum', e.target.value)} 
                         rows={2} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none text-base" 
                         placeholder="Brief description of the curriculum"
@@ -323,7 +348,7 @@ const Courses = () => {
                       <input 
                         type="text" 
                         value={course.assessment_method || ''} 
-                        onChange={e => handleInputChange(courseIndex, 'assessment_method', e.target.value)} 
+                        onChange={e => handleInputChange(actualIndex, 'assessment_method', e.target.value)} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
                         placeholder="e.g., Continuous Assessment, Final Exams, Projects"
                       />
@@ -336,23 +361,24 @@ const Courses = () => {
                             <input
                               type="text"
                               value={specialization}
-                              onChange={e => handleSpecializationChange(courseIndex, specIndex, e.target.value)}
+                              onChange={e => handleSpecializationChange(actualIndex, specIndex, e.target.value)}
                               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-base"
                               placeholder="e.g., Computer Science, Mechanical Engineering"
                             />
                             <button
                               type="button"
-                              onClick={() => handleRemoveSpecialization(courseIndex, specIndex)}
-                              className="text-red-600 hover:text-red-800 px-2"
+                              onClick={() => handleRemoveSpecialization(actualIndex, specIndex)}
+                              className="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50 transition-colors"
                               disabled={course.specializations?.length === 1}
+                              title="Remove this specialization"
                             >
-                              Remove
+                              <X className="w-4 h-4" />
                             </button>
                           </div>
                         ))}
                         <button
                           type="button"
-                          onClick={() => handleAddSpecialization(courseIndex)}
+                          onClick={() => handleAddSpecialization(actualIndex)}
                           className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                         >
                           Add Specialization
@@ -361,7 +387,8 @@ const Courses = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
               
               <div className="border-t pt-4">
                 <button

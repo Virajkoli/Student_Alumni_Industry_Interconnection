@@ -825,9 +825,13 @@ class CollegeProfileController {
     try {
       const collegeId = req.user.id;
       
-      const academics = await collegeProfileService.getCollegeAcademics(collegeId);
+      const result = await collegeProfileService.getCollegeAcademics(collegeId);
       
-      res.json(academics);
+      res.json({
+        success: true,
+        data: result.data || result, // Extract the actual data array
+        message: 'College academics retrieved successfully'
+      });
     } catch (error) {
       console.error('Get college academics error:', error);
       res.status(500).json({
@@ -863,11 +867,11 @@ class CollegeProfileController {
       const collegeId = req.user.id;
       const academicsData = req.body;
       
-      const updatedAcademics = await collegeProfileService.updateCollegeAcademics(collegeId, academicsData);
+      const result = await collegeProfileService.updateCollegeAcademics(collegeId, academicsData);
       
       res.json({
         success: true,
-        data: updatedAcademics,
+        data: result.data || result, // Extract the actual data array
         message: 'College academics updated successfully'
       });
     } catch (error) {

@@ -240,7 +240,6 @@ const CollegeInformation = () => {
       console.log("🔄 Transformed campus data:", transformedCampuses);
 
       const response = await apiService.updateCollegeCampuses(
-        user.id,
         transformedCampuses
       );
 

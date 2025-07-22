@@ -144,6 +144,8 @@ model College {
   nirfRank             Int?
   totalFaculty         Int?
   totalStudents        Int?
+  universityAffiliation String?              @db.VarChar(255)
+  naacRating           String?              @db.VarChar(10)
   updatedAt            DateTime               @default(now()) @map("updatedAt") @db.Timestamptz(6)
   about                college_about[]
   achievements         college_achievements[]

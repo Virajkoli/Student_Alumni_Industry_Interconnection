@@ -10,7 +10,9 @@ const {
   StudentProjects,
   StudentRecommendations,
 } = require("../config/database");
+const prisma = require("../config/prisma");
 const { auth } = require("../middleware/auth");
+const { authMiddleware } = require("../middleware/authMiddleware");
 const router = express.Router();
 const upload = require("../middleware/upload");
 const streamifier = require("streamifier");
@@ -22,6 +24,107 @@ cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper function for student fields selection (Prisma)
+function studentSelectFields() {
+  return {
+    id: true,
+    firstName: true,
+    lastName: true,
+    email: true,
+    contactNo: true,
+    collegeName: true,
+    interestedField: true,
+    location: true,
+    headline: true,
+    otherField: true,
+    profilePicture: true,
+    coverPicture: true,
+    isActive: true,
+    isEmailVerified: true,
+    lastLogin: true,
+    loginCount: true,
+    createdAt: true,
+    updatedAt: true,
+  };
+}
+
+// GET /api/students/me - Get current student profile (Prisma-based)
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res.status(403).json({
+        success: false,
+        message: "Only students can access this endpoint",
+      });
+    }
+
+    const student = await prisma.student.findUnique({
+      where: { id: req.user.userId },
+      select: studentSelectFields(),
+    });
+
+    if (!student)
+      return res
+        .status(404)
+        .json({ success: false, message: "Student profile not found" });
+
+    res.json({ success: true, data: student });
+  } catch (error) {
+    console.error("Error fetching student profile:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch student profile" });
+  }
+});
+
+// PUT /api/students/me - Update current student profile (Prisma-based)
+router.put("/me", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res.status(403).json({
+        success: false,
+        message: "Only students can access this endpoint",
+      });
+    }
+
+    const {
+      firstName,
+      lastName,
+      contactNo,
+      collegeName,
+      interestedField,
+      otherField,
+      location,
+      headline,
+      profilePicture,
+    } = req.body;
+
+    const updatedStudent = await prisma.student.update({
+      where: { id: req.user.userId },
+      data: {
+        firstName,
+        lastName,
+        contactNo,
+        collegeName,
+        interestedField,
+        otherField,
+        location,
+        headline,
+        profilePicture,
+        updatedAt: new Date(),
+      },
+      select: studentSelectFields(),
+    });
+
+    res.json({ success: true, data: updatedStudent });
+  } catch (error) {
+    console.error("Error updating student profile:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update student profile" });
+  }
 });
 
 // @desc    Get complete student profile

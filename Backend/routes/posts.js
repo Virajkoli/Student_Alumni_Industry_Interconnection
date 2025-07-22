@@ -1,509 +1,747 @@
 const express = require("express");
 const router = express.Router();
-const { Pool } = require("pg");
-const { auth } = require("../middleware/auth");
-const {
-  uploadPostMedia,
-  deleteFromCloudinary,
-  extractPublicId,
-} = require("../config/cloudinary");
+const { authMiddleware } = require("../middleware/authMiddleware");
+const { uploadPostMedia } = require("../config/cloudinary");
+const prisma = require("../config/prisma");
 
-// Database connection
-const pool = new Pool({
-  user: process.env.DB_USERNAME || "postgres",
-  password: process.env.DB_PASSWORD || "password",
-  database: process.env.DB_DATABASE || "scaips_dev",
-  host: process.env.DB_HOST || "localhost",
-  port: process.env.DB_PORT || 5432,
-  ssl:
-    process.env.DB_SSL === "true"
-      ? {
-          require: true,
-          rejectUnauthorized: false,
-        }
-      : false,
-});
+// Helper function to add interaction data to posts
+const addInteractionData = async (posts, currentUserId, currentUserRole) => {
+  return Promise.all(
+    posts.map(async (post) => {
+      // Count reactions
+      const reactionCount = await prisma.post_reactions.count({
+        where: { post_id: post.post_id },
+      });
 
-// Helper function to determine user type and ID from token
-function getUserTypeAndId(user) {
-  switch (user.role) {
-    case "student":
-      return { column: "student_id", value: user.id };
-    case "college":
-      return { column: "college_id", value: user.id };
-    case "industry":
-      return { column: "industry_id", value: user.id };
-    case "alumni":
-      return { column: "alumni_id", value: user.id };
-    case "startup":
-      return { column: "startup_id", value: user.id };
-    default:
-      throw new Error("Invalid user role");
-  }
-}
+      // Count comments
+      const commentCount = await prisma.post_comments.count({
+        where: { post_id: post.post_id },
+      });
 
-// Helper function to get user details based on type
-async function getUserDetails(userType, userId) {
-  let query;
-  let tableName;
+      // Count shares
+      const shareCount = await prisma.post_shares.count({
+        where: { post_id: post.post_id },
+      });
 
-  switch (userType) {
-    case "student":
-      tableName = "students";
-      query = `
-        SELECT id, first_name, last_name, 
-               CONCAT(first_name, ' ', last_name) as full_name,
-               email
-        FROM students WHERE id = $1
-      `;
-      break;
-    case "college":
-      tableName = "college";
-      query = `
-        SELECT id, name as full_name, email, avatar, 'college' as role
-        FROM college WHERE id = $1
-      `;
-      break;
-    case "industry":
-      tableName = "industry";
-      query = `
-        SELECT id, company_name as full_name, email, avatar, 'industry' as role
-        FROM industry WHERE id = $1
-      `;
-      break;
-    case "alumni":
-      tableName = "alumni";
-      query = `
-        SELECT id, first_name, last_name,
-               CONCAT(first_name, ' ', last_name) as full_name,
-               email, avatar, 'alumni' as role
-        FROM alumni WHERE id = $1
-      `;
-      break;
-    case "startup":
-      tableName = "startup";
-      query = `
-        SELECT id, company_name as full_name, email, avatar, 'startup' as role
-        FROM startup WHERE id = $1
-      `;
-      break;
-    default:
-      throw new Error("Invalid user type");
-  }
+      // Check if current user has liked this post
+      const userReaction = await prisma.post_reactions.findFirst({
+        where: {
+          post_id: post.post_id,
+          [`${currentUserRole.toLowerCase()}_id`]: currentUserId,
+        },
+      });
 
-  const result = await pool.query(query, [userId]);
-  return result.rows[0];
-}
+      return {
+        ...post,
+        reaction_count: reactionCount,
+        comment_count: commentCount,
+        share_count: shareCount,
+        liked: !!userReaction,
+        user_reaction_type: userReaction?.reaction_type || null,
+      };
+    })
+  );
+};
 
 // Create a new post
-router.post("/", auth, uploadPostMedia.array("media", 5), async (req, res) => {
-  console.log("📨 Incoming post content:", req.body.content);
-console.log("📷 Files:", req.files);
-console.log("👤 Authenticated user:", req.user);
-  const client = await pool.connect();
+router.post(
+  "/",
+  authMiddleware,
+  uploadPostMedia.array("media", 10),
+  async (req, res) => {
+    try {
+      const { userId, role } = req.user;
+      const { content, title } = req.body;
 
-  try {
-    await client.query("BEGIN");
+      if (!content || !content.trim()) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Content is required" });
+      }
 
-    const { content, pollOptions } = req.body;
-    const userInfo = getUserTypeAndId(req.user);
+      // Prepare data object with common fields
+      const postData = {
+        content: content.trim(),
+        title: title || null,
+        authorId: userId,
+        authorType: role.toUpperCase(),
+      };
 
-    if (!content && (!req.files || req.files.length === 0)) {
-      return res.status(400).json({
+      // Add respective foreign key based on role
+      switch (role.toLowerCase()) {
+        case "student":
+          postData.student_id = userId;
+          break;
+        case "alumni":
+          postData.alumni_id = userId;
+          break;
+        case "college":
+          postData.college_id = userId;
+          break;
+        case "industry":
+          postData.industry_id = userId;
+          break;
+        case "startup":
+          postData.startup_id = userId;
+          break;
+      }
+
+      // Create Post
+      const newPost = await prisma.post.create({
+        data: postData,
+      });
+
+      // Handle Media if present
+      if (req.files && req.files.length > 0) {
+        const mediaData = req.files.map((file) => ({
+          post_id: newPost.post_id,
+          media_url: file.path,
+          media_type: "image", // You can improve this by checking file.mimetype
+        }));
+
+        await prisma.post_media.createMany({ data: mediaData });
+      }
+
+      res.status(201).json({
+        success: true,
+        message: "Post created successfully",
+        data: newPost,
+      });
+    } catch (error) {
+      console.error("Create post error:", error);
+      res.status(500).json({
         success: false,
-        message: "Post must have content or media",
+        message: "Failed to create post",
+        error: error.message,
       });
     }
-
-    // Insert post
-    const postQuery = `
-      INSERT INTO posts (content, ${userInfo.column})
-      VALUES ($1, $2)
-      RETURNING post_id, created_at
-    `;
-
-    const postResult = await client.query(postQuery, [
-      content || "",
-      userInfo.value,
-    ]);
-    const postId = postResult.rows[0].post_id;
-
-    // Insert media if present (now using Cloudinary URLs)
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const mediaType = file.mimetype.startsWith("image/")
-          ? "image"
-          : "video";
-        // Use the Cloudinary URL directly
-        const mediaUrl = file.path; // Cloudinary provides the full URL in file.path
-
-        console.log(`📁 Uploaded to Cloudinary: ${mediaUrl}`);
-        console.log("📦 Uploaded File:", file);
-        
-        try {
-          // Try to insert with cloudinary_public_id first
-          await client.query(
-  "INSERT INTO post_media (post_id, media_type, media_url, cloudinary_public_id) VALUES ($1, $2, $3, $4)",
-  [postId, mediaType, mediaUrl, file.public_id || null] // ✅ Correct field from Cloudinary response
+  }
 );
 
-        } catch (columnError) {
-          // If column doesn't exist, fall back to the old structure
-          console.log(
-            `⚠️ cloudinary_public_id column not found, using fallback:`,
-            columnError.message
-          );
-          await client.query(
-            "INSERT INTO post_media (post_id, media_type, media_url) VALUES ($1, $2, $3)",
-            [postId, mediaType, mediaUrl]
-          );
-        }
-      }
-    }
+// Get all posts
+router.get("/", authMiddleware, async (req, res) => {
+  try {
+    const { limit = 10, offset = 0 } = req.query;
+    const { userId, role } = req.user;
 
-    // Insert poll options if present
-    if (pollOptions) {
-      let parsedPollOptions;
-
-      // Handle both JSON string and array formats
-      if (typeof pollOptions === "string") {
-        try {
-          parsedPollOptions = JSON.parse(pollOptions);
-        } catch (parseError) {
-          console.warn("Invalid poll options JSON:", pollOptions);
-          parsedPollOptions = [];
-        }
-      } else if (Array.isArray(pollOptions)) {
-        parsedPollOptions = pollOptions;
-      } else {
-        parsedPollOptions = [];
-      }
-
-      if (Array.isArray(parsedPollOptions) && parsedPollOptions.length > 0) {
-        for (const option of parsedPollOptions) {
-          if (option && typeof option === "string" && option.trim()) {
-            await client.query(
-              "INSERT INTO post_polls (post_id, option_text) VALUES ($1, $2)",
-              [postId, option.trim()]
-            );
-          }
-        }
-      }
-    }
-
-    await client.query("COMMIT");
-
-    res.json({
-      success: true,
-      message: "Post created successfully",
-      data: {
-        postId,
-        createdAt: postResult.rows[0].created_at,
+    const posts = await prisma.post.findMany({
+      take: parseInt(limit),
+      skip: parseInt(offset),
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        post_media: true, // ✅ Include related media
       },
     });
- } catch (error) {
-  await client.query("ROLLBACK");
-  console.error("❌ Error creating post:", error); // ✅ ADD THIS LINE
-  return res.status(500).json({
-    success: false,
-    message: "Server Error",
-    backendMessage: error.message, // ✅ ADD THIS TOO
-  });
-} finally {
-    client.release();
-  }
-});
 
-// Get posts feed (all posts or specific user's posts)
-router.get("/", auth, async (req, res) => {
-  try {
-    const { userId, userType, limit = 20, offset = 0 } = req.query;
+    // Enhance posts with author information
+    const enhancedPosts = await Promise.all(
+      posts.map(async (post) => {
+        let authorInfo = null;
 
-    let whereClause = "";
-    let queryParams = [limit, offset];
-
-    if (userId && userType) {
-      const userInfo = getUserTypeAndId({ role: userType, id: userId });
-      whereClause = `WHERE p.${userInfo.column} = $3`;
-      queryParams.push(userInfo.value);
-    }
-
-    const postsQuery = `
-      SELECT 
-        p.post_id,
-        p.content,
-        p.created_at,
-        p.student_id,
-        p.college_id,
-        p.industry_id,
-        p.alumni_id,
-        p.startup_id,
-        COUNT(*) OVER() as total_count,
-        COALESCE(
-          ARRAY_AGG(
-            CASE WHEN pm.media_id IS NOT NULL THEN
-              json_build_object(
-                'media_id', pm.media_id,
-                'media_type', pm.media_type,
-                'media_url', pm.media_url
-              )
-            END
-          ) FILTER (WHERE pm.media_id IS NOT NULL),
-          '{}'
-        ) as media,
-        COALESCE(
-          ARRAY_AGG(
-            CASE WHEN pp.poll_id IS NOT NULL THEN
-              json_build_object(
-                'poll_id', pp.poll_id,
-                'option_text', pp.option_text
-              )
-            END
-          ) FILTER (WHERE pp.poll_id IS NOT NULL),
-          '{}'
-        ) as poll_options,
-        COUNT(DISTINCT pr.reaction_id) as reaction_count,
-        COUNT(DISTINCT pc.comment_id) as comment_count,
-        COUNT(DISTINCT ps.share_id) as share_count
-      FROM posts p
-      LEFT JOIN post_media pm ON p.post_id = pm.post_id
-      LEFT JOIN post_polls pp ON p.post_id = pp.post_id
-      LEFT JOIN post_reactions pr ON p.post_id = pr.post_id
-      LEFT JOIN post_comments pc ON p.post_id = pc.post_id
-      LEFT JOIN post_shares ps ON p.post_id = ps.post_id
-      ${whereClause}
-      GROUP BY p.post_id
-      ORDER BY p.created_at DESC
-      LIMIT $1 OFFSET $2
-    `;
-
-    const postsResult = await pool.query(postsQuery, queryParams);
-
-    // Get user details for each post
-    const postsWithUserDetails = await Promise.all(
-      postsResult.rows.map(async (post) => {
-        let userDetails = null;
-        let userType = null;
-        let userId = null;
-
-        // Determine which user type created this post
-        if (post.student_id) {
-          userType = "student";
-          userId = post.student_id;
-        } else if (post.college_id) {
-          userType = "college";
-          userId = post.college_id;
-        } else if (post.industry_id) {
-          userType = "industry";
-          userId = post.industry_id;
-        } else if (post.alumni_id) {
-          userType = "alumni";
-          userId = post.alumni_id;
-        } else if (post.startup_id) {
-          userType = "startup";
-          userId = post.startup_id;
-        }
-
-        if (userType && userId) {
-          userDetails = await getUserDetails(userType, userId);
+        // Get author info based on role and ID
+        try {
+          switch (post.authorType.toLowerCase()) {
+            case "student":
+              authorInfo = await prisma.student.findUnique({
+                where: { id: post.authorId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = `${authorInfo.firstName || ""} ${
+                  authorInfo.lastName || ""
+                }`.trim();
+                authorInfo.userType = "student";
+              }
+              break;
+            case "college":
+              authorInfo = await prisma.college.findUnique({
+                where: { id: post.authorId },
+                select: {
+                  id: true,
+                  name: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = authorInfo.name;
+                authorInfo.userType = "college";
+              }
+              break;
+            case "industry":
+              authorInfo = await prisma.industry.findUnique({
+                where: { id: post.authorId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  companyName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.companyName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "industry";
+              }
+              break;
+            case "startup":
+              authorInfo = await prisma.startup.findUnique({
+                where: { id: post.authorId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  startupName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.startupName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "startup";
+              }
+              break;
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching author info for post ${post.post_id}:`,
+            error
+          );
         }
 
         return {
           ...post,
-          user: userDetails,
-          userType,
+          author: authorInfo,
         };
       })
     );
 
-    res.json({
+    // Add interaction data (likes, comments, shares, user's like status)
+    const postsWithInteractions = await addInteractionData(
+      enhancedPosts,
+      userId,
+      role
+    );
+
+    res.status(200).json({
       success: true,
-      data: postsWithUserDetails,
+      data: postsWithInteractions,
+      pagination: {
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        total: postsWithInteractions.length,
+      },
     });
   } catch (error) {
-    console.error("Error fetching posts:", error);
+    console.error("Get posts error:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch posts",
+      message: "Failed to get posts",
       error: error.message,
     });
   }
 });
 
 // Get current user's posts
-router.get("/my-posts", auth, async (req, res) => {
+router.get("/my", authMiddleware, async (req, res) => {
   try {
-    const userInfo = getUserTypeAndId(req.user);
-    const { limit = 20, offset = 0 } = req.query;
+    const { userId, role } = req.user;
+    const { limit = 10, offset = 0 } = req.query;
 
-    // First check if posts table exists
-    const tableExistsQuery = `
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = 'posts'
-      );
-    `;
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: userId,
+        authorType: role.toUpperCase(),
+      },
+      take: parseInt(limit),
+      skip: parseInt(offset),
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        post_media: true, // ✅ Include related media
+        post_reactions: true,
+        post_comments: true,
+        post_shares: true,
+      },
+    });
 
-    const tableExists = await pool.query(tableExistsQuery);
+    // Enhance posts with author information (current user)
+    const enhancedPosts = await Promise.all(
+      posts.map(async (post) => {
+        let authorInfo = null;
 
-    if (!tableExists.rows[0].exists) {
-      return res.json({
-        success: true,
-        data: [],
-        message: "Posts table not found. Please run database migrations.",
-      });
-    }
+        // Get current user's info based on role
+        try {
+          switch (role.toLowerCase()) {
+            case "student":
+              authorInfo = await prisma.student.findUnique({
+                where: { id: userId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = `${authorInfo.firstName || ""} ${
+                  authorInfo.lastName || ""
+                }`.trim();
+                authorInfo.userType = "student";
+              }
+              break;
+            case "college":
+              authorInfo = await prisma.college.findUnique({
+                where: { id: userId },
+                select: {
+                  id: true,
+                  name: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = authorInfo.name;
+                authorInfo.userType = "college";
+              }
+              break;
+            case "industry":
+              authorInfo = await prisma.industry.findUnique({
+                where: { id: userId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  companyName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.companyName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "industry";
+              }
+              break;
+            case "startup":
+              authorInfo = await prisma.startup.findUnique({
+                where: { id: userId },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  startupName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.startupName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "startup";
+              }
+              break;
+          }
+        } catch (error) {
+          console.error(`Error fetching current user info:`, error);
+        }
 
-    const postsQuery = `
-      SELECT 
-        p.post_id,
-        p.content,
-        p.created_at,
-        COUNT(*) OVER() as total_count,
-        COALESCE(
-          ARRAY_AGG(
-            CASE WHEN pm.media_id IS NOT NULL THEN
-              json_build_object(
-                'media_id', pm.media_id,
-                'media_type', pm.media_type,
-                'media_url', pm.media_url
-              )
-            END
-          ) FILTER (WHERE pm.media_id IS NOT NULL),
-          '{}'
-        ) as media,
-        COALESCE(
-          ARRAY_AGG(
-            CASE WHEN pp.poll_id IS NOT NULL THEN
-              json_build_object(
-                'poll_id', pp.poll_id,
-                'option_text', pp.option_text
-              )
-            END
-          ) FILTER (WHERE pp.poll_id IS NOT NULL),
-          '{}'
-        ) as poll_options,
-        COUNT(DISTINCT pr.reaction_id) as reaction_count,
-        COUNT(DISTINCT pc.comment_id) as comment_count,
-        COUNT(DISTINCT ps.share_id) as share_count
-      FROM posts p
-      LEFT JOIN post_media pm ON p.post_id = pm.post_id
-      LEFT JOIN post_polls pp ON p.post_id = pp.post_id
-      LEFT JOIN post_reactions pr ON p.post_id = pr.post_id
-      LEFT JOIN post_comments pc ON p.post_id = pc.post_id
-      LEFT JOIN post_shares ps ON p.post_id = ps.post_id
-      WHERE p.${userInfo.column} = $1
-      GROUP BY p.post_id
-      ORDER BY p.created_at DESC
-      LIMIT $2 OFFSET $3
-    `;
+        return {
+          ...post,
+          author: authorInfo,
+        };
+      })
+    );
 
-    const result = await pool.query(postsQuery, [
-      userInfo.value,
-      limit,
-      offset,
-    ]);
+    // Add interaction data
+    const postsWithInteractions = await addInteractionData(
+      enhancedPosts,
+      userId,
+      role
+    );
 
-    // Add user details to each post (since these are all from the same user)
-    const userDetails = await getUserDetails(req.user.role, req.user.id);
-
-    const postsWithUserDetails = result.rows.map((post) => ({
-      ...post,
-      user: userDetails,
-      userType: req.user.role,
-    }));
-
-    res.json({
+    res.status(200).json({
       success: true,
-      data: postsWithUserDetails,
+      data: postsWithInteractions,
+      pagination: {
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        total: postsWithInteractions.length,
+      },
     });
   } catch (error) {
-    console.error("Error fetching user posts:", error);
-
-    // If the error is about missing tables, return empty array
-    if (
-      error.message.includes("relation") &&
-      error.message.includes("does not exist")
-    ) {
-      return res.json({
-        success: true,
-        data: [],
-        message: "Posts tables not found. Please run database migrations.",
-      });
-    }
-
+    console.error("Get my posts error:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch user posts",
+      message: "Failed to get your posts",
       error: error.message,
     });
   }
 });
 
-// React to a post
-router.post("/:postId/react", auth, async (req, res) => {
+// Get posts by user ID and role
+router.get("/user/:userId/:role", authMiddleware, async (req, res) => {
   try {
-    const { postId } = req.params;
-    const { reactionType } = req.body; // 'like', 'love', 'share', 'wow', 'sad'
-    const userInfo = getUserTypeAndId(req.user);
+    const { userId, role } = req.params;
+    const { limit = 10, offset = 0 } = req.query;
 
-    // Validate reaction type
-    const validReactionTypes = ["like", "love", "share", "wow", "sad"];
-    if (!validReactionTypes.includes(reactionType)) {
+    // Validate role
+    const validRoles = ["STUDENT", "COLLEGE", "INDUSTRY", "STARTUP", "ALUMNI"];
+    if (!validRoles.includes(role.toUpperCase())) {
       return res.status(400).json({
         success: false,
-        message: "Invalid reaction type",
+        message: "Invalid role specified",
       });
     }
 
-    // Check if post exists
-    const postExists = await pool.query(
-      "SELECT post_id FROM posts WHERE post_id = $1",
-      [postId]
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: parseInt(userId),
+        authorType: role.toUpperCase(),
+      },
+      take: parseInt(limit),
+      skip: parseInt(offset),
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        post_media: true, // ✅ Include related media
+        post_reactions: true,
+        post_comments: true,
+        post_shares: true,
+      },
+    });
+
+    // Enhance posts with author information
+    const enhancedPosts = await Promise.all(
+      posts.map(async (post) => {
+        let authorInfo = null;
+
+        // Get author info based on role and ID
+        try {
+          switch (role.toLowerCase()) {
+            case "student":
+              authorInfo = await prisma.student.findUnique({
+                where: { id: parseInt(userId) },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = `${authorInfo.firstName || ""} ${
+                  authorInfo.lastName || ""
+                }`.trim();
+                authorInfo.userType = "student";
+              }
+              break;
+            case "college":
+              authorInfo = await prisma.college.findUnique({
+                where: { id: parseInt(userId) },
+                select: {
+                  id: true,
+                  name: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName = authorInfo.name;
+                authorInfo.userType = "college";
+              }
+              break;
+            case "industry":
+              authorInfo = await prisma.industry.findUnique({
+                where: { id: parseInt(userId) },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  companyName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.companyName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "industry";
+              }
+              break;
+            case "startup":
+              authorInfo = await prisma.startup.findUnique({
+                where: { id: parseInt(userId) },
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  startupName: true,
+                  profilePicture: true,
+                  email: true,
+                },
+              });
+              if (authorInfo) {
+                authorInfo.fullName =
+                  authorInfo.startupName ||
+                  `${authorInfo.firstName || ""} ${
+                    authorInfo.lastName || ""
+                  }`.trim();
+                authorInfo.userType = "startup";
+              }
+              break;
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching author info for user ${userId}:`,
+            error
+          );
+        }
+
+        return {
+          ...post,
+          author: authorInfo,
+        };
+      })
     );
 
-    if (postExists.rows.length === 0) {
+    // Add interaction data for the requesting user
+    const { userId: requestingUserId, role: requestingUserRole } = req.user;
+    const postsWithInteractions = await addInteractionData(
+      enhancedPosts,
+      requestingUserId,
+      requestingUserRole
+    );
+
+    res.status(200).json({
+      success: true,
+      data: postsWithInteractions,
+      pagination: {
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        total: postsWithInteractions.length,
+      },
+    });
+  } catch (error) {
+    console.error("Get user posts error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get user posts",
+      error: error.message,
+    });
+  }
+});
+
+// Get a specific post
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const post = await prisma.post.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        post_media: true, // ✅ Include related media
+        post_reactions: true,
+        post_comments: true,
+        post_shares: true,
+      },
+    });
+
+    if (!post) {
       return res.status(404).json({
         success: false,
         message: "Post not found",
       });
     }
 
-    // Check if user already reacted to this post and update/insert accordingly
-    // TODO: Replace with UPSERT once unique constraints are added via migration
-    const existingReaction = await pool.query(
-      `SELECT reaction_id FROM post_reactions WHERE post_id = $1 AND ${userInfo.column} = $2`,
-      [postId, userInfo.value]
-    );
-
-    let result;
-    if (existingReaction.rows.length > 0) {
-      // Update existing reaction
-      result = await pool.query(
-        `UPDATE post_reactions SET reaction_type = $1, created_at = CURRENT_TIMESTAMP 
-         WHERE reaction_id = $2 RETURNING reaction_id, reaction_type`,
-        [reactionType, existingReaction.rows[0].reaction_id]
-      );
-    } else {
-      // Create new reaction
-      result = await pool.query(
-        `INSERT INTO post_reactions (post_id, reaction_type, ${userInfo.column}) 
-         VALUES ($1, $2, $3) RETURNING reaction_id, reaction_type`,
-        [postId, reactionType, userInfo.value]
-      );
-    }
-
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "Reaction updated successfully",
-      data: {
-        reactionId: result.rows[0].reaction_id,
-        reactionType: result.rows[0].reaction_type,
-      },
+      data: post,
     });
   } catch (error) {
-    console.error("Error reacting to post:", error);
+    console.error("Get post error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get post",
+      error: error.message,
+    });
+  }
+});
+
+// Update a post
+router.put("/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, role } = req.user;
+    const { content, title } = req.body;
+
+    // Check if post exists and belongs to user
+    const existingPost = await prisma.post.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingPost) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    if (
+      existingPost.authorId !== userId ||
+      existingPost.authorType !== role.toUpperCase()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only update your own posts",
+      });
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: { id: parseInt(id) },
+      data: {
+        content: content || existingPost.content,
+        title: title !== undefined ? title : existingPost.title,
+        updatedAt: new Date(),
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Post updated successfully",
+      data: updatedPost,
+    });
+  } catch (error) {
+    console.error("Update post error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update post",
+      error: error.message,
+    });
+  }
+});
+
+// Delete a post
+router.delete("/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, role } = req.user;
+
+    // Check if post exists and belongs to user
+    const existingPost = await prisma.post.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingPost) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    if (
+      existingPost.authorId !== userId ||
+      existingPost.authorType !== role.toUpperCase()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only delete your own posts",
+      });
+    }
+
+    await prisma.post.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Post deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete post error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete post",
+      error: error.message,
+    });
+  }
+});
+
+// React to a post (placeholder for future implementation)
+router.post("/:id/react", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, role } = req.user;
+    const { reactionType = "like" } = req.body;
+
+    // Check if already reacted
+    const existingReaction = await prisma.post_reactions.findFirst({
+      where: {
+        post_id: parseInt(id),
+        reaction_type: reactionType,
+        [`${role.toLowerCase()}_id`]: userId,
+      },
+    });
+
+    if (existingReaction) {
+      // Unlike (Delete Reaction)
+      await prisma.post_reactions.delete({
+        where: { reaction_id: existingReaction.reaction_id },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Reaction removed",
+        action: "unliked",
+      });
+    } else {
+      // Add Reaction
+      const reactionData = {
+        post_id: parseInt(id),
+        reaction_type: reactionType,
+        [`${role.toLowerCase()}_id`]: userId,
+      };
+
+      await prisma.post_reactions.create({ data: reactionData });
+
+      return res.status(201).json({
+        success: true,
+        message: "Reaction added",
+        action: "liked",
+      });
+    }
+  } catch (error) {
+    console.error("React to post error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to react to post",
@@ -512,189 +750,333 @@ router.post("/:postId/react", auth, async (req, res) => {
   }
 });
 
-// Remove reaction from a post
-router.delete("/:postId/react", auth, async (req, res) => {
+router.get("/:id/reactions", authMiddleware, async (req, res) => {
   try {
-    const { postId } = req.params;
-    const userInfo = getUserTypeAndId(req.user);
-
-    const deleteResult = await pool.query(
-      `DELETE FROM post_reactions WHERE post_id = $1 AND ${userInfo.column} = $2 RETURNING reaction_id`,
-      [postId, userInfo.value]
-    );
-
-    if (deleteResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No reaction found to remove",
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Reaction removed successfully",
+    const { id } = req.params;
+    const reactions = await prisma.post_reactions.findMany({
+      where: { post_id: parseInt(id) },
     });
-  } catch (error) {
-    console.error("Error removing reaction:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to remove reaction",
-      error: error.message,
-    });
-  }
-});
 
-// Delete a post
-router.delete("/:postId", auth, async (req, res) => {
-  const client = await pool.connect();
+    // Enhance reactions with author information
+    const enhancedReactions = await Promise.all(
+      reactions.map(async (reaction) => {
+        let authorInfo = null;
 
-  try {
-    await client.query("BEGIN");
-
-    const { postId } = req.params;
-    const userInfo = getUserTypeAndId(req.user);
-
-    // Check if post belongs to the user
-    const postCheck = await client.query(
-      `SELECT post_id FROM posts WHERE post_id = $1 AND ${userInfo.column} = $2`,
-      [postId, userInfo.value]
-    );
-
-    if (postCheck.rows.length === 0) {
-      return res.status(403).json({
-        success: false,
-        message: "You can only delete your own posts",
-      });
-    }
-
-    // Get media files to delete from Cloudinary
-    let mediaResult;
-    try {
-      // Try to get media with cloudinary_public_id first
-      mediaResult = await client.query(
-        "SELECT media_url, cloudinary_public_id FROM post_media WHERE post_id = $1",
-        [postId]
-      );
-    } catch (columnError) {
-      // If column doesn't exist, fall back to the old structure
-      console.log(
-        `⚠️ cloudinary_public_id column not found in deletion, using fallback:`,
-        columnError.message
-      );
-      mediaResult = await client.query(
-        "SELECT media_url FROM post_media WHERE post_id = $1",
-        [postId]
-      );
-    }
-
-    // Delete post (cascade will handle related tables)
-    await client.query("DELETE FROM posts WHERE post_id = $1", [postId]);
-
-    // Delete media files from Cloudinary
-    for (const media of mediaResult.rows) {
-      try {
-        if (media.cloudinary_public_id) {
-          // Delete from Cloudinary using public_id
-          await deleteFromCloudinary(media.cloudinary_public_id);
-          console.log(
-            `Deleted media from Cloudinary: ${media.cloudinary_public_id}`
-          );
-        } else {
-          // Fallback: try to extract public_id from URL
-          const publicId = extractPublicId(media.media_url);
-          if (publicId) {
-            await deleteFromCloudinary(publicId);
-            console.log(
-              `Deleted media from Cloudinary (extracted): ${publicId}`
-            );
-          } else {
-            console.warn(
-              `Could not extract public_id from URL: ${media.media_url}`
-            );
+        // Determine which user type and get their info
+        if (reaction.student_id) {
+          authorInfo = await prisma.student.findUnique({
+            where: { id: reaction.student_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = `${authorInfo.firstName || ""} ${
+              authorInfo.lastName || ""
+            }`.trim();
+            authorInfo.userType = "student";
+          }
+        } else if (reaction.college_id) {
+          authorInfo = await prisma.college.findUnique({
+            where: { id: reaction.college_id },
+            select: { id: true, name: true, profilePicture: true },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = authorInfo.name;
+            authorInfo.userType = "college";
+          }
+        } else if (reaction.industry_id) {
+          authorInfo = await prisma.industry.findUnique({
+            where: { id: reaction.industry_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              companyName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.companyName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "industry";
+          }
+        } else if (reaction.startup_id) {
+          authorInfo = await prisma.startup.findUnique({
+            where: { id: reaction.startup_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              startupName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.startupName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "startup";
+          }
+        } else if (reaction.alumni_id) {
+          authorInfo = await prisma.alumni.findUnique({
+            where: { id: reaction.alumni_id },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = "Alumni User";
+            authorInfo.userType = "alumni";
           }
         }
-      } catch (fileError) {
-        console.error(
-          `Error deleting media file from Cloudinary ${media.media_url}:`,
-          fileError
-        );
-        // Don't fail the entire operation if file deletion fails
-      }
-    }
 
-    await client.query("COMMIT");
+        return {
+          ...reaction,
+          author: authorInfo,
+        };
+      })
+    );
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "Post deleted successfully",
+      data: enhancedReactions,
     });
   } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Error deleting post:", error);
+    console.error("Get post reactions error:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to delete post",
+      message: "Failed to get post reactions",
       error: error.message,
     });
-  } finally {
-    client.release();
   }
 });
 
-// Add a comment to a post
-router.post("/:postId/comment", auth, async (req, res) => {
+router.get("/:id/comments", authMiddleware, async (req, res) => {
   try {
-    const { postId } = req.params;
-    const { content } = req.body;
-    const userInfo = getUserTypeAndId(req.user);
+    const { id } = req.params;
+    const { limit = 10, offset = 0 } = req.query;
 
-    if (!content || content.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Comment content is required",
-      });
-    }
+    const comments = await prisma.post_comments.findMany({
+      where: { post_id: parseInt(id) },
+      orderBy: { created_at: "desc" },
+      take: parseInt(limit),
+      skip: parseInt(offset),
+    });
 
-    // Check if post exists
-    const postExists = await pool.query(
-      "SELECT post_id FROM posts WHERE post_id = $1",
-      [postId]
+    // Enhance comments with author information
+    const enhancedComments = await Promise.all(
+      comments.map(async (comment) => {
+        let authorInfo = null;
+
+        // Determine which user type and get their info
+        if (comment.student_id) {
+          authorInfo = await prisma.student.findUnique({
+            where: { id: comment.student_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = `${authorInfo.firstName || ""} ${
+              authorInfo.lastName || ""
+            }`.trim();
+            authorInfo.userType = "student";
+          }
+        } else if (comment.college_id) {
+          authorInfo = await prisma.college.findUnique({
+            where: { id: comment.college_id },
+            select: { id: true, name: true, profilePicture: true },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = authorInfo.name;
+            authorInfo.userType = "college";
+          }
+        } else if (comment.industry_id) {
+          authorInfo = await prisma.industry.findUnique({
+            where: { id: comment.industry_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              companyName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.companyName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "industry";
+          }
+        } else if (comment.startup_id) {
+          authorInfo = await prisma.startup.findUnique({
+            where: { id: comment.startup_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              startupName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.startupName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "startup";
+          }
+        } else if (comment.alumni_id) {
+          authorInfo = await prisma.alumni.findUnique({
+            where: { id: comment.alumni_id },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = "Alumni User";
+            authorInfo.userType = "alumni";
+          }
+        }
+
+        return {
+          ...comment,
+          author: authorInfo,
+        };
+      })
     );
 
-    if (postExists.rows.length === 0) {
-      return res.status(404).json({
+    res.status(200).json({
+      success: true,
+      data: enhancedComments,
+    });
+  } catch (error) {
+    console.error("Get comments error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get comments",
+      error: error.message,
+    });
+  }
+});
+
+router.post("/:id/comments", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, role } = req.user;
+    const { commentText, mediaUrl = null } = req.body;
+
+    if (!commentText || !commentText.trim()) {
+      return res.status(400).json({
         success: false,
-        message: "Post not found",
+        message: "Comment text is required",
       });
     }
 
-    // Insert comment
-    const commentQuery = `
-      INSERT INTO post_comments (post_id, content, ${userInfo.column})
-      VALUES ($1, $2, $3)
-      RETURNING comment_id, content, created_at
-    `;
+    const commentData = {
+      post_id: parseInt(id),
+      comment_text: commentText.trim(),
+      media_url: mediaUrl,
+      [`${role.toLowerCase()}_id`]: userId,
+    };
 
-    const result = await pool.query(commentQuery, [
-      postId,
-      content.trim(),
-      userInfo.value,
-    ]);
+    const newComment = await prisma.post_comments.create({ data: commentData });
 
-    // Get user details for the comment
-    const userDetails = await getUserDetails(req.user.role, req.user.id);
+    // Get author info for the new comment
+    let authorInfo = null;
+    try {
+      switch (role.toLowerCase()) {
+        case "student":
+          authorInfo = await prisma.student.findUnique({
+            where: { id: userId },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = `${authorInfo.firstName || ""} ${
+              authorInfo.lastName || ""
+            }`.trim();
+            authorInfo.userType = "student";
+          }
+          break;
+        case "college":
+          authorInfo = await prisma.college.findUnique({
+            where: { id: userId },
+            select: { id: true, name: true, profilePicture: true },
+          });
+          if (authorInfo) {
+            authorInfo.fullName = authorInfo.name;
+            authorInfo.userType = "college";
+          }
+          break;
+        case "industry":
+          authorInfo = await prisma.industry.findUnique({
+            where: { id: userId },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              companyName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.companyName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "industry";
+          }
+          break;
+        case "startup":
+          authorInfo = await prisma.startup.findUnique({
+            where: { id: userId },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              startupName: true,
+              profilePicture: true,
+            },
+          });
+          if (authorInfo) {
+            authorInfo.fullName =
+              authorInfo.startupName ||
+              `${authorInfo.firstName || ""} ${
+                authorInfo.lastName || ""
+              }`.trim();
+            authorInfo.userType = "startup";
+          }
+          break;
+      }
+    } catch (error) {
+      console.error("Error fetching comment author info:", error);
+    }
 
-    res.json({
+    res.status(201).json({
       success: true,
       message: "Comment added successfully",
       data: {
-        ...result.rows[0],
-        user: userDetails,
-        userType: req.user.role,
+        ...newComment,
+        author: authorInfo,
       },
     });
   } catch (error) {
-    console.error("Error adding comment:", error);
+    console.error("Add comment error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to add comment",
@@ -703,236 +1085,49 @@ router.post("/:postId/comment", auth, async (req, res) => {
   }
 });
 
-// Get comments for a post
-router.get("/:postId/comments", auth, async (req, res) => {
-  try {
-    const { postId } = req.params;
-    const { limit = 20, offset = 0 } = req.query;
+router.delete(
+  "/:postId/comments/:commentId",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const { commentId } = req.params;
+      const { userId, role } = req.user;
 
-    // Check if post exists
-    const postExists = await pool.query(
-      "SELECT post_id FROM posts WHERE post_id = $1",
-      [postId]
-    );
+      const comment = await prisma.post_comments.findUnique({
+        where: { comment_id: parseInt(commentId) },
+      });
 
-    if (postExists.rows.length === 0) {
-      return res.status(404).json({
+      if (!comment) {
+        return res.status(404).json({
+          success: false,
+          message: "Comment not found",
+        });
+      }
+
+      if (comment[`${role.toLowerCase()}_id`] !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: "You can only delete your own comments",
+        });
+      }
+
+      await prisma.post_comments.delete({
+        where: { comment_id: parseInt(commentId) },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Comment deleted successfully",
+      });
+    } catch (error) {
+      console.error("Delete comment error:", error);
+      res.status(500).json({
         success: false,
-        message: "Post not found",
+        message: "Failed to delete comment",
+        error: error.message,
       });
     }
-
-    const commentsQuery = `
-      SELECT 
-        pc.comment_id,
-        pc.content,
-        pc.created_at,
-        pc.student_id,
-        pc.college_id,
-        pc.industry_id,
-        pc.alumni_id,
-        pc.startup_id,
-        COUNT(*) OVER() as total_count
-      FROM post_comments pc
-      WHERE pc.post_id = $1
-      ORDER BY pc.created_at ASC
-      LIMIT $2 OFFSET $3
-    `;
-
-    const result = await pool.query(commentsQuery, [postId, limit, offset]);
-
-    // Get user details for each comment
-    const commentsWithUserDetails = await Promise.all(
-      result.rows.map(async (comment) => {
-        let userDetails = null;
-        let userType = null;
-        let userId = null;
-
-        // Determine which user type created this comment
-        if (comment.student_id) {
-          userType = "student";
-          userId = comment.student_id;
-        } else if (comment.college_id) {
-          userType = "college";
-          userId = comment.college_id;
-        } else if (comment.industry_id) {
-          userType = "industry";
-          userId = comment.industry_id;
-        } else if (comment.alumni_id) {
-          userType = "alumni";
-          userId = comment.alumni_id;
-        } else if (comment.startup_id) {
-          userType = "startup";
-          userId = comment.startup_id;
-        }
-
-        if (userType && userId) {
-          userDetails = await getUserDetails(userType, userId);
-        }
-
-        return {
-          ...comment,
-          user: userDetails,
-          userType,
-        };
-      })
-    );
-
-    res.json({
-      success: true,
-      data: commentsWithUserDetails,
-    });
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch comments",
-      error: error.message,
-    });
   }
-});
-
-// Delete a comment
-router.delete("/:postId/comment/:commentId", auth, async (req, res) => {
-  try {
-    const { postId, commentId } = req.params;
-    const userInfo = getUserTypeAndId(req.user);
-
-    // Check if comment belongs to the user
-    const commentCheck = await pool.query(
-      `SELECT comment_id FROM post_comments WHERE comment_id = $1 AND post_id = $2 AND ${userInfo.column} = $3`,
-      [commentId, postId, userInfo.value]
-    );
-
-    if (commentCheck.rows.length === 0) {
-      return res.status(403).json({
-        success: false,
-        message: "You can only delete your own comments",
-      });
-    }
-
-    // Delete comment
-    await pool.query("DELETE FROM post_comments WHERE comment_id = $1", [
-      commentId,
-    ]);
-
-    res.json({
-      success: true,
-      message: "Comment deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error deleting comment:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete comment",
-      error: error.message,
-    });
-  }
-});
-
-// Get a specific post by ID
-router.get("/:postId", auth, async (req, res) => {
-  try {
-    const { postId } = req.params;
-
-    const postQuery = `
-      SELECT 
-        p.post_id,
-        p.content,
-        p.created_at,
-        p.student_id,
-        p.college_id,
-        p.industry_id,
-        p.alumni_id,
-        p.startup_id,
-        COALESCE(
-          ARRAY_AGG(
-            CASE WHEN pm.media_id IS NOT NULL THEN
-              json_build_object(
-                'media_id', pm.media_id,
-                'media_type', pm.media_type,
-                'media_url', pm.media_url
-              )
-            END
-          ) FILTER (WHERE pm.media_id IS NOT NULL),
-          '{}'
-        ) as media,
-        COALESCE(
-          ARRAY_AGG(
-            CASE WHEN pp.poll_id IS NOT NULL THEN
-              json_build_object(
-                'poll_id', pp.poll_id,
-                'option_text', pp.option_text
-              )
-            END
-          ) FILTER (WHERE pp.poll_id IS NOT NULL),
-          '{}'
-        ) as poll_options,
-        COUNT(DISTINCT pr.reaction_id) as reaction_count,
-        COUNT(DISTINCT pc.comment_id) as comment_count,
-        COUNT(DISTINCT ps.share_id) as share_count
-      FROM posts p
-      LEFT JOIN post_media pm ON p.post_id = pm.post_id
-      LEFT JOIN post_polls pp ON p.post_id = pp.post_id
-      LEFT JOIN post_reactions pr ON p.post_id = pr.post_id
-      LEFT JOIN post_comments pc ON p.post_id = pc.post_id
-      LEFT JOIN post_shares ps ON p.post_id = ps.post_id
-      WHERE p.post_id = $1
-      GROUP BY p.post_id
-    `;
-
-    const result = await pool.query(postQuery, [postId]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
-    }
-
-    const post = result.rows[0];
-    let userDetails = null;
-    let userType = null;
-    let userId = null;
-
-    // Determine which user type created this post
-    if (post.student_id) {
-      userType = "student";
-      userId = post.student_id;
-    } else if (post.college_id) {
-      userType = "college";
-      userId = post.college_id;
-    } else if (post.industry_id) {
-      userType = "industry";
-      userId = post.industry_id;
-    } else if (post.alumni_id) {
-      userType = "alumni";
-      userId = post.alumni_id;
-    } else if (post.startup_id) {
-      userType = "startup";
-      userId = post.startup_id;
-    }
-
-    if (userType && userId) {
-      userDetails = await getUserDetails(userType, userId);
-    }
-
-    res.json({
-      success: true,
-      data: {
-        ...post,
-        user: userDetails,
-        userType,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching post:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch post",
-      error: error.message,
-    });
-  }
-});
+);
 
 module.exports = router;

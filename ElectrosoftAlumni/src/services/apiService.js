@@ -1697,6 +1697,262 @@ class ApiService {
     };
     return rolePages[role] || "/profile";
   }
+
+  // ==================== COLLEGE API METHODS ====================
+  // Following the same pattern as student methods
+
+  // College File upload methods
+  async uploadCollegeLogo(formData) {
+    if (!formData || !formData.has("logoImage")) {
+      throw new Error("No logo file uploaded");
+    }
+    return this.api.post("/colleges/logo-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
+  async uploadCollegeCover(formData) {
+    if (!formData || !formData.has("coverImage")) {
+      throw new Error("No cover file uploaded");
+    }
+    return this.api.post("/colleges/cover-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
+  // College Ping/Connection methods
+  async sendCollegePingRequest(collegeId) {
+    try {
+      const response = await this.api.post(`/colleges/ping/${collegeId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to send ping request to college"
+      );
+    }
+  }
+
+  async getCollegePingRequests() {
+    try {
+      const response = await this.api.get("/colleges/ping-requests");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college ping requests"
+      );
+    }
+  }
+
+  async acceptCollegePingRequest(requestId) {
+    try {
+      const response = await this.api.put(`/colleges/ping/${requestId}/accept`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to accept college ping request"
+      );
+    }
+  }
+
+  async rejectCollegePingRequest(requestId) {
+    try {
+      const response = await this.api.put(`/colleges/ping/${requestId}/reject`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to reject college ping request"
+      );
+    }
+  }
+
+  async getCollegeConnections() {
+    try {
+      const response = await this.api.get("/colleges/connections");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college connections"
+      );
+    }
+  }
+
+  async getCollegeConnectionCount() {
+    try {
+      const response = await this.api.get("/colleges/connections/count");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college connection count"
+      );
+    }
+  }
+
+  async checkCollegePingStatus(collegeId) {
+    try {
+      const response = await this.api.get(`/colleges/ping-status/${collegeId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to check college ping status"
+      );
+    }
+  }
+
+  // College Programs methods (equivalent to student projects)
+  async getCollegePrograms() {
+    try {
+      console.log("🔍 API: Fetching college programs...");
+      const response = await this.api.get("/colleges/programs");
+      console.log("📊 API: College programs response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ API: Error fetching college programs:", error);
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college programs"
+      );
+    }
+  }
+
+  async createCollegeProgram(programData) {
+    try {
+      const response = await this.api.post("/colleges/programs", programData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create college program"
+      );
+    }
+  }
+
+  async updateCollegeProgram(programId, programData) {
+    try {
+      const response = await this.api.put(`/colleges/programs/${programId}`, programData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college program"
+      );
+    }
+  }
+
+  async deleteCollegeProgram(programId) {
+    try {
+      const response = await this.api.delete(`/colleges/programs/${programId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete college program"
+      );
+    }
+  }
+
+  // College Events methods
+  async getCollegeEvents() {
+    try {
+      const response = await this.api.get("/colleges/events");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college events"
+      );
+    }
+  }
+
+  async createCollegeEvent(eventData) {
+    try {
+      const response = await this.api.post("/colleges/events", eventData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create college event"
+      );
+    }
+  }
+
+  // College Faculty methods
+  async getCollegeFaculty() {
+    try {
+      const response = await this.api.get("/colleges/faculty");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college faculty"
+      );
+    }
+  }
+
+  async addCollegeFaculty(facultyData) {
+    try {
+      const response = await this.api.post("/colleges/faculty", facultyData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to add college faculty"
+      );
+    }
+  }
+
+  // College Alumni methods
+  async getCollegeAlumni() {
+    try {
+      const response = await this.api.get("/colleges/alumni");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college alumni"
+      );
+    }
+  }
+
+  // College Placement methods
+  async getCollegePlacements() {
+    try {
+      const response = await this.api.get("/colleges/placements");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college placements"
+      );
+    }
+  }
+
+  async addCollegePlacement(placementData) {
+    try {
+      const response = await this.api.post("/colleges/placements", placementData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to add college placement"
+      );
+    }
+  }
+
+  // College Reviews methods
+  async getCollegeReviews() {
+    try {
+      const response = await this.api.get("/colleges/reviews");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college reviews"
+      );
+    }
+  }
+
+  async addCollegeReview(reviewData) {
+    try {
+      const response = await this.api.post("/colleges/reviews", reviewData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to add college review"
+      );
+    }
+  }
 }
 
 // Create API objects for backward compatibility

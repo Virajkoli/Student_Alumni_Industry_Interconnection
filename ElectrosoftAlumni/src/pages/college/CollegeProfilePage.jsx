@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import apiService from "../../services/apiService";
 import CollegeProfileHeader from "../../components/college/CollegeProfileHeader";
 import CollegeNotifications from "../../components/college/CollegeNotifications";
 import CollegeInformation from "../../components/college/sections/CollegeInformation";
@@ -9,6 +11,7 @@ import Downloads from "../../components/college/sections/Downloads";
 import Admission from "../../components/college/sections/Admission";
 import Placement from "../../components/college/sections/Placement";
 import Events from "../../components/college/sections/Events";
+import StudentReviews from "../../components/college/sections/StudentReviews";
 // import Facilities from "../../components/college/sections/Facilities";
 import Alumni from "../../components/college/sections/Alumni";
 import Hostel from "../../components/college/sections/Hostel";
@@ -22,8 +25,9 @@ const NAV_OPTIONS = [
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
   { id: "downloads", name: "Downloads" },
-  { id: "hostel", name: "Hostel/Campus" }, // Added Hostel/Campus tab
-  { id: "events", name: "Events" }, // Added Events tab
+  { id: "hostel", name: "Hostel/Campus" },
+  { id: "alumni", name: "Alumni" },
+  { id: "events", name: "Events" },
 ];
 
 // Mock external review form responses (in a real app, this would come from an API/database)
@@ -97,6 +101,7 @@ const calculateAverageRating = (responses) => {
 };
 
 const CollegeProfilePage = () => {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(NAV_OPTIONS[0].id);
   const [externalRatings, setExternalRatings] = useState(() =>
@@ -104,6 +109,43 @@ const CollegeProfilePage = () => {
   );
   const [showSectionForm, setShowSectionForm] = useState(null);
   const [sectionFormData, setSectionFormData] = useState({});
+  
+  // College profile data state
+  const [collegeProfile, setCollegeProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
+
+  // Fetch college profile data
+  useEffect(() => {
+    const fetchCollegeProfile = async () => {
+      try {
+        setLoading(true);
+        
+        // Check if current user is a college and if this is their own profile
+        if (user && user.role === 'college') {
+          // This is the college's own profile page
+          setIsOwner(true);
+          const response = await apiService.getCollegeProfile();
+          console.log("✅ College Profile Data:", response);
+          setCollegeProfile(response.data || response);
+        } else {
+          // For viewing other college profiles, you would get college ID from URL params
+          // For now, we'll use a placeholder
+          setIsOwner(false);
+          setCollegeProfile(null);
+        }
+      } catch (error) {
+        console.error("Error fetching college profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchCollegeProfile();
+    }
+  }, [user]);
+
   const [formData, setFormData] = useState({
     "college-info": {
       name: "Indian Institute of Technology Kanpur (IIT Kanpur)",
@@ -597,25 +639,10 @@ const CollegeProfilePage = () => {
         );
       case "review":
         return (
-          <div className="bg-white rounded-xl shadow p-6 mb-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                Student Reviews
-              </h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("review")}
-              >
-                Edit
-              </button>
-            </div>
-            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-              {formData["review"].comments &&
-                formData["review"].comments.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-            </ul>
-          </div>
+          <StudentReviews
+            data={formData["review"]}
+            onEdit={() => openSectionForm("review")}
+          />
         );
       case "hostel":
         return (
@@ -669,14 +696,23 @@ const CollegeProfilePage = () => {
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-6">
         {/* Profile Header Section with integrated navigation */}
         <div className="w-full mb-8">
-          <CollegeProfileHeader
-            name="IIT Kanpur"
-            location="Kanpur, Uttar Pradesh"
-            logo="/ElectrosoftAlumni/Features/Logo.jpg"
-            background="/college-bg.jpg"
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
+          {loading ? (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+              <div className="animate-pulse">
+                <div className="h-48 bg-gray-200 rounded mb-4"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          ) : (
+            <CollegeProfileHeader
+              profileData={collegeProfile}
+              onProfileUpdate={(updatedData) => setCollegeProfile(updatedData)}
+              onNavigationChange={setActiveTab}
+              isOwner={isOwner}
+              activeTab={activeTab}
+            />
+          )}
         </div>
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Main Content Area - 70% width */}

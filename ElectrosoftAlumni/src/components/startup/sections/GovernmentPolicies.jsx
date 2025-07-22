@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Edit, Save, X, Building, FileText, TrendingUp } from "lucide-react";
 
-const GovernmentPolicies = () => {
+const GovernmentPolicies = ({ isOwner, startupData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingPolicyIndex, setEditingPolicyIndex] = useState(null);
   const [content, setContent] = useState({
@@ -108,8 +108,6 @@ const GovernmentPolicies = () => {
           <h1 className="text-2xl font-bold text-gray-900">{content.title}</h1>
           <p className="text-gray-600 mt-2">{content.description}</p>
         </div>
-
-       
       </div>
 
       {/* Tax Benefits Overview */}
@@ -156,7 +154,9 @@ const GovernmentPolicies = () => {
                         <input
                           type="text"
                           value={policy.title}
-                          onChange={(e) => updatePolicy(index, "title", e.target.value)}
+                          onChange={(e) =>
+                            updatePolicy(index, "title", e.target.value)
+                          }
                           className="w-full text-xl font-semibold p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           placeholder="Policy title"
                         />
@@ -167,7 +167,9 @@ const GovernmentPolicies = () => {
                         </label>
                         <textarea
                           value={policy.description}
-                          onChange={(e) => updatePolicy(index, "description", e.target.value)}
+                          onChange={(e) =>
+                            updatePolicy(index, "description", e.target.value)
+                          }
                           rows="3"
                           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                           placeholder="Policy description"
@@ -180,7 +182,16 @@ const GovernmentPolicies = () => {
                         <input
                           type="text"
                           value={policy.benefits.join(", ")}
-                          onChange={(e) => updatePolicy(index, "benefits", e.target.value.split(",").map(b => b.trim()).filter(b => b.length > 0))}
+                          onChange={(e) =>
+                            updatePolicy(
+                              index,
+                              "benefits",
+                              e.target.value
+                                .split(",")
+                                .map((b) => b.trim())
+                                .filter((b) => b.length > 0)
+                            )
+                          }
                           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Benefit 1, Benefit 2, Benefit 3"
                         />
@@ -191,7 +202,9 @@ const GovernmentPolicies = () => {
                         </label>
                         <textarea
                           value={policy.eligibility}
-                          onChange={(e) => updatePolicy(index, "eligibility", e.target.value)}
+                          onChange={(e) =>
+                            updatePolicy(index, "eligibility", e.target.value)
+                          }
                           rows="2"
                           className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                           placeholder="Eligibility criteria"
@@ -254,7 +267,7 @@ const GovernmentPolicies = () => {
                       <span>Cancel</span>
                     </button>
                   </div>
-                ) : !isEditing ? (
+                ) : !isEditing && isOwner ? (
                   <button
                     onClick={() => handleEditPolicy(index)}
                     className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 shadow-sm border border-blue-200"

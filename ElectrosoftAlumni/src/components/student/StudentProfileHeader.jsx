@@ -26,6 +26,7 @@ const StudentProfileHeader = ({
   customNavigations,
   onCustomNavigationUpdate,
   isOwner = false,
+  sectionsData = {}, // Add sectionsData prop
 }) => {
   // Profile edit state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -432,14 +433,68 @@ const StudentProfileHeader = ({
     }
   }, [onProfileUpdate]);
 
+  // Function to refresh profile completion - can be called externally
+  const refreshProfileCompletion = () => {
+    if (!profileData) return;
+
+    // Calculate profile completion based on basic info and all sections
+    let total = 10; // Total number of profile sections to check
+    let completed = 0;
+
+    // Basic profile information (5 fields)
+    if (profileData.firstName) completed++;
+    if (profileData.lastName) completed++;
+    if (profileData.collegeName) completed++;
+    if (profileData.location || profileData.city) completed++;
+    if (profileData.headline || profileData.interestedField) completed++;
+
+    // Profile sections (5 sections) - check if they have any data
+    if (profileData.about) completed++; // About section
+    if (sectionsData.experiences && sectionsData.experiences.length > 0)
+      completed++; // Experience
+    if (sectionsData.education && sectionsData.education.length > 0)
+      completed++; // Education
+    if (sectionsData.skills && sectionsData.skills.length > 0) completed++; // Skills
+    if (sectionsData.projects && sectionsData.projects.length > 0) completed++; // Projects
+
+    const progressPercent = Math.round((completed / total) * 100);
+    console.log(
+      `📊 Profile Completion: ${completed}/${total} = ${progressPercent}%`,
+      {
+        basic: {
+          firstName: !!profileData.firstName,
+          lastName: !!profileData.lastName,
+          collegeName: !!profileData.collegeName,
+          location: !!(profileData.location || profileData.city),
+          headline: !!(profileData.headline || profileData.interestedField),
+        },
+        sections: {
+          about: !!profileData.about,
+          experiences: sectionsData.experiences?.length || 0,
+          education: sectionsData.education?.length || 0,
+          skills: sectionsData.skills?.length || 0,
+          projects: sectionsData.projects?.length || 0,
+        },
+      }
+    );
+
+    setUser((prev) => ({ ...prev, profileCompletion: progressPercent }));
+  };
+
+  useEffect(() => {
+    refreshProfileCompletion();
+  }, [profileData, sectionsData]);
+
   // Also create a global function that can be called from anywhere
   useEffect(() => {
-    // Store the refresh function globally so it can be called from ProjectsSection
+    // Store the refresh functions globally so they can be called from section components
     window.refreshStudentProfileProjects = refreshProjectData;
+    window.refreshProfileCompletion = refreshProfileCompletion;
 
     return () => {
       // Clean up
       delete window.refreshStudentProfileProjects;
+      delete window.refreshProfileCompletion;
     };
   }, []);
 
@@ -481,8 +536,12 @@ const StudentProfileHeader = ({
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("focus", handleFocus);
     };
@@ -658,7 +717,7 @@ const StudentProfileHeader = ({
         {/* Profile Info */}
         <div className="pt-16 px-8 pb-6 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex-1">
+            <div className="flex-col">
               <h3 className="text-2xl font-bold text-gray-900">
                 {editData?.firstName ||
                   editData?.basicInfo?.first_name ||
@@ -701,6 +760,40 @@ const StudentProfileHeader = ({
                 </p>
               )}
             </div>
+
+            {/* Center: Enhanced Progress Bar */}
+            {isOwner && (
+              <div className="flex flex-col items-center w-64">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm text-gray-700 font-medium">
+                    Profile Completion
+                  </span>
+                  <span className="text-sm font-bold text-blue-600">
+                    {user?.profileCompletion || 0}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+                  <div
+                    className={`h-3 rounded-full transition-all duration-500 ${
+                      (user?.profileCompletion || 0) < 30
+                        ? "bg-red-500"
+                        : (user?.profileCompletion || 0) < 70
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
+                    } shadow-sm`}
+                    style={{ width: `${user?.profileCompletion || 0}%` }}
+                  ></div>
+                </div>
+                <span className="text-xs text-gray-500 mt-1">
+                  {(user?.profileCompletion || 0) < 50
+                    ? "Complete your profile to get noticed!"
+                    : (user?.profileCompletion || 0) < 90
+                    ? "Almost done! Add more sections."
+                    : "Excellent! Your profile is complete."}
+                </span>
+              </div>
+            )}
+
             <div className="flex flex-col items-start gap-2 sm:items-end">
               {/* Profile Info Edit Button - Above Connect button */}
               {isOwner && (
@@ -788,77 +881,60 @@ const StudentProfileHeader = ({
             className="flex items-center justify-around mt-6 pt-4 border-t"
             style={{ borderColor: "#DCE8F2" }}
           >
-            {/* Projects */}
-            <div className="flex flex-col items-center text-center">
-              <button
-                onClick={isOwner ? openProjectModal : undefined}
-                className={`${
-                  isOwner
-                    ? "hover:bg-gray-100 cursor-pointer"
-                    : "cursor-default"
-                } p-2 rounded-lg transition-colors`}
-                title={isOwner ? "View your projects" : undefined}
-              >
-                <span
-                  className="block text-2xl font-bold"
-                  style={{ color: "#1F2D3D" }}
-                >
-                  {projectCount}
-                </span>
-                <span
-                  className="block text-sm mt-1"
-                  style={{ color: "#1F2D3D", opacity: 0.7 }}
-                >
-                  Projects
-                </span>
-              </button>
-              {isOwner && (
+            <div className="text-left">
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={fetchProjectCount}
-                  className="mt-1 p-1 hover:bg-gray-100 rounded transition-colors"
-                  title="Refresh project count"
+                  onClick={isOwner ? openProjectModal : undefined}
+                  className={`${
+                    isOwner
+                      ? "hover:bg-gray-100 cursor-pointer"
+                      : "cursor-default"
+                  } p-2 rounded-lg transition-colors`}
+                  title={isOwner ? "View your projects" : undefined}
                 >
-                  <svg
-                    className="w-3 h-3 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  <span className="font-bold" style={{ color: "#1F2D3D" }}>
+                    {projectCount}
+                  </span>
+                  <span
+                    className="text-sm ml-1.5"
+                    style={{ color: "#1F2D3D", opacity: 0.7 }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
+                    Projects
+                  </span>
                 </button>
-              )}
+                {isOwner && (
+                  <button
+                    onClick={fetchProjectCount}
+                    className="p-1 hover:bg-gray-100 rounded transition-colors"
+                    title="Refresh project count"
+                  >
+                    <svg
+                      className="w-3 h-3 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
-
-            {/* Connections */}
-            <div className="flex flex-col items-center text-center">
-              <button
-                onClick={isOwner ? openConnectionModal : undefined}
-                className={`${
-                  isOwner
-                    ? "hover:bg-gray-100 cursor-pointer"
-                    : "cursor-default"
-                } p-2 rounded-lg transition-colors`}
-                title={isOwner ? "View your connections" : undefined}
+            <div className="text-left">
+              <span className="font-bold" style={{ color: "#1F2D3D" }}>
+                {connectionCount}
+              </span>
+              <span
+                className="text-sm ml-1.5"
+                style={{ color: "#1F2D3D", opacity: 0.7 }}
               >
-                <span
-                  className="block text-2xl font-bold"
-                  style={{ color: "#1F2D3D" }}
-                >
-                  {connectionCount}
-                </span>
-                <span
-                  className="block text-sm mt-1"
-                  style={{ color: "#1F2D3D", opacity: 0.7 }}
-                >
-                  Connections
-                </span>
-              </button>
+                Connections
+              </span>
             </div>
 
             {/* Rating */}
@@ -1409,7 +1485,10 @@ const StudentProfileHeader = ({
                   <textarea
                     value={newNavData.content}
                     onChange={(e) =>
-                      setNewNavData({ ...newNavData, content: e.target.value })
+                      setNewNavData({
+                        ...newNavData,
+                        content: e.target.value,
+                      })
                     }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
@@ -1420,7 +1499,10 @@ const StudentProfileHeader = ({
                     type="text"
                     value={newNavData.content}
                     onChange={(e) =>
-                      setNewNavData({ ...newNavData, content: e.target.value })
+                      setNewNavData({
+                        ...newNavData,
+                        content: e.target.value,
+                      })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     placeholder="Enter link URL"
@@ -1577,7 +1659,10 @@ const StudentProfileHeader = ({
                   <textarea
                     value={newNavData.content}
                     onChange={(e) =>
-                      setNewNavData({ ...newNavData, content: e.target.value })
+                      setNewNavData({
+                        ...newNavData,
+                        content: e.target.value,
+                      })
                     }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
@@ -1588,7 +1673,10 @@ const StudentProfileHeader = ({
                     type="text"
                     value={newNavData.content}
                     onChange={(e) =>
-                      setNewNavData({ ...newNavData, content: e.target.value })
+                      setNewNavData({
+                        ...newNavData,
+                        content: e.target.value,
+                      })
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     placeholder="Enter link URL"
@@ -1675,6 +1763,8 @@ const StudentProfileHeader = ({
                         <p className="text-sm text-gray-500 truncate">
                           {request.sender?.headline ||
                             request.sender?.collegeName}
+                          {request.sender?.headline ||
+                            request.sender?.collegeName}
                         </p>
                         <p className="text-xs text-gray-400">
                           {new Date(request.created_at).toLocaleDateString()}
@@ -1750,11 +1840,25 @@ const StudentProfileHeader = ({
                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                       />
                     </svg>
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                      />
+                    </svg>
                   </div>
                   <p className="text-gray-500 mb-4">No projects yet</p>
                   <p className="text-sm text-gray-400">
                     Add your first project in the Projects section to showcase
-                    your work
+                    your work Add your first project in the Projects section to
+                    showcase your work
                   </p>
                 </div>
               ) : (
@@ -1789,6 +1893,20 @@ const StudentProfileHeader = ({
                                     {tech}
                                   </span>
                                 ))}
+                              {(typeof project.technologies === "string"
+                                ? project.technologies.split(", ")
+                                : project.technologies || []
+                              )
+                                .slice(0, 3)
+                                .map((tech, index) => (
+                                  <span
+                                    key={index}
+                                    className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+
                               {(typeof project.technologies === "string"
                                 ? project.technologies.split(", ").length
                                 : project.technologies?.length || 0) > 3 && (

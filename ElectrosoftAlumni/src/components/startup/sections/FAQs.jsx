@@ -10,7 +10,7 @@ import {
   Search,
 } from "lucide-react";
 
-const FAQs = () => {
+const FAQs = ({ isOwner, startupData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);

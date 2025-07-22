@@ -9,7 +9,7 @@ import {
   Play,
 } from "lucide-react";
 
-const SuccessStories = () => {
+const SuccessStories = ({ isOwner, industryData }) => {
   const [editingId, setEditingId] = useState(null);
   const [stories, setStories] = useState([
     {
@@ -428,13 +428,15 @@ const SuccessStories = () => {
                           Featured
                         </span>
                       </div>
-                      <button
-                        onClick={() => handleEdit(story)}
-                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Edit Story"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
+                      {isOwner && (
+                        <button
+                          onClick={() => handleEdit(story)}
+                          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Edit Story"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
 
                     <h3 className="text-xl font-bold text-gray-900 mb-3">
@@ -607,13 +609,15 @@ const SuccessStories = () => {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {story.title}
                           </h3>
-                          <button
-                            onClick={() => handleEdit(story)}
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit Story"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
+                          {isOwner && (
+                            <button
+                              onClick={() => handleEdit(story)}
+                              className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Edit Story"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
 
                         <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">

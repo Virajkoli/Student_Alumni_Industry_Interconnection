@@ -218,7 +218,7 @@ const StudentSidebar = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         <h3 className="font-semibold text-gray-900 text-sm mb-4">Your Progress</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -244,7 +244,7 @@ const StudentSidebar = () => {
             <span className="text-xs font-medium text-gray-900">8</span>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

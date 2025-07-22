@@ -9,7 +9,7 @@ import {
   Upload,
 } from "lucide-react";
 
-const PostCreator = () => {
+const PostCreator = ({ isOwner, onPostCreated }) => {
   const [postText, setPostText] = useState("");
   const [attachedFiles, setAttachedFiles] = useState([]);
   const photoInputRef = useRef(null);

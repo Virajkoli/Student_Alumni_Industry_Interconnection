@@ -3,8 +3,7 @@ const prisma = require('../config/prisma');
 /**
  * College Profile Service
  * Service for college profile management and related operations
- * Note: College-specific profile section tables don't exist yet in the schema
- * This service handles basic college profile operations and can be extended
+ * Now includes all college profile section tables
  */
 
 class CollegeProfileService {
@@ -80,14 +79,416 @@ class CollegeProfileService {
   }
 
   // =============================================
-  // COLLEGE CAMPUSES (Related table exists)
+  // COMPREHENSIVE COLLEGE INFORMATION
+  // =============================================
+  
+  async getCollegeInformation(collegeId) {
+    try {
+      const college = await prisma.college.findUnique({
+        where: { id: collegeId },
+        include: {
+          about: true,
+          college_campuses_new: true,
+          college_information_new: true,
+          college_admissions_new: true,
+          college_academics_new: true,
+          college_infrastructure_new: true,
+          college_activities_new: true,
+          college_placements_new: true,
+          college_contact_new: true,
+          departments: true,
+          faculty: true,
+          programs: true,
+          alumni: true,
+          events: true,
+          facilities: true,
+          placements: true,
+          rankings: true,
+          admissions: true,
+          achievements: true,
+          affiliations: true,
+          certifications: true,
+          history: true,
+          research: true,
+          college_courses: true,
+          college_downloads: true,
+          college_fees: true,
+          college_hostels: true,
+          college_reviews: true
+        }
+      });
+      
+      if (!college) {
+        throw new Error('College not found');
+      }
+      
+      // Transform data to match frontend expectations
+      const transformedData = {
+        id: college.id,
+        name: college.name,
+        overview: college.college_information_new?.overview || college.about?.[0]?.overview || college.description || '',
+        website: college.college_information_new?.website || college.website || '',
+        verified: college.isEmailVerified || false,
+        verifiedDate: college.isEmailVerified ? college.updatedAt : null,
+        establishmentYear: college.college_information_new?.establishment_year || college.established || '',
+        location: college.location || '',
+        collegeType: college.college_information_new?.college_type || 'Public University',
+        totalStudents: college.totalStudents || '',
+        faculty: college.totalFaculty || '',
+        accreditation: college.college_information_new?.accreditation || college.accreditation || '',
+        nirfRank: college.college_information_new?.nirf_rank || college.nirfRank || '',
+        specialties: college.college_information_new?.specialties || [],
+        customFields: college.college_information_new?.custom_fields || [],
+        highlights: college.college_information_new?.highlights || [],
+        programsOffered: college.college_information_new?.programs_offered || [],
+        dualPrograms: college.college_information_new?.dual_programs || [],
+        // New section data
+        informationData: college.college_information_new || {},
+        admissionsData: college.college_admissions_new || [],
+        academicsData: college.college_academics_new || [],
+        infrastructureData: college.college_infrastructure_new || {},
+        activitiesData: college.college_activities_new || [],
+        placementsData: college.college_placements_new || [],
+        contactData: college.college_contact_new || {},
+        // Legacy data
+        campuses: college.college_campuses_new || [],
+        departments: college.departments || [],
+        facultyMembers: college.faculty || [],
+        programs: college.programs || [],
+        alumni: college.alumni || [],
+        events: college.events || [],
+        facilities: college.facilities || [],
+        placements: college.placements || [],
+        rankings: college.rankings || [],
+        admissions: college.admissions || [],
+        achievements: college.achievements || [],
+        affiliations: college.affiliations || [],
+        certifications: college.certifications || [],
+        history: college.history || [],
+        research: college.research || []
+      };
+      
+      return transformedData;
+    } catch (error) {
+      throw new Error(`Failed to get college information: ${error.message}`);
+    }
+  }
+
+  async updateCollegeInformation(collegeId, informationData) {
+    try {
+      const {
+        overview, website, establishmentYear, location, collegeType,
+        totalStudents, faculty, accreditation, nirfRank, specialties,
+        customFields, ...otherData
+      } = informationData;
+      
+      // Helper function to safely parse integers
+      const safeParseInt = (value) => {
+        if (value === null || value === undefined || value === '') return null;
+        const parsed = parseInt(value);
+        return isNaN(parsed) ? null : parsed;
+      };
+      
+      // Update main college record
+      const updatedCollege = await prisma.college.update({
+        where: { id: collegeId },
+        data: {
+          description: overview || null,
+          website: website || null,
+          established: safeParseInt(establishmentYear),
+          location: location || null,
+          totalStudents: safeParseInt(totalStudents),
+          totalFaculty: safeParseInt(faculty),
+          accreditation: accreditation || null,
+          nirfRank: safeParseInt(nirfRank),
+          updatedAt: new Date()
+        }
+      });
+
+      // Update about section
+      if (overview) {
+        await prisma.college_about.upsert({
+          where: { college_id: collegeId },
+          update: { overview },
+          create: { college_id: collegeId, overview }
+        });
+      }
+
+      return this.getCollegeInformation(collegeId);
+    } catch (error) {
+      throw new Error(`Failed to update college information: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE ABOUT SECTION
+  // =============================================
+  
+  async getCollegeAbout(collegeId) {
+    try {
+      const about = await prisma.college_about.findFirst({
+        where: { college_id: collegeId }
+      });
+      return about || {};
+    } catch (error) {
+      throw new Error(`Failed to get college about: ${error.message}`);
+    }
+  }
+
+  async updateCollegeAbout(collegeId, aboutData) {
+    try {
+      const { mission, vision, values, overview } = aboutData;
+      
+      const about = await prisma.college_about.upsert({
+        where: { college_id: collegeId },
+        update: { mission, vision, values, overview },
+        create: { college_id: collegeId, mission, vision, values, overview }
+      });
+      
+      return about;
+    } catch (error) {
+      throw new Error(`Failed to update college about: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE DEPARTMENTS
+  // =============================================
+  
+  async getCollegeDepartments(collegeId) {
+    try {
+      const departments = await prisma.college_departments.findMany({
+        where: { college_id: collegeId },
+        orderBy: { name: 'asc' }
+      });
+      return departments;
+    } catch (error) {
+      throw new Error(`Failed to get college departments: ${error.message}`);
+    }
+  }
+
+  async createCollegeDepartment(collegeId, departmentData) {
+    try {
+      const department = await prisma.college_departments.create({
+        data: {
+          college_id: collegeId,
+          ...departmentData
+        }
+      });
+      return department;
+    } catch (error) {
+      throw new Error(`Failed to create college department: ${error.message}`);
+    }
+  }
+
+  async updateCollegeDepartment(departmentId, collegeId, departmentData) {
+    try {
+      const department = await prisma.college_departments.update({
+        where: { 
+          id: departmentId,
+          college_id: collegeId 
+        },
+        data: departmentData
+      });
+      return department;
+    } catch (error) {
+      throw new Error(`Failed to update college department: ${error.message}`);
+    }
+  }
+
+  async deleteCollegeDepartment(departmentId, collegeId) {
+    try {
+      await prisma.college_departments.delete({
+        where: { 
+          id: departmentId,
+          college_id: collegeId 
+        }
+      });
+      return { message: 'Department deleted successfully' };
+    } catch (error) {
+      throw new Error(`Failed to delete college department: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE FACULTY
+  // =============================================
+  
+  async getCollegeFaculty(collegeId) {
+    try {
+      const faculty = await prisma.college_faculty.findMany({
+        where: { college_id: collegeId },
+        orderBy: { name: 'asc' }
+      });
+      return faculty;
+    } catch (error) {
+      throw new Error(`Failed to get college faculty: ${error.message}`);
+    }
+  }
+
+  async createCollegeFaculty(collegeId, facultyData) {
+    try {
+      const faculty = await prisma.college_faculty.create({
+        data: {
+          college_id: collegeId,
+          ...facultyData
+        }
+      });
+      return faculty;
+    } catch (error) {
+      throw new Error(`Failed to create college faculty: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE PROGRAMS
+  // =============================================
+  
+  async getCollegePrograms(collegeId) {
+    try {
+      const programs = await prisma.college_programs.findMany({
+        where: { college_id: collegeId },
+        orderBy: { name: 'asc' }
+      });
+      return programs;
+    } catch (error) {
+      throw new Error(`Failed to get college programs: ${error.message}`);
+    }
+  }
+
+  async createCollegeProgram(collegeId, programData) {
+    try {
+      const program = await prisma.college_programs.create({
+        data: {
+          college_id: collegeId,
+          ...programData
+        }
+      });
+      return program;
+    } catch (error) {
+      throw new Error(`Failed to create college program: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE ALUMNI
+  // =============================================
+  
+  async getCollegeAlumni(collegeId) {
+    try {
+      const alumni = await prisma.college_alumni.findMany({
+        where: { college_id: collegeId },
+        orderBy: { graduation_year: 'desc' }
+      });
+      return alumni;
+    } catch (error) {
+      throw new Error(`Failed to get college alumni: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE EVENTS
+  // =============================================
+  
+  async getCollegeEvents(collegeId) {
+    try {
+      const events = await prisma.college_events.findMany({
+        where: { college_id: collegeId },
+        orderBy: { start_date: 'desc' }
+      });
+      return events;
+    } catch (error) {
+      throw new Error(`Failed to get college events: ${error.message}`);
+    }
+  }
+
+  async createCollegeEvent(collegeId, eventData) {
+    try {
+      const event = await prisma.college_events.create({
+        data: {
+          college_id: collegeId,
+          ...eventData
+        }
+      });
+      return event;
+    } catch (error) {
+      throw new Error(`Failed to create college event: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE FACILITIES
+  // =============================================
+  
+  async getCollegeFacilities(collegeId) {
+    try {
+      const facilities = await prisma.college_facilities.findMany({
+        where: { college_id: collegeId },
+        orderBy: { name: 'asc' }
+      });
+      return facilities;
+    } catch (error) {
+      throw new Error(`Failed to get college facilities: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE PLACEMENTS
+  // =============================================
+  
+  async getCollegePlacements(collegeId) {
+    try {
+      const placements = await prisma.college_placements.findMany({
+        where: { college_id: collegeId },
+        orderBy: { academic_year: 'desc' }
+      });
+      return placements;
+    } catch (error) {
+      throw new Error(`Failed to get college placements: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE RANKINGS
+  // =============================================
+  
+  async getCollegeRankings(collegeId) {
+    try {
+      const rankings = await prisma.college_rankings.findMany({
+        where: { college_id: collegeId },
+        orderBy: { year: 'desc' }
+      });
+      return rankings;
+    } catch (error) {
+      throw new Error(`Failed to get college rankings: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE ADMISSIONS
+  // =============================================
+  
+  async getCollegeAdmissions(collegeId) {
+    try {
+      const admissions = await prisma.college_admissions.findMany({
+        where: { college_id: collegeId },
+        orderBy: { academic_year: 'desc' }
+      });
+      return admissions;
+    } catch (error) {
+      throw new Error(`Failed to get college admissions: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE CAMPUSES (with Map Location Support)
   // =============================================
   
   async getCollegeCampuses(collegeId) {
     try {
-      const campuses = await prisma.college_campuses.findMany({
+      const campuses = await prisma.college_campuses_new.findMany({
         where: { college_id: collegeId },
-        orderBy: { id: 'asc' }
+        orderBy: { is_main_campus: 'desc' } // Main campus first
       });
       return campuses;
     } catch (error) {
@@ -97,16 +498,49 @@ class CollegeProfileService {
 
   async createCollegeCampus(collegeId, campusData) {
     try {
-      const { campus_name, location, contact_person, contact_email, contact_phone } = campusData;
+      const {
+        name, type = 'Campus', address, city, state, country, pincode,
+        student_count, faculty_count, area_acres, latitude, longitude,
+        dean, dean_email, contact_number, image_url, facilities = [],
+        departments = [], is_main_campus = false
+      } = campusData;
       
-      const campus = await prisma.college_campuses.create({
+      // Helper function to safely parse numbers
+      const safeParseFloat = (value) => {
+        if (value === null || value === undefined || value === '') return null;
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? null : parsed;
+      };
+      
+      const safeParseInt = (value) => {
+        if (value === null || value === undefined || value === '') return null;
+        const parsed = parseInt(value);
+        return isNaN(parsed) ? null : parsed;
+      };
+      
+      const campus = await prisma.college_campuses_new.create({
         data: {
           college_id: collegeId,
-          campus_name,
-          location,
-          contact_person,
-          contact_email,
-          contact_phone
+          name,
+          type,
+          address,
+          city,
+          state,
+          country,
+          pincode,
+          student_count: safeParseInt(student_count),
+          faculty_count: safeParseInt(faculty_count),
+          area_acres: safeParseFloat(area_acres),
+          latitude: safeParseFloat(latitude),
+          longitude: safeParseFloat(longitude),
+          dean,
+          dean_email,
+          contact_number,
+          image_url,
+          facilities,
+          departments,
+          is_main_campus: Boolean(is_main_campus),
+          is_active: true
         }
       });
       return campus;
@@ -117,23 +551,62 @@ class CollegeProfileService {
 
   async updateCollegeCampus(campusId, collegeId, campusData) {
     try {
-      const { campus_name, location, contact_person, contact_email, contact_phone } = campusData;
+      const {
+        name, type, address, city, state, country, pincode,
+        student_count, faculty_count, area_acres, latitude, longitude,
+        dean, dean_email, contact_number, image_url, facilities,
+        departments, is_main_campus, is_active
+      } = campusData;
       
-      const campus = await prisma.college_campuses.updateMany({
+      // Helper function to safely parse numbers
+      const safeParseFloat = (value) => {
+        if (value === null || value === undefined || value === '') return null;
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? null : parsed;
+      };
+      
+      const safeParseInt = (value) => {
+        if (value === null || value === undefined || value === '') return null;
+        const parsed = parseInt(value);
+        return isNaN(parsed) ? null : parsed;
+      };
+      
+      const campus = await prisma.college_campuses_new.updateMany({
         where: { id: parseInt(campusId), college_id: collegeId },
         data: {
-          campus_name,
-          location,
-          contact_person,
-          contact_email,
-          contact_phone
+          name,
+          type,
+          address,
+          city,
+          state,
+          country,
+          pincode,
+          student_count: safeParseInt(student_count),
+          faculty_count: safeParseInt(faculty_count),
+          area_acres: safeParseFloat(area_acres),
+          latitude: safeParseFloat(latitude),
+          longitude: safeParseFloat(longitude),
+          dean,
+          dean_email,
+          contact_number,
+          image_url,
+          facilities: facilities || [],
+          departments: departments || [],
+          is_main_campus: Boolean(is_main_campus),
+          is_active: is_active !== undefined ? Boolean(is_active) : true,
+          updated_at: new Date()
         }
       });
       
       if (campus.count === 0) {
         throw new Error('Campus not found or unauthorized');
       }
-      return campus;
+      
+      // Return the updated campus
+      const updatedCampus = await prisma.college_campuses_new.findFirst({
+        where: { id: parseInt(campusId), college_id: collegeId }
+      });
+      return updatedCampus;
     } catch (error) {
       throw new Error(`Failed to update college campus: ${error.message}`);
     }
@@ -141,7 +614,7 @@ class CollegeProfileService {
 
   async deleteCollegeCampus(campusId, collegeId) {
     try {
-      const campus = await prisma.college_campuses.deleteMany({
+      const campus = await prisma.college_campuses_new.deleteMany({
         where: { id: parseInt(campusId), college_id: collegeId }
       });
       
@@ -151,6 +624,279 @@ class CollegeProfileService {
       return { message: 'Campus deleted successfully' };
     } catch (error) {
       throw new Error(`Failed to delete college campus: ${error.message}`);
+    }
+  }
+
+  // Campus location and map methods
+  async updateCampusLocation(campusId, collegeId, locationData) {
+    try {
+      const { latitude, longitude, address, city, state, country, pincode } = locationData;
+      
+      // Helper function to safely parse floats
+      const safeParseFloat = (value) => {
+        if (value === null || value === undefined || value === '') return null;
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? null : parsed;
+      };
+      
+      const campus = await prisma.college_campuses_new.updateMany({
+        where: { id: parseInt(campusId), college_id: collegeId },
+        data: {
+          latitude: safeParseFloat(latitude),
+          longitude: safeParseFloat(longitude),
+          address: address || undefined,
+          city: city || undefined,
+          state: state || undefined,
+          country: country || undefined,
+          pincode: pincode || undefined,
+          updated_at: new Date()
+        }
+      });
+      
+      if (campus.count === 0) {
+        throw new Error('Campus not found or unauthorized');
+      }
+      
+      return await prisma.college_campuses_new.findFirst({
+        where: { id: parseInt(campusId), college_id: collegeId }
+      });
+    } catch (error) {
+      throw new Error(`Failed to update campus location: ${error.message}`);
+    }
+  }
+
+  async getCampusesWithLocations(collegeId) {
+    try {
+      const campuses = await prisma.college_campuses_new.findMany({
+        where: { 
+          college_id: collegeId,
+          is_active: true,
+          latitude: { not: null },
+          longitude: { not: null }
+        },
+        orderBy: { is_main_campus: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          address: true,
+          city: true,
+          state: true,
+          country: true,
+          latitude: true,
+          longitude: true,
+          is_main_campus: true,
+          student_count: true,
+          faculty_count: true,
+          image_url: true
+        }
+      });
+      return campuses;
+    } catch (error) {
+      throw new Error(`Failed to get campuses with locations: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // BULK CAMPUS OPERATIONS
+  // =============================================
+  
+  async updateCollegeCampuses(collegeId, campusesData) {
+    try {
+      if (!Array.isArray(campusesData)) {
+        throw new Error('Campuses data must be an array');
+      }
+
+      const results = [];
+      
+      for (const campusData of campusesData) {
+        if (campusData.id) {
+          // Update existing campus
+          const updatedCampus = await this.updateCollegeCampus(campusData.id, collegeId, campusData);
+          results.push(updatedCampus);
+        } else {
+          // Create new campus
+          const newCampus = await this.createCollegeCampus(collegeId, campusData);
+          results.push(newCampus);
+        }
+      }
+      
+      return results;
+    } catch (error) {
+      throw new Error(`Failed to update college campuses: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // NEW COLLEGE PROFILE SECTIONS
+  // =============================================
+  
+  // COLLEGE INFORMATION SECTION (NEW)
+  async getCollegeInformationNew(collegeId) {
+    try {
+      const information = await prisma.college_information_new.findUnique({
+        where: { college_id: collegeId }
+      });
+      return information || {};
+    } catch (error) {
+      throw new Error(`Failed to get college information: ${error.message}`);
+    }
+  }
+
+  async updateCollegeInformationNew(collegeId, informationData) {
+    try {
+      const {
+        overview, website, establishment_year, college_type, accreditation,
+        nirf_rank, specialties, custom_fields, highlights, programs_offered, dual_programs
+      } = informationData;
+      
+      const information = await prisma.college_information_new.upsert({
+        where: { college_id: collegeId },
+        update: {
+          overview,
+          website,
+          establishment_year: establishment_year ? parseInt(establishment_year) : null,
+          college_type,
+          accreditation,
+          nirf_rank: nirf_rank ? parseInt(nirf_rank) : null,
+          specialties: specialties || [],
+          custom_fields: custom_fields || {},
+          highlights: highlights || [],
+          programs_offered: programs_offered || [],
+          dual_programs: dual_programs || [],
+          updated_at: new Date()
+        },
+        create: {
+          college_id: collegeId,
+          overview,
+          website,
+          establishment_year: establishment_year ? parseInt(establishment_year) : null,
+          college_type,
+          accreditation,
+          nirf_rank: nirf_rank ? parseInt(nirf_rank) : null,
+          specialties: specialties || [],
+          custom_fields: custom_fields || {},
+          highlights: highlights || [],
+          programs_offered: programs_offered || [],
+          dual_programs: dual_programs || []
+        }
+      });
+      
+      return information;
+    } catch (error) {
+      throw new Error(`Failed to update college information: ${error.message}`);
+    }
+  }
+
+  // COLLEGE ADMISSIONS SECTION (NEW)
+  async getCollegeAdmissionsNew(collegeId) {
+    try {
+      const admissions = await prisma.college_admissions_new.findMany({
+        where: { college_id: collegeId },
+        orderBy: { course_name: 'asc' }
+      });
+      return admissions;
+    } catch (error) {
+      throw new Error(`Failed to get college admissions: ${error.message}`);
+    }
+  }
+
+  async createCollegeAdmission(collegeId, admissionData) {
+    try {
+      const admission = await prisma.college_admissions_new.create({
+        data: {
+          college_id: collegeId,
+          ...admissionData,
+          application_fee: admissionData.application_fee ? parseFloat(admissionData.application_fee) : null,
+          total_seats: admissionData.total_seats ? parseInt(admissionData.total_seats) : null,
+          required_documents: admissionData.required_documents || []
+        }
+      });
+      return admission;
+    } catch (error) {
+      throw new Error(`Failed to create college admission: ${error.message}`);
+    }
+  }
+
+  // COLLEGE INFRASTRUCTURE SECTION (NEW)
+  async getCollegeInfrastructureNew(collegeId) {
+    try {
+      const infrastructure = await prisma.college_infrastructure_new.findUnique({
+        where: { college_id: collegeId }
+      });
+      return infrastructure || {};
+    } catch (error) {
+      throw new Error(`Failed to get college infrastructure: ${error.message}`);
+    }
+  }
+
+  async updateCollegeInfrastructure(collegeId, infrastructureData) {
+    try {
+      const infrastructure = await prisma.college_infrastructure_new.upsert({
+        where: { college_id: collegeId },
+        update: {
+          ...infrastructureData,
+          buildings_count: infrastructureData.buildings_count ? parseInt(infrastructureData.buildings_count) : null,
+          classrooms_count: infrastructureData.classrooms_count ? parseInt(infrastructureData.classrooms_count) : null,
+          laboratories_count: infrastructureData.laboratories_count ? parseInt(infrastructureData.laboratories_count) : null,
+          sports_facilities: infrastructureData.sports_facilities || [],
+          security_features: infrastructureData.security_features || [],
+          green_initiatives: infrastructureData.green_initiatives || [],
+          accessibility: infrastructureData.accessibility || [],
+          other_facilities: infrastructureData.other_facilities || [],
+          updated_at: new Date()
+        },
+        create: {
+          college_id: collegeId,
+          ...infrastructureData,
+          buildings_count: infrastructureData.buildings_count ? parseInt(infrastructureData.buildings_count) : null,
+          classrooms_count: infrastructureData.classrooms_count ? parseInt(infrastructureData.classrooms_count) : null,
+          laboratories_count: infrastructureData.laboratories_count ? parseInt(infrastructureData.laboratories_count) : null,
+          sports_facilities: infrastructureData.sports_facilities || [],
+          security_features: infrastructureData.security_features || [],
+          green_initiatives: infrastructureData.green_initiatives || [],
+          accessibility: infrastructureData.accessibility || [],
+          other_facilities: infrastructureData.other_facilities || []
+        }
+      });
+      
+      return infrastructure;
+    } catch (error) {
+      throw new Error(`Failed to update college infrastructure: ${error.message}`);
+    }
+  }
+
+  // COLLEGE CONTACT SECTION (NEW)
+  async getCollegeContactNew(collegeId) {
+    try {
+      const contact = await prisma.college_contact_new.findUnique({
+        where: { college_id: collegeId }
+      });
+      return contact || {};
+    } catch (error) {
+      throw new Error(`Failed to get college contact: ${error.message}`);
+    }
+  }
+
+  async updateCollegeContact(collegeId, contactData) {
+    try {
+      const contact = await prisma.college_contact_new.upsert({
+        where: { college_id: collegeId },
+        update: {
+          ...contactData,
+          social_media: contactData.social_media || {},
+          updated_at: new Date()
+        },
+        create: {
+          college_id: collegeId,
+          ...contactData,
+          social_media: contactData.social_media || {}
+        }
+      });
+      
+      return contact;
+    } catch (error) {
+      throw new Error(`Failed to update college contact: ${error.message}`);
     }
   }
 
@@ -300,6 +1046,123 @@ class CollegeProfileService {
     return { message: 'College facilities section not yet implemented in database schema' };
   }
 
+  
+  // =============================================
+  // ACADEMICS/COURSES SECTION
+  // =============================================
+  
+  async getCollegeAcademics(collegeId) {
+    try {
+      const academics = await prisma.college_academics_new.findMany({
+        where: { college_id: collegeId },
+        orderBy: { created_at: 'desc' }
+      });
+      
+      return {
+        success: true,
+        data: academics
+      };
+    } catch (error) {
+      throw new Error(`Failed to get college academics: ${error.message}`);
+    }
+  }
+
+  async createCollegeAcademic(collegeId, academicData) {
+    try {
+      const {
+        course_name,
+        degree_type,
+        duration,
+        total_seats,
+        specializations = [],
+        curriculum,
+        syllabus_url,
+        course_structure,
+        assessment_method,
+        is_active = true
+      } = academicData;
+
+      const academic = await prisma.college_academics_new.create({
+        data: {
+          college_id: collegeId,
+          course_name,
+          degree_type,
+          duration,
+          total_seats: total_seats ? parseInt(total_seats) : null,
+          specializations,
+          curriculum,
+          syllabus_url,
+          course_structure,
+          assessment_method,
+          is_active
+        }
+      });
+
+      return {
+        success: true,
+        data: academic
+      };
+    } catch (error) {
+      throw new Error(`Failed to create college academic: ${error.message}`);
+    }
+  }
+
+  async updateCollegeAcademics(collegeId, academicsData) {
+    try {
+      // First, deactivate all existing academics for this college
+      await prisma.college_academics_new.updateMany({
+        where: { college_id: collegeId },
+        data: { is_active: false }
+      });
+
+      // Then create new ones
+      const academics = [];
+      for (const academicData of academicsData) {
+        if (academicData.course_name) { // Only create if course name is provided
+          const academic = await prisma.college_academics_new.create({
+            data: {
+              college_id: collegeId,
+              course_name: academicData.course_name,
+              degree_type: academicData.degree_type || '',
+              duration: academicData.duration || null,
+              total_seats: academicData.total_seats ? parseInt(academicData.total_seats) : null,
+              specializations: Array.isArray(academicData.specializations) ? academicData.specializations : [],
+              curriculum: academicData.curriculum || null,
+              syllabus_url: academicData.syllabus_url || null,
+              course_structure: academicData.course_structure || null,
+              assessment_method: academicData.assessment_method || null,
+              is_active: true
+            }
+          });
+          academics.push(academic);
+        }
+      }
+
+      return {
+        success: true,
+        data: academics
+      };
+    } catch (error) {
+      throw new Error(`Failed to update college academics: ${error.message}`);
+    }
+  }
+
+  async deleteCollegeAcademic(academicId) {
+    try {
+      await prisma.college_academics_new.update({
+        where: { id: academicId },
+        data: { is_active: false }
+      });
+
+      return {
+        success: true,
+        message: 'Academic record deactivated successfully'
+      };
+    } catch (error) {
+      throw new Error(`Failed to delete college academic: ${error.message}`);
+    }
+  }
+
   // =============================================
   // COMPLETE COLLEGE PROFILE
   // =============================================
@@ -377,4 +1240,5 @@ class CollegeProfileService {
   }
 }
 
-module.exports = new CollegeProfileService();
+module.exports = CollegeProfileService;
+module.exports.CollegeProfileService = CollegeProfileService;

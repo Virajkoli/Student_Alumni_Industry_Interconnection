@@ -1,7 +1,17 @@
 import React, { useState } from "react";
-import { Edit3, Building2, TrendingUp, MapPin, Users, X, Plus, Globe, ChartBar } from "lucide-react";
+import {
+  Edit3,
+  Building2,
+  TrendingUp,
+  MapPin,
+  Users,
+  X,
+  Plus,
+  Globe,
+  ChartBar,
+} from "lucide-react";
 
-const SectorCategory = () => {
+const SectorCategory = ({ isOwner, industryData }) => {
   const [editingId, setEditingId] = useState(null);
   const [sectors, setSectors] = useState([
     {
@@ -13,7 +23,6 @@ const SectorCategory = () => {
       employment: "5.2M",
       growth: "+12%",
       majorCities: ["Mumbai", "Chennai", "Pune", "Gujarat"],
-     
     },
     {
       id: 2,
@@ -24,7 +33,7 @@ const SectorCategory = () => {
       employment: "4.8M",
       growth: "+18%",
       majorCities: ["Bangalore", "Hyderabad", "Pune", "Chennai"],
-      
+
       color: "green",
     },
     {
@@ -36,7 +45,7 @@ const SectorCategory = () => {
       employment: "3.1M",
       growth: "+15%",
       majorCities: ["Mumbai", "Hyderabad", "Delhi", "Bangalore"],
-      
+
       color: "red",
     },
     {
@@ -48,7 +57,7 @@ const SectorCategory = () => {
       employment: "2.8M",
       growth: "+14%",
       majorCities: ["Mumbai", "Delhi", "Bangalore", "Chennai"],
-      
+
       color: "purple",
     },
     {
@@ -60,7 +69,7 @@ const SectorCategory = () => {
       employment: "1.5M",
       growth: "+25%",
       majorCities: ["Gujarat", "Rajasthan", "Karnataka", "Tamil Nadu"],
-      
+
       color: "emerald",
     },
     {
@@ -72,7 +81,7 @@ const SectorCategory = () => {
       employment: "2.2M",
       growth: "+8%",
       majorCities: ["Chennai", "Pune", "Gurgaon", "Bangalore"],
-     
+
       color: "orange",
     },
   ]);
@@ -168,27 +177,32 @@ const SectorCategory = () => {
   };
 
   return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" style={{ backgroundColor: "#F7FAFC" }}>
+    <div
+      className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+      style={{ backgroundColor: "#F7FAFC" }}
+    >
       {/* Header Section - Clean and Professional */}
       <div className="mb-10">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight" style={{ color: "#1F2D3D" }}>Industry Sectors</h2>
-            
+            <h2
+              className="text-2xl font-bold tracking-tight"
+              style={{ color: "#1F2D3D" }}
+            >
+              Industry Sectors
+            </h2>
           </div>
           <button
             onClick={handleAddNew}
             className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors duration-200 shadow-sm hover:shadow"
             style={{ backgroundColor: "#6EA9CB" }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-            onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = "#5a8fa8")}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = "#6EA9CB")}
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add Sector
           </button>
         </div>
-        
-       
       </div>
 
       {/* Sectors Grid - 2 cards per row */}
@@ -197,68 +211,110 @@ const SectorCategory = () => {
           <div
             key={sector.id}
             className="rounded-xl border transition-all duration-200 group"
-            style={{ 
+            style={{
               backgroundColor: "white",
-              borderColor: "#B5D3E7"
+              borderColor: "#B5D3E7",
             }}
-            onMouseEnter={(e) => e.target.style.borderColor = "#6EA9CB"}
-            onMouseLeave={(e) => e.target.style.borderColor = "#B5D3E7"}
+            onMouseEnter={(e) => (e.target.style.borderColor = "#6EA9CB")}
+            onMouseLeave={(e) => (e.target.style.borderColor = "#B5D3E7")}
           >
             {/* Card Header */}
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-4">
-                  <div className="text-3xl p-3 rounded-lg" style={{ backgroundColor: "#DCE8F2" }}>{sector.icon}</div>
+                  <div
+                    className="text-3xl p-3 rounded-lg"
+                    style={{ backgroundColor: "#DCE8F2" }}
+                  >
+                    {sector.icon}
+                  </div>
                   <div>
-                    <h3 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                    <h3
+                      className="text-xl font-semibold"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       {sector.name}
                     </h3>
-                    <div className="inline-flex items-center mt-2 text-sm font-medium px-2.5 py-1 rounded-full" style={{ color: "#1F2D3D", backgroundColor: "#DCE8F2" }}>
+                    <div
+                      className="inline-flex items-center mt-2 text-sm font-medium px-2.5 py-1 rounded-full"
+                      style={{ color: "#1F2D3D", backgroundColor: "#DCE8F2" }}
+                    >
                       <TrendingUp className="w-4 h-4 mr-1.5" />
                       {sector.growth} Growth
                     </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleEditClick(sector)}
-                  className="p-2 rounded-full transition-colors"
-                  style={{ color: "#1F2D3D", opacity: "0.6" }}
-                  onMouseEnter={(e) => {
-                    e.target.style.color = "#6EA9CB";
-                    e.target.style.backgroundColor = "#DCE8F2";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.color = "#1F2D3D";
-                    e.target.style.opacity = "0.6";
-                    e.target.style.backgroundColor = "transparent";
-                  }}
-                >
-                  <Edit3 className="w-4 h-4" />
-                </button>
+                {isOwner && (
+                  <button
+                    onClick={() => handleEditClick(sector)}
+                    className="p-2 rounded-full transition-colors"
+                    style={{ color: "#1F2D3D", opacity: "0.6" }}
+                    onMouseEnter={(e) => {
+                      e.target.style.color = "#6EA9CB";
+                      e.target.style.backgroundColor = "#DCE8F2";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = "#1F2D3D";
+                      e.target.style.opacity = "0.6";
+                      e.target.style.backgroundColor = "transparent";
+                    }}
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
-              <p className="text-sm leading-relaxed border-t pt-4" style={{ color: "#1F2D3D", opacity: "0.7", borderColor: "#DCE8F2" }}>
+              <p
+                className="text-sm leading-relaxed border-t pt-4"
+                style={{
+                  color: "#1F2D3D",
+                  opacity: "0.7",
+                  borderColor: "#DCE8F2",
+                }}
+              >
                 {sector.description}
               </p>
 
               {/* Stats */}
               <div className="flex items-center gap-8">
                 <div className="flex items-center gap-2">
-                  <Building2 className="w-5 h-5" style={{ color: "#1F2D3D", opacity: "0.4" }} />
+                  <Building2
+                    className="w-5 h-5"
+                    style={{ color: "#1F2D3D", opacity: "0.4" }}
+                  />
                   <div>
-                    <div className="text-lg font-semibold" style={{ color: "#1F2D3D" }}>
+                    <div
+                      className="text-lg font-semibold"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       {sector.companies.toLocaleString()}
                     </div>
-                    <div className="text-xs" style={{ color: "#1F2D3D", opacity: "0.5" }}>Companies</div>
+                    <div
+                      className="text-xs"
+                      style={{ color: "#1F2D3D", opacity: "0.5" }}
+                    >
+                      Companies
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5" style={{ color: "#1F2D3D", opacity: "0.4" }} />
+                  <Users
+                    className="w-5 h-5"
+                    style={{ color: "#1F2D3D", opacity: "0.4" }}
+                  />
                   <div>
-                    <div className="text-lg font-semibold" style={{ color: "#1F2D3D" }}>
+                    <div
+                      className="text-lg font-semibold"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       {sector.employment}
                     </div>
-                    <div className="text-xs" style={{ color: "#1F2D3D", opacity: "0.5" }}>Employees</div>
+                    <div
+                      className="text-xs"
+                      style={{ color: "#1F2D3D", opacity: "0.5" }}
+                    >
+                      Employees
+                    </div>
                   </div>
                 </div>
               </div>
@@ -266,8 +322,16 @@ const SectorCategory = () => {
               {/* Major Cities */}
               <div className="border-t pt-4" style={{ borderColor: "#DCE8F2" }}>
                 <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="w-4 h-4" style={{ color: "#1F2D3D", opacity: "0.4" }} />
-                  <span className="text-sm font-medium" style={{ color: "#1F2D3D" }}>Major Hubs</span>
+                  <MapPin
+                    className="w-4 h-4"
+                    style={{ color: "#1F2D3D", opacity: "0.4" }}
+                  />
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: "#1F2D3D" }}
+                  >
+                    Major Hubs
+                  </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {sector.majorCities.map((city, index) => (
@@ -275,8 +339,12 @@ const SectorCategory = () => {
                       key={index}
                       className="px-3 py-1 rounded-full text-sm transition-colors duration-200"
                       style={{ backgroundColor: "#DCE8F2", color: "#1F2D3D" }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = "#B5D3E7"}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = "#DCE8F2"}
+                      onMouseEnter={(e) =>
+                        (e.target.style.backgroundColor = "#B5D3E7")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.target.style.backgroundColor = "#DCE8F2")
+                      }
                     >
                       {city}
                     </span>
@@ -291,10 +359,16 @@ const SectorCategory = () => {
       {/* Modal - Keep existing modal code but update styling */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "white" }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "white" }}
+          >
             <div className="p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   {selectedSector ? "Edit Sector" : "Add New Sector"}
                 </h2>
                 <button
@@ -320,107 +394,147 @@ const SectorCategory = () => {
             <form className="p-6 space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium" style={{ color: "#1F2D3D" }}>Basic Information</h3>
-                
+                <h3
+                  className="text-sm font-medium"
+                  style={{ color: "#1F2D3D" }}
+                >
+                  Basic Information
+                </h3>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Sector Name</label>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
+                      Sector Name
+                    </label>
                     <input
                       type="text"
                       name="name"
                       value={editData.name}
-                      onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                      onChange={(e) =>
+                        setEditData({ ...editData, name: e.target.value })
+                      }
                       className="w-full rounded-lg shadow-sm outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
                         color: "#1F2D3D",
-                        border: "1px solid #B5D3E7"
+                        border: "1px solid #B5D3E7",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       placeholder="e.g., Technology"
                     />
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Growth Rate</label>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
+                      Growth Rate
+                    </label>
                     <input
                       type="text"
                       name="growth"
                       value={editData.growth}
-                      onChange={(e) => setEditData({ ...editData, growth: e.target.value })}
+                      onChange={(e) =>
+                        setEditData({ ...editData, growth: e.target.value })
+                      }
                       className="w-full rounded-lg shadow-sm outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
                         color: "#1F2D3D",
-                        border: "1px solid #B5D3E7"
+                        border: "1px solid #B5D3E7",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       placeholder="e.g., 12.5%"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Description</label>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
+                    Description
+                  </label>
                   <textarea
                     name="description"
                     value={editData.description}
-                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                    onChange={(e) =>
+                      setEditData({ ...editData, description: e.target.value })
+                    }
                     rows={3}
                     className="w-full rounded-lg shadow-sm outline-none"
-                    style={{ 
+                    style={{
                       backgroundColor: "white",
                       borderColor: "#B5D3E7",
                       color: "#1F2D3D",
-                      border: "1px solid #B5D3E7"
+                      border: "1px solid #B5D3E7",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                    onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                    onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                    onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     placeholder="Brief description of the sector..."
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Number of Companies</label>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
+                      Number of Companies
+                    </label>
                     <input
                       type="number"
                       name="companies"
                       value={editData.companies}
-                      onChange={(e) => setEditData({ ...editData, companies: e.target.value })}
+                      onChange={(e) =>
+                        setEditData({ ...editData, companies: e.target.value })
+                      }
                       className="w-full rounded-lg shadow-sm outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
                         color: "#1F2D3D",
-                        border: "1px solid #B5D3E7"
+                        border: "1px solid #B5D3E7",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       placeholder="e.g., 2500"
                     />
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Employment</label>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
+                      Employment
+                    </label>
                     <input
                       type="text"
                       name="employment"
                       value={editData.employment}
-                      onChange={(e) => setEditData({ ...editData, employment: e.target.value })}
+                      onChange={(e) =>
+                        setEditData({ ...editData, employment: e.target.value })
+                      }
                       className="w-full rounded-lg shadow-sm outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
                         color: "#1F2D3D",
-                        border: "1px solid #B5D3E7"
+                        border: "1px solid #B5D3E7",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       placeholder="e.g., 5.2M"
                     />
                   </div>
@@ -429,16 +543,36 @@ const SectorCategory = () => {
 
               {/* Major Cities */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium" style={{ color: "#1F2D3D" }}>Major Hubs</h3>
-                
+                <h3
+                  className="text-sm font-medium"
+                  style={{ color: "#1F2D3D" }}
+                >
+                  Major Hubs
+                </h3>
+
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Major Cities</label>
-                  <div className="flex flex-wrap gap-2 p-3 rounded-lg border" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
+                    Major Cities
+                  </label>
+                  <div
+                    className="flex flex-wrap gap-2 p-3 rounded-lg border"
+                    style={{
+                      backgroundColor: "#F7FAFC",
+                      borderColor: "#B5D3E7",
+                    }}
+                  >
                     {editData.majorCities.split(",").map((city, index) => (
                       <div
                         key={index}
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm border"
-                        style={{ backgroundColor: "white", borderColor: "#B5D3E7", color: "#1F2D3D" }}
+                        style={{
+                          backgroundColor: "white",
+                          borderColor: "#B5D3E7",
+                          color: "#1F2D3D",
+                        }}
                       >
                         {city}
                         <button
@@ -446,11 +580,16 @@ const SectorCategory = () => {
                           onClick={() => {
                             const cities = editData.majorCities.split(",");
                             cities.splice(index, 1);
-                            setEditData({ ...editData, majorCities: cities.join(",") });
+                            setEditData({
+                              ...editData,
+                              majorCities: cities.join(","),
+                            });
                           }}
                           className="ml-2 transition-colors"
                           style={{ color: "#1F2D3D", opacity: "0.4" }}
-                          onMouseEnter={(e) => e.target.style.color = "#dc2626"}
+                          onMouseEnter={(e) =>
+                            (e.target.style.color = "#dc2626")
+                          }
                           onMouseLeave={(e) => {
                             e.target.style.color = "#1F2D3D";
                             e.target.style.opacity = "0.4";
@@ -463,12 +602,19 @@ const SectorCategory = () => {
                     <input
                       type="text"
                       value={editData.newCity}
-                      onChange={(e) => setEditData({ ...editData, newCity: e.target.value })}
+                      onChange={(e) =>
+                        setEditData({ ...editData, newCity: e.target.value })
+                      }
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" && editData.newCity.trim() !== "") {
+                        if (
+                          e.key === "Enter" &&
+                          editData.newCity.trim() !== ""
+                        ) {
                           setEditData({
                             ...editData,
-                            majorCities: `${editData.majorCities}, ${editData.newCity.trim()}`,
+                            majorCities: `${
+                              editData.majorCities
+                            }, ${editData.newCity.trim()}`,
                             newCity: "",
                           });
                           e.preventDefault();
@@ -479,50 +625,74 @@ const SectorCategory = () => {
                       placeholder="Type and press Enter to add..."
                     />
                   </div>
-                  <p className="mt-1 text-sm" style={{ color: "#1F2D3D", opacity: "0.5" }}>Press Enter to add a new city</p>
+                  <p
+                    className="mt-1 text-sm"
+                    style={{ color: "#1F2D3D", opacity: "0.5" }}
+                  >
+                    Press Enter to add a new city
+                  </p>
                 </div>
               </div>
 
               {/* Visual */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium" style={{ color: "#1F2D3D" }}>Visual</h3>
-                
+                <h3
+                  className="text-sm font-medium"
+                  style={{ color: "#1F2D3D" }}
+                >
+                  Visual
+                </h3>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Icon</label>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
+                      Icon
+                    </label>
                     <input
                       type="text"
                       name="icon"
                       value={editData.icon}
-                      onChange={(e) => setEditData({ ...editData, icon: e.target.value })}
+                      onChange={(e) =>
+                        setEditData({ ...editData, icon: e.target.value })
+                      }
                       className="w-full rounded-lg shadow-sm outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
                         color: "#1F2D3D",
-                        border: "1px solid #B5D3E7"
+                        border: "1px solid #B5D3E7",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       placeholder="Icon emoji or symbol"
                     />
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>Color Theme</label>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
+                      Color Theme
+                    </label>
                     <select
                       name="color"
                       value={editData.color}
-                      onChange={(e) => setEditData({ ...editData, color: e.target.value })}
+                      onChange={(e) =>
+                        setEditData({ ...editData, color: e.target.value })
+                      }
                       className="w-full rounded-lg shadow-sm outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
                         color: "#1F2D3D",
-                        border: "1px solid #B5D3E7"
+                        border: "1px solid #B5D3E7",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     >
                       <option value="blue">Blue</option>
                       <option value="green">Green</option>
@@ -535,17 +705,20 @@ const SectorCategory = () => {
               </div>
             </form>
 
-            <div className="px-6 py-4 border-t flex justify-end gap-3" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
+            <div
+              className="px-6 py-4 border-t flex justify-end gap-3"
+              style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}
+            >
               <button
                 onClick={handleCancel}
                 className="px-4 py-2 text-sm font-medium border rounded-lg transition-colors"
-                style={{ 
+                style={{
                   color: "#1F2D3D",
                   backgroundColor: "#DCE8F2",
-                  borderColor: "#B5D3E7"
+                  borderColor: "#B5D3E7",
                 }}
-                onMouseEnter={(e) => e.target.style.opacity = "0.8"}
-                onMouseLeave={(e) => e.target.style.opacity = "1"}
+                onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+                onMouseLeave={(e) => (e.target.style.opacity = "1")}
               >
                 Cancel
               </button>
@@ -553,8 +726,12 @@ const SectorCategory = () => {
                 onClick={handleSave}
                 className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
                 style={{ backgroundColor: "#6EA9CB" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#5a8fa8")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#6EA9CB")
+                }
               >
                 {selectedSector ? "Save Changes" : "Add Sector"}
               </button>

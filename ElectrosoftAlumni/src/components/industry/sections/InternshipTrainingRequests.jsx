@@ -15,7 +15,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-const InternshipTrainingRequests = () => {
+const InternshipTrainingRequests = ({ isOwner, industryData }) => {
   const [requests, setRequests] = useState([
     {
       id: 1,

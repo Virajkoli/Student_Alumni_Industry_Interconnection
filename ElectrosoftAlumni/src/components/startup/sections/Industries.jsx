@@ -9,7 +9,7 @@ import {
   Globe,
 } from "lucide-react";
 
-const Industries = () => {
+const Industries = ({ isOwner, startupData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndustryIndex, setEditingIndustryIndex] = useState(null);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
@@ -246,8 +246,6 @@ const Industries = () => {
           <h1 className="text-xl font-bold text-gray-900">{content.title}</h1>
           <p className="text-gray-600 text-sm mt-1">{content.description}</p>
         </div>
-
-       
       </div>
 
       {/* Industry Overview */}
@@ -271,7 +269,9 @@ const Industries = () => {
                     <input
                       type="text"
                       value={industry.name}
-                      onChange={(e) => updateIndustry(index, "name", e.target.value)}
+                      onChange={(e) =>
+                        updateIndustry(index, "name", e.target.value)
+                      }
                       className="w-full text-base font-semibold p-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Industry name"
                     />
@@ -302,7 +302,9 @@ const Industries = () => {
                     <input
                       type="text"
                       value={industry.icon}
-                      onChange={(e) => updateIndustry(index, "icon", e.target.value)}
+                      onChange={(e) =>
+                        updateIndustry(index, "icon", e.target.value)
+                      }
                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
                       placeholder="💻"
                       maxLength="2"
@@ -315,7 +317,9 @@ const Industries = () => {
                     <input
                       type="text"
                       value={industry.growth}
-                      onChange={(e) => updateIndustry(index, "growth", e.target.value)}
+                      onChange={(e) =>
+                        updateIndustry(index, "growth", e.target.value)
+                      }
                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="+25%"
                     />
@@ -328,7 +332,9 @@ const Industries = () => {
                   </label>
                   <textarea
                     value={industry.description}
-                    onChange={(e) => updateIndustry(index, "description", e.target.value)}
+                    onChange={(e) =>
+                      updateIndustry(index, "description", e.target.value)
+                    }
                     rows="2"
                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
                     placeholder="Industry description"
@@ -343,7 +349,9 @@ const Industries = () => {
                     <input
                       type="text"
                       value={industry.startups}
-                      onChange={(e) => updateIndustry(index, "startups", e.target.value)}
+                      onChange={(e) =>
+                        updateIndustry(index, "startups", e.target.value)
+                      }
                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="15,000+"
                     />
@@ -355,7 +363,9 @@ const Industries = () => {
                     <input
                       type="text"
                       value={industry.funding}
-                      onChange={(e) => updateIndustry(index, "funding", e.target.value)}
+                      onChange={(e) =>
+                        updateIndustry(index, "funding", e.target.value)
+                      }
                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="$45B"
                     />
@@ -369,7 +379,16 @@ const Industries = () => {
                     </label>
                     <textarea
                       value={industry.trends.join(", ")}
-                      onChange={(e) => updateIndustry(index, "trends", e.target.value.split(",").map(t => t.trim()).filter(t => t.length > 0))}
+                      onChange={(e) =>
+                        updateIndustry(
+                          index,
+                          "trends",
+                          e.target.value
+                            .split(",")
+                            .map((t) => t.trim())
+                            .filter((t) => t.length > 0)
+                        )
+                      }
                       rows="2"
                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
                       placeholder="Trend 1, Trend 2, Trend 3"
@@ -381,7 +400,16 @@ const Industries = () => {
                     </label>
                     <textarea
                       value={industry.opportunities.join(", ")}
-                      onChange={(e) => updateIndustry(index, "opportunities", e.target.value.split(",").map(o => o.trim()).filter(o => o.length > 0))}
+                      onChange={(e) =>
+                        updateIndustry(
+                          index,
+                          "opportunities",
+                          e.target.value
+                            .split(",")
+                            .map((o) => o.trim())
+                            .filter((o) => o.length > 0)
+                        )
+                      }
                       rows="2"
                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
                       placeholder="Opportunity 1, Opportunity 2"
@@ -396,7 +424,16 @@ const Industries = () => {
                     </label>
                     <textarea
                       value={industry.challenges.join(", ")}
-                      onChange={(e) => updateIndustry(index, "challenges", e.target.value.split(",").map(c => c.trim()).filter(c => c.length > 0))}
+                      onChange={(e) =>
+                        updateIndustry(
+                          index,
+                          "challenges",
+                          e.target.value
+                            .split(",")
+                            .map((c) => c.trim())
+                            .filter((c) => c.length > 0)
+                        )
+                      }
                       rows="2"
                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
                       placeholder="Challenge 1, Challenge 2"
@@ -408,7 +445,16 @@ const Industries = () => {
                     </label>
                     <textarea
                       value={industry.keyPlayers.join(", ")}
-                      onChange={(e) => updateIndustry(index, "keyPlayers", e.target.value.split(",").map(p => p.trim()).filter(p => p.length > 0))}
+                      onChange={(e) =>
+                        updateIndustry(
+                          index,
+                          "keyPlayers",
+                          e.target.value
+                            .split(",")
+                            .map((p) => p.trim())
+                            .filter((p) => p.length > 0)
+                        )
+                      }
                       rows="2"
                       className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
                       placeholder="Company 1, Company 2"
@@ -419,9 +465,14 @@ const Industries = () => {
             ) : (
               <div>
                 <div className="flex items-start justify-between mb-3">
-                  <div 
+                  <div
                     className="flex items-center space-x-2 flex-1 cursor-pointer"
-                    onClick={() => !isEditing && setSelectedIndustry(selectedIndustry === index ? null : index)}
+                    onClick={() =>
+                      !isEditing &&
+                      setSelectedIndustry(
+                        selectedIndustry === index ? null : index
+                      )
+                    }
                   >
                     <span className="text-xl">{industry.icon}</span>
                     <h3 className="text-base font-semibold text-gray-900 leading-tight">
@@ -447,16 +498,26 @@ const Industries = () => {
                   </div>
                 </div>
 
-                <p 
+                <p
                   className="text-gray-600 text-xs mb-3 line-clamp-2 cursor-pointer"
-                  onClick={() => !isEditing && setSelectedIndustry(selectedIndustry === index ? null : index)}
+                  onClick={() =>
+                    !isEditing &&
+                    setSelectedIndustry(
+                      selectedIndustry === index ? null : index
+                    )
+                  }
                 >
                   {industry.description}
                 </p>
 
-                <div 
+                <div
                   className="grid grid-cols-3 gap-2 text-center cursor-pointer"
-                  onClick={() => !isEditing && setSelectedIndustry(selectedIndustry === index ? null : index)}
+                  onClick={() =>
+                    !isEditing &&
+                    setSelectedIndustry(
+                      selectedIndustry === index ? null : index
+                    )
+                  }
                 >
                   <div>
                     <p className="text-sm font-bold text-gray-900">

@@ -15,39 +15,82 @@ import ProjectSuccessStories from "./sections/ProjectSuccessStories";
 import UploadProject from "./sections/UploadProject";
 import AddUniversityProject from "./sections/AddUniversityProject";
 
-const ContentRenderer = ({ activeContent, activeContentName, isOwner }) => {
+const ContentRenderer = ({
+  activeContent,
+  activeContentName,
+  isOwner,
+  industryData,
+}) => {
   const renderContent = () => {
     switch (activeContent) {
       case "industry-overview":
-        return <IndustryOverview />;
+        return (
+          <IndustryOverview isOwner={isOwner} industryData={industryData} />
+        );
       case "sector-category":
-        return <SectorCategory />;
+        return <SectorCategory isOwner={isOwner} industryData={industryData} />;
       case "job-career-opportunities":
-        return <JobCareerOpportunities />;
+        return (
+          <JobCareerOpportunities
+            isOwner={isOwner}
+            industryData={industryData}
+          />
+        );
       case "technology":
-        return <Technology />;
+        return <Technology isOwner={isOwner} industryData={industryData} />;
       case "challenges-solutions":
-        return <ChallengesSolutions />;
+        return (
+          <ChallengesSolutions isOwner={isOwner} industryData={industryData} />
+        );
       case "success-stories":
-        return <SuccessStories />;
+        return <SuccessStories isOwner={isOwner} industryData={industryData} />;
       case "post-news-jobs":
-        return isOwner ? <PostNewsJobs /> : <p>You do not have permission to post news or jobs.</p>;
+        return isOwner ? (
+          <PostNewsJobs isOwner={isOwner} industryData={industryData} />
+        ) : (
+          <p>You do not have permission to post news or jobs.</p>
+        );
       case "expert-opinions-interview":
-        return <ExpertOpinionsInterview />;
+        return (
+          <ExpertOpinionsInterview
+            isOwner={isOwner}
+            industryData={industryData}
+          />
+        );
       case "poll-comment-section":
-        return <PollCommentSection />;
+        return (
+          <PollCommentSection isOwner={isOwner} industryData={industryData} />
+        );
       case "internship-training-requests":
-        return <InternshipTrainingRequests />;
+        return (
+          <InternshipTrainingRequests
+            isOwner={isOwner}
+            industryData={industryData}
+          />
+        );
       case "live-projects":
-        return <LiveProjects />;
+        return <LiveProjects isOwner={isOwner} industryData={industryData} />;
       case "student-login":
-        return <StudentLogin />;
+        return <StudentLogin isOwner={isOwner} industryData={industryData} />;
       case "project-success-stories":
-        return <ProjectSuccessStories />;
+        return (
+          <ProjectSuccessStories
+            isOwner={isOwner}
+            industryData={industryData}
+          />
+        );
       case "upload-project":
-        return isOwner ? <UploadProject /> : <p>You do not have permission to upload projects.</p>;
+        return isOwner ? (
+          <UploadProject isOwner={isOwner} industryData={industryData} />
+        ) : (
+          <p>You do not have permission to upload projects.</p>
+        );
       case "add-university-project":
-        return isOwner ? <AddUniversityProject /> : <p>You do not have permission to add university projects.</p>;
+        return isOwner ? (
+          <AddUniversityProject isOwner={isOwner} industryData={industryData} />
+        ) : (
+          <p>You do not have permission to add university projects.</p>
+        );
       default:
         return (
           <div className="p-8 text-center">

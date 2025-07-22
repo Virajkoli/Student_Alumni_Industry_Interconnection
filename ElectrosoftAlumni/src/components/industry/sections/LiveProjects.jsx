@@ -19,7 +19,7 @@ import {
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-const LiveProjects = () => {
+const LiveProjects = ({ isOwner, industryData }) => {
   const [editingId, setEditingId] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
@@ -627,8 +627,8 @@ const LiveProjects = () => {
           onClick={handleNewProject}
           className="px-4 py-2 rounded-lg transition-colors text-white"
           style={{ backgroundColor: "#6EA9CB" }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-          onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = "#5a8fa8")}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = "#6EA9CB")}
         >
           Post New Project
         </button>
@@ -646,7 +646,10 @@ const LiveProjects = () => {
               <div className="p-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       Project Title
                     </label>
                     <input
@@ -656,17 +659,20 @@ const LiveProjects = () => {
                         setEditData({ ...editData, title: e.target.value })
                       }
                       className="w-full px-3 py-2 border rounded-lg outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
-                        color: "#1F2D3D"
+                        color: "#1F2D3D",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       Company
                     </label>
                     <input
@@ -676,17 +682,20 @@ const LiveProjects = () => {
                         setEditData({ ...editData, company: e.target.value })
                       }
                       className="w-full px-3 py-2 border rounded-lg outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
-                        color: "#1F2D3D"
+                        color: "#1F2D3D",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       Description
                     </label>
                     <textarea
@@ -699,18 +708,21 @@ const LiveProjects = () => {
                       }
                       rows={4}
                       className="w-full px-3 py-2 border rounded-lg outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
-                        color: "#1F2D3D"
+                        color: "#1F2D3D",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-1"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Budget
                       </label>
                       <input
@@ -720,17 +732,22 @@ const LiveProjects = () => {
                           setEditData({ ...editData, budget: e.target.value })
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-1"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Duration
                       </label>
                       <input
@@ -740,17 +757,22 @@ const LiveProjects = () => {
                           setEditData({ ...editData, duration: e.target.value })
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-1"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Deadline
                       </label>
                       <input
@@ -760,19 +782,24 @@ const LiveProjects = () => {
                           setEditData({ ...editData, deadline: e.target.value })
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-1"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Project Type
                       </label>
                       <select
@@ -781,13 +808,15 @@ const LiveProjects = () => {
                           setEditData({ ...editData, type: e.target.value })
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       >
                         <option value="Development">Development</option>
                         <option value="Analytics">Analytics</option>
@@ -797,7 +826,10 @@ const LiveProjects = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                      <label
+                        className="block text-sm font-medium mb-1"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         Priority
                       </label>
                       <select
@@ -806,13 +838,15 @@ const LiveProjects = () => {
                           setEditData({ ...editData, priority: e.target.value })
                         }
                         className="w-full px-3 py-2 border rounded-lg outline-none"
-                        style={{ 
+                        style={{
                           backgroundColor: "white",
                           borderColor: "#B5D3E7",
-                          color: "#1F2D3D"
+                          color: "#1F2D3D",
                         }}
-                        onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                        onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                        onFocus={(e) =>
+                          (e.target.style.borderColor = "#6EA9CB")
+                        }
+                        onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                       >
                         <option value="High">High</option>
                         <option value="Medium">Medium</option>
@@ -821,7 +855,10 @@ const LiveProjects = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       Skills Required (comma separated)
                     </label>
                     <input
@@ -835,17 +872,20 @@ const LiveProjects = () => {
                       }
                       placeholder="Python, Machine Learning, API Integration"
                       className="w-full px-3 py-2 border rounded-lg outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
-                        color: "#1F2D3D"
+                        color: "#1F2D3D",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1F2D3D" }}
+                    >
                       Required Candidates
                     </label>
                     <input
@@ -860,13 +900,13 @@ const LiveProjects = () => {
                       placeholder="30"
                       min="1"
                       className="w-full px-3 py-2 border rounded-lg outline-none"
-                      style={{ 
+                      style={{
                         backgroundColor: "white",
                         borderColor: "#B5D3E7",
-                        color: "#1F2D3D"
+                        color: "#1F2D3D",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                      onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                      onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                      onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                     />
                   </div>
                   <div className="flex space-x-3 pt-2">
@@ -874,20 +914,24 @@ const LiveProjects = () => {
                       onClick={handleSave}
                       className="px-4 py-2 rounded-lg transition-colors text-white"
                       style={{ backgroundColor: "#6EA9CB" }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                      onMouseEnter={(e) =>
+                        (e.target.style.backgroundColor = "#5a8fa8")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.target.style.backgroundColor = "#6EA9CB")
+                      }
                     >
                       Save Changes
                     </button>
                     <button
                       onClick={handleCancel}
                       className="px-4 py-2 rounded-lg transition-colors"
-                      style={{ 
+                      style={{
                         backgroundColor: "#DCE8F2",
-                        color: "#1F2D3D"
+                        color: "#1F2D3D",
                       }}
-                      onMouseEnter={(e) => e.target.style.opacity = "0.8"}
-                      onMouseLeave={(e) => e.target.style.opacity = "1"}
+                      onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+                      onMouseLeave={(e) => (e.target.style.opacity = "1")}
                     >
                       Cancel
                     </button>
@@ -900,28 +944,36 @@ const LiveProjects = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                      <h3
+                        className="text-xl font-semibold"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         {project.title}
                       </h3>
-                      <button
-                        onClick={() => handleEdit(project)}
-                        className="p-2 rounded-lg transition-colors"
-                        style={{ color: "#1F2D3D", opacity: "0.5" }}
-                        onMouseEnter={(e) => {
-                          e.target.style.color = "#6EA9CB";
-                          e.target.style.backgroundColor = "#DCE8F2";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.color = "#1F2D3D";
-                          e.target.style.opacity = "0.5";
-                          e.target.style.backgroundColor = "transparent";
-                        }}
-                        title="Edit Project"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
+                      {isOwner && (
+                        <button
+                          onClick={() => handleEdit(project)}
+                          className="p-2 rounded-lg transition-colors"
+                          style={{ color: "#1F2D3D", opacity: "0.5" }}
+                          onMouseEnter={(e) => {
+                            e.target.style.color = "#6EA9CB";
+                            e.target.style.backgroundColor = "#DCE8F2";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.color = "#1F2D3D";
+                            e.target.style.opacity = "0.5";
+                            e.target.style.backgroundColor = "transparent";
+                          }}
+                          title="Edit Project"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
-                    <p className="text-lg font-medium mb-3" style={{ color: "#6EA9CB" }}>
+                    <p
+                      className="text-lg font-medium mb-3"
+                      style={{ color: "#6EA9CB" }}
+                    >
                       {project.company}
                     </p>
 
@@ -938,12 +990,18 @@ const LiveProjects = () => {
                       >
                         {project.priority} Priority
                       </span>
-                      <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: "#DCE8F2", color: "#1F2D3D" }}>
+                      <span
+                        className="px-2 py-1 text-xs rounded-full"
+                        style={{ backgroundColor: "#DCE8F2", color: "#1F2D3D" }}
+                      >
                         {project.type}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm mb-4" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                    <div
+                      className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm mb-4"
+                      style={{ color: "#1F2D3D", opacity: "0.6" }}
+                    >
                       <div className="flex items-center space-x-1">
                         <DollarSign className="w-4 h-4" />
                         <span>{project.budget}</span>
@@ -973,13 +1031,19 @@ const LiveProjects = () => {
 
                     {/* Positions Progress Bar */}
                     <div className="mb-4">
-                      <div className="flex justify-between text-sm mb-1" style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                      <div
+                        className="flex justify-between text-sm mb-1"
+                        style={{ color: "#1F2D3D", opacity: "0.6" }}
+                      >
                         <span>Positions Filled</span>
                         <span>
                           {project.applicants}/{project.requiredCandidates}
                         </span>
                       </div>
-                      <div className="w-full rounded-full h-2" style={{ backgroundColor: "#DCE8F2" }}>
+                      <div
+                        className="w-full rounded-full h-2"
+                        style={{ backgroundColor: "#DCE8F2" }}
+                      >
                         <div
                           className="h-2 rounded-full transition-all duration-300"
                           style={{
@@ -997,12 +1061,18 @@ const LiveProjects = () => {
                   </div>
                 </div>
 
-                <p className="mb-4 leading-relaxed" style={{ color: "#1F2D3D", opacity: "0.7" }}>
+                <p
+                  className="mb-4 leading-relaxed"
+                  style={{ color: "#1F2D3D", opacity: "0.7" }}
+                >
                   {project.description}
                 </p>
 
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-2" style={{ color: "#1F2D3D" }}>
+                  <h4
+                    className="text-sm font-medium mb-2"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Required Skills:
                   </h4>
                   <div className="flex flex-wrap gap-2">
@@ -1018,8 +1088,14 @@ const LiveProjects = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: "#B5D3E7" }}>
-                  <div className="text-sm" style={{ color: "#1F2D3D", opacity: "0.5" }}>
+                <div
+                  className="flex items-center justify-between pt-4 border-t"
+                  style={{ borderColor: "#B5D3E7" }}
+                >
+                  <div
+                    className="text-sm"
+                    style={{ color: "#1F2D3D", opacity: "0.5" }}
+                  >
                     Posted on{" "}
                     {new Date(project.postedDate).toLocaleDateString()}
                   </div>
@@ -1027,12 +1103,16 @@ const LiveProjects = () => {
                     <button
                       onClick={() => handleViewDetails(project)}
                       className="px-4 py-2 border rounded-lg transition-colors flex items-center space-x-2"
-                      style={{ 
+                      style={{
                         borderColor: "#B5D3E7",
-                        color: "#6EA9CB"
+                        color: "#6EA9CB",
                       }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = "#DCE8F2"}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+                      onMouseEnter={(e) =>
+                        (e.target.style.backgroundColor = "#DCE8F2")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.target.style.backgroundColor = "transparent")
+                      }
                     >
                       <Eye className="w-4 h-4" />
                       <span>View Details</span>
@@ -1045,12 +1125,14 @@ const LiveProjects = () => {
                           : ""
                       }`}
                       style={{
-                        backgroundColor: project.applicants >= project.requiredCandidates
-                          ? "#f8f9fa"
-                          : "#6EA9CB",
-                        color: project.applicants >= project.requiredCandidates
-                          ? "#6c757d"
-                          : "white"
+                        backgroundColor:
+                          project.applicants >= project.requiredCandidates
+                            ? "#f8f9fa"
+                            : "#6EA9CB",
+                        color:
+                          project.applicants >= project.requiredCandidates
+                            ? "#6c757d"
+                            : "white",
                       }}
                       onMouseEnter={(e) => {
                         if (project.applicants < project.requiredCandidates) {
@@ -1081,10 +1163,16 @@ const LiveProjects = () => {
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "white" }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "white" }}
+          >
             <div className="p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Edit Project Details
                 </h2>
                 <button
@@ -1109,7 +1197,10 @@ const LiveProjects = () => {
             <div className="p-6 space-y-6">
               {/* Form fields */}
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Project Title
                 </label>
                 <input
@@ -1119,17 +1210,20 @@ const LiveProjects = () => {
                     setEditData({ ...editData, title: e.target.value })
                   }
                   className="w-full px-3 py-2 border rounded-lg outline-none"
-                  style={{ 
+                  style={{
                     backgroundColor: "white",
                     borderColor: "#B5D3E7",
-                    color: "#1F2D3D"
+                    color: "#1F2D3D",
                   }}
-                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                  onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                  onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                  onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Company
                 </label>
                 <input
@@ -1139,17 +1233,20 @@ const LiveProjects = () => {
                     setEditData({ ...editData, company: e.target.value })
                   }
                   className="w-full px-3 py-2 border rounded-lg outline-none"
-                  style={{ 
+                  style={{
                     backgroundColor: "white",
                     borderColor: "#B5D3E7",
-                    color: "#1F2D3D"
+                    color: "#1F2D3D",
                   }}
-                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                  onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                  onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                  onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: "#1F2D3D" }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Description
                 </label>
                 <textarea
@@ -1162,18 +1259,26 @@ const LiveProjects = () => {
                   }
                   rows={4}
                   className="w-full px-3 py-2 border rounded-lg outline-none"
-                  style={{ 
+                  style={{
                     backgroundColor: "white",
                     borderColor: "#B5D3E7",
-                    color: "#1F2D3D"
+                    color: "#1F2D3D",
                   }}
-                  onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                  onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                  onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                  onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#1F2D3D', marginBottom: '4px' }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "#1F2D3D",
+                      marginBottom: "4px",
+                    }}
+                  >
                     Budget
                   </label>
                   <input
@@ -1183,20 +1288,28 @@ const LiveProjects = () => {
                       setEditData({ ...editData, budget: e.target.value })
                     }
                     style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      border: '1px solid #B5D3E7',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      color: '#1F2D3D',
-                      backgroundColor: '#F7FAFC'
+                      width: "100%",
+                      padding: "8px 12px",
+                      border: "1px solid #B5D3E7",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      color: "#1F2D3D",
+                      backgroundColor: "#F7FAFC",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                    onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                    onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                    onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#1F2D3D', marginBottom: '4px' }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "#1F2D3D",
+                      marginBottom: "4px",
+                    }}
+                  >
                     Duration
                   </label>
                   <input
@@ -1206,20 +1319,23 @@ const LiveProjects = () => {
                       setEditData({ ...editData, duration: e.target.value })
                     }
                     style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      border: '1px solid #B5D3E7',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      color: '#1F2D3D',
-                      backgroundColor: '#F7FAFC'
+                      width: "100%",
+                      padding: "8px 12px",
+                      border: "1px solid #B5D3E7",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      color: "#1F2D3D",
+                      backgroundColor: "#F7FAFC",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "#6EA9CB"}
-                    onBlur={(e) => e.target.style.borderColor = "#B5D3E7"}
+                    onFocus={(e) => (e.target.style.borderColor = "#6EA9CB")}
+                    onBlur={(e) => (e.target.style.borderColor = "#B5D3E7")}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Deadline
                   </label>
                   <input
@@ -1229,26 +1345,30 @@ const LiveProjects = () => {
                       setEditData({ ...editData, deadline: e.target.value })
                     }
                     className="w-full px-3 py-2 rounded-lg"
-                    style={{ 
-                      border: '1px solid #DCE8F2',
-                      backgroundColor: '#F7FAFC',
-                      color: '#1F2D3D'
+                    style={{
+                      border: "1px solid #DCE8F2",
+                      backgroundColor: "#F7FAFC",
+                      color: "#1F2D3D",
                     }}
                     onFocus={(e) => {
-                      e.target.style.outline = 'none';
-                      e.target.style.borderColor = '#6EA9CB';
-                      e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                      e.target.style.outline = "none";
+                      e.target.style.borderColor = "#6EA9CB";
+                      e.target.style.boxShadow =
+                        "0 0 0 2px rgba(110, 169, 203, 0.2)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = '#DCE8F2';
-                      e.target.style.boxShadow = 'none';
+                      e.target.style.borderColor = "#DCE8F2";
+                      e.target.style.boxShadow = "none";
                     }}
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Project Type
                   </label>
                   <select
@@ -1257,19 +1377,20 @@ const LiveProjects = () => {
                       setEditData({ ...editData, type: e.target.value })
                     }
                     className="w-full px-3 py-2 rounded-lg"
-                    style={{ 
-                      border: '1px solid #DCE8F2',
-                      backgroundColor: '#F7FAFC',
-                      color: '#1F2D3D'
+                    style={{
+                      border: "1px solid #DCE8F2",
+                      backgroundColor: "#F7FAFC",
+                      color: "#1F2D3D",
                     }}
                     onFocus={(e) => {
-                      e.target.style.outline = 'none';
-                      e.target.style.borderColor = '#6EA9CB';
-                      e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                      e.target.style.outline = "none";
+                      e.target.style.borderColor = "#6EA9CB";
+                      e.target.style.boxShadow =
+                        "0 0 0 2px rgba(110, 169, 203, 0.2)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = '#DCE8F2';
-                      e.target.style.boxShadow = 'none';
+                      e.target.style.borderColor = "#DCE8F2";
+                      e.target.style.boxShadow = "none";
                     }}
                   >
                     <option value="Development">Development</option>
@@ -1280,7 +1401,10 @@ const LiveProjects = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Priority
                   </label>
                   <select
@@ -1289,19 +1413,20 @@ const LiveProjects = () => {
                       setEditData({ ...editData, priority: e.target.value })
                     }
                     className="w-full px-3 py-2 rounded-lg"
-                    style={{ 
-                      border: '1px solid #DCE8F2',
-                      backgroundColor: '#F7FAFC',
-                      color: '#1F2D3D'
+                    style={{
+                      border: "1px solid #DCE8F2",
+                      backgroundColor: "#F7FAFC",
+                      color: "#1F2D3D",
                     }}
                     onFocus={(e) => {
-                      e.target.style.outline = 'none';
-                      e.target.style.borderColor = '#6EA9CB';
-                      e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                      e.target.style.outline = "none";
+                      e.target.style.borderColor = "#6EA9CB";
+                      e.target.style.boxShadow =
+                        "0 0 0 2px rgba(110, 169, 203, 0.2)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = '#DCE8F2';
-                      e.target.style.boxShadow = 'none';
+                      e.target.style.borderColor = "#DCE8F2";
+                      e.target.style.boxShadow = "none";
                     }}
                   >
                     <option value="High">High</option>
@@ -1311,7 +1436,10 @@ const LiveProjects = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Skills Required (comma separated)
                 </label>
                 <input
@@ -1326,25 +1454,29 @@ const LiveProjects = () => {
                   placeholder="Python, Machine Learning, API Integration"
                   className="w-full px-3 py-2 border rounded-lg"
                   style={{
-                    borderColor: '#DCE8F2',
-                    '&:focus': {
-                      outline: 'none',
-                      borderColor: '#6EA9CB',
-                      boxShadow: '0 0 0 2px rgba(110, 169, 203, 0.2)'
-                    }
+                    borderColor: "#DCE8F2",
+                    "&:focus": {
+                      outline: "none",
+                      borderColor: "#6EA9CB",
+                      boxShadow: "0 0 0 2px rgba(110, 169, 203, 0.2)",
+                    },
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#6EA9CB';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                    e.target.style.borderColor = "#6EA9CB";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(110, 169, 203, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Required Candidates
                 </label>
                 <input
@@ -1360,36 +1492,40 @@ const LiveProjects = () => {
                   min="1"
                   className="w-full px-3 py-2 border rounded-lg"
                   style={{
-                    borderColor: '#DCE8F2',
-                    '&:focus': {
-                      outline: 'none',
-                      borderColor: '#6EA9CB',
-                      boxShadow: '0 0 0 2px rgba(110, 169, 203, 0.2)'
-                    }
+                    borderColor: "#DCE8F2",
+                    "&:focus": {
+                      outline: "none",
+                      borderColor: "#6EA9CB",
+                      boxShadow: "0 0 0 2px rgba(110, 169, 203, 0.2)",
+                    },
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#6EA9CB';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(110, 169, 203, 0.2)';
+                    e.target.style.borderColor = "#6EA9CB";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(110, 169, 203, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t flex justify-end gap-3" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
+            <div
+              className="px-6 py-4 border-t flex justify-end gap-3"
+              style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}
+            >
               <button
                 onClick={handleCancel}
                 className="px-4 py-2 text-sm font-medium border rounded-lg transition-colors"
-                style={{ 
+                style={{
                   color: "#1F2D3D",
                   backgroundColor: "#DCE8F2",
-                  borderColor: "#B5D3E7"
+                  borderColor: "#B5D3E7",
                 }}
-                onMouseEnter={(e) => e.target.style.opacity = "0.8"}
-                onMouseLeave={(e) => e.target.style.opacity = "1"}
+                onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+                onMouseLeave={(e) => (e.target.style.opacity = "1")}
               >
                 Cancel
               </button>
@@ -1397,8 +1533,12 @@ const LiveProjects = () => {
                 onClick={handleSave}
                 className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
                 style={{ backgroundColor: "#6EA9CB" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#5a8fa8")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#6EA9CB")
+                }
               >
                 Save Changes
               </button>
@@ -1410,10 +1550,16 @@ const LiveProjects = () => {
       {/* Application Modal */}
       {isApplicationModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "white" }}>
+          <div
+            className="rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "white" }}
+          >
             <div className="p-6 border-b" style={{ borderColor: "#B5D3E7" }}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Apply for {selectedProject?.title}
                 </h2>
                 <button
@@ -1438,32 +1584,55 @@ const LiveProjects = () => {
             <div className="p-6 space-y-6">
               {/* Project Info Summary */}
               {selectedProject && (
-                <div className="p-4 rounded-lg mb-6" style={{ backgroundColor: "#F7FAFC" }}>
+                <div
+                  className="p-4 rounded-lg mb-6"
+                  style={{ backgroundColor: "#F7FAFC" }}
+                >
                   <h3 className="font-medium mb-2" style={{ color: "#1F2D3D" }}>
                     Project Details
                   </h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span style={{ color: "#1F2D3D", opacity: "0.6" }}>Company:</span>
-                      <span className="ml-2 font-medium" style={{ color: "#1F2D3D" }}>
+                      <span style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                        Company:
+                      </span>
+                      <span
+                        className="ml-2 font-medium"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         {selectedProject.company}
                       </span>
                     </div>
                     <div>
-                      <span style={{ color: "#1F2D3D", opacity: "0.6" }}>Budget:</span>
-                      <span className="ml-2 font-medium" style={{ color: "#1F2D3D" }}>
+                      <span style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                        Budget:
+                      </span>
+                      <span
+                        className="ml-2 font-medium"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         {selectedProject.budget}
                       </span>
                     </div>
                     <div>
-                      <span style={{ color: "#1F2D3D", opacity: "0.6" }}>Duration:</span>
-                      <span className="ml-2 font-medium" style={{ color: "#1F2D3D" }}>
+                      <span style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                        Duration:
+                      </span>
+                      <span
+                        className="ml-2 font-medium"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         {selectedProject.duration}
                       </span>
                     </div>
                     <div>
-                      <span style={{ color: "#1F2D3D", opacity: "0.6" }}>Registered:</span>
-                      <span className="ml-2 font-medium" style={{ color: "#1F2D3D" }}>
+                      <span style={{ color: "#1F2D3D", opacity: "0.6" }}>
+                        Registered:
+                      </span>
+                      <span
+                        className="ml-2 font-medium"
+                        style={{ color: "#1F2D3D" }}
+                      >
                         {selectedProject.applicants}/
                         {selectedProject.requiredCandidates} candidates
                       </span>
@@ -1472,7 +1641,10 @@ const LiveProjects = () => {
                       <span style={{ color: "#1F2D3D", opacity: "0.6" }}>
                         Remaining Positions:
                       </span>
-                      <span className="ml-2 font-medium" style={{ color: "#6EA9CB" }}>
+                      <span
+                        className="ml-2 font-medium"
+                        style={{ color: "#6EA9CB" }}
+                      >
                         {selectedProject.requiredCandidates -
                           selectedProject.applicants}{" "}
                         positions available
@@ -1484,7 +1656,10 @@ const LiveProjects = () => {
 
               {/* Application form fields */}
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Full Name
                 </label>
                 <input
@@ -1497,23 +1672,27 @@ const LiveProjects = () => {
                     })
                   }
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Email
                 </label>
                 <input
@@ -1526,23 +1705,27 @@ const LiveProjects = () => {
                     })
                   }
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Phone
                 </label>
                 <input
@@ -1555,23 +1738,27 @@ const LiveProjects = () => {
                     })
                   }
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Experience (in years)
                 </label>
                 <input
@@ -1584,23 +1771,27 @@ const LiveProjects = () => {
                     })
                   }
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Skills
                 </label>
                 <input
@@ -1614,23 +1805,27 @@ const LiveProjects = () => {
                   }
                   placeholder="e.g. Python, Data Analysis"
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Portfolio URL
                 </label>
                 <input
@@ -1643,23 +1838,27 @@ const LiveProjects = () => {
                     })
                   }
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Cover Letter
                 </label>
                 <textarea
@@ -1672,36 +1871,42 @@ const LiveProjects = () => {
                   }
                   rows={4}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Resume *
                 </label>
-                <div className="border-2 border-dashed rounded-lg p-4 transition-colors"
-                     style={{ 
-                       borderColor: '#DCE8F2',
-                       backgroundColor: '#FFFFFF'
-                     }}
-                     onMouseEnter={(e) => {
-                       e.target.style.borderColor = '#B5D3E7';
-                     }}
-                     onMouseLeave={(e) => {
-                       e.target.style.borderColor = '#DCE8F2';
-                     }}>
+                <div
+                  className="border-2 border-dashed rounded-lg p-4 transition-colors"
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.borderColor = "#B5D3E7";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.borderColor = "#DCE8F2";
+                  }}
+                >
                   <input
                     type="file"
                     onChange={handleFileUpload}
@@ -1713,14 +1918,23 @@ const LiveProjects = () => {
                     htmlFor="resume-upload"
                     className="flex flex-col items-center justify-center cursor-pointer"
                   >
-                    <Upload className="w-8 h-8 mb-2" style={{ color: '#6EA9CB' }} />
-                    <span className="text-sm" style={{ color: '#1F2D3D' }}>
+                    <Upload
+                      className="w-8 h-8 mb-2"
+                      style={{ color: "#6EA9CB" }}
+                    />
+                    <span className="text-sm" style={{ color: "#1F2D3D" }}>
                       {applicationData.resume ? (
                         <div className="text-center">
-                          <div className="font-medium" style={{ color: '#6EA9CB' }}>
+                          <div
+                            className="font-medium"
+                            style={{ color: "#6EA9CB" }}
+                          >
                             {applicationData.resume.name}
                           </div>
-                          <div className="text-xs mt-1" style={{ color: '#6EA9CB' }}>
+                          <div
+                            className="text-xs mt-1"
+                            style={{ color: "#6EA9CB" }}
+                          >
                             {(
                               applicationData.resume.size /
                               1024 /
@@ -1732,7 +1946,10 @@ const LiveProjects = () => {
                       ) : (
                         <div className="text-center">
                           <div>Click to upload your resume</div>
-                          <div className="text-xs mt-1" style={{ color: '#6EA9CB' }}>
+                          <div
+                            className="text-xs mt-1"
+                            style={{ color: "#6EA9CB" }}
+                          >
                             PDF, DOC, DOCX (max 5MB)
                           </div>
                         </div>
@@ -1750,12 +1967,12 @@ const LiveProjects = () => {
                           })
                         }
                         className="text-sm"
-                        style={{ color: '#6EA9CB' }}
+                        style={{ color: "#6EA9CB" }}
                         onMouseEnter={(e) => {
-                          e.target.style.color = '#1F2D3D';
+                          e.target.style.color = "#1F2D3D";
                         }}
                         onMouseLeave={(e) => {
-                          e.target.style.color = '#6EA9CB';
+                          e.target.style.color = "#6EA9CB";
                         }}
                       >
                         Remove file
@@ -1765,7 +1982,10 @@ const LiveProjects = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Availability
                 </label>
                 <input
@@ -1779,34 +1999,38 @@ const LiveProjects = () => {
                   }
                   placeholder="e.g. Immediately, 2 weeks notice"
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t flex justify-end gap-3" style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}>
+            <div
+              className="px-6 py-4 border-t flex justify-end gap-3"
+              style={{ backgroundColor: "#F7FAFC", borderColor: "#B5D3E7" }}
+            >
               <button
                 onClick={handleApplicationCancel}
                 className="px-4 py-2 text-sm font-medium border rounded-lg transition-colors"
-                style={{ 
+                style={{
                   color: "#1F2D3D",
                   backgroundColor: "#DCE8F2",
-                  borderColor: "#B5D3E7"
+                  borderColor: "#B5D3E7",
                 }}
-                onMouseEnter={(e) => e.target.style.opacity = "0.8"}
-                onMouseLeave={(e) => e.target.style.opacity = "1"}
+                onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+                onMouseLeave={(e) => (e.target.style.opacity = "1")}
               >
                 Cancel
               </button>
@@ -1814,8 +2038,12 @@ const LiveProjects = () => {
                 onClick={handleApplicationSubmit}
                 className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
                 style={{ backgroundColor: "#6EA9CB" }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#5a8fa8"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#6EA9CB"}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#5a8fa8")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#6EA9CB")
+                }
               >
                 Submit Application
               </button>
@@ -1827,16 +2055,25 @@ const LiveProjects = () => {
       {/* New Project Modal */}
       {isNewProjectModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="rounded-xl shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "white" }}>
-            <div className="px-6 py-4 border-b flex justify-between items-center" style={{ borderColor: "#B5D3E7" }}>
-              <h3 className="text-xl font-semibold" style={{ color: "#1F2D3D" }}>
+          <div
+            className="rounded-xl shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "white" }}
+          >
+            <div
+              className="px-6 py-4 border-b flex justify-between items-center"
+              style={{ borderColor: "#B5D3E7" }}
+            >
+              <h3
+                className="text-xl font-semibold"
+                style={{ color: "#1F2D3D" }}
+              >
                 Post New Project
               </h3>
               <button
                 onClick={handleNewProjectCancel}
                 className="transition-colors"
                 style={{ color: "#1F2D3D", opacity: "0.4" }}
-                onMouseEnter={(e) => e.target.style.color = "#6EA9CB"}
+                onMouseEnter={(e) => (e.target.style.color = "#6EA9CB")}
                 onMouseLeave={(e) => {
                   e.target.style.color = "#1F2D3D";
                   e.target.style.opacity = "0.4";
@@ -1849,7 +2086,10 @@ const LiveProjects = () => {
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Project Title *
                   </label>
                   <input
@@ -1863,23 +2103,27 @@ const LiveProjects = () => {
                     }
                     placeholder="Enter project title"
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                    style={{ 
-                      borderColor: '#DCE8F2', 
-                      backgroundColor: '#FFFFFF',
-                      color: '#1F2D3D'
+                    style={{
+                      borderColor: "#DCE8F2",
+                      backgroundColor: "#FFFFFF",
+                      color: "#1F2D3D",
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = '#B5D3E7';
-                      e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                      e.target.style.borderColor = "#B5D3E7";
+                      e.target.style.boxShadow =
+                        "0 0 0 2px rgba(181, 211, 231, 0.2)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = '#DCE8F2';
-                      e.target.style.boxShadow = 'none';
+                      e.target.style.borderColor = "#DCE8F2";
+                      e.target.style.boxShadow = "none";
                     }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Company *
                   </label>
                   <input
@@ -1893,25 +2137,29 @@ const LiveProjects = () => {
                     }
                     placeholder="Company name"
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                    style={{ 
-                      borderColor: '#DCE8F2', 
-                      backgroundColor: '#FFFFFF',
-                      color: '#1F2D3D'
+                    style={{
+                      borderColor: "#DCE8F2",
+                      backgroundColor: "#FFFFFF",
+                      color: "#1F2D3D",
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = '#B5D3E7';
-                      e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                      e.target.style.borderColor = "#B5D3E7";
+                      e.target.style.boxShadow =
+                        "0 0 0 2px rgba(181, 211, 231, 0.2)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = '#DCE8F2';
-                      e.target.style.boxShadow = 'none';
+                      e.target.style.borderColor = "#DCE8F2";
+                      e.target.style.boxShadow = "none";
                     }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: "#1F2D3D" }}
+                >
                   Project Description *
                 </label>
                 <textarea
@@ -1925,25 +2173,29 @@ const LiveProjects = () => {
                   rows={4}
                   placeholder="Describe the project requirements and objectives"
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                  style={{ 
-                    borderColor: '#DCE8F2', 
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2D3D'
+                  style={{
+                    borderColor: "#DCE8F2",
+                    backgroundColor: "#FFFFFF",
+                    color: "#1F2D3D",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#B5D3E7';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                    e.target.style.borderColor = "#B5D3E7";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(181, 211, 231, 0.2)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#DCE8F2';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.borderColor = "#DCE8F2";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: '#1F2D3D' }}>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     Budget *
                   </label>
                   <input
@@ -1957,18 +2209,19 @@ const LiveProjects = () => {
                     }
                     placeholder="e.g. ₹5-10 Lakhs"
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none"
-                    style={{ 
-                      borderColor: '#DCE8F2', 
-                      backgroundColor: '#FFFFFF',
-                      color: '#1F2D3D'
+                    style={{
+                      borderColor: "#DCE8F2",
+                      backgroundColor: "#FFFFFF",
+                      color: "#1F2D3D",
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = '#B5D3E7';
-                      e.target.style.boxShadow = '0 0 0 2px rgba(181, 211, 231, 0.2)';
+                      e.target.style.borderColor = "#B5D3E7";
+                      e.target.style.boxShadow =
+                        "0 0 0 2px rgba(181, 211, 231, 0.2)";
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = '#DCE8F2';
-                      e.target.style.boxShadow = 'none';
+                      e.target.style.borderColor = "#DCE8F2";
+                      e.target.style.boxShadow = "none";
                     }}
                   />
                 </div>
@@ -2398,40 +2651,144 @@ const LiveProjects = () => {
 
       {/* Project Statistics */}
       <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div style={{ backgroundColor: '#DCE8F2', color: '#1F2D3D', padding: '12px', borderRadius: '8px', border: '1px solid #B5D3E7' }}>
+        <div
+          style={{
+            backgroundColor: "#DCE8F2",
+            color: "#1F2D3D",
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid #B5D3E7",
+          }}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <p style={{ color: '#6B7280', fontSize: '12px', marginBottom: '4px' }}>Active Projects</p>
-              <p style={{ fontSize: '18px', fontWeight: '600', color: '#1F2D3D' }}>45</p>
+              <p
+                style={{
+                  color: "#6B7280",
+                  fontSize: "12px",
+                  marginBottom: "4px",
+                }}
+              >
+                Active Projects
+              </p>
+              <p
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  color: "#1F2D3D",
+                }}
+              >
+                45
+              </p>
             </div>
-            <CheckCircle style={{ width: '20px', height: '20px', color: '#6B7280' }} />
+            <CheckCircle
+              style={{ width: "20px", height: "20px", color: "#6B7280" }}
+            />
           </div>
         </div>
-        <div style={{ backgroundColor: '#DCE8F2', color: '#1F2D3D', padding: '12px', borderRadius: '8px', border: '1px solid #B5D3E7' }}>
+        <div
+          style={{
+            backgroundColor: "#DCE8F2",
+            color: "#1F2D3D",
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid #B5D3E7",
+          }}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <p style={{ color: '#6B7280', fontSize: '12px', marginBottom: '4px' }}>Total Budget</p>
-              <p style={{ fontSize: '18px', fontWeight: '600', color: '#1F2D3D' }}>₹2.5Cr</p>
+              <p
+                style={{
+                  color: "#6B7280",
+                  fontSize: "12px",
+                  marginBottom: "4px",
+                }}
+              >
+                Total Budget
+              </p>
+              <p
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  color: "#1F2D3D",
+                }}
+              >
+                ₹2.5Cr
+              </p>
             </div>
-            <DollarSign style={{ width: '20px', height: '20px', color: '#6B7280' }} />
+            <DollarSign
+              style={{ width: "20px", height: "20px", color: "#6B7280" }}
+            />
           </div>
         </div>
-        <div style={{ backgroundColor: '#DCE8F2', color: '#1F2D3D', padding: '12px', borderRadius: '8px', border: '1px solid #B5D3E7' }}>
+        <div
+          style={{
+            backgroundColor: "#DCE8F2",
+            color: "#1F2D3D",
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid #B5D3E7",
+          }}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <p style={{ color: '#6B7280', fontSize: '12px', marginBottom: '4px' }}>Applications</p>
-              <p style={{ fontSize: '18px', fontWeight: '600', color: '#1F2D3D' }}>234</p>
+              <p
+                style={{
+                  color: "#6B7280",
+                  fontSize: "12px",
+                  marginBottom: "4px",
+                }}
+              >
+                Applications
+              </p>
+              <p
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  color: "#1F2D3D",
+                }}
+              >
+                234
+              </p>
             </div>
-            <Users style={{ width: '20px', height: '20px', color: '#6B7280' }} />
+            <Users
+              style={{ width: "20px", height: "20px", color: "#6B7280" }}
+            />
           </div>
         </div>
-        <div style={{ backgroundColor: '#DCE8F2', color: '#1F2D3D', padding: '12px', borderRadius: '8px', border: '1px solid #B5D3E7' }}>
+        <div
+          style={{
+            backgroundColor: "#DCE8F2",
+            color: "#1F2D3D",
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid #B5D3E7",
+          }}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <p style={{ color: '#6B7280', fontSize: '12px', marginBottom: '4px' }}>Urgent</p>
-              <p style={{ fontSize: '18px', fontWeight: '600', color: '#1F2D3D' }}>8</p>
+              <p
+                style={{
+                  color: "#6B7280",
+                  fontSize: "12px",
+                  marginBottom: "4px",
+                }}
+              >
+                Urgent
+              </p>
+              <p
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  color: "#1F2D3D",
+                }}
+              >
+                8
+              </p>
             </div>
-            <AlertCircle style={{ width: '20px', height: '20px', color: '#6B7280' }} />
+            <AlertCircle
+              style={{ width: "20px", height: "20px", color: "#6B7280" }}
+            />
           </div>
         </div>
       </div>

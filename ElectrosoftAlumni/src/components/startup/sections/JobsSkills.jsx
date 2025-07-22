@@ -24,17 +24,29 @@ import {
 
 // Map skill names to specific Lucide icons for a professional look
 const iconMap = {
-  "Artificial Intelligence": <Bot className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
-  "Product Management": <ClipboardList className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
-  "Data Science": <BarChart className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
-  "UI/UX Design": <Palette className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
-  "DevOps Engineering": <Settings className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
-  "Digital Marketing": <Megaphone className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
-  Cybersecurity: <ShieldCheck className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
-  "Blockchain Development": <LinkIcon className="w-6 h-6" style={{ color: '#6EA9CB' }} />,
+  "Artificial Intelligence": (
+    <Bot className="w-6 h-6" style={{ color: "#6EA9CB" }} />
+  ),
+  "Product Management": (
+    <ClipboardList className="w-6 h-6" style={{ color: "#6EA9CB" }} />
+  ),
+  "Data Science": <BarChart className="w-6 h-6" style={{ color: "#6EA9CB" }} />,
+  "UI/UX Design": <Palette className="w-6 h-6" style={{ color: "#6EA9CB" }} />,
+  "DevOps Engineering": (
+    <Settings className="w-6 h-6" style={{ color: "#6EA9CB" }} />
+  ),
+  "Digital Marketing": (
+    <Megaphone className="w-6 h-6" style={{ color: "#6EA9CB" }} />
+  ),
+  Cybersecurity: (
+    <ShieldCheck className="w-6 h-6" style={{ color: "#6EA9CB" }} />
+  ),
+  "Blockchain Development": (
+    <LinkIcon className="w-6 h-6" style={{ color: "#6EA9CB" }} />
+  ),
 };
 
-const JobsSkills = () => {
+const JobsSkills = ({ isOwner, startupData }) => {
   // State for editing functionality
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState({});
@@ -76,22 +88,22 @@ const JobsSkills = () => {
     ],
     marketStats: [
       {
-        icon: <Briefcase className="w-8 h-8" style={{ color: '#6EA9CB' }} />,
+        icon: <Briefcase className="w-8 h-8" style={{ color: "#6EA9CB" }} />,
         value: "2,500+",
         label: "Active Jobs",
       },
       {
-        icon: <TrendingUp className="w-8 h-8" style={{ color: '#6EA9CB' }} />,
+        icon: <TrendingUp className="w-8 h-8" style={{ color: "#6EA9CB" }} />,
         value: "85%",
         label: "Placement Rate",
       },
       {
-        icon: <Star className="w-8 h-8" style={{ color: '#6EA9CB' }} />,
+        icon: <Star className="w-8 h-8" style={{ color: "#6EA9CB" }} />,
         value: "4.8/5",
         label: "Avg Rating",
       },
       {
-        icon: <MapPin className="w-8 h-8" style={{ color: '#6EA9CB' }} />,
+        icon: <MapPin className="w-8 h-8" style={{ color: "#6EA9CB" }} />,
         value: "50+",
         label: "Cities",
       },
@@ -443,7 +455,10 @@ const JobsSkills = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all duration-300" style={{ backgroundColor: '#F7FAFC' }}>
+        <div
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all duration-300"
+          style={{ backgroundColor: "#F7FAFC" }}
+        >
           <div className="p-6 relative">
             <button
               onClick={onClose}
@@ -470,7 +485,7 @@ const JobsSkills = () => {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 bg-[#DCE8F2] rounded-xl flex-shrink-0 items-center justify-center hidden sm:flex">
                   {iconMap[skill.name] || (
-                    <Zap className="w-8 h-8" style={{ color: '#6EA9CB' }} />
+                    <Zap className="w-8 h-8" style={{ color: "#6EA9CB" }} />
                   )}
                 </div>
                 <div>
@@ -501,14 +516,16 @@ const JobsSkills = () => {
                   <>
                     <div className="w-12 h-12 bg-[#DCE8F2] rounded-xl flex-shrink-0 items-center justify-center hidden sm:flex">
                       {iconMap[skill.name] || (
-                        <Zap className="w-7 h-7" style={{ color: '#6EA9CB' }} />
+                        <Zap className="w-7 h-7" style={{ color: "#6EA9CB" }} />
                       )}
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold text-[#1F2D3D]">
                         {path.title}
                       </h2>
-                      <p className="text-md text-[#1F2D3D]/70">for {skill.name}</p>
+                      <p className="text-md text-[#1F2D3D]/70">
+                        for {skill.name}
+                      </p>
                     </div>
                   </>
                 ) : (
@@ -516,26 +533,49 @@ const JobsSkills = () => {
                     <h2 className="text-2xl font-bold text-[#1F2D3D]">
                       {path.title}
                     </h2>
-                    <p className="text-md text-[#1F2D3D]/70">for {skill.name}</p>
+                    <p className="text-md text-[#1F2D3D]/70">
+                      for {skill.name}
+                    </p>
                   </div>
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center">
                 <div className="bg-[#DCE8F2] p-3 rounded-lg">
-                  <Clock className="w-6 h-6 mx-auto mb-1" style={{ color: '#6EA9CB' }} />
-                  <p className="font-semibold" style={{ color: '#1F2D3D' }}>{path.duration}</p>
-                  <p className="text-xs" style={{ color: '#1F2D3D' }}>Duration</p>
+                  <Clock
+                    className="w-6 h-6 mx-auto mb-1"
+                    style={{ color: "#6EA9CB" }}
+                  />
+                  <p className="font-semibold" style={{ color: "#1F2D3D" }}>
+                    {path.duration}
+                  </p>
+                  <p className="text-xs" style={{ color: "#1F2D3D" }}>
+                    Duration
+                  </p>
                 </div>
                 <div className="bg-[#DCE8F2] p-3 rounded-lg">
-                  <BarChart2 className="w-6 h-6 mx-auto mb-1" style={{ color: '#6EA9CB' }} />
-                  <p className="font-semibold" style={{ color: '#1F2D3D' }}>{path.level}</p>
-                  <p className="text-xs" style={{ color: '#1F2D3D' }}>Level</p>
+                  <BarChart2
+                    className="w-6 h-6 mx-auto mb-1"
+                    style={{ color: "#6EA9CB" }}
+                  />
+                  <p className="font-semibold" style={{ color: "#1F2D3D" }}>
+                    {path.level}
+                  </p>
+                  <p className="text-xs" style={{ color: "#1F2D3D" }}>
+                    Level
+                  </p>
                 </div>
                 <div className="bg-[#DCE8F2] p-3 rounded-lg">
-                  <Star className="w-6 h-6 mx-auto mb-1" style={{ color: '#6EA9CB' }} />
-                  <p className="font-semibold" style={{ color: '#1F2D3D' }}>{path.rating}/5</p>
-                  <p className="text-xs" style={{ color: '#1F2D3D' }}>by {path.provider}</p>
+                  <Star
+                    className="w-6 h-6 mx-auto mb-1"
+                    style={{ color: "#6EA9CB" }}
+                  />
+                  <p className="font-semibold" style={{ color: "#1F2D3D" }}>
+                    {path.rating}/5
+                  </p>
+                  <p className="text-xs" style={{ color: "#1F2D3D" }}>
+                    by {path.provider}
+                  </p>
                 </div>
               </div>
 
@@ -593,7 +633,10 @@ const JobsSkills = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all duration-300" style={{ backgroundColor: '#F7FAFC' }}>
+        <div
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all duration-300"
+          style={{ backgroundColor: "#F7FAFC" }}
+        >
           <div className="p-6 relative">
             <button
               onClick={onClose}
@@ -604,7 +647,7 @@ const JobsSkills = () => {
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-[#DCE8F2] rounded-lg flex items-center justify-center">
                 {iconMap[skill.name] || (
-                  <Briefcase className="w-7 h-7" style={{ color: '#6EA9CB' }} />
+                  <Briefcase className="w-7 h-7" style={{ color: "#6EA9CB" }} />
                 )}
               </div>
               <div>
@@ -761,7 +804,7 @@ const JobsSkills = () => {
   };
 
   return (
-    <div className="p-6 sm:p-6 lg:p-8" style={{ backgroundColor: '#F7FAFC' }}>
+    <div className="p-6 sm:p-6 lg:p-8" style={{ backgroundColor: "#F7FAFC" }}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-12 relative">
           {/* Edit button positioned at top right */}
@@ -819,8 +862,14 @@ const JobsSkills = () => {
       {/* Edit Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden" style={{ backgroundColor: '#F7FAFC' }}>
-            <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#DCE8F2' }}>
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden"
+            style={{ backgroundColor: "#F7FAFC" }}
+          >
+            <div
+              className="flex items-center justify-between p-6 border-b"
+              style={{ borderColor: "#DCE8F2" }}
+            >
               <h2 className="text-xl font-semibold text-[#1F2D3D]">
                 Edit Jobs & Skills Content
               </h2>

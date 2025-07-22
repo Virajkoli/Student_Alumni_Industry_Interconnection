@@ -16,6 +16,8 @@ const HorizontalProfileNavbar = ({
   onNavigationChange,
   navigationOptions,
   industryData = {},
+  isOwner = false,
+  onUpdate,
 }) => {
   const [activeItem, setActiveItem] = useState("industry-overview");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -95,6 +97,9 @@ const HorizontalProfileNavbar = ({
 
   const handleSaveProfile = () => {
     setProfileData({ ...editData });
+    if (onUpdate) {
+      onUpdate(editData);
+    }
     setIsEditModalOpen(false);
   };
 
@@ -122,15 +127,17 @@ const HorizontalProfileNavbar = ({
               background: "linear-gradient(135deg, #B5D3E7 0%, #6EA9CB 100%)",
             }}
           ></div>
-          {/* Edit Button */}
-          <button
-            onClick={handleEditClick}
-            className="absolute top-4 right-4 p-2 hover:opacity-80 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
-            style={{ backgroundColor: "rgba(110, 169, 203, 0.3)" }}
-            title="Edit Profile"
-          >
-            <Edit3 className="w-5 h-5" />
-          </button>
+          {/* Edit Button - Only show if user is owner */}
+          {isOwner && (
+            <button
+              onClick={handleEditClick}
+              className="absolute top-4 right-4 p-2 hover:opacity-80 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
+              style={{ backgroundColor: "rgba(110, 169, 203, 0.3)" }}
+              title="Edit Profile"
+            >
+              <Edit3 className="w-5 h-5" />
+            </button>
+          )}
           {/* Larger profile image, adjusted positioning */}
           <div className="absolute -bottom-14 left-8">
             <div

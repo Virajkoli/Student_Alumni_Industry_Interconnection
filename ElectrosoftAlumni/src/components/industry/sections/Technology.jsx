@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Edit3, Cpu, Zap, TrendingUp, Star, ExternalLink } from "lucide-react";
 
-const Technology = () => {
+const Technology = ({ isOwner, industryData }) => {
   const [editingId, setEditingId] = useState(null);
   const [technologies, setTechnologies] = useState([
     {
@@ -383,13 +383,15 @@ const Technology = () => {
                       </span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleEdit(tech)}
-                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="Edit Technology"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
+                  {isOwner && (
+                    <button
+                      onClick={() => handleEdit(tech)}
+                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit Technology"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
 
                 <p className="text-gray-700 mb-4 leading-relaxed text-sm">

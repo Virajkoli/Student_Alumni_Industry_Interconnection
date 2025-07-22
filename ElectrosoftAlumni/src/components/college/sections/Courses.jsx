@@ -1,68 +1,177 @@
-import React, { useState } from "react";
-import { Edit, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Edit, X, Plus, Trash2 } from "lucide-react";
+import { useAuth } from "../../../contexts/AuthContext";
+import apiService from "../../../services/apiService";
 
-const Courses = ({ data, onEdit }) => {
+const Courses = () => {
+  const { user } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editData, setEditData] = useState({ ...data });
-  const [courseData, setCourseData] = useState({ ...data });
+  const [editData, setEditData] = useState([]);
+  const [courseData, setCourseData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Load courses data from backend
+  useEffect(() => {
+    const loadCoursesData = async () => {
+      if (!user || user.role !== "college") {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await apiService.getCollegeAcademics();
+        
+        if (response.success) {
+          setCourseData(response.data);
+        } else {
+          setCourseData([]);
+        }
+      } catch (error) {
+        console.error("Error loading courses data:", error);
+        setError("Failed to load course information. Please try again.");
+        setCourseData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCoursesData();
+  }, [user]);
 
   const handleEditClick = () => {
-    setEditData({ ...courseData });
+    setEditData([...courseData]);
     setIsEditModalOpen(true);
   };
 
-  const handleInputChange = (field, value) => {
-    setEditData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleBranchChange = (key, idx, value) => {
+  const handleInputChange = (index, field, value) => {
     setEditData((prev) => {
-      const arr = [...(prev[`${key}Branches`] || [])];
-      arr[idx] = value;
-      return { ...prev, [`${key}Branches`]: arr };
+      const newData = [...prev];
+      newData[index] = { ...newData[index], [field]: value };
+      return newData;
     });
   };
 
-  const handleAddBranch = (key) => {
-    setEditData((prev) => ({
+  const handleSpecializationChange = (courseIndex, specializationIndex, value) => {
+    setEditData((prev) => {
+      const newData = [...prev];
+      const specializations = [...(newData[courseIndex].specializations || [])];
+      specializations[specializationIndex] = value;
+      newData[courseIndex] = { ...newData[courseIndex], specializations };
+      return newData;
+    });
+  };
+
+  const handleAddSpecialization = (courseIndex) => {
+    setEditData((prev) => {
+      const newData = [...prev];
+      const specializations = [...(newData[courseIndex].specializations || []), ""];
+      newData[courseIndex] = { ...newData[courseIndex], specializations };
+      return newData;
+    });
+  };
+
+  const handleRemoveSpecialization = (courseIndex, specializationIndex) => {
+    setEditData((prev) => {
+      const newData = [...prev];
+      const specializations = [...(newData[courseIndex].specializations || [])];
+      specializations.splice(specializationIndex, 1);
+      newData[courseIndex] = { ...newData[courseIndex], specializations };
+      return newData;
+    });
+  };
+
+  const handleAddCourse = () => {
+    setEditData((prev) => [
       ...prev,
-      [`${key}Branches`]: [...(prev[`${key}Branches`] || []), ""]
-    }));
+      {
+        course_name: "",
+        degree_type: "",
+        duration: "",
+        total_seats: "",
+        specializations: [""],
+        curriculum: "",
+        assessment_method: "",
+        is_active: true
+      }
+    ]);
   };
 
-  const handleRemoveBranch = (key, idx) => {
+  const handleRemoveCourse = (index) => {
     setEditData((prev) => {
-      const arr = [...(prev[`${key}Branches`] || [])];
-      arr.splice(idx, 1);
-      return { ...prev, [`${key}Branches`]: arr };
+      const newData = [...prev];
+      newData.splice(index, 1);
+      return newData;
     });
   };
 
-  const handleSave = () => {
-    setCourseData({ ...editData });
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    try {
+      setError(null);
+      
+      const response = await apiService.updateCollegeAcademics(editData);
+      
+      if (response.success) {
+        setCourseData(response.data);
+        setIsEditModalOpen(false);
+      } else {
+        throw new Error(response.message || "Failed to save courses");
+      }
+    } catch (error) {
+      console.error("Error saving courses:", error);
+      setError("Failed to save course information. Please try again.");
+    }
   };
 
   const handleCancel = () => {
-    setEditData({ ...courseData });
+    setEditData([...courseData]);
     setIsEditModalOpen(false);
   };
 
-  if (!courseData) return null;
+  if (isLoading) {
+    return (
+      <div className="p-8 max-w-4xl mx-auto">
+        <div className="bg-white rounded-lg">
+          <div className="flex justify-center items-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading course information...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // Helper to render a table row for each course type
-  const renderTableRow = (label, duration, eligibility, branches, fees, totalSeats) => (
-    <tr className="bg-white">
-      <td className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-900">{label}</td>
-      <td className="px-4 py-3 border-b border-gray-200 text-gray-700">{duration}</td>
-      <td className="px-4 py-3 border-b border-gray-200 text-gray-700">{eligibility}</td>
+  // Helper to render a table row for each course
+  const renderTableRow = (course, index) => (
+    <tr key={index} className="bg-white">
+      <td className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-900">
+        {course.course_name || 'N/A'}
+      </td>
+      <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+        {course.degree_type || 'N/A'}
+      </td>
+      <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+        {course.duration || 'N/A'}
+      </td>
       <td className="px-4 py-3 border-b border-gray-200">
         <ul className="list-disc list-inside space-y-1 text-gray-700">
-          {branches && branches.length > 0 ? branches.map((b, i) => <li key={i}>{b}</li>) : <li>N/A</li>}
+          {course.specializations && course.specializations.length > 0 
+            ? course.specializations.map((spec, i) => <li key={i}>{spec}</li>) 
+            : <li>N/A</li>
+          }
         </ul>
       </td>
-      <td className="px-4 py-3 border-b border-gray-200 text-gray-700">{fees}</td>
-      <td className="px-4 py-3 border-b border-gray-200 text-gray-700">{totalSeats}</td>
+      <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+        {course.total_seats || 'N/A'}
+      </td>
+      <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+        {course.assessment_method || 'N/A'}
+      </td>
     </tr>
   );
   return (
@@ -71,79 +180,54 @@ const Courses = ({ data, onEdit }) => {
         <div className="bg-white rounded-lg mb-8">
           <div className="flex items-center justify-between p-8 border-b border-gray-200">
             <h2 className="text-2xl font-semibold text-gray-900">Course Details</h2>
-            <button
-              onClick={handleEditClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-              title="Edit course details"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
+            {user && user.role === "college" && (
+              <button
+                onClick={handleEditClick}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                title="Edit course details"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+            )}
           </div>
           <div className="p-8">
-            <div className="overflow-x-auto">
-              <table className="min-w-full border border-gray-200 rounded-lg text-base">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Program</th>
-                    <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Duration</th>
-                    <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Eligibility</th>
-                    <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Branches & Seats</th>
-                    <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Annual Fees</th>
-                    <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Total Seats</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {renderTableRow(
-                    "B.Tech",
-                    courseData.btechDuration,
-                    courseData.btechEligibility,
-                    courseData.btechBranches,
-                    courseData.btechFees,
-                    courseData.btechTotalSeats
-                  )}
-                  {renderTableRow(
-                    "M.Tech",
-                    courseData.mtechDuration,
-                    courseData.mtechEligibility,
-                    courseData.mtechBranches,
-                    courseData.mtechFees,
-                    courseData.mtechTotalSeats
-                  )}
-                  {renderTableRow(
-                    "B.Sc",
-                    courseData.bscDuration,
-                    courseData.bscEligibility,
-                    courseData.bscBranches,
-                    courseData.bscFees,
-                    courseData.bscTotalSeats
-                  )}
-                  {renderTableRow(
-                    "M.Sc",
-                    courseData.mscDuration,
-                    courseData.mscEligibility,
-                    courseData.mscBranches,
-                    courseData.mscFees,
-                    courseData.mscTotalSeats
-                  )}
-                  {renderTableRow(
-                    "MBA",
-                    courseData.mbaDuration,
-                    courseData.mbaEligibility,
-                    courseData.mbaBranches,
-                    courseData.mbaFees,
-                    courseData.mbaTotalSeats
-                  )}
-                  {renderTableRow(
-                    "Ph.D",
-                    courseData.phdDuration,
-                    courseData.phdEligibility,
-                    courseData.phdBranches,
-                    courseData.phdFees,
-                    courseData.phdTotalSeats
-                  )}
-                </tbody>
-              </table>
-            </div>
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600">{error}</p>
+              </div>
+            )}
+            
+            {courseData.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">No course information available</p>
+                {user && user.role === "college" && (
+                  <button
+                    onClick={handleEditClick}
+                    className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Add Courses
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full border border-gray-200 rounded-lg text-base">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Course Name</th>
+                      <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Degree Type</th>
+                      <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Duration</th>
+                      <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Specializations</th>
+                      <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Total Seats</th>
+                      <th className="px-4 py-3 border-b border-gray-200 text-left font-semibold text-gray-900">Assessment Method</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {courseData.map((course, index) => renderTableRow(course, index))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -159,70 +243,108 @@ const Courses = ({ data, onEdit }) => {
                 <X className="w-6 h-6" />
               </button>
             </div>
+            
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600">{error}</p>
+              </div>
+            )}
+            
             <form className="space-y-6" onSubmit={e => { e.preventDefault(); handleSave(); }}>
-              {[
-                { key: 'btech', label: 'B.Tech' },
-                { key: 'mtech', label: 'M.Tech' },
-                { key: 'bsc', label: 'B.Sc' },
-                { key: 'msc', label: 'M.Sc' },
-                { key: 'mba', label: 'MBA' },
-                { key: 'phd', label: 'Ph.D' },
-              ].map(({ key, label }) => (
-                <div key={key} className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-800 mb-3 text-lg">{label}</h4>
+              {editData.map((course, courseIndex) => (
+                <div key={courseIndex} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="font-semibold text-blue-800 text-lg">
+                      Course {courseIndex + 1}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCourse(courseIndex)}
+                      className="text-red-600 hover:text-red-800"
+                      disabled={editData.length === 1}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Course Name</label>
+                      <input 
+                        type="text" 
+                        value={course.course_name || ''} 
+                        onChange={e => handleInputChange(courseIndex, 'course_name', e.target.value)} 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
+                        placeholder="e.g., Bachelor of Technology"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Degree Type</label>
+                      <input 
+                        type="text" 
+                        value={course.degree_type || ''} 
+                        onChange={e => handleInputChange(courseIndex, 'degree_type', e.target.value)} 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
+                        placeholder="e.g., B.Tech, M.Tech, MBA"
+                      />
+                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
                       <input 
                         type="text" 
-                        value={editData[`${key}Duration`] || ''} 
-                        onChange={e => handleInputChange(`${key}Duration`, e.target.value)} 
+                        value={course.duration || ''} 
+                        onChange={e => handleInputChange(courseIndex, 'duration', e.target.value)} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Annual Fees</label>
-                      <input 
-                        type="text" 
-                        value={editData[`${key}Fees`] || ''} 
-                        onChange={e => handleInputChange(`${key}Fees`, e.target.value)} 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
+                        placeholder="e.g., 4 Years, 2 Years"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Total Seats</label>
                       <input 
-                        type="text" 
-                        value={editData[`${key}TotalSeats`] || ''} 
-                        onChange={e => handleInputChange(`${key}TotalSeats`, e.target.value)} 
+                        type="number" 
+                        value={course.total_seats || ''} 
+                        onChange={e => handleInputChange(courseIndex, 'total_seats', e.target.value)} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
+                        placeholder="e.g., 120"
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Eligibility</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Curriculum</label>
                       <textarea 
-                        value={editData[`${key}Eligibility`] || ''} 
-                        onChange={e => handleInputChange(`${key}Eligibility`, e.target.value)} 
+                        value={course.curriculum || ''} 
+                        onChange={e => handleInputChange(courseIndex, 'curriculum', e.target.value)} 
                         rows={2} 
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none text-base" 
+                        placeholder="Brief description of the curriculum"
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Branches & Seats</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Assessment Method</label>
+                      <input 
+                        type="text" 
+                        value={course.assessment_method || ''} 
+                        onChange={e => handleInputChange(courseIndex, 'assessment_method', e.target.value)} 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" 
+                        placeholder="e.g., Continuous Assessment, Final Exams, Projects"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Specializations</label>
                       <div className="space-y-2">
-                        {(editData[`${key}Branches`] && editData[`${key}Branches`].length > 0 ? editData[`${key}Branches`] : ['']).map((branch, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
+                        {(course.specializations && course.specializations.length > 0 ? course.specializations : ['']).map((specialization, specIndex) => (
+                          <div key={specIndex} className="flex items-center gap-2">
                             <input
                               type="text"
-                              value={branch}
-                              onChange={e => handleBranchChange(key, idx, e.target.value)}
+                              value={specialization}
+                              onChange={e => handleSpecializationChange(courseIndex, specIndex, e.target.value)}
                               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-base"
+                              placeholder="e.g., Computer Science, Mechanical Engineering"
                             />
                             <button
                               type="button"
-                              onClick={() => handleRemoveBranch(key, idx)}
+                              onClick={() => handleRemoveSpecialization(courseIndex, specIndex)}
                               className="text-red-600 hover:text-red-800 px-2"
-                              disabled={editData[`${key}Branches`]?.length === 1}
+                              disabled={course.specializations?.length === 1}
                             >
                               Remove
                             </button>
@@ -230,16 +352,28 @@ const Courses = ({ data, onEdit }) => {
                         ))}
                         <button
                           type="button"
-                          onClick={() => handleAddBranch(key)}
+                          onClick={() => handleAddSpecialization(courseIndex)}
                           className="w-full p-2 border border-blue-600 text-blue-700 rounded hover:bg-blue-50 text-base"
                         >
-                          Add Branch
+                          Add Specialization
                         </button>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
+              
+              <div className="border-t pt-4">
+                <button
+                  type="button"
+                  onClick={handleAddCourse}
+                  className="w-full p-3 border-2 border-dashed border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 text-base flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add New Course
+                </button>
+              </div>
+              
               <div className="flex gap-4 pt-4 border-t justify-end">
                 <button 
                   type="button" 
@@ -254,7 +388,6 @@ const Courses = ({ data, onEdit }) => {
                 >
                   Save Changes
                 </button>
-                
               </div>
             </form>
           </div>

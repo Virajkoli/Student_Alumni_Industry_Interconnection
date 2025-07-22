@@ -9,6 +9,7 @@ import Downloads from "../../components/college/sections/Downloads";
 import Admission from "../../components/college/sections/Admission";
 import Placement from "../../components/college/sections/Placement";
 import Events from "../../components/college/sections/Events";
+import StudentReviews from "../../components/college/sections/StudentReviews";
 // import Facilities from "../../components/college/sections/Facilities";
 import Alumni from "../../components/college/sections/Alumni";
 import Hostel from "../../components/college/sections/Hostel";
@@ -22,8 +23,9 @@ const NAV_OPTIONS = [
   { id: "placement", name: "Placement" },
   { id: "faculty", name: "Faculty" },
   { id: "downloads", name: "Downloads" },
-  { id: "hostel", name: "Hostel/Campus" }, // Added Hostel/Campus tab
-  { id: "events", name: "Events" }, // Added Events tab
+  { id: "hostel", name: "Hostel/Campus" },
+  { id: "alumni", name: "Alumni" },
+  { id: "events", name: "Events" },
 ];
 
 // Mock external review form responses (in a real app, this would come from an API/database)
@@ -597,25 +599,10 @@ const CollegeProfilePage = () => {
         );
       case "review":
         return (
-          <div className="bg-white rounded-xl shadow p-6 mb-6">
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6">
-                Student Reviews
-              </h2>
-              <button
-                className="ml-4 px-4 py-2 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition"
-                onClick={() => openSectionForm("review")}
-              >
-                Edit
-              </button>
-            </div>
-            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-7">
-              {formData["review"].comments &&
-                formData["review"].comments.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-            </ul>
-          </div>
+          <StudentReviews
+            data={formData["review"]}
+            onEdit={() => openSectionForm("review")}
+          />
         );
       case "hostel":
         return (
@@ -675,7 +662,7 @@ const CollegeProfilePage = () => {
             logo="/ElectrosoftAlumni/Features/Logo.jpg"
             background="/college-bg.jpg"
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            onNavigationChange={setActiveTab}
           />
         </div>
         <div className="flex flex-col lg:flex-row gap-6">

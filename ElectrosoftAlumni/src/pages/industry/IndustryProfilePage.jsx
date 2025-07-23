@@ -36,7 +36,20 @@ const IndustryProfilePage = () => {
   const { user } = useAuth();
 
   // Check if current user is the owner of this profile
-  const isOwner = user?.id === profileData?.owner_id;
+  // For industry profiles, user.id should match the industry.id
+  const isOwner = 
+    user?.role === "industry" && 
+    ((!routeId && user?.id === profileData?.id) || 
+     (routeId && user?.id === parseInt(routeId)));
+
+  // Debug ownership check
+  console.log("🔍 Ownership Debug:", {
+    userRole: user?.role,
+    userId: user?.id,
+    profileId: profileData?.id,
+    routeId: routeId,
+    isOwner: isOwner
+  });
 
   // Function to refresh posts when a new post is created
   const handlePostCreated = (newPost) => {
@@ -77,7 +90,7 @@ const IndustryProfilePage = () => {
         const mappedData = {
           ...data,
           id: data.id,
-          owner_id: data.owner_id || data.user_id || null,
+          owner_id: data.id, // For industries, the id IS the owner_id
           companyName: data.companyName || data.industry_name || "",
           industryType: data.industryType || "",
           email: data.email || "",

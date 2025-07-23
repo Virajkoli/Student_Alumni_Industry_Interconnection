@@ -74,18 +74,18 @@ router.put("/me", authMiddleware, async (req, res) => {
       });
     }
 
-    const { 
-      name, 
-      location, 
-      website, 
-      established, 
+    const {
+      name,
+      location,
+      website,
+      established,
       description,
       accreditation,
       nirfRank,
       totalStudents,
       totalFaculty,
       universityAffiliation,
-      naacRating
+      naacRating,
     } = req.body;
 
     const updatedCollege = await prisma.college.update({
@@ -167,7 +167,7 @@ router.get("/programs", authMiddleware, async (req, res) => {
         updated_at: true,
       },
       orderBy: {
-        created_at: 'desc',
+        created_at: "desc",
       },
     });
 
@@ -198,14 +198,8 @@ router.post("/programs", authMiddleware, async (req, res) => {
       });
     }
 
-    const {
-      name,
-      description,
-      duration,
-      degree_type,
-      eligibility,
-      fees,
-    } = req.body;
+    const { name, description, duration, degree_type, eligibility, fees } =
+      req.body;
 
     console.log("➕ Creating new program for college ID:", req.user.id);
 
@@ -250,179 +244,404 @@ router.post("/programs", authMiddleware, async (req, res) => {
 });
 
 // POST /api/colleges/logo-image - Upload college logo (Prisma-based)
-router.post("/logo-image", authMiddleware, upload.single("logoImage"), async (req, res) => {
-  try {
-    // Check if user is a college
-    if (req.user.role !== "college") {
-      return res.status(403).json({
-        success: false,
-        message: "Only colleges can upload logo images",
-      });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No logo image file provided",
-      });
-    }
-
-    console.log("📸 Uploading college logo for college ID:", req.user.id);
-
-    // Upload to Cloudinary
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: "college_logos",
-        public_id: `college_logo_${req.user.id}_${Date.now()}`,
-        transformation: [
-          { width: 400, height: 400, crop: "fill", gravity: "face" },
-          { quality: "auto" },
-          { fetch_format: "auto" }
-        ]
-      },
-      async (error, result) => {
-        if (error) {
-          console.error("❌ Cloudinary upload error:", error);
-          return res.status(500).json({
-            success: false,
-            message: "Failed to upload logo image",
-            error: error.message,
-          });
-        }
-
-        try {
-          // Update college with new logo URL
-          const updatedCollege = await prisma.college.update({
-            where: { id: req.user.id },
-            data: {
-              profilePicture: result.secure_url,
-              logoUrl: result.secure_url, // Also update logoUrl for compatibility
-              updatedAt: new Date(),
-            },
-            select: {
-              id: true,
-              profilePicture: true,
-              logoUrl: true,
-            },
-          });
-
-          console.log("✅ College logo updated successfully");
-
-          res.json({
-            success: true,
-            message: "College logo uploaded successfully",
-            data: {
-              profile_picture: updatedCollege.profilePicture,
-              logo_url: updatedCollege.logoUrl,
-            },
-          });
-        } catch (dbError) {
-          console.error("❌ Database error:", dbError);
-          res.status(500).json({
-            success: false,
-            message: "Failed to update college logo in database",
-            error: dbError.message,
-          });
-        }
+router.post(
+  "/logo-image",
+  authMiddleware,
+  upload.single("logoImage"),
+  async (req, res) => {
+    try {
+      // Check if user is a college
+      if (req.user.role !== "college") {
+        return res.status(403).json({
+          success: false,
+          message: "Only colleges can upload logo images",
+        });
       }
-    );
 
-    uploadStream.end(req.file.buffer);
-  } catch (error) {
-    console.error("❌ Error uploading college logo:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to upload college logo",
-      error: error.message,
-    });
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No logo image file provided",
+        });
+      }
+
+      console.log("📸 Uploading college logo for college ID:", req.user.id);
+
+      // Upload to Cloudinary
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "college_logos",
+          public_id: `college_logo_${req.user.id}_${Date.now()}`,
+          transformation: [
+            { width: 400, height: 400, crop: "fill", gravity: "face" },
+            { quality: "auto" },
+            { fetch_format: "auto" },
+          ],
+        },
+        async (error, result) => {
+          if (error) {
+            console.error("❌ Cloudinary upload error:", error);
+            return res.status(500).json({
+              success: false,
+              message: "Failed to upload logo image",
+              error: error.message,
+            });
+          }
+
+          try {
+            // Update college with new logo URL
+            const updatedCollege = await prisma.college.update({
+              where: { id: req.user.id },
+              data: {
+                profilePicture: result.secure_url,
+                logoUrl: result.secure_url, // Also update logoUrl for compatibility
+                updatedAt: new Date(),
+              },
+              select: {
+                id: true,
+                profilePicture: true,
+                logoUrl: true,
+              },
+            });
+
+            console.log("✅ College logo updated successfully");
+
+            res.json({
+              success: true,
+              message: "College logo uploaded successfully",
+              data: {
+                profile_picture: updatedCollege.profilePicture,
+                logo_url: updatedCollege.logoUrl,
+              },
+            });
+          } catch (dbError) {
+            console.error("❌ Database error:", dbError);
+            res.status(500).json({
+              success: false,
+              message: "Failed to update college logo in database",
+              error: dbError.message,
+            });
+          }
+        }
+      );
+
+      uploadStream.end(req.file.buffer);
+    } catch (error) {
+      console.error("❌ Error uploading college logo:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to upload college logo",
+        error: error.message,
+      });
+    }
   }
-});
+);
 
 // POST /api/colleges/cover-image - Upload college cover image (Prisma-based)
-router.post("/cover-image", authMiddleware, upload.single("coverImage"), async (req, res) => {
+router.post(
+  "/cover-image",
+  authMiddleware,
+  upload.single("coverImage"),
+  async (req, res) => {
+    try {
+      // Check if user is a college
+      if (req.user.role !== "college") {
+        return res.status(403).json({
+          success: false,
+          message: "Only colleges can upload cover images",
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No cover image file provided",
+        });
+      }
+
+      console.log(
+        "📸 Uploading college cover image for college ID:",
+        req.user.id
+      );
+
+      // Upload to Cloudinary
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "college_covers",
+          public_id: `college_cover_${req.user.id}_${Date.now()}`,
+          transformation: [
+            { width: 1200, height: 400, crop: "fill" },
+            { quality: "auto" },
+            { fetch_format: "auto" },
+          ],
+        },
+        async (error, result) => {
+          if (error) {
+            console.error("❌ Cloudinary upload error:", error);
+            return res.status(500).json({
+              success: false,
+              message: "Failed to upload cover image",
+              error: error.message,
+            });
+          }
+
+          try {
+            // Update college with new cover URL
+            const updatedCollege = await prisma.college.update({
+              where: { id: req.user.id },
+              data: {
+                backgroundUrl: result.secure_url, // Use existing backgroundUrl field
+                updatedAt: new Date(),
+              },
+              select: {
+                id: true,
+                backgroundUrl: true,
+              },
+            });
+
+            console.log("✅ College cover image updated successfully");
+
+            res.json({
+              success: true,
+              message: "College cover image uploaded successfully",
+              data: {
+                background_url: updatedCollege.backgroundUrl,
+              },
+            });
+          } catch (dbError) {
+            console.error("❌ Database error:", dbError);
+            res.status(500).json({
+              success: false,
+              message: "Failed to update college cover image in database",
+              error: dbError.message,
+            });
+          }
+        }
+      );
+
+      uploadStream.end(req.file.buffer);
+    } catch (error) {
+      console.error("❌ Error uploading college cover image:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to upload college cover image",
+        error: error.message,
+      });
+    }
+  }
+);
+
+// ============= PLACEMENTS SECTION =============
+
+// GET /api/colleges/placements - Get placement data for a college
+router.get("/placements", authMiddleware, async (req, res) => {
   try {
-    // Check if user is a college
     if (req.user.role !== "college") {
       return res.status(403).json({
         success: false,
-        message: "Only colleges can upload cover images",
+        message: "Only colleges can access this endpoint",
       });
     }
 
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No cover image file provided",
-      });
-    }
+    const placements = await prisma.college_placements_new.findMany({
+      where: { college_id: req.user.id },
+      orderBy: { academic_year: "desc" },
+    });
 
-    console.log("📸 Uploading college cover image for college ID:", req.user.id);
+    // Get the latest placement data or create empty structure
+    const latestPlacement = placements[0] || {};
 
-    // Upload to Cloudinary
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: "college_covers",
-        public_id: `college_cover_${req.user.id}_${Date.now()}`,
-        transformation: [
-          { width: 1200, height: 400, crop: "fill" },
-          { quality: "auto" },
-          { fetch_format: "auto" }
-        ]
+    const placementData = {
+      highlights: latestPlacement.success_stories || [],
+      internships: [], // Will be stored in JSON field
+      support: [], // Will be stored in JSON field
+      statistics: {
+        averagePackage: latestPlacement.average_package
+          ? `₹${latestPlacement.average_package} LPA`
+          : "₹0 LPA",
+        highestPackage: latestPlacement.highest_package
+          ? `₹${latestPlacement.highest_package} LPA`
+          : "₹0 LPA",
+        placementRate: latestPlacement.placement_percentage
+          ? `${latestPlacement.placement_percentage}%`
+          : "0%",
+        companiesVisited: "0+",
+        internshipStipend: "₹0 - ₹0/month",
       },
-      async (error, result) => {
-        if (error) {
-          console.error("❌ Cloudinary upload error:", error);
-          return res.status(500).json({
-            success: false,
-            message: "Failed to upload cover image",
-            error: error.message,
-          });
-        }
+      topRecruiters:
+        latestPlacement.top_recruiters?.map((name) => ({ name, logo: "" })) ||
+        [],
+      customFields: [],
+      rawData: latestPlacement,
+    };
 
-        try {
-          // Update college with new cover URL
-          const updatedCollege = await prisma.college.update({
-            where: { id: req.user.id },
-            data: {
-              backgroundUrl: result.secure_url, // Use existing backgroundUrl field
-              updatedAt: new Date(),
-            },
-            select: {
-              id: true,
-              backgroundUrl: true,
-            },
-          });
+    // Parse JSON fields if they exist
+    if (latestPlacement.placement_trends) {
+      const trends = latestPlacement.placement_trends;
+      placementData.internships = trends.internships || [];
+      placementData.support = trends.support || [];
+      placementData.statistics.companiesVisited =
+        trends.companiesVisited || "0+";
+      placementData.statistics.internshipStipend =
+        trends.internshipStipend || "₹0 - ₹0/month";
+    }
 
-          console.log("✅ College cover image updated successfully");
-
-          res.json({
-            success: true,
-            message: "College cover image uploaded successfully",
-            data: {
-              background_url: updatedCollege.backgroundUrl,
-            },
-          });
-        } catch (dbError) {
-          console.error("❌ Database error:", dbError);
-          res.status(500).json({
-            success: false,
-            message: "Failed to update college cover image in database",
-            error: dbError.message,
-          });
-        }
-      }
-    );
-
-    uploadStream.end(req.file.buffer);
+    res.json({
+      success: true,
+      data: placementData,
+    });
   } catch (error) {
-    console.error("❌ Error uploading college cover image:", error);
+    console.error("Error fetching placements:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to upload college cover image",
+      message: "Failed to fetch placements",
       error: error.message,
     });
   }
 });
+
+// POST /api/colleges/placements - Create or update placement data
+router.post("/placements", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const {
+      highlights,
+      internships,
+      support,
+      statistics,
+      topRecruiters,
+      academicYear = new Date().getFullYear().toString(),
+    } = req.body;
+
+    // Parse statistics
+    const averagePackage =
+      statistics.averagePackage?.replace(/[₹LPA\s]/g, "") || "0";
+    const highestPackage =
+      statistics.highestPackage?.replace(/[₹LPA\s]/g, "") || "0";
+    const placementRate =
+      statistics.placementRate?.replace(/[%\s]/g, "") || "0";
+
+    // Prepare placement trends JSON
+    const placementTrends = {
+      internships: internships || [],
+      support: support || [],
+      companiesVisited: statistics.companiesVisited || "0+",
+      internshipStipend: statistics.internshipStipend || "₹0 - ₹0/month",
+    };
+
+    // Check if placement data exists for this academic year
+    const existingPlacement = await prisma.college_placements_new.findFirst({
+      where: {
+        college_id: req.user.id,
+        academic_year: academicYear,
+      },
+    });
+
+    let placementRecord;
+    if (existingPlacement) {
+      // Update existing record
+      placementRecord = await prisma.college_placements_new.update({
+        where: { id: existingPlacement.id },
+        data: {
+          average_package: parseFloat(averagePackage) || null,
+          highest_package: parseFloat(highestPackage) || null,
+          placement_percentage: parseFloat(placementRate) || null,
+          top_recruiters:
+            topRecruiters?.map((r) => r.name).filter(Boolean) || [],
+          success_stories: highlights || [],
+          placement_trends: placementTrends,
+          updated_at: new Date(),
+        },
+      });
+    } else {
+      // Create new record
+      placementRecord = await prisma.college_placements_new.create({
+        data: {
+          college_id: req.user.id,
+          academic_year: academicYear,
+          course_name: "All Courses", // Default value
+          average_package: parseFloat(averagePackage) || null,
+          highest_package: parseFloat(highestPackage) || null,
+          placement_percentage: parseFloat(placementRate) || null,
+          top_recruiters:
+            topRecruiters?.map((r) => r.name).filter(Boolean) || [],
+          success_stories: highlights || [],
+          placement_trends: placementTrends,
+        },
+      });
+    }
+
+    res.json({
+      success: true,
+      data: placementRecord,
+      message: "Placement data saved successfully",
+    });
+  } catch (error) {
+    console.error("Error saving placement data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to save placement data",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/placements/upload-logo - Upload company logo
+router.post(
+  "/placements/upload-logo",
+  authMiddleware,
+  upload.single("logo"),
+  async (req, res) => {
+    try {
+      if (req.user.role !== "college") {
+        return res.status(403).json({
+          success: false,
+          message: "Only colleges can access this endpoint",
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No logo file provided",
+        });
+      }
+
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "company-logos",
+        resource_type: "image",
+        transformation: [
+          { width: 200, height: 200, crop: "fit" },
+          { quality: "auto" },
+          { format: "png" },
+        ],
+      });
+
+      res.json({
+        success: true,
+        data: {
+          logoUrl: result.secure_url,
+          publicId: result.public_id,
+        },
+        message: "Logo uploaded successfully",
+      });
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to upload logo",
+        error: error.message,
+      });
+    }
+  }
+);
 
 // GET /api/colleges/:id - Get college information (main endpoint)
 router.get("/:id", async (req, res) => {
@@ -436,7 +655,7 @@ router.get("/:id", async (req, res) => {
       include: [
         {
           model: CollegeCampus,
-          as: 'campuses',
+          as: "campuses",
         },
       ],
     });
@@ -450,30 +669,35 @@ router.get("/:id", async (req, res) => {
 
     // Transform data for frontend
     const responseData = {
-      overview: college.about || '',
-      website: college.website || '',
+      overview: college.about || "",
+      website: college.website || "",
       verified: college.verified || false,
       verifiedDate: college.verifiedDate || null,
-      establishmentYear: college.established ? college.established.toString() : '',
-      location: college.location || '',
-      collegeType: college.collegeType || 'Public University',
-      totalStudents: college.totalStudents ? college.totalStudents.toString() : '',
-      faculty: college.totalFaculty ? college.totalFaculty.toString() : '',
-      accreditation: college.accreditation || '',
-      nirfRank: college.nirfRank ? college.nirfRank.toString() : '',
+      establishmentYear: college.established
+        ? college.established.toString()
+        : "",
+      location: college.location || "",
+      collegeType: college.collegeType || "Public University",
+      totalStudents: college.totalStudents
+        ? college.totalStudents.toString()
+        : "",
+      faculty: college.totalFaculty ? college.totalFaculty.toString() : "",
+      accreditation: college.accreditation || "",
+      nirfRank: college.nirfRank ? college.nirfRank.toString() : "",
       specialties: college.specialties || [],
       customFields: college.customFields || [],
-      campuses: college.campuses?.map(campus => ({
-        name: campus.name,
-        address: campus.address,
-        type: campus.type,
-        students: campus.students,
-        coordinates: campus.coordinates,
-        dean: campus.dean,
-        contact: campus.contact,
-        image: campus.image,
-        customFields: campus.customFields || {},
-      })) || [],
+      campuses:
+        college.campuses?.map((campus) => ({
+          name: campus.name,
+          address: campus.address,
+          type: campus.type,
+          students: campus.students,
+          coordinates: campus.coordinates,
+          dean: campus.dean,
+          contact: campus.contact,
+          image: campus.image,
+          customFields: campus.customFields || {},
+        })) || [],
     };
 
     console.log("✅ College information fetched successfully");
@@ -482,7 +706,6 @@ router.get("/:id", async (req, res) => {
       success: true,
       data: responseData,
     });
-
   } catch (error) {
     console.error("❌ Error fetching college information:", error);
     res.status(500).json({
@@ -556,15 +779,20 @@ router.get("/:id/information", async (req, res) => {
       overview: college.about || college.description || "",
       website: college.website || "",
       verified: college.verified || false,
-      verifiedDate: college.verifiedDate ? 
-        (college.verifiedDate instanceof Date ? 
-          college.verifiedDate.toISOString().split('T')[0] : 
-          college.verifiedDate) : null,
+      verifiedDate: college.verifiedDate
+        ? college.verifiedDate instanceof Date
+          ? college.verifiedDate.toISOString().split("T")[0]
+          : college.verifiedDate
+        : null,
       establishmentYear: college.established?.toString() || "",
       location: college.location || "",
       collegeType: college.collegeType || "Public University", // Default if not set
-      totalStudents: college.totalStudents ? `${college.totalStudents}+ students` : "",
-      faculty: college.totalFaculty ? `${college.totalFaculty}+ faculty members` : "",
+      totalStudents: college.totalStudents
+        ? `${college.totalStudents}+ students`
+        : "",
+      faculty: college.totalFaculty
+        ? `${college.totalFaculty}+ faculty members`
+        : "",
       accreditation: college.accreditation || "",
       nirfRank: college.nirfRank ? `National Ranking: ${college.nirfRank}` : "",
       campusArea: college.campusArea || null,
@@ -572,19 +800,23 @@ router.get("/:id/information", async (req, res) => {
       backgroundUrl: college.backgroundUrl || "",
       specialties: [], // Will be populated from separate table if exists
       customFields: [], // Will be populated from college metadata if exists
-      campuses: (college.campuses || []).map(campus => ({
+      campuses: (college.campuses || []).map((campus) => ({
         name: campus.name || "",
         address: campus.address || "",
         type: campus.type || "Campus",
         students: campus.student_count || "",
-        coordinates: campus.latitude && campus.longitude ? 
-          [parseFloat(campus.latitude), parseFloat(campus.longitude)] : [0, 0],
+        coordinates:
+          campus.latitude && campus.longitude
+            ? [parseFloat(campus.latitude), parseFloat(campus.longitude)]
+            : [0, 0],
         dean: campus.dean || "",
         contact: {
           phone: campus.contact_number || "",
           email: campus.email || "",
         },
-        image: campus.image_url || "https://images.unsplash.com/photo-1562774053-701939374585?w=200&h=150&fit=crop",
+        image:
+          campus.image_url ||
+          "https://images.unsplash.com/photo-1562774053-701939374585?w=200&h=150&fit=crop",
         customFields: campus.custom_fields || {},
       })),
     };
@@ -622,7 +854,7 @@ router.put("/:id", auth, async (req, res) => {
     }
 
     // Check if user is authorized (either the college owner or admin)
-    if (req.user.id !== parseInt(id) && req.user.role !== 'admin') {
+    if (req.user.id !== parseInt(id) && req.user.role !== "admin") {
       return res.status(403).json({
         success: false,
         message: "Unauthorized to update this college",
@@ -631,7 +863,7 @@ router.put("/:id", auth, async (req, res) => {
 
     // Parse numbers with validation
     const parseNumber = (value, fieldName) => {
-      if (!value || value === '') return null;
+      if (!value || value === "") return null;
       const parsed = parseInt(value);
       if (isNaN(parsed)) {
         throw new Error(`${fieldName} must be a valid number`);
@@ -644,28 +876,46 @@ router.put("/:id", auth, async (req, res) => {
 
     // Prepare update data
     const fieldsToUpdate = {};
-    
-    if (updateData.overview !== undefined) fieldsToUpdate.about = updateData.overview;
-    if (updateData.website !== undefined) fieldsToUpdate.website = updateData.website;
-    if (updateData.verified !== undefined) fieldsToUpdate.verified = updateData.verified;
-    if (updateData.verifiedDate !== undefined) fieldsToUpdate.verifiedDate = updateData.verifiedDate;
+
+    if (updateData.overview !== undefined)
+      fieldsToUpdate.about = updateData.overview;
+    if (updateData.website !== undefined)
+      fieldsToUpdate.website = updateData.website;
+    if (updateData.verified !== undefined)
+      fieldsToUpdate.verified = updateData.verified;
+    if (updateData.verifiedDate !== undefined)
+      fieldsToUpdate.verifiedDate = updateData.verifiedDate;
     if (updateData.establishmentYear !== undefined) {
-      fieldsToUpdate.established = parseNumber(updateData.establishmentYear, "Establishment year");
+      fieldsToUpdate.established = parseNumber(
+        updateData.establishmentYear,
+        "Establishment year"
+      );
     }
-    if (updateData.location !== undefined) fieldsToUpdate.location = updateData.location;
+    if (updateData.location !== undefined)
+      fieldsToUpdate.location = updateData.location;
     if (updateData.totalStudents !== undefined) {
-      fieldsToUpdate.totalStudents = parseNumber(updateData.totalStudents, "Total students");
+      fieldsToUpdate.totalStudents = parseNumber(
+        updateData.totalStudents,
+        "Total students"
+      );
     }
     if (updateData.faculty !== undefined) {
-      fieldsToUpdate.totalFaculty = parseNumber(updateData.faculty, "Total faculty");
+      fieldsToUpdate.totalFaculty = parseNumber(
+        updateData.faculty,
+        "Total faculty"
+      );
     }
-    if (updateData.accreditation !== undefined) fieldsToUpdate.accreditation = updateData.accreditation;
+    if (updateData.accreditation !== undefined)
+      fieldsToUpdate.accreditation = updateData.accreditation;
     if (updateData.nirfRank !== undefined) {
       fieldsToUpdate.nirfRank = parseNumber(updateData.nirfRank, "NIRF rank");
     }
-    if (updateData.collegeType !== undefined) fieldsToUpdate.collegeType = updateData.collegeType;
-    if (updateData.specialties !== undefined) fieldsToUpdate.specialties = updateData.specialties;
-    if (updateData.customFields !== undefined) fieldsToUpdate.customFields = updateData.customFields;
+    if (updateData.collegeType !== undefined)
+      fieldsToUpdate.collegeType = updateData.collegeType;
+    if (updateData.specialties !== undefined)
+      fieldsToUpdate.specialties = updateData.specialties;
+    if (updateData.customFields !== undefined)
+      fieldsToUpdate.customFields = updateData.customFields;
 
     console.log("📊 Fields to update:", fieldsToUpdate);
 
@@ -677,37 +927,46 @@ router.put("/:id", auth, async (req, res) => {
       include: [
         {
           model: CollegeCampus,
-          as: 'campuses',
+          as: "campuses",
         },
       ],
     });
 
     // Transform data for frontend
     const responseData = {
-      overview: updatedCollege.about || '',
-      website: updatedCollege.website || '',
+      overview: updatedCollege.about || "",
+      website: updatedCollege.website || "",
       verified: updatedCollege.verified || false,
       verifiedDate: updatedCollege.verifiedDate || null,
-      establishmentYear: updatedCollege.established ? updatedCollege.established.toString() : '',
-      location: updatedCollege.location || '',
-      collegeType: updatedCollege.collegeType || 'Public University',
-      totalStudents: updatedCollege.totalStudents ? updatedCollege.totalStudents.toString() : '',
-      faculty: updatedCollege.totalFaculty ? updatedCollege.totalFaculty.toString() : '',
-      accreditation: updatedCollege.accreditation || '',
-      nirfRank: updatedCollege.nirfRank ? updatedCollege.nirfRank.toString() : '',
+      establishmentYear: updatedCollege.established
+        ? updatedCollege.established.toString()
+        : "",
+      location: updatedCollege.location || "",
+      collegeType: updatedCollege.collegeType || "Public University",
+      totalStudents: updatedCollege.totalStudents
+        ? updatedCollege.totalStudents.toString()
+        : "",
+      faculty: updatedCollege.totalFaculty
+        ? updatedCollege.totalFaculty.toString()
+        : "",
+      accreditation: updatedCollege.accreditation || "",
+      nirfRank: updatedCollege.nirfRank
+        ? updatedCollege.nirfRank.toString()
+        : "",
       specialties: updatedCollege.specialties || [],
       customFields: updatedCollege.customFields || [],
-      campuses: updatedCollege.campuses?.map(campus => ({
-        name: campus.name,
-        address: campus.address,
-        type: campus.type,
-        students: campus.students,
-        coordinates: campus.coordinates,
-        dean: campus.dean,
-        contact: campus.contact,
-        image: campus.image,
-        customFields: campus.customFields || {},
-      })) || [],
+      campuses:
+        updatedCollege.campuses?.map((campus) => ({
+          name: campus.name,
+          address: campus.address,
+          type: campus.type,
+          students: campus.students,
+          coordinates: campus.coordinates,
+          dean: campus.dean,
+          contact: campus.contact,
+          image: campus.image,
+          customFields: campus.customFields || {},
+        })) || [],
     };
 
     console.log("✅ College information updated successfully");
@@ -717,7 +976,6 @@ router.put("/:id", auth, async (req, res) => {
       message: "College information updated successfully",
       data: responseData,
     });
-
   } catch (error) {
     console.error("❌ Error updating college information:", error);
     res.status(400).json({
@@ -748,8 +1006,8 @@ router.put("/:id/information", auth, async (req, res) => {
       customFields,
     } = req.body;
 
-    console.log('🔧 Received update request for college:', id);
-    console.log('🔧 Request body:', req.body);
+    console.log("🔧 Received update request for college:", id);
+    console.log("🔧 Request body:", req.body);
 
     // Find the college
     const college = await College.findByPk(id);
@@ -765,45 +1023,51 @@ router.put("/:id/information", auth, async (req, res) => {
     if (overview !== undefined) updateData.about = overview;
     if (website !== undefined) updateData.website = website;
     if (verified !== undefined) updateData.verified = verified;
-    if (verifiedDate !== undefined) updateData.verifiedDate = verifiedDate ? new Date(verifiedDate) : null;
-    if (establishmentYear !== undefined) updateData.established = establishmentYear ? parseInt(establishmentYear) : null;
+    if (verifiedDate !== undefined)
+      updateData.verifiedDate = verifiedDate ? new Date(verifiedDate) : null;
+    if (establishmentYear !== undefined)
+      updateData.established = establishmentYear
+        ? parseInt(establishmentYear)
+        : null;
     if (location !== undefined) updateData.location = location;
     if (totalStudents !== undefined) {
       // Handle both string and number inputs
       let studentCount;
-      if (typeof totalStudents === 'string') {
+      if (typeof totalStudents === "string") {
         // Extract number from string like "15,000+ students"
-        studentCount = totalStudents.replace(/[^\d]/g, '');
+        studentCount = totalStudents.replace(/[^\d]/g, "");
       } else {
         studentCount = totalStudents;
       }
-      updateData.totalStudents = studentCount && !isNaN(studentCount) ? parseInt(studentCount) : null;
+      updateData.totalStudents =
+        studentCount && !isNaN(studentCount) ? parseInt(studentCount) : null;
     }
     if (faculty !== undefined) {
       // Handle both string and number inputs
       let facultyCount;
-      if (typeof faculty === 'string') {
+      if (typeof faculty === "string") {
         // Extract number from string like "800+ faculty members"
-        facultyCount = faculty.replace(/[^\d]/g, '');
+        facultyCount = faculty.replace(/[^\d]/g, "");
       } else {
         facultyCount = faculty;
       }
-      updateData.totalFaculty = facultyCount && !isNaN(facultyCount) ? parseInt(facultyCount) : null;
+      updateData.totalFaculty =
+        facultyCount && !isNaN(facultyCount) ? parseInt(facultyCount) : null;
     }
     if (accreditation !== undefined) updateData.accreditation = accreditation;
     if (nirfRank !== undefined) {
       // Handle both string and number inputs
       let rank;
-      if (typeof nirfRank === 'string') {
+      if (typeof nirfRank === "string") {
         // Extract number from string like "National Ranking: 45"
-        rank = nirfRank.replace(/[^\d]/g, '');
+        rank = nirfRank.replace(/[^\d]/g, "");
       } else {
         rank = nirfRank;
       }
       updateData.nirfRank = rank && !isNaN(rank) ? parseInt(rank) : null;
     }
 
-    console.log('🔧 Update data being processed:', updateData);
+    console.log("🔧 Update data being processed:", updateData);
 
     await college.update(updateData);
 
@@ -845,19 +1109,24 @@ router.get("/:id/campuses", async (req, res) => {
       ],
     });
 
-    const formattedCampuses = campuses.map(campus => ({
+    const formattedCampuses = campuses.map((campus) => ({
       id: campus.id,
       name: campus.name,
       address: campus.address,
       type: campus.type,
       students: campus.student_count,
-      coordinates: campus.latitude && campus.longitude ? [parseFloat(campus.latitude), parseFloat(campus.longitude)] : [0, 0],
+      coordinates:
+        campus.latitude && campus.longitude
+          ? [parseFloat(campus.latitude), parseFloat(campus.longitude)]
+          : [0, 0],
       dean: campus.dean,
       contact: {
         phone: campus.contact_number,
         email: campus.email,
       },
-      image: campus.image_url || "https://images.unsplash.com/photo-1562774053-701939374585?w=200&h=150&fit=crop",
+      image:
+        campus.image_url ||
+        "https://images.unsplash.com/photo-1562774053-701939374585?w=200&h=150&fit=crop",
       customFields: campus.custom_fields || {},
     }));
 
@@ -896,15 +1165,21 @@ router.put("/:id/campuses", auth, async (req, res) => {
     });
 
     // Create new campuses
-    const campusPromises = campuses.map(campus => {
+    const campusPromises = campuses.map((campus) => {
       const campusData = {
         college_id: id,
         name: campus.name,
         type: campus.type,
         address: campus.address,
         student_count: campus.students,
-        latitude: campus.coordinates && campus.coordinates[0] ? campus.coordinates[0] : null,
-        longitude: campus.coordinates && campus.coordinates[1] ? campus.coordinates[1] : null,
+        latitude:
+          campus.coordinates && campus.coordinates[0]
+            ? campus.coordinates[0]
+            : null,
+        longitude:
+          campus.coordinates && campus.coordinates[1]
+            ? campus.coordinates[1]
+            : null,
         dean: campus.dean,
         image_url: campus.image,
         contact_number: campus.contact?.phone,
@@ -953,8 +1228,14 @@ router.post("/:id/campuses", auth, async (req, res) => {
       type: campusData.type,
       address: campusData.address,
       student_count: campusData.students,
-      latitude: campusData.coordinates && campusData.coordinates[0] ? campusData.coordinates[0] : null,
-      longitude: campusData.coordinates && campusData.coordinates[1] ? campusData.coordinates[1] : null,
+      latitude:
+        campusData.coordinates && campusData.coordinates[0]
+          ? campusData.coordinates[0]
+          : null,
+      longitude:
+        campusData.coordinates && campusData.coordinates[1]
+          ? campusData.coordinates[1]
+          : null,
       dean: campusData.dean,
       image_url: campusData.image,
       contact_number: campusData.contact?.phone,
@@ -1011,6 +1292,278 @@ router.delete("/:id/campuses/:campusId", auth, async (req, res) => {
       success: false,
       message: "Internal server error",
       error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+});
+
+// ============= DOWNLOADS SECTION =============
+
+// GET /api/colleges/downloads - Get all downloads for a college
+router.get("/downloads", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const downloads = await prisma.college_downloads.findMany({
+      where: { college_id: req.user.id },
+      orderBy: { created_at: "desc" },
+    });
+
+    // Group downloads by category
+    const groupedDownloads = downloads.reduce((acc, download) => {
+      const category = download.category.toLowerCase();
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push({
+        id: download.id,
+        name: download.title,
+        description: download.description,
+        fileSize: download.file_size,
+        format: download.file_type,
+        url: download.file_url,
+        uploadDate: download.created_at.toISOString().split("T")[0],
+        downloadCount: download.download_count,
+        isPublic: download.is_public,
+      });
+      return acc;
+    }, {});
+
+    res.json({
+      success: true,
+      data: groupedDownloads,
+    });
+  } catch (error) {
+    console.error("Error fetching downloads:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch downloads",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/downloads - Add a new download
+router.post(
+  "/downloads",
+  authMiddleware,
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      if (req.user.role !== "college") {
+        return res.status(403).json({
+          success: false,
+          message: "Only colleges can access this endpoint",
+        });
+      }
+
+      const {
+        title,
+        description,
+        category,
+        fileType,
+        fileSize,
+        fileUrl,
+        isPublic,
+      } = req.body;
+      let uploadedFileUrl = fileUrl;
+
+      // If a file was uploaded, use Cloudinary URL
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "college-downloads",
+          resource_type: "auto",
+        });
+        uploadedFileUrl = result.secure_url;
+      }
+
+      const newDownload = await prisma.college_downloads.create({
+        data: {
+          college_id: req.user.id,
+          title,
+          description,
+          file_type: fileType || "PDF",
+          category,
+          file_url: uploadedFileUrl,
+          file_size: fileSize,
+          is_public: isPublic !== undefined ? isPublic : true,
+        },
+      });
+
+      res.json({
+        success: true,
+        data: {
+          id: newDownload.id,
+          name: newDownload.title,
+          description: newDownload.description,
+          fileSize: newDownload.file_size,
+          format: newDownload.file_type,
+          url: newDownload.file_url,
+          uploadDate: newDownload.created_at.toISOString().split("T")[0],
+          downloadCount: newDownload.download_count,
+          isPublic: newDownload.is_public,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating download:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to create download",
+        error: error.message,
+      });
+    }
+  }
+);
+
+// PUT /api/colleges/downloads/:id - Update a download
+router.put("/downloads/:id", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const downloadId = parseInt(req.params.id);
+    const {
+      title,
+      description,
+      category,
+      fileType,
+      fileSize,
+      fileUrl,
+      isPublic,
+    } = req.body;
+
+    // Check if download belongs to the college
+    const existingDownload = await prisma.college_downloads.findFirst({
+      where: {
+        id: downloadId,
+        college_id: req.user.id,
+      },
+    });
+
+    if (!existingDownload) {
+      return res.status(404).json({
+        success: false,
+        message: "Download not found",
+      });
+    }
+
+    const updatedDownload = await prisma.college_downloads.update({
+      where: { id: downloadId },
+      data: {
+        title,
+        description,
+        file_type: fileType,
+        category,
+        file_url: fileUrl,
+        file_size: fileSize,
+        is_public: isPublic,
+        updated_at: new Date(),
+      },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        id: updatedDownload.id,
+        name: updatedDownload.title,
+        description: updatedDownload.description,
+        fileSize: updatedDownload.file_size,
+        format: updatedDownload.file_type,
+        url: updatedDownload.file_url,
+        uploadDate: updatedDownload.created_at.toISOString().split("T")[0],
+        downloadCount: updatedDownload.download_count,
+        isPublic: updatedDownload.is_public,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating download:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update download",
+      error: error.message,
+    });
+  }
+});
+
+// DELETE /api/colleges/downloads/:id - Delete a download
+router.delete("/downloads/:id", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const downloadId = parseInt(req.params.id);
+
+    // Check if download belongs to the college
+    const existingDownload = await prisma.college_downloads.findFirst({
+      where: {
+        id: downloadId,
+        college_id: req.user.id,
+      },
+    });
+
+    if (!existingDownload) {
+      return res.status(404).json({
+        success: false,
+        message: "Download not found",
+      });
+    }
+
+    await prisma.college_downloads.delete({
+      where: { id: downloadId },
+    });
+
+    res.json({
+      success: true,
+      message: "Download deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting download:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete download",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/downloads/:id/increment - Increment download count
+router.post("/downloads/:id/increment", async (req, res) => {
+  try {
+    const downloadId = parseInt(req.params.id);
+
+    const updatedDownload = await prisma.college_downloads.update({
+      where: { id: downloadId },
+      data: {
+        download_count: {
+          increment: 1,
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        downloadCount: updatedDownload.download_count,
+      },
+    });
+  } catch (error) {
+    console.error("Error incrementing download count:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to increment download count",
+      error: error.message,
     });
   }
 });

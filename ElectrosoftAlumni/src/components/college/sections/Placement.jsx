@@ -1,98 +1,71 @@
-import React, { useState } from "react";
-import { Edit, X, Plus, Minus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Edit, X, Plus, Minus, Upload } from "lucide-react";
+import apiService from "../../../services/apiService";
 
 const Placement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const [placementData, setPlacementData] = useState({
-    highlights: [
-      "Average package of ₹8.5 LPA with highest reaching ₹45 LPA",
-      "95% placement rate across all engineering branches",
-      "450+ companies visited campus for recruitment",
-      "Top recruiters include Microsoft, Google, Amazon, TCS, Infosys",
-      "Strong alumni network in leading MNCs and startups",
-      "Pre-placement offers (PPOs) available through internships",
-    ],
-    internships: [
-      "Summer internship programs with 100+ partner companies",
-      "Industry-sponsored projects and research opportunities",
-      "Internship stipends ranging from ₹15,000 to ₹80,000 per month",
-      "International internship opportunities with global companies",
-      "Mentorship programs connecting students with industry experts",
-      "Hands-on experience in cutting-edge technologies",
-    ],
-    support: [
-      "Dedicated Training & Placement Cell with industry professionals",
-      "Regular soft skills and technical training workshops",
-      "Mock interviews and group discussion sessions",
-      "Resume building and LinkedIn profile optimization",
-      "Industry interaction sessions and guest lectures",
-      "Career counseling and guidance programs",
-      "Alumni mentorship network for career guidance",
-    ],
+    highlights: [],
+    internships: [],
+    support: [],
     statistics: {
-      averagePackage: "₹8.5 LPA",
-      highestPackage: "₹45 LPA",
-      placementRate: "95%",
-      companiesVisited: "450+",
-      internshipStipend: "₹15K - ₹80K/month",
+      averagePackage: "₹0 LPA",
+      highestPackage: "₹0 LPA",
+      placementRate: "0%",
+      companiesVisited: "0+",
+      internshipStipend: "₹0 - ₹0/month",
     },
-    topRecruiters: [
-      {
-        name: "Microsoft",
-        logo: "https://img.icons8.com/color/48/microsoft.png",
-      },
-      {
-        name: "Google",
-        logo: "https://img.icons8.com/color/48/google-logo.png",
-      },
-      { name: "Amazon", logo: "https://img.icons8.com/color/48/amazon.png" },
-      {
-        name: "Flipkart",
-        logo: "https://img.icons8.com/?size=160&id=UU2im0hihoyi&format=png",
-      },
-      { name: "Paytm", logo: "https://img.icons8.com/color/48/paytm.png" },
-      { name: "TCS", logo: "https://img.icons8.com/color/48/tcs.png" },
-      { name: "Infosys", logo: "https://img.icons8.com/color/48/infosys.png" },
-      { name: "Wipro", logo: "https://img.icons8.com/color/48/wipro.png" },
-      {
-        name: "Accenture",
-        logo: "https://img.icons8.com/color/48/accenture.png",
-      },
-      {
-        name: "Cognizant",
-        logo: "https://img.icons8.com/color/48/cognizant.png",
-      },
-      {
-        name: "Goldman Sachs",
-        logo: "https://img.icons8.com/color/48/goldman-sachs.png",
-      },
-      {
-        name: "Morgan Stanley",
-        logo: "https://img.icons8.com/color/48/morgan-stanley.png",
-      },
-      {
-        name: "Deloitte",
-        logo: "https://img.icons8.com/color/48/deloitte.png",
-      },
-      {
-        name: "EY",
-        logo: "https://img.icons8.com/color/48/ernst-and-young.png",
-      },
-    ],
+    topRecruiters: [],
     customFields: [],
   });
 
   const [editData, setEditData] = useState({ ...placementData });
+
+  // Fetch placement data on component mount
+  useEffect(() => {
+    fetchPlacementData();
+  }, []);
+
+  const fetchPlacementData = async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.getCollegePlacements();
+      if (response.success) {
+        setPlacementData(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching placement data:", error);
+      // Keep default data if fetch fails
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEditClick = () => {
     setEditData({ ...placementData });
     setIsEditModalOpen(true);
   };
 
-  const handleSave = () => {
-    setPlacementData(editData);
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const response = await apiService.savePlacementData(editData);
+      if (response.success) {
+        setPlacementData({ ...editData });
+        setIsEditModalOpen(false);
+        // Optionally refresh data
+        await fetchPlacementData();
+      }
+    } catch (error) {
+      console.error("Error saving placement data:", error);
+      alert("Failed to save placement data. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -184,6 +157,28 @@ const Placement = () => {
     setEditData({ ...editData, topRecruiters: newRecruiters });
   };
 
+  // Company logo upload handler
+  const handleLogoUpload = async (index, file) => {
+    try {
+      setUploadingLogo(true);
+      const response = await apiService.uploadCompanyLogo(file);
+
+      if (response.success) {
+        const newRecruiters = [...editData.topRecruiters];
+        newRecruiters[index] = {
+          ...newRecruiters[index],
+          logo: response.data.logoUrl,
+        };
+        setEditData({ ...editData, topRecruiters: newRecruiters });
+      }
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      alert("Failed to upload logo. Please try again.");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
   // Custom fields handlers
   const handleAddCustomField = () => {
     const newField = {
@@ -230,134 +225,153 @@ const Placement = () => {
 
           {/* Content */}
           <div className="p-6">
-            {/* Placement Statistics */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Placement Statistics
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">
-                    Average Package
-                  </h4>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {placementData.statistics.averagePackage}
-                  </p>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">
-                    Highest Package
-                  </h4>
-                  <p className="text-2xl font-bold text-green-600">
-                    {placementData.statistics.highestPackage}
-                  </p>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">
-                    Placement Rate
-                  </h4>
-                  <p className="text-2xl font-bold text-purple-600">
-                    {placementData.statistics.placementRate}
-                  </p>
-                </div>
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">
+                  Loading placement data...
+                </span>
               </div>
-            </div>
-
-            {/* Placement Highlights */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Placement Highlights
-              </h3>
-              <div className="space-y-3">
-                {placementData.highlights &&
-                  placementData.highlights.map((item, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{item}</p>
+            ) : (
+              <>
+                {/* Placement Statistics */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Placement Statistics
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-1">
+                        Average Package
+                      </h4>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {placementData.statistics.averagePackage}
+                      </p>
                     </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Top Recruiters */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Top Recruiters
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {placementData.topRecruiters &&
-                  placementData.topRecruiters.map((recruiter, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
-                    >
-                      <img
-                        src={recruiter.logo}
-                        alt={`${recruiter.name} logo`}
-                        className="w-12 h-12 object-contain mb-2"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                      />
-                      <span className="text-xs font-medium text-gray-700 text-center">
-                        {recruiter.name}
-                      </span>
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-1">
+                        Highest Package
+                      </h4>
+                      <p className="text-2xl font-bold text-green-600">
+                        {placementData.statistics.highestPackage}
+                      </p>
                     </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Internship Opportunities */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Internship Opportunities
-              </h3>
-              <div className="space-y-3">
-                {placementData.internships &&
-                  placementData.internships.map((item, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{item}</p>
+                    <div className="bg-purple-50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-1">
+                        Placement Rate
+                      </h4>
+                      <p className="text-2xl font-bold text-purple-600">
+                        {placementData.statistics.placementRate}
+                      </p>
                     </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Placement Support */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Placement Support
-              </h3>
-              <div className="space-y-3">
-                {placementData.support &&
-                  placementData.support.map((item, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{item}</p>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Custom Fields Display */}
-            {placementData.customFields &&
-              placementData.customFields.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">
-                    Additional Information
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {placementData.customFields.map((field, index) => (
-                      <div key={field.id || index}>
-                        <h5 className="text-sm font-medium text-gray-900 mb-1">
-                          {field.label}
-                        </h5>
-                        <p className="text-gray-700">{field.value}</p>
-                      </div>
-                    ))}
                   </div>
                 </div>
-              )}
+
+                {/* Placement Highlights */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Placement Highlights
+                  </h3>
+                  <div className="space-y-3">
+                    {placementData.highlights &&
+                      placementData.highlights.map((item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
+                          <p className="text-gray-700 leading-relaxed">
+                            {item}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Top Recruiters */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Top Recruiters
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {placementData.topRecruiters &&
+                      placementData.topRecruiters.map((recruiter, index) => (
+                        <div
+                          key={index}
+                          className="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+                        >
+                          {recruiter.logo && (
+                            <img
+                              src={recruiter.logo}
+                              alt={`${recruiter.name} logo`}
+                              className="w-12 h-12 object-contain mb-2"
+                              onError={(e) => {
+                                e.target.style.display = "none";
+                              }}
+                            />
+                          )}
+                          <span className="text-xs font-medium text-gray-700 text-center">
+                            {recruiter.name}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Internship Opportunities */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Internship Opportunities
+                  </h3>
+                  <div className="space-y-3">
+                    {placementData.internships &&
+                      placementData.internships.map((item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
+                          <p className="text-gray-700 leading-relaxed">
+                            {item}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Placement Support */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Placement Support
+                  </h3>
+                  <div className="space-y-3">
+                    {placementData.support &&
+                      placementData.support.map((item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0 mt-2"></div>
+                          <p className="text-gray-700 leading-relaxed">
+                            {item}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Custom Fields Display */}
+                {placementData.customFields &&
+                  placementData.customFields.length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">
+                        Additional Information
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {placementData.customFields.map((field, index) => (
+                          <div key={field.id || index}>
+                            <h5 className="text-sm font-medium text-gray-900 mb-1">
+                              {field.label}
+                            </h5>
+                            <p className="text-gray-700">{field.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -551,6 +565,30 @@ const Placement = () => {
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
                           </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Upload Logo
+                            </label>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                if (e.target.files[0]) {
+                                  handleLogoUpload(index, e.target.files[0]);
+                                }
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              disabled={uploadingLogo}
+                            />
+                            {uploadingLogo && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                <span className="text-sm text-gray-600">
+                                  Uploading...
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <div className="flex items-center justify-between">
                           {recruiter.logo && (
@@ -737,14 +775,19 @@ const Placement = () => {
               <button
                 onClick={handleCancelEdit}
                 className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                disabled={saving}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                disabled={saving}
               >
-                Save Changes
+                {saving && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                )}
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

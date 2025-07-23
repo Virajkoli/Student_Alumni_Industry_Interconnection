@@ -45,6 +45,7 @@ app.options(
   cors({
     origin: [
       "http://localhost:5173", // Local development
+      "https://n55tb9bt-5173.inc1.devtunnels.ms/",
       "http://localhost:3000", // Alternative local port
       "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
       "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
@@ -83,6 +84,7 @@ app.use(
 
       const allowedOrigins = [
         "http://localhost:5173", // Local development
+        "https://n55tb9bt-5173.inc1.devtunnels.ms/",
         "http://localhost:3000", // Alternative local port
         "https://scaipsfrontend.vercel.app", // Your main Vercel deployment
         "https://scaipsfrontend-6gcmi40xt-viraj-kolis-projects.vercel.app", // Vercel preview URLs
@@ -143,7 +145,7 @@ app.use("/api/students", studentRoutes);
 app.use("/api/colleges", collegeRoutes);
 app.use("/api/startups", startupRoutes);
 app.use("/api/industries", industryRoutes);
-app.use('/api/search', require('./routes/search'));
+app.use("/api/search", require("./routes/search"));
 // Temporarily commented out until migrated to Prisma
 // Updated: GitHub auth routes now mounted at /api/auth to match the callback URL
 // app.use("/api/auth", githubAuthRoutes);
@@ -159,10 +161,9 @@ app.use("/api/startup-profile", startupProfileRoutes); // Startup profiles
 
 // Note: Media serving endpoint removed - files are now served directly from Cloudinary
 
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
+app.get("/api/test", (req, res) => {
+  res.json({ message: "API is working!" });
 });
-
 
 // Debug endpoint to show all registered routes
 app.get("/api/debug/routes", (req, res) => {

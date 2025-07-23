@@ -1,140 +1,130 @@
-import React, { useState } from "react";
-import { Edit, X, Plus, Minus, Download, FileText, Eye } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Edit,
+  X,
+  Plus,
+  Minus,
+  Download,
+  FileText,
+  Eye,
+  Upload,
+} from "lucide-react";
+import  apiService  from "../../../services/apiService";
 
 const Downloads = () => {
+  // const apiService = new apiService();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   const [downloadsData, setDownloadsData] = useState({
-    forms: [
-      {
-        id: "1",
-        name: "Application Form",
-        description: "Official application form for admission",
-        fileSize: "2.5 MB",
-        format: "PDF",
-        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-        uploadDate: "2024-01-15",
-      },
-      {
-        id: "2",
-        name: "Fee Structure Form",
-        description: "Detailed fee structure for all courses",
-        fileSize: "1.8 MB",
-        format: "PDF",
-        url: "https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf",
-        uploadDate: "2024-01-10",
-      },
-      {
-        id: "3",
-        name: "Scholarship Application",
-        description: "Application form for various scholarships",
-        fileSize: "3.2 MB",
-        format: "PDF",
-        url: "https://www.africau.edu/images/default/sample.pdf",
-        uploadDate: "2024-01-08",
-      },
-    ],
-    brochures: [
-      {
-        id: "4",
-        name: "College Brochure 2024",
-        description:
-          "Complete information about college facilities and courses",
-        fileSize: "15.6 MB",
-        format: "PDF",
-        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-        uploadDate: "2024-01-01",
-      },
-      {
-        id: "5",
-        name: "Engineering Catalog",
-        description: "Detailed catalog for engineering programs",
-        fileSize: "8.9 MB",
-        format: "PDF",
-        url: "https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf",
-        uploadDate: "2023-12-28",
-      },
-      {
-        id: "6",
-        name: "Campus Life Guide",
-        description: "Guide to campus facilities and student life",
-        fileSize: "12.3 MB",
-        format: "PDF",
-        url: "https://www.africau.edu/images/default/sample.pdf",
-        uploadDate: "2023-12-20",
-      },
-    ],
-    syllabus: [
-      {
-        id: "7",
-        name: "Computer Science Syllabus",
-        description: "Complete syllabus for B.Tech Computer Science",
-        fileSize: "4.7 MB",
-        format: "PDF",
-        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-        uploadDate: "2024-01-05",
-      },
-      {
-        id: "8",
-        name: "Mechanical Engineering Syllabus",
-        description: "Complete syllabus for B.Tech Mechanical Engineering",
-        fileSize: "5.2 MB",
-        format: "PDF",
-        url: "https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf",
-        uploadDate: "2024-01-05",
-      },
-      {
-        id: "9",
-        name: "MBA Curriculum",
-        description: "Curriculum for Master of Business Administration",
-        fileSize: "3.8 MB",
-        format: "PDF",
-        url: "https://www.africau.edu/images/default/sample.pdf",
-        uploadDate: "2024-01-03",
-      },
-    ],
-    other: [
-      {
-        id: "10",
-        name: "Placement Report 2023",
-        description: "Annual placement statistics and company details",
-        fileSize: "6.4 MB",
-        format: "PDF",
-        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-        uploadDate: "2024-01-12",
-      },
-      {
-        id: "11",
-        name: "Research Guidelines",
-        description: "Guidelines for research projects and thesis",
-        fileSize: "2.1 MB",
-        format: "PDF",
-        url: "https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf",
-        uploadDate: "2023-12-15",
-      },
-      {
-        id: "12",
-        name: "Alumni Directory",
-        description: "Directory of notable alumni and their achievements",
-        fileSize: "7.8 MB",
-        format: "PDF",
-        url: "https://www.africau.edu/images/default/sample.pdf",
-        uploadDate: "2023-12-10",
-      },
-    ],
+    forms: [],
+    brochures: [],
+    syllabus: [],
+    other: [],
     customFields: [],
   });
 
   const [editData, setEditData] = useState({ ...downloadsData });
+
+  // Fetch downloads data on component mount
+  useEffect(() => {
+    fetchDownloads();
+  }, []);
+
+  const fetchDownloads = async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.getCollegeDownloads();
+      if (response.success) {
+        const data = response.data;
+        setDownloadsData({
+          forms: data.forms || [],
+          brochures: data.brochures || [],
+          syllabus: data.syllabus || [],
+          other: data.other || [],
+          customFields: [],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching downloads:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEditClick = () => {
     setEditData({ ...downloadsData });
     setIsEditModalOpen(true);
   };
 
-  const handleSave = () => {
-    setDownloadsData(editData);
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    try {
+      setUploading(true);
+
+      // Process each category and save changes
+      for (const category of ["forms", "brochures", "syllabus", "other"]) {
+        const originalDocs = downloadsData[category] || [];
+        const editedDocs = editData[category] || [];
+
+        // Find new documents (those without database ID)
+        const newDocs = editedDocs.filter(
+          (doc) => !doc.id || doc.id.toString().startsWith("new_")
+        );
+
+        // Find updated documents
+        const updatedDocs = editedDocs.filter((doc) => {
+          if (!doc.id || doc.id.toString().startsWith("new_")) return false;
+          const original = originalDocs.find((orig) => orig.id === doc.id);
+          return original && JSON.stringify(original) !== JSON.stringify(doc);
+        });
+
+        // Find deleted documents
+        const deletedDocs = originalDocs.filter(
+          (original) => !editedDocs.find((edited) => edited.id === original.id)
+        );
+
+        // Create new documents
+        for (const newDoc of newDocs) {
+          await apiService.addCollegeDownload({
+            title: newDoc.name,
+            description: newDoc.description,
+            category: category,
+            fileType: newDoc.format,
+            fileSize: newDoc.fileSize,
+            fileUrl: newDoc.url,
+            isPublic: true,
+          });
+        }
+
+        // Update existing documents
+        for (const updatedDoc of updatedDocs) {
+          await apiService.updateCollegeDownload(updatedDoc.id, {
+            title: updatedDoc.name,
+            description: updatedDoc.description,
+            category: category,
+            fileType: updatedDoc.format,
+            fileSize: updatedDoc.fileSize,
+            fileUrl: updatedDoc.url,
+            isPublic: true,
+          });
+        }
+
+        // Delete removed documents
+        for (const deletedDoc of deletedDocs) {
+          await apiService.deleteCollegeDownload(deletedDoc.id);
+        }
+      }
+
+      // Refresh data
+      await fetchDownloads();
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error saving downloads:", error);
+      alert("Failed to save downloads. Please try again.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -151,7 +141,7 @@ const Downloads = () => {
 
   const handleAddDocument = (category) => {
     const newDocument = {
-      id: Date.now().toString(),
+      id: `new_${Date.now()}`,
       name: "",
       description: "",
       fileSize: "",
@@ -168,6 +158,74 @@ const Downloads = () => {
   const handleRemoveDocument = (category, index) => {
     const newDocuments = editData[category].filter((_, i) => i !== index);
     setEditData({ ...editData, [category]: newDocuments });
+  };
+
+  // Handle file upload for new documents
+  const handleFileUpload = async (category, index, file) => {
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("title", `Uploaded ${file.name}`);
+      formData.append("description", `Uploaded file: ${file.name}`);
+      formData.append("category", category);
+      formData.append("fileType", file.type.includes("pdf") ? "PDF" : "DOC");
+      formData.append(
+        "fileSize",
+        `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+      );
+
+      const response = await apiService.addCollegeDownload(formData);
+
+      if (response.success) {
+        // Update the document in editData with the uploaded file info
+        const newDocuments = [...editData[category]];
+        newDocuments[index] = {
+          ...newDocuments[index],
+          name: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
+          url: response.data.url,
+          fileSize: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+          format: file.type.includes("pdf") ? "PDF" : "DOC",
+        };
+        setEditData({ ...editData, [category]: newDocuments });
+
+        // Refresh the main data
+        await fetchDownloads();
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("Failed to upload file. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDownload = async (doc) => {
+    try {
+      // Increment download count
+      if (doc.id) {
+        await apiService.incrementDownloadCount(doc.id);
+      }
+
+      // Create download link
+      const link = document.createElement("a");
+      link.href = doc.url;
+      link.download = doc.name;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      // Still allow download even if count increment fails
+      const link = document.createElement("a");
+      link.href = doc.url;
+      link.download = doc.name;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   // Custom fields handlers
@@ -239,15 +297,7 @@ const Downloads = () => {
                     Preview
                   </button>
                   <button
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = doc.url;
-                      link.download = doc.name;
-                      link.target = '_blank';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
+                    onClick={() => handleDownload(doc)}
                     className="flex items-center gap-1 px-3 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                     title="Download document"
                   >
@@ -274,6 +324,7 @@ const Downloads = () => {
               onClick={handleEditClick}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
               title="Edit downloads"
+              disabled={loading}
             >
               <Edit className="w-5 h-5" />
             </button>
@@ -281,75 +332,84 @@ const Downloads = () => {
 
           {/* Content */}
           <div className="p-6">
-            {/* Download Statistics */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Download Center
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <p className="text-2xl font-bold text-blue-600">
-                    {downloadsData.forms.length}
-                  </p>
-                  <p className="text-sm text-gray-600">Forms</p>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4 text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {downloadsData.brochures.length}
-                  </p>
-                  <p className="text-sm text-gray-600">Brochures</p>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4 text-center">
-                  <p className="text-2xl font-bold text-purple-600">
-                    {downloadsData.syllabus.length}
-                  </p>
-                  <p className="text-sm text-gray-600">Syllabus</p>
-                </div>
-                <div className="bg-orange-50 rounded-lg p-4 text-center">
-                  <p className="text-2xl font-bold text-orange-600">
-                    {downloadsData.other.length}
-                  </p>
-                  <p className="text-sm text-gray-600">Other Documents</p>
-                </div>
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">Loading downloads...</span>
               </div>
-            </div>
-
-            {renderDocumentSection("Forms", downloadsData.forms, "forms")}
-            {renderDocumentSection(
-              "Brochures & Catalogs",
-              downloadsData.brochures,
-              "brochures"
-            )}
-            {renderDocumentSection(
-              "Course Syllabus",
-              downloadsData.syllabus,
-              "syllabus"
-            )}
-            {renderDocumentSection(
-              "Other Documents",
-              downloadsData.other,
-              "other"
-            )}
-
-            {/* Custom Fields Display */}
-            {downloadsData.customFields &&
-              downloadsData.customFields.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">
-                    Additional Information
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {downloadsData.customFields.map((field, index) => (
-                      <div key={field.id || index}>
-                        <h5 className="text-sm font-medium text-gray-900 mb-1">
-                          {field.label}
-                        </h5>
-                        <p className="text-gray-700">{field.value}</p>
-                      </div>
-                    ))}
+            ) : (
+              <>
+                {/* Download Statistics */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Download Center
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-blue-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-blue-600">
+                        {downloadsData.forms.length}
+                      </p>
+                      <p className="text-sm text-gray-600">Forms</p>
+                    </div>
+                    <div className="bg-green-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-green-600">
+                        {downloadsData.brochures.length}
+                      </p>
+                      <p className="text-sm text-gray-600">Brochures</p>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-purple-600">
+                        {downloadsData.syllabus.length}
+                      </p>
+                      <p className="text-sm text-gray-600">Syllabus</p>
+                    </div>
+                    <div className="bg-orange-50 rounded-lg p-4 text-center">
+                      <p className="text-2xl font-bold text-orange-600">
+                        {downloadsData.other.length}
+                      </p>
+                      <p className="text-sm text-gray-600">Other Documents</p>
+                    </div>
                   </div>
                 </div>
-              )}
+
+                {renderDocumentSection("Forms", downloadsData.forms, "forms")}
+                {renderDocumentSection(
+                  "Brochures & Catalogs",
+                  downloadsData.brochures,
+                  "brochures"
+                )}
+                {renderDocumentSection(
+                  "Course Syllabus",
+                  downloadsData.syllabus,
+                  "syllabus"
+                )}
+                {renderDocumentSection(
+                  "Other Documents",
+                  downloadsData.other,
+                  "other"
+                )}
+
+                {/* Custom Fields Display */}
+                {downloadsData.customFields &&
+                  downloadsData.customFields.length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">
+                        Additional Information
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {downloadsData.customFields.map((field, index) => (
+                          <div key={field.id || index}>
+                            <h5 className="text-sm font-medium text-gray-900 mb-1">
+                              {field.label}
+                            </h5>
+                            <p className="text-gray-700">{field.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -449,6 +509,26 @@ const Downloads = () => {
                               rows={2}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
                               placeholder="Document description..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Upload File
+                            </label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx,.xls,.xlsx"
+                              onChange={(e) => {
+                                if (e.target.files[0]) {
+                                  handleFileUpload(
+                                    "forms",
+                                    index,
+                                    e.target.files[0]
+                                  );
+                                }
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              disabled={uploading}
                             />
                           </div>
                           <div>
@@ -587,6 +667,26 @@ const Downloads = () => {
                               rows={2}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
                               placeholder="Document description..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Upload File
+                            </label>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx,.xls,.xlsx"
+                              onChange={(e) => {
+                                if (e.target.files[0]) {
+                                  handleFileUpload(
+                                    "brochures",
+                                    index,
+                                    e.target.files[0]
+                                  );
+                                }
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                              disabled={uploading}
                             />
                           </div>
                           <div>
@@ -996,14 +1096,19 @@ const Downloads = () => {
               <button
                 onClick={handleCancelEdit}
                 className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                disabled={uploading}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                disabled={uploading}
               >
-                Save Changes
+                {uploading && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                )}
+                {uploading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

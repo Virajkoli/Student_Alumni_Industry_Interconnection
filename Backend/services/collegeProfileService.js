@@ -1200,8 +1200,273 @@ class CollegeProfileService {
   }
 
   // =============================================
+  // FEES MANAGEMENT METHODS
+  // =============================================
+
+  async getFees(collegeId) {
+    try {
+      const fees = await prisma.college_fees.findMany({
+        where: { college_id: collegeId },
+        orderBy: { created_at: 'desc' }
+      });
+
+      // Transform fees data to match frontend structure
+      const feesStructure = {
+        btech: "",
+        mtech: "",
+        bsc: "",
+        msc: "",
+        mba: "",
+        phd: "",
+        scholarships: [],
+        hostel: "",
+        mess: "",
+        other: "",
+        customFees: [],
+        customCharges: [],
+        customFields: []
+      };
+
+      // Track if we found any scholarships in the database
+      let hasDbScholarships = false;
+
+      // Process database fees and populate structure
+      for (const fee of fees) {
+        const courseKey = fee.course_name.toLowerCase().replace(/[^a-z]/g, '');
+        
+        if (['btech', 'mtech', 'bsc', 'msc', 'mba', 'phd'].includes(courseKey)) {
+          feesStructure[courseKey] = `₹${parseFloat(fee.total_fee || fee.tuition_fee || 0).toLocaleString('en-IN')}`;
+        } else {
+          feesStructure.customFees.push({
+            id: fee.id,
+            program: fee.course_name,
+            amount: `₹${parseFloat(fee.total_fee || fee.tuition_fee || 0).toLocaleString('en-IN')}`
+          });
+        }
+
+        // Extract hostel and mess fees
+        if (fee.hostel_fee) {
+          feesStructure.hostel = `₹${parseFloat(fee.hostel_fee).toLocaleString('en-IN')} per year`;
+        }
+        if (fee.mess_fee) {
+          feesStructure.mess = `₹${parseFloat(fee.mess_fee).toLocaleString('en-IN')} per year`;
+        }
+        if (fee.other_fees) {
+          feesStructure.customCharges.push({
+            id: `other_${fee.id}`,
+            name: "Other Fees",
+            amount: `₹${parseFloat(fee.other_fees).toLocaleString('en-IN')}`
+          });
+        }
+
+        // Extract scholarships if available
+        if (fee.scholarships && fee.scholarships.length > 0) {
+          hasDbScholarships = true;
+          feesStructure.scholarships = [...new Set([...feesStructure.scholarships, ...fee.scholarships])];
+        }
+      }
+
+      // If no scholarships found in database, provide default ones for new colleges
+      if (!hasDbScholarships && fees.length === 0) {
+        feesStructure.scholarships = [
+          "Merit-based scholarships up to 100% fee waiver",
+          "Need-based financial assistance for economically weaker sections",
+          "Sports quota scholarships for outstanding athletes",
+          "SC/ST/OBC category fee concessions as per government norms",
+          "Girl child education support program"
+        ];
+      }
+
+      return feesStructure;
+    } catch (error) {
+      throw new Error(`Failed to get college fees: ${error.message}`);
+    }
+  }
+
+  async updateFees(collegeId, feesData) {
+    try {
+      // Start transaction
+      return await prisma.$transaction(async (tx) => {
+        // Clear existing fees for this college
+        await tx.college_fees.deleteMany({
+          where: { college_id: collegeId }
+        });
+
+        const feesToCreate = [];
+        const currentYear = new Date().getFullYear();
+        const academicYear = `${currentYear}-${currentYear + 1}`;
+
+        // Process standard course fees
+        const standardCourses = ['btech', 'mtech', 'bsc', 'msc', 'mba', 'phd'];
+        const courseNameMap = {
+          btech: 'B.Tech',
+          mtech: 'M.Tech',
+          bsc: 'B.Sc',
+          msc: 'M.Sc',
+          mba: 'MBA',
+          phd: 'Ph.D'
+        };
+
+        for (const courseKey of standardCourses) {
+          if (feesData[courseKey]) {
+            const feeAmount = this.parseNumericValue(feesData[courseKey]);
+            if (feeAmount > 0) {
+              feesToCreate.push({
+                college_id: collegeId,
+                course_name: courseNameMap[courseKey],
+                degree_type: courseKey.includes('m') || courseKey === 'phd' ? 'Postgraduate' : 'Undergraduate',
+                tuition_fee: feeAmount,
+                total_fee: feeAmount,
+                academic_year: academicYear,
+                scholarships: feesData.scholarships || [],
+                payment_modes: ['Online', 'Offline'],
+                created_at: new Date(),
+                updated_at: new Date()
+              });
+            }
+          }
+        }
+
+        // Process custom fees
+        if (feesData.customFees && Array.isArray(feesData.customFees)) {
+          for (const customFee of feesData.customFees) {
+            if (customFee.program && customFee.amount) {
+              const feeAmount = this.parseNumericValue(customFee.amount);
+              if (feeAmount > 0) {
+                feesToCreate.push({
+                  college_id: collegeId,
+                  course_name: customFee.program,
+                  degree_type: 'Other',
+                  tuition_fee: feeAmount,
+                  total_fee: feeAmount,
+                  academic_year: academicYear,
+                  scholarships: feesData.scholarships || [],
+                  payment_modes: ['Online', 'Offline'],
+                  created_at: new Date(),
+                  updated_at: new Date()
+                });
+              }
+            }
+          }
+        }
+
+        // Add hostel and mess fees to the first course or create a general entry
+        if (feesToCreate.length > 0) {
+          if (feesData.hostel) {
+            const hostelFee = this.parseNumericValue(feesData.hostel);
+            if (hostelFee > 0) {
+              feesToCreate[0].hostel_fee = hostelFee;
+            }
+          }
+          if (feesData.mess) {
+            const messFee = this.parseNumericValue(feesData.mess);
+            if (messFee > 0) {
+              feesToCreate[0].mess_fee = messFee;
+            }
+          }
+          if (feesData.other) {
+            const otherFee = this.parseNumericValue(feesData.other);
+            if (otherFee > 0) {
+              feesToCreate[0].other_fees = otherFee;
+            }
+          }
+        } else if (feesData.hostel || feesData.mess || feesData.other) {
+          // Create a general entry for accommodation fees if no course fees exist
+          feesToCreate.push({
+            college_id: collegeId,
+            course_name: 'General',
+            degree_type: 'Other',
+            tuition_fee: 0,
+            hostel_fee: feesData.hostel ? this.parseNumericValue(feesData.hostel) : null,
+            mess_fee: feesData.mess ? this.parseNumericValue(feesData.mess) : null,
+            other_fees: feesData.other ? this.parseNumericValue(feesData.other) : null,
+            total_fee: 0,
+            academic_year: academicYear,
+            scholarships: feesData.scholarships || [],
+            payment_modes: ['Online', 'Offline'],
+            created_at: new Date(),
+            updated_at: new Date()
+          });
+        }
+
+        // Create all fee records
+        if (feesToCreate.length > 0) {
+          // Validate all numeric fields before creating
+          const validatedFeesToCreate = feesToCreate.map(fee => {
+            const validatedFee = { ...fee };
+            
+            // Validate and cap numeric fields
+            const numericFields = ['tuition_fee', 'hostel_fee', 'mess_fee', 'other_fees', 'total_fee'];
+            numericFields.forEach(field => {
+              if (validatedFee[field] !== null && validatedFee[field] !== undefined) {
+                if (validatedFee[field] > 99999999.99) {
+                  console.warn(`${field} value ${validatedFee[field]} exceeds limit, capping to 99999999.99`);
+                  validatedFee[field] = 99999999.99;
+                }
+                if (validatedFee[field] < 0) {
+                  validatedFee[field] = 0;
+                }
+                // Round to 2 decimal places
+                validatedFee[field] = Math.round(validatedFee[field] * 100) / 100;
+              }
+            });
+            
+            return validatedFee;
+          });
+          
+          await tx.college_fees.createMany({
+            data: validatedFeesToCreate
+          });
+        }
+
+        return { message: 'Fees updated successfully' };
+      });
+    } catch (error) {
+      throw new Error(`Failed to update college fees: ${error.message}`);
+    }
+  }
+
+  // =============================================
   // UTILITY METHODS
   // =============================================
+  
+  // Helper method to parse numeric values from strings (like currency)
+  parseNumericValue(value) {
+    if (value === null || value === undefined || value === '') return 0;
+    
+    // Remove currency symbols, commas, and spaces
+    const cleanValue = value.toString()
+      .replace(/[₹$£€,\s]/g, '')
+      .replace(/[^\d.-]/g, '');
+    
+    const parsed = parseFloat(cleanValue);
+    if (isNaN(parsed)) return 0;
+    
+    // Ensure the value doesn't exceed PostgreSQL numeric(10,2) limits
+    // Maximum value: 99,999,999.99
+    const maxValue = 99999999.99;
+    if (parsed > maxValue) {
+      console.warn(`Value ${parsed} exceeds maximum allowed value ${maxValue}, capping to maximum`);
+      return maxValue;
+    }
+    
+    // Ensure minimum value is 0
+    return Math.max(0, parsed);
+  }
+
+  // Helper method to safely parse integers
+  safeParseInt(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const parsed = parseInt(value);
+    return isNaN(parsed) ? null : parsed;
+  }
+
+  // Helper method to safely parse floats
+  safeParseFloat(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? null : parsed;
+  }
   
   async getCollegeProfileSummary(collegeId) {
     try {

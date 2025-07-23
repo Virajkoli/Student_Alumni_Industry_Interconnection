@@ -1517,6 +1517,32 @@ class ApiService {
     }
   }
 
+  // College Fees
+  async getCollegeFees(collegeId = null) {
+    try {
+      const endpoint = collegeId 
+        ? `/college-profile/fees/${collegeId}` 
+        : "/college-profile/fees";
+      const response = await this.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college fees"
+      );
+    }
+  }
+
+  async updateCollegeFees(feesData) {
+    try {
+      const response = await this.api.put("/college-profile/fees", feesData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college fees"
+      );
+    }
+  }
+
   async getStartupProfile(startupId = null) {
     try {
       const endpoint = startupId ? `/startups/${startupId}` : "/startups/me";

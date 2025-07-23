@@ -894,6 +894,50 @@ class CollegeProfileController {
       });
     }
   }
+
+  // =============================================
+  // FEES MANAGEMENT
+  // =============================================
+  
+  async getFees(req, res) {
+    try {
+      const collegeId = parseInt(req.params.collegeId) || req.user.id;
+      
+      const fees = await collegeProfileService.getFees(collegeId);
+      
+      res.json({
+        success: true,
+        data: fees
+      });
+    } catch (error) {
+      console.error('Get college fees error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get college fees'
+      });
+    }
+  }
+  
+  async updateFees(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const feesData = req.body;
+      
+      const result = await collegeProfileService.updateFees(collegeId, feesData);
+      
+      res.json({
+        success: true,
+        data: result,
+        message: 'College fees updated successfully'
+      });
+    } catch (error) {
+      console.error('Update college fees error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update college fees'
+      });
+    }
+  }
 }
 
 module.exports = CollegeProfileController;

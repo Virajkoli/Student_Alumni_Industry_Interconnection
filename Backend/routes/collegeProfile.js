@@ -63,6 +63,11 @@ router.put('/infrastructure-new', auth, collegeProfileController.updateCollegeIn
 router.get('/contact-new', auth, collegeProfileController.getCollegeContactNew);
 router.put('/contact-new', auth, collegeProfileController.updateCollegeContact);
 
+// College fees routes
+router.get('/fees', auth, collegeProfileController.getFees);
+router.get('/fees/:collegeId', collegeProfileController.getFees); // Public endpoint for viewing
+router.put('/fees', auth, collegeProfileController.updateFees);
+
 // College academics/courses routes
 router.get('/academics', auth, collegeProfileController.getAcademics);
 router.post('/academics', auth, collegeProfileController.createAcademic);

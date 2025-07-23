@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit, X, Plus, Minus } from "lucide-react";
+import { useAuth } from "../../../contexts/AuthContext";
+import apiService from "../../../services/apiService";
 
-const CourseFees = () => {
+const CourseFees = ({ collegeId = null, isEditable = true }) => {
+  const { user } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const [feesData, setFeesData] = useState({
     btech: "₹1,50,000",
@@ -28,14 +34,55 @@ const CourseFees = () => {
 
   const [editData, setEditData] = useState({ ...feesData });
 
+  // Load fees data on component mount
+  useEffect(() => {
+    loadFeesData();
+  }, [collegeId]);
+
+  const loadFeesData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiService.getCollegeFees(collegeId);
+      if (response.success) {
+        setFeesData(response.data);
+        setEditData(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading fees data:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEditClick = () => {
     setEditData({ ...feesData });
     setIsEditModalOpen(true);
   };
 
-  const handleSave = () => {
-    setFeesData({ ...editData });
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    if (!user || user.role !== 'college') {
+      setError('Only colleges can update fees information');
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError(null);
+      
+      const response = await apiService.updateCollegeFees(editData);
+      if (response.success) {
+        setFeesData({ ...editData });
+        setIsEditModalOpen(false);
+        // Show success message if you have a toast system
+      }
+    } catch (error) {
+      console.error('Error saving fees data:', error);
+      setError(error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -170,20 +217,56 @@ const CourseFees = () => {
   return (
     <>
       <div className="p-6 max-w-4xl mx-auto">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading fees information...</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <X className="h-5 w-5 text-red-400" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error loading fees data</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={loadFeesData}
+                    className="text-sm bg-red-100 text-red-800 rounded-md px-3 py-1 hover:bg-red-200"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Course Fees Section */}
-        <div className="bg-white rounded-lg mb-6">
+        {!loading && !error && (
+          <div className="bg-white rounded-lg mb-6">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">
               Course Fees & Scholarships
             </h2>
-            <button
-              onClick={handleEditClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-              title="Edit fees"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
+            {isEditable && user?.role === 'college' && (
+              <button
+                onClick={handleEditClick}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                title="Edit fees"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Content */}
@@ -355,6 +438,7 @@ const CourseFees = () => {
             )}
           </div>
         </div>
+        )}
       </div>
 
       {/* Edit Modal */}
@@ -797,9 +881,11 @@ const CourseFees = () => {
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                Save Changes
+                {saving && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+                {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>

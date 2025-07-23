@@ -551,8 +551,8 @@ const CollegeProfilePage = () => {
       case "course-fees":
         return (
           <FeesReview
-            data={formData["course-fees"]}
-            onEdit={() => openSectionForm("course-fees")}
+            collegeId={null} // Use current user's college
+            isEditable={true}
           />
         );
       case "faculty":

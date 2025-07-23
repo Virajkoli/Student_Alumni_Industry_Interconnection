@@ -52,9 +52,16 @@ const Admission = ({ collegeId = null, isEditable = true }) => {
       setError(null);
       
       // Clean the data before sending
-      const cleanedData = editData.filter(admission => 
-        admission.course_name && admission.course_name.trim() !== ''
-      );
+      const cleanedData = editData
+        .filter(admission => admission.course_name && admission.course_name.trim() !== '')
+        .map(admission => {
+          const cleanedAdmission = { ...admission };
+          // Remove temporary IDs (those starting with 'temp_') so backend treats them as new records
+          if (typeof cleanedAdmission.id === 'string' && cleanedAdmission.id.startsWith('temp_')) {
+            cleanedAdmission.id = null;
+          }
+          return cleanedAdmission;
+        });
       
       const response = await apiService.collegeAPI.updateAdmissions(cleanedData);
       if (response.success) {
@@ -78,7 +85,7 @@ const Admission = ({ collegeId = null, isEditable = true }) => {
   // Add new admission record
   const handleAddAdmission = () => {
     const newAdmission = {
-      id: null,
+      id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Generate unique temporary ID
       course_name: "",
       degree_type: "",
       duration: "",
@@ -201,7 +208,7 @@ const Admission = ({ collegeId = null, isEditable = true }) => {
               ) : (
                 <div className="space-y-8">
                   {admissionData.map((admission, index) => (
-                    <div key={admission.id || index} className="border border-gray-200 rounded-lg p-6">
+                    <div key={admission.id ? `admission_${admission.id}` : `admission_index_${index}`} className="border border-gray-200 rounded-lg p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-gray-900">
                           {admission.course_name}
@@ -375,7 +382,7 @@ const Admission = ({ collegeId = null, isEditable = true }) => {
 
               {/* Admission Records */}
               {editData.map((admission, index) => (
-                <div key={admission.id || index} className="border border-gray-200 rounded-lg p-6 space-y-4">
+                <div key={admission.id ? `edit_admission_${admission.id}` : `edit_admission_index_${index}`} className="border border-gray-200 rounded-lg p-6 space-y-4">
                   <div className="flex justify-between items-center">
                     <h4 className="text-md font-medium text-gray-900">
                       Admission Record {index + 1}

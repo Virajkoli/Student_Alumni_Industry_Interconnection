@@ -737,6 +737,69 @@ class CollegeProfileController {
     }
   }
 
+  async updateCollegeAdmissions(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const admissionsData = req.body;
+      
+      const updatedAdmissions = await collegeProfileService.updateCollegeAdmissions(collegeId, admissionsData);
+      
+      res.json({
+        success: true,
+        data: updatedAdmissions,
+        message: 'Admissions updated successfully'
+      });
+    } catch (error) {
+      console.error('Update college admissions error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update admissions'
+      });
+    }
+  }
+
+  async updateCollegeAdmission(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const admissionId = parseInt(req.params.admissionId);
+      const admissionData = req.body;
+      
+      const updatedAdmission = await collegeProfileService.updateCollegeAdmission(admissionId, collegeId, admissionData);
+      
+      res.json({
+        success: true,
+        data: updatedAdmission,
+        message: 'Admission record updated successfully'
+      });
+    } catch (error) {
+      console.error('Update college admission error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update admission record'
+      });
+    }
+  }
+
+  async deleteCollegeAdmission(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const admissionId = parseInt(req.params.admissionId);
+      
+      await collegeProfileService.deleteCollegeAdmission(admissionId, collegeId);
+      
+      res.json({
+        success: true,
+        message: 'Admission record deleted successfully'
+      });
+    } catch (error) {
+      console.error('Delete college admission error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to delete admission record'
+      });
+    }
+  }
+
   // College Infrastructure (New)
   async getCollegeInfrastructureNew(req, res) {
     try {

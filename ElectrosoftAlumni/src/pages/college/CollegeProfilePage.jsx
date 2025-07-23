@@ -612,8 +612,8 @@ const CollegeProfilePage = () => {
       case "admission":
         return (
           <Admission
-            data={formData["admission"]}
-            onEdit={() => openSectionForm("admission")}
+            collegeId={user?.id}
+            isEditable={true}
           />
         );
       case "placement":

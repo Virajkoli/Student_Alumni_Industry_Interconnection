@@ -1,376 +1,350 @@
-import React, { useState } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Edit, X, Plus, Minus } from "lucide-react";
+import { useAuth } from "../../../contexts/AuthContext";
+import apiService from "../../../services/apiService";
 
-const Admission = () => {
+const Admission = ({ collegeId = null, isEditable = true }) => {
+  const { user } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [admissionData, setAdmissionData] = useState({
-    eligibility: [
-      "JEE Main score required for B.Tech admission",
-      "GATE score required for M.Tech admission",
-      "Minimum 60% in 12th standard for undergraduate programs",
-      "Bachelor's degree with 50% marks for postgraduate programs",
-      "Valid entrance exam scores as per university guidelines",
-    ],
-    steps: [
-      "Register on the official admission portal",
-      "Fill the online application form with required details",
-      "Upload necessary documents (mark sheets, certificates)",
-      "Pay the application fee through online payment gateway",
-      "Submit the application before the deadline",
-      "Attend counseling sessions as per merit list",
-      "Complete document verification process",
-      "Pay admission fees to confirm seat",
-    ],
-    dates: [
-      "Application Start Date: March 15, 2024",
-      "Application End Date: May 30, 2024",
-      "Entrance Exam Date: June 15-20, 2024",
-      "Result Declaration: July 10, 2024",
-      "Counseling Rounds: July 25 - August 15, 2024",
-      "Classes Commence: September 1, 2024",
-    ],
-    cutoffTable: [
-      {
-        year: "2023",
-        round1: "#",
-        round2: "#",
-        round3: "#",
-      },
-      {
-        year: "2022",
-        round1: "#",
-        round2: "#",
-        round3: "#",
-      },
-    ],
-    customFields: [],
-  });
+  const [admissionData, setAdmissionData] = useState([]);
+  const [editData, setEditData] = useState([]);
 
-  const [editData, setEditData] = useState({ ...admissionData });
+  // Load admission data on component mount
+  useEffect(() => {
+    loadAdmissionData();
+  }, [collegeId]);
+
+  const loadAdmissionData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiService.collegeAPI.getAdmissions();
+      if (response.success) {
+        const loadedData = response.data || [];
+        setAdmissionData(loadedData);
+        setEditData([...loadedData]);
+      }
+    } catch (error) {
+      console.error('Error loading admission data:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEditClick = () => {
-    setEditData({ ...admissionData });
+    setEditData([...admissionData]);
     setIsEditModalOpen(true);
   };
 
-  const handleSave = () => {
-    setAdmissionData({ ...editData });
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    if (!user || user.role !== 'college') {
+      setError('Only colleges can update admission information');
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError(null);
+      
+      // Clean the data before sending
+      const cleanedData = editData.filter(admission => 
+        admission.course_name && admission.course_name.trim() !== ''
+      );
+      
+      const response = await apiService.collegeAPI.updateAdmissions(cleanedData);
+      if (response.success) {
+        setAdmissionData([...cleanedData]);
+        setIsEditModalOpen(false);
+        // Show success message if you have a toast system
+      }
+    } catch (error) {
+      console.error('Error saving admission data:', error);
+      setError(error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancelEdit = () => {
-    setEditData({ ...admissionData });
+    setEditData([...admissionData]);
     setIsEditModalOpen(false);
   };
 
-  // Eligibility handlers
-  const handleAddEligibility = () => {
-    setEditData((prev) => ({
-      ...prev,
-      eligibility: [...prev.eligibility, ""],
-    }));
-  };
-
-  const handleEligibilityChange = (index, value) => {
-    setEditData((prev) => ({
-      ...prev,
-      eligibility: prev.eligibility.map((item, i) =>
-        i === index ? value : item
-      ),
-    }));
-  };
-
-  const handleRemoveEligibility = (index) => {
-    setEditData((prev) => ({
-      ...prev,
-      eligibility: prev.eligibility.filter((_, i) => i !== index),
-    }));
-  };
-
-  // Steps handlers
-  const handleAddStep = () => {
-    setEditData((prev) => ({
-      ...prev,
-      steps: [...prev.steps, ""],
-    }));
-  };
-
-  const handleStepChange = (index, value) => {
-    setEditData((prev) => ({
-      ...prev,
-      steps: prev.steps.map((item, i) => (i === index ? value : item)),
-    }));
-  };
-
-  const handleRemoveStep = (index) => {
-    setEditData((prev) => ({
-      ...prev,
-      steps: prev.steps.filter((_, i) => i !== index),
-    }));
-  };
-
-  // Dates handlers
-  const handleAddDate = () => {
-    setEditData((prev) => ({
-      ...prev,
-      dates: [...prev.dates, ""],
-    }));
-  };
-
-  const handleDateChange = (index, value) => {
-    setEditData((prev) => ({
-      ...prev,
-      dates: prev.dates.map((item, i) => (i === index ? value : item)),
-    }));
-  };
-
-  const handleRemoveDate = (index) => {
-    setEditData((prev) => ({
-      ...prev,
-      dates: prev.dates.filter((_, i) => i !== index),
-    }));
-  };
-
-  // Cutoff table handlers
-  const handleAddCutoffRow = () => {
-    const newRow = {
-      id: Date.now(),
-      year: "",
-      round1: "",
-      round2: "",
-      round3: "",
+  // Add new admission record
+  const handleAddAdmission = () => {
+    const newAdmission = {
+      id: null,
+      course_name: "",
+      degree_type: "",
+      duration: "",
+      eligibility_criteria: "",
+      entrance_exam: "",
+      application_process: "",
+      application_fee: "",
+      total_seats: "",
+      admission_url: "",
+      application_start: "",
+      application_end: "",
+      exam_date: "",
+      result_date: "",
+      required_documents: [],
+      reservation_policy: "",
+      scholarship_info: "",
+      important_dates: {},
+      is_active: true
     };
-    setEditData((prev) => ({
-      ...prev,
-      cutoffTable: [...prev.cutoffTable, newRow],
-    }));
+    setEditData(prev => [...prev, newAdmission]);
   };
 
-  const handleCutoffChange = (index, field, value) => {
-    setEditData((prev) => ({
-      ...prev,
-      cutoffTable: prev.cutoffTable.map((row, i) =>
-        i === index ? { ...row, [field]: value } : row
-      ),
-    }));
+  // Remove admission record
+  const handleRemoveAdmission = (index) => {
+    setEditData(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleRemoveCutoffRow = (index) => {
-    setEditData((prev) => ({
-      ...prev,
-      cutoffTable: prev.cutoffTable.filter((_, i) => i !== index),
-    }));
+  // Update admission field
+  const handleAdmissionChange = (index, field, value) => {
+    setEditData(prev => prev.map((admission, i) => 
+      i === index ? { ...admission, [field]: value } : admission
+    ));
   };
 
-  // Custom fields handlers
-  const handleAddCustomField = () => {
-    const newField = {
-      id: Date.now(),
-      label: "",
-      value: "",
-    };
-    setEditData((prev) => ({
-      ...prev,
-      customFields: [...prev.customFields, newField],
-    }));
+  // Handle array fields like required_documents
+  const handleArrayFieldChange = (index, field, arrayValue) => {
+    const arrayData = Array.isArray(arrayValue) ? arrayValue : 
+      (typeof arrayValue === 'string' ? arrayValue.split('\n').filter(item => item.trim() !== '') : []);
+    
+    setEditData(prev => prev.map((admission, i) => 
+      i === index ? { ...admission, [field]: arrayData } : admission
+    ));
   };
 
-  const handleCustomFieldChange = (fieldId, property, value) => {
-    setEditData((prev) => ({
-      ...prev,
-      customFields: prev.customFields.map((field) =>
-        field.id === fieldId ? { ...field, [property]: value } : field
-      ),
-    }));
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN');
   };
 
-  const handleRemoveCustomField = (fieldId) => {
-    setEditData((prev) => ({
-      ...prev,
-      customFields: prev.customFields.filter((field) => field.id !== fieldId),
-    }));
+  const formatCurrency = (amount) => {
+    if (!amount) return 'Not specified';
+    return `₹${parseFloat(amount).toLocaleString('en-IN')}`;
   };
 
   return (
     <>
       <div className="p-6 max-w-4xl mx-auto">
-        {/* Admission Section */}
-        <div className="bg-white rounded-lg mb-6">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Admission</h2>
-            <button
-              onClick={handleEditClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-              title="Edit admission information"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading admission information...</span>
           </div>
+        )}
 
-          {/* Content */}
-          <div className="p-6">
-            {/* Eligibility & Entrance Exams */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Eligibility & Entrance Exams
-              </h3>
-              <div className="space-y-3">
-                {admissionData.eligibility &&
-                  admissionData.eligibility.map((item, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{item}</p>
-                    </div>
-                  ))}
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <X className="h-5 w-5 text-red-400" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error loading admission data</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={loadAdmissionData}
+                    className="text-sm bg-red-100 text-red-800 rounded-md px-3 py-1 hover:bg-red-200"
+                  >
+                    Try Again
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
+        )}
 
-            {/* Application Steps */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Application Steps
-              </h3>
-              <div className="space-y-3">
-                {admissionData.steps &&
-                  admissionData.steps.map((step, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
-                        {index + 1}
+        {/* Admission Section */}
+        {!loading && !error && (
+          <div className="bg-white rounded-lg mb-6">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Admission Information
+              </h2>
+              {isEditable && user?.role === 'college' && (
+                <button
+                  onClick={handleEditClick}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Edit admission information"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              {admissionData.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <p className="mb-2">No admission information available.</p>
+                  {isEditable && user?.role === 'college' && (
+                    <p className="text-sm">Click the edit button to add admission details.</p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  {admissionData.map((admission, index) => (
+                    <div key={admission.id || index} className="border border-gray-200 rounded-lg p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {admission.course_name}
+                          {admission.degree_type && ` (${admission.degree_type})`}
+                        </h3>
+                        {admission.duration && (
+                          <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                            {admission.duration}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-gray-700 leading-relaxed pt-0.5">
-                        {step}
-                      </p>
-                    </div>
-                  ))}
-              </div>
-            </div>
 
-            {/* Important Dates */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Important Dates
-              </h3>
-              <div className="space-y-3">
-                {admissionData.dates &&
-                  admissionData.dates.map((date, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{date}</p>
-                    </div>
-                  ))}
-              </div>
-            </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Eligibility Criteria */}
+                        {admission.eligibility_criteria && (
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">Eligibility Criteria</h4>
+                            <p className="text-gray-700">{admission.eligibility_criteria}</p>
+                          </div>
+                        )}
 
-            {/* Cut Off Table */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Cut Off
-              </h3>
-              {admissionData.cutoffTable &&
-                admissionData.cutoffTable.length > 0 && (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full border border-gray-200 rounded-lg">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="py-3 px-4 text-left text-gray-900 font-semibold border-b border-gray-200">
-                            Year
-                          </th>
-                          <th className="py-3 px-4 text-center text-gray-900 font-semibold border-b border-gray-200">
-                            CAP Round 1
-                          </th>
-                          <th className="py-3 px-4 text-center text-gray-900 font-semibold border-b border-gray-200">
-                            CAP Round 2
-                          </th>
-                          <th className="py-3 px-4 text-center text-gray-900 font-semibold border-b border-gray-200">
-                            CAP Round 3
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {admissionData.cutoffTable.map((row, index) => (
-                          <tr key={index} className="hover:bg-gray-50">
-                            <td className="py-3 px-4 font-medium text-gray-900">
-                              {row.year}
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                              {row.round1 && row.round1 !== "#" ? (
-                                <a
-                                  href={row.round1}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-800 underline"
-                                >
-                                  Download PDF
-                                </a>
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                              {row.round2 && row.round2 !== "#" ? (
-                                <a
-                                  href={row.round2}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-800 underline"
-                                >
-                                  Download PDF
-                                </a>
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                              {row.round3 && row.round3 !== "#" ? (
-                                <a
-                                  href={row.round3}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-800 underline"
-                                >
-                                  Download PDF
-                                </a>
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-            </div>
+                        {/* Entrance Exam */}
+                        {admission.entrance_exam && (
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">Entrance Exam</h4>
+                            <p className="text-gray-700">{admission.entrance_exam}</p>
+                          </div>
+                        )}
 
-            {/* Custom Fields Display */}
-            {admissionData.customFields &&
-              admissionData.customFields.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">
-                    Additional Information
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {admissionData.customFields.map((field, index) => (
-                      <div key={field.id || index}>
-                        <h5 className="text-sm font-medium text-gray-900 mb-1">
-                          {field.label}
-                        </h5>
-                        <p className="text-sm text-gray-700">{field.value}</p>
+                        {/* Application Fee */}
+                        {admission.application_fee && (
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">Application Fee</h4>
+                            <p className="text-gray-700">{formatCurrency(admission.application_fee)}</p>
+                          </div>
+                        )}
+
+                        {/* Total Seats */}
+                        {admission.total_seats && (
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">Total Seats</h4>
+                            <p className="text-gray-700">{admission.total_seats}</p>
+                          </div>
+                        )}
+
+                        {/* Important Dates */}
+                        <div className="md:col-span-2">
+                          <h4 className="font-medium text-gray-900 mb-2">Important Dates</h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {admission.application_start && (
+                              <div>
+                                <span className="text-sm font-medium text-gray-600">Application Start:</span>
+                                <p className="text-sm text-gray-700">{formatDate(admission.application_start)}</p>
+                              </div>
+                            )}
+                            {admission.application_end && (
+                              <div>
+                                <span className="text-sm font-medium text-gray-600">Application End:</span>
+                                <p className="text-sm text-gray-700">{formatDate(admission.application_end)}</p>
+                              </div>
+                            )}
+                            {admission.exam_date && (
+                              <div>
+                                <span className="text-sm font-medium text-gray-600">Exam Date:</span>
+                                <p className="text-sm text-gray-700">{formatDate(admission.exam_date)}</p>
+                              </div>
+                            )}
+                            {admission.result_date && (
+                              <div>
+                                <span className="text-sm font-medium text-gray-600">Result Date:</span>
+                                <p className="text-sm text-gray-700">{formatDate(admission.result_date)}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Required Documents */}
+                        {admission.required_documents && admission.required_documents.length > 0 && (
+                          <div className="md:col-span-2">
+                            <h4 className="font-medium text-gray-900 mb-2">Required Documents</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {admission.required_documents.map((doc, docIndex) => (
+                                <div key={docIndex} className="flex items-start gap-2">
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
+                                  <p className="text-sm text-gray-700">{doc}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Application Process */}
+                        {admission.application_process && (
+                          <div className="md:col-span-2">
+                            <h4 className="font-medium text-gray-900 mb-2">Application Process</h4>
+                            <p className="text-gray-700">{admission.application_process}</p>
+                          </div>
+                        )}
+
+                        {/* Reservation Policy */}
+                        {admission.reservation_policy && (
+                          <div className="md:col-span-2">
+                            <h4 className="font-medium text-gray-900 mb-2">Reservation Policy</h4>
+                            <p className="text-gray-700">{admission.reservation_policy}</p>
+                          </div>
+                        )}
+
+                        {/* Scholarship Information */}
+                        {admission.scholarship_info && (
+                          <div className="md:col-span-2">
+                            <h4 className="font-medium text-gray-900 mb-2">Scholarship Information</h4>
+                            <p className="text-gray-700">{admission.scholarship_info}</p>
+                          </div>
+                        )}
+
+                        {/* Admission URL */}
+                        {admission.admission_url && (
+                          <div className="md:col-span-2">
+                            <h4 className="font-medium text-gray-900 mb-2">Apply Online</h4>
+                            <a 
+                              href={admission.admission_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 underline"
+                            >
+                              {admission.admission_url}
+                            </a>
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -386,316 +360,271 @@ const Admission = () => {
             </div>
 
             <div className="p-6 space-y-8">
-              {/* Eligibility Section */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Eligibility & Entrance Exams
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={handleAddEligibility}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    + Add Eligibility
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  {editData.eligibility &&
-                    editData.eligibility.map((item, index) => (
-                      <div key={index} className="flex gap-3 items-start">
-                        <div className="flex-1">
-                          <textarea
-                            value={item}
-                            onChange={(e) =>
-                              handleEligibilityChange(index, e.target.value)
-                            }
-                            rows={2}
-                            placeholder="Enter eligibility criteria..."
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveEligibility(index)}
-                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Remove eligibility"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                </div>
+              {/* Add New Admission Button */}
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium text-gray-900">Admission Records</h3>
+                <button
+                  type="button"
+                  onClick={handleAddAdmission}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Admission
+                </button>
               </div>
 
-              {/* Application Steps */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Application Steps
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={handleAddStep}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    + Add Step
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  {editData.steps &&
-                    editData.steps.map((step, index) => (
-                      <div key={index} className="flex gap-3 items-start">
-                        <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium mt-1">
-                          {index + 1}
-                        </div>
-                        <div className="flex-1">
-                          <textarea
-                            value={step}
-                            onChange={(e) =>
-                              handleStepChange(index, e.target.value)
-                            }
-                            rows={2}
-                            placeholder="Enter application step..."
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveStep(index)}
-                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Remove step"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                </div>
-              </div>
-
-              {/* Important Dates */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Important Dates
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={handleAddDate}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Date
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  {editData.dates &&
-                    editData.dates.map((date, index) => (
-                      <div key={index} className="flex gap-3 items-start">
-                        <div className="flex-1">
-                          <input
-                            type="text"
-                            value={date}
-                            onChange={(e) =>
-                              handleDateChange(index, e.target.value)
-                            }
-                            placeholder="Enter important date..."
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveDate(index)}
-                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Remove date"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                </div>
-              </div>
-
-              {/* Cutoff Table */}
-              <div className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Cut Off Table
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={handleAddCutoffRow}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Year
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {editData.cutoffTable &&
-                    editData.cutoffTable.map((row, index) => (
-                      <div
-                        key={index}
-                        className="border border-gray-200 rounded-lg p-4"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-medium text-gray-700">
-                            Year {index + 1}
-                          </h4>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveCutoffRow(index)}
-                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
-                            title="Remove year"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
-                              Year
-                            </label>
-                            <input
-                              type="text"
-                              value={row.year}
-                              onChange={(e) =>
-                                handleCutoffChange(
-                                  index,
-                                  "year",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="2024"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
-                              Round 1 PDF URL
-                            </label>
-                            <input
-                              type="text"
-                              value={row.round1}
-                              onChange={(e) =>
-                                handleCutoffChange(
-                                  index,
-                                  "round1",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="PDF link or #"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
-                              Round 2 PDF URL
-                            </label>
-                            <input
-                              type="text"
-                              value={row.round2}
-                              onChange={(e) =>
-                                handleCutoffChange(
-                                  index,
-                                  "round2",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="PDF link or #"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
-                              Round 3 PDF URL
-                            </label>
-                            <input
-                              type="text"
-                              value={row.round3}
-                              onChange={(e) =>
-                                handleCutoffChange(
-                                  index,
-                                  "round3",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="PDF link or #"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-
-              {/* Custom Fields Section */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Custom Fields
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleAddCustomField}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    + Add Custom Field
-                  </button>
-                </div>
-
-                {editData.customFields && editData.customFields.length > 0 && (
-                  <div className="space-y-3">
-                    {editData.customFields.map((field) => (
-                      <div key={field.id} className="flex gap-3 items-start">
-                        <div className="flex-1">
-                          <input
-                            type="text"
-                            value={field.label}
-                            onChange={(e) =>
-                              handleCustomFieldChange(
-                                field.id,
-                                "label",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Field Label (e.g., Special Requirements, Contact Info)"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <input
-                            type="text"
-                            value={field.value}
-                            onChange={(e) =>
-                              handleCustomFieldChange(
-                                field.id,
-                                "value",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Field Value"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCustomField(field.id)}
-                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Remove field"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+              {/* Admission Records */}
+              {editData.map((admission, index) => (
+                <div key={admission.id || index} className="border border-gray-200 rounded-lg p-6 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-md font-medium text-gray-900">
+                      Admission Record {index + 1}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveAdmission(index)}
+                      className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Remove admission record"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
                   </div>
-                )}
-              </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Course Name */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Course Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={admission.course_name || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'course_name', e.target.value)}
+                        placeholder="e.g., B.Tech Computer Science"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Degree Type */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Degree Type
+                      </label>
+                      <select
+                        value={admission.degree_type || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'degree_type', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      >
+                        <option value="">Select degree type</option>
+                        <option value="Bachelor">Bachelor</option>
+                        <option value="Master">Master</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="PhD">PhD</option>
+                        <option value="Certificate">Certificate</option>
+                      </select>
+                    </div>
+
+                    {/* Duration */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Duration
+                      </label>
+                      <input
+                        type="text"
+                        value={admission.duration || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'duration', e.target.value)}
+                        placeholder="e.g., 4 Years"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Entrance Exam */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Entrance Exam
+                      </label>
+                      <input
+                        type="text"
+                        value={admission.entrance_exam || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'entrance_exam', e.target.value)}
+                        placeholder="e.g., JEE Main, GATE"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Application Fee */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Application Fee (₹)
+                      </label>
+                      <input
+                        type="number"
+                        value={admission.application_fee || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'application_fee', e.target.value)}
+                        placeholder="1000"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Total Seats */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Total Seats
+                      </label>
+                      <input
+                        type="number"
+                        value={admission.total_seats || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'total_seats', e.target.value)}
+                        placeholder="60"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Application Start Date */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Application Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={admission.application_start || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'application_start', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Application End Date */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Application End Date
+                      </label>
+                      <input
+                        type="date"
+                        value={admission.application_end || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'application_end', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Exam Date */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Exam Date
+                      </label>
+                      <input
+                        type="date"
+                        value={admission.exam_date || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'exam_date', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Result Date */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Result Date
+                      </label>
+                      <input
+                        type="date"
+                        value={admission.result_date || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'result_date', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Admission URL */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Admission Portal URL
+                      </label>
+                      <input
+                        type="url"
+                        value={admission.admission_url || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'admission_url', e.target.value)}
+                        placeholder="https://admission.college.edu"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Eligibility Criteria */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Eligibility Criteria
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={admission.eligibility_criteria || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'eligibility_criteria', e.target.value)}
+                        placeholder="Describe the eligibility criteria for this course..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      />
+                    </div>
+
+                    {/* Application Process */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Application Process
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={admission.application_process || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'application_process', e.target.value)}
+                        placeholder="Describe the step-by-step application process..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      />
+                    </div>
+
+                    {/* Required Documents */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Required Documents (one per line)
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={Array.isArray(admission.required_documents) ? admission.required_documents.join('\n') : ''}
+                        onChange={(e) => handleArrayFieldChange(index, 'required_documents', e.target.value)}
+                        placeholder="10th Mark Sheet&#10;12th Mark Sheet&#10;Transfer Certificate&#10;Character Certificate"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      />
+                    </div>
+
+                    {/* Reservation Policy */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Reservation Policy
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={admission.reservation_policy || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'reservation_policy', e.target.value)}
+                        placeholder="Describe reservation policy (SC/ST/OBC etc.)..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      />
+                    </div>
+
+                    {/* Scholarship Information */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Scholarship Information
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={admission.scholarship_info || ''}
+                        onChange={(e) => handleAdmissionChange(index, 'scholarship_info', e.target.value)}
+                        placeholder="Describe available scholarships..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {editData.length === 0 && (
+                <div className="text-center py-8 text-gray-500 border border-dashed border-gray-300 rounded-lg">
+                  <p className="mb-2">No admission records yet.</p>
+                  <p className="text-sm">Click "Add Admission" to create your first admission record.</p>
+                </div>
+              )}
             </div>
 
             {/* Modal Footer */}
@@ -708,9 +637,11 @@ const Admission = () => {
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                Save Changes
+                {saving && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+                {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>

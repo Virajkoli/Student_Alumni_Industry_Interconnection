@@ -30,6 +30,12 @@ const HorizontalProfileNavbar = ({
   const [connectionCount, setConnectionCount] = useState(0);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
 
+  // Real-time project stats from localStorage or parent component
+  const [projectStats, setProjectStats] = useState({
+    total: 0,
+    
+  });
+
   const navigationItems = [
     { id: "posts", name: "Posts", description: "Your posts and activities" },
     {
@@ -81,16 +87,50 @@ const HorizontalProfileNavbar = ({
     // },
   ];
 
-  // Fetch project count from Live Projects section
+  // Fetch project count from Live Projects section or localStorage
   const fetchProjectCount = async () => {
     try {
       setIsLoadingStats(true);
-      // Simulate API call - replace with actual API to fetch industry projects
-      const count = Math.floor(Math.random() * 50) + 10; // Random between 10-60
-      setProjectCount(count);
+      
+      // Try to get real project data from localStorage first (where LiveProjects stores data)
+      const storedProjects = localStorage.getItem('industryProjects');
+      let projects = [];
+      
+      if (storedProjects) {
+        try {
+          projects = JSON.parse(storedProjects);
+        } catch (e) {
+          console.warn('Failed to parse stored projects:', e);
+        }
+      }
+      
+      // If no stored data, create some sample data or use API
+      if (!projects || projects.length === 0) {
+        // You can replace this with actual API call
+        projects = [
+          { id: 1, status: "Open" },
+          { id: 2, status: "In Progress" },
+          { id: 3, status: "Open" },
+          { id: 4, status: "Completed" },
+          { id: 5, status: "Open" }
+        ];
+      }
+      
+      // Calculate stats
+      const stats = {
+        total: projects.length,
+        open: projects.filter(p => p.status === "Open").length,
+        inProgress: projects.filter(p => p.status === "In Progress").length,
+        completed: projects.filter(p => p.status === "Completed").length
+      };
+      
+      setProjectCount(stats.total);
+      setProjectStats(stats);
+      
     } catch (error) {
       console.error("Error fetching project count:", error);
       setProjectCount(0);
+      setProjectStats({ total: 0, open: 0, inProgress: 0, completed: 0 });
     } finally {
       setIsLoadingStats(false);
     }
@@ -129,6 +169,23 @@ const HorizontalProfileNavbar = ({
       fetchProjectCount();
       fetchConnectionCount();
     }
+
+    // Listen for project updates from LiveProjects component
+    const handleProjectUpdate = () => {
+      fetchProjectCount();
+    };
+
+    // Add event listeners for real-time updates
+    window.addEventListener('projectAdded', handleProjectUpdate);
+    window.addEventListener('projectUpdated', handleProjectUpdate);
+    window.addEventListener('projectDeleted', handleProjectUpdate);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('projectAdded', handleProjectUpdate);
+      window.removeEventListener('projectUpdated', handleProjectUpdate);
+      window.removeEventListener('projectDeleted', handleProjectUpdate);
+    };
   }, [industryData, initialized]);
 
   const handleItemClick = (item) => {
@@ -252,8 +309,9 @@ const HorizontalProfileNavbar = ({
             className="flex items-center justify-around mt-6 pt-4 border-t"
             style={{ borderColor: "#DCE8F2" }}
           >
-            <div className="text-left">
-              <div className="flex items-center gap-1">
+            {/* Total Projects */}
+            <div className="text-center">
+              <div className="flex items-center gap-1 justify-center">
                 <button
                   onClick={isOwner ? openProjectModal : undefined}
                   className={`${
@@ -261,16 +319,10 @@ const HorizontalProfileNavbar = ({
                       ? "hover:bg-gray-100 cursor-pointer"
                       : "cursor-default"
                   } p-2 rounded-lg transition-colors`}
-                  title={isOwner ? "View your live projects" : undefined}
+                  title={isOwner ? "View your live projects" : "Total Projects"}
                 >
-                  <span className="font-bold" style={{ color: "#1F2D3D" }}>
-                    {isLoadingStats ? "..." : projectCount}
-                  </span>
-                  <span
-                    className="text-sm ml-1.5"
-                    style={{ color: "#1F2D3D", opacity: 0.7 }}
-                  >
-                    Projects
+                  <span className="font-bold text-lg" style={{ color: "#1F2D3D" }}>
+                    {isLoadingStats ? "..." : projectStats.total}
                   </span>
                 </button>
                 {isOwner && (
@@ -298,14 +350,21 @@ const HorizontalProfileNavbar = ({
                   </button>
                 )}
               </div>
+              <span
+                className="text-sm"
+                style={{ color: "#1F2D3D", opacity: 0.7 }}
+              >
+                Projects
+              </span>
             </div>
 
-            <div className="text-left">
-              <span className="font-bold" style={{ color: "#1F2D3D" }}>
+            {/* Connections */}
+            <div className="text-center">
+              <span className="font-bold text-lg" style={{ color: "#007AFF" }}>
                 {connectionCount}+
               </span>
               <span
-                className="text-sm ml-1.5"
+                className="block text-sm"
                 style={{ color: "#1F2D3D", opacity: 0.7 }}
               >
                 Connections
@@ -313,15 +372,15 @@ const HorizontalProfileNavbar = ({
             </div>
 
             {/* Rating */}
-            <div className="flex flex-col items-center text-center">
+            <div className="text-center">
               <span
-                className="block text-2xl font-bold"
+                className="block text-lg font-bold"
                 style={{ color: "#1F2D3D" }}
               >
                 4.9
               </span>
               <span
-                className="block text-sm mt-1"
+                className="block text-sm"
                 style={{ color: "#1F2D3D", opacity: 0.7 }}
               >
                 Rating

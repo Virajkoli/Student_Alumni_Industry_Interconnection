@@ -38,7 +38,13 @@ router.get("/me", authMiddleware, async (req, res) => {
       });
     }
 
-    res.json({ success: true, data: industry });
+    res.json({ 
+      success: true, 
+      data: {
+        ...industry,
+        owner_id: industry.id // Add owner_id for frontend compatibility
+      }
+    });
   } catch (error) {
     console.error("Error fetching industry profile:", error);
     res.status(500).json({
@@ -201,7 +207,10 @@ router.get("/:id", async (req, res) => {
 
     res.json({
       success: true,
-      data: industry,
+      data: {
+        ...industry,
+        owner_id: industry.id // Add owner_id for frontend compatibility
+      },
     });
   } catch (error) {
     console.error("Error fetching industry by ID:", error);

@@ -108,6 +108,18 @@ const LiveProjects = ({ isOwner, industryData }) => {
     },
   ]);
 
+  // Store initial data in localStorage on component mount
+  React.useEffect(() => {
+    try {
+      const existingData = localStorage.getItem('industryProjects');
+      if (!existingData) {
+        localStorage.setItem('industryProjects', JSON.stringify(projectsData));
+      }
+    } catch (error) {
+      console.warn('Failed to store initial projects in localStorage:', error);
+    }
+  }, []);
+
   const [editData, setEditData] = useState({
     title: "",
     company: "",
@@ -181,27 +193,40 @@ const LiveProjects = ({ isOwner, industryData }) => {
   };
 
   const handleSave = () => {
-    setProjectsData(
-      projectsData.map((project) =>
-        project.id === editingId
-          ? {
-              ...project,
-              title: editData.title,
-              company: editData.company,
-              description: editData.description,
-              budget: editData.budget,
-              duration: editData.duration,
-              deadline: editData.deadline,
-              skillsRequired: editData.skillsRequired
-                .split(",")
-                .map((skill) => skill.trim()),
-              type: editData.type,
-              priority: editData.priority,
-              requiredCandidates: parseInt(editData.requiredCandidates) || 0,
-            }
-          : project
-      )
+    const updatedProjects = projectsData.map((project) =>
+      project.id === editingId
+        ? {
+            ...project,
+            title: editData.title,
+            company: editData.company,
+            description: editData.description,
+            budget: editData.budget,
+            duration: editData.duration,
+            deadline: editData.deadline,
+            skillsRequired: editData.skillsRequired
+              .split(",")
+              .map((skill) => skill.trim()),
+            type: editData.type,
+            priority: editData.priority,
+            requiredCandidates: parseInt(editData.requiredCandidates) || 0,
+          }
+        : project
     );
+    
+    setProjectsData(updatedProjects);
+
+    // Store in localStorage for header to access
+    try {
+      localStorage.setItem('industryProjects', JSON.stringify(updatedProjects));
+    } catch (error) {
+      console.warn('Failed to store projects in localStorage:', error);
+    }
+
+    // Trigger event for header to update stats
+    window.dispatchEvent(new CustomEvent('projectUpdated', { 
+      detail: { totalProjects: updatedProjects.length } 
+    }));
+
     setEditingId(null);
     setIsEditModalOpen(false);
     setEditData({
@@ -264,7 +289,20 @@ const LiveProjects = ({ isOwner, industryData }) => {
     };
 
     // Add to projects list
-    setProjectsData([...projectsData, newProject]);
+    const updatedProjects = [...projectsData, newProject];
+    setProjectsData(updatedProjects);
+
+    // Store in localStorage for header to access
+    try {
+      localStorage.setItem('industryProjects', JSON.stringify(updatedProjects));
+    } catch (error) {
+      console.warn('Failed to store projects in localStorage:', error);
+    }
+
+    // Trigger event for header to update stats
+    window.dispatchEvent(new CustomEvent('projectAdded', { 
+      detail: { project: newProject, totalProjects: updatedProjects.length } 
+    }));
 
     // Close modal and reset form
     handleNewProjectCancel();
@@ -632,6 +670,101 @@ const LiveProjects = ({ isOwner, industryData }) => {
         >
           Post New Project
         </button>}
+      </div>
+
+      {/* Quick Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        {/* Total Projects */}
+        <div
+          className="rounded-xl p-6 shadow-sm"
+          style={{ backgroundColor: "white", border: "1px solid #DCE8F2" }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium" style={{ color: "#1F2D3D", opacity: "0.7" }}>
+                Total Projects
+              </p>
+              <p className="text-2xl font-bold mt-1" style={{ color: "#6EA9CB" }}>
+                {projectsData.length}
+              </p>
+            </div>
+            <div
+              className="p-3 rounded-lg"
+              style={{ backgroundColor: "#F7FAFC" }}
+            >
+              <FileText className="w-6 h-6" style={{ color: "#6EA9CB" }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Open Projects */}
+        <div
+          className="rounded-xl p-6 shadow-sm"
+          style={{ backgroundColor: "white", border: "1px solid #DCE8F2" }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium" style={{ color: "#1F2D3D", opacity: "0.7" }}>
+                Open Projects
+              </p>
+              <p className="text-2xl font-bold mt-1" style={{ color: "#34C759" }}>
+                {projectsData.filter(p => p.status === "Open").length}
+              </p>
+            </div>
+            <div
+              className="p-3 rounded-lg"
+              style={{ backgroundColor: "#F0FDF4" }}
+            >
+              <CheckCircle className="w-6 h-6" style={{ color: "#34C759" }} />
+            </div>
+          </div>
+        </div>
+
+        {/* In Progress */}
+        <div
+          className="rounded-xl p-6 shadow-sm"
+          style={{ backgroundColor: "white", border: "1px solid #DCE8F2" }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium" style={{ color: "#1F2D3D", opacity: "0.7" }}>
+                In Progress
+              </p>
+              <p className="text-2xl font-bold mt-1" style={{ color: "#FF9500" }}>
+                {projectsData.filter(p => p.status === "In Progress").length}
+              </p>
+            </div>
+            <div
+              className="p-3 rounded-lg"
+              style={{ backgroundColor: "#FFF8F0" }}
+            >
+              <Clock className="w-6 h-6" style={{ color: "#FF9500" }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Total Applicants */}
+        <div
+          className="rounded-xl p-6 shadow-sm"
+          style={{ backgroundColor: "white", border: "1px solid #DCE8F2" }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium" style={{ color: "#1F2D3D", opacity: "0.7" }}>
+                Total Applicants
+              </p>
+              <p className="text-2xl font-bold mt-1" style={{ color: "#007AFF" }}>
+                {projectsData.reduce((total, project) => total + (project.applicants || 0), 0)}
+              </p>
+            </div>
+            <div
+              className="p-3 rounded-lg"
+              style={{ backgroundColor: "#F0F8FF" }}
+            >
+              <Users className="w-6 h-6" style={{ color: "#007AFF" }} />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-6">

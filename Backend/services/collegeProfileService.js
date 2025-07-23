@@ -1205,10 +1205,17 @@ class CollegeProfileService {
 
   async getFees(collegeId) {
     try {
+      console.log('🔍 Getting fees for college:', collegeId);
+      
       const fees = await prisma.college_fees.findMany({
         where: { college_id: collegeId },
         orderBy: { created_at: 'desc' }
       });
+
+      console.log('📋 Found', fees.length, 'fee records');
+      if (fees.length > 0) {
+        console.log('📊 Sample fee record:', JSON.stringify(fees[0], null, 2));
+      }
 
       // Transform fees data to match frontend structure
       const feesStructure = {
@@ -1229,6 +1236,8 @@ class CollegeProfileService {
 
       // Track if we found any scholarships in the database
       let hasDbScholarships = false;
+      let allCustomCharges = new Map(); // Use Map to avoid duplicates
+      let allCustomFields = new Map(); // Use Map to avoid duplicates
 
       // Process database fees and populate structure
       for (const fee of fees) {
@@ -1264,7 +1273,35 @@ class CollegeProfileService {
           hasDbScholarships = true;
           feesStructure.scholarships = [...new Set([...feesStructure.scholarships, ...fee.scholarships])];
         }
+
+        // Extract custom charges and fields from fee_structure JSON
+        if (fee.fee_structure) {
+          if (fee.fee_structure.customCharges && Array.isArray(fee.fee_structure.customCharges)) {
+            fee.fee_structure.customCharges.forEach(charge => {
+              if (charge.id && charge.name && charge.amount) {
+                allCustomCharges.set(charge.id, charge);
+              }
+            });
+          }
+          
+          if (fee.fee_structure.customFields && Array.isArray(fee.fee_structure.customFields)) {
+            fee.fee_structure.customFields.forEach(field => {
+              if (field.id && field.label && field.value) {
+                allCustomFields.set(field.id, field);
+              }
+            });
+          }
+        }
       }
+
+      // Add unique custom charges and fields to the result
+      feesStructure.customCharges.push(...Array.from(allCustomCharges.values()));
+      feesStructure.customFields = Array.from(allCustomFields.values());
+
+      console.log('🎯 Final fees structure custom data:');
+      console.log('- Custom charges:', feesStructure.customCharges.length);
+      console.log('- Custom fields:', feesStructure.customFields.length);
+      console.log('- Custom fees:', feesStructure.customFees.length);
 
       // If no scholarships found in database, provide default ones for new colleges
       if (!hasDbScholarships && fees.length === 0) {
@@ -1285,6 +1322,9 @@ class CollegeProfileService {
 
   async updateFees(collegeId, feesData) {
     try {
+      console.log('🔄 Updating fees for college:', collegeId);
+      console.log('📋 Input fees data:', JSON.stringify(feesData, null, 2));
+      
       // Start transaction
       return await prisma.$transaction(async (tx) => {
         // Clear existing fees for this college
@@ -1320,6 +1360,10 @@ class CollegeProfileService {
                 academic_year: academicYear,
                 scholarships: feesData.scholarships || [],
                 payment_modes: ['Online', 'Offline'],
+                fee_structure: {
+                  customCharges: feesData.customCharges || [],
+                  customFields: feesData.customFields || []
+                },
                 created_at: new Date(),
                 updated_at: new Date()
               });
@@ -1342,6 +1386,10 @@ class CollegeProfileService {
                   academic_year: academicYear,
                   scholarships: feesData.scholarships || [],
                   payment_modes: ['Online', 'Offline'],
+                  fee_structure: {
+                    customCharges: feesData.customCharges || [],
+                    customFields: feesData.customFields || []
+                  },
                   created_at: new Date(),
                   updated_at: new Date()
                 });
@@ -1384,13 +1432,43 @@ class CollegeProfileService {
             academic_year: academicYear,
             scholarships: feesData.scholarships || [],
             payment_modes: ['Online', 'Offline'],
+            fee_structure: {
+              customCharges: feesData.customCharges || [],
+              customFields: feesData.customFields || []
+            },
             created_at: new Date(),
             updated_at: new Date()
           });
         }
 
+        // If we have custom charges or custom fields but no course fees, create a minimal entry to store them
+        if ((feesData.customCharges && feesData.customCharges.length > 0) || 
+            (feesData.customFields && feesData.customFields.length > 0)) {
+          if (feesToCreate.length === 0) {
+            feesToCreate.push({
+              college_id: collegeId,
+              course_name: 'General',
+              degree_type: 'Other',
+              tuition_fee: 0,
+              total_fee: 0,
+              academic_year: academicYear,
+              scholarships: feesData.scholarships || [],
+              payment_modes: ['Online', 'Offline'],
+              fee_structure: {
+                customCharges: feesData.customCharges || [],
+                customFields: feesData.customFields || []
+              },
+              created_at: new Date(),
+              updated_at: new Date()
+            });
+          }
+        }
+
         // Create all fee records
         if (feesToCreate.length > 0) {
+          console.log('🚀 Creating fees records:', feesToCreate.length);
+          console.log('📊 First record sample:', JSON.stringify(feesToCreate[0], null, 2));
+          
           // Validate all numeric fields before creating
           const validatedFeesToCreate = feesToCreate.map(fee => {
             const validatedFee = { ...fee };
@@ -1417,6 +1495,10 @@ class CollegeProfileService {
           await tx.college_fees.createMany({
             data: validatedFeesToCreate
           });
+          
+          console.log('✅ Successfully created', validatedFeesToCreate.length, 'fee records');
+        } else {
+          console.log('⚠️  No fees to create');
         }
 
         return { message: 'Fees updated successfully' };

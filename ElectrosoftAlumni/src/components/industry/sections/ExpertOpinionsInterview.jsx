@@ -233,18 +233,20 @@ const ExpertOpinionsInterview = ({ isOwner, industryData }) => {
             materials
           </p>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
-          style={{ backgroundColor: "#6EA9CB" }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#5a8fa8")}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = "#6EA9CB")}
-        >
-          <Plus className="w-4 h-4" />
-          <span>
-            {activeTab === "interviews" ? "Add Interview" : "Add Resource"}
-          </span>
-        </button>
+        {isOwner && (
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+            style={{ backgroundColor: "#6EA9CB" }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = "#5a8fa8")}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = "#6EA9CB")}
+          >
+            <Plus className="w-4 h-4" />
+            <span>
+              {activeTab === "interviews" ? "Add Interview" : "Add Resource"}
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Tab Navigation */}

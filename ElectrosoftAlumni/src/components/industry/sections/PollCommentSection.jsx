@@ -238,7 +238,7 @@ const PollCommentSection = ({ isOwner, industryData }) => {
             Voice your opinion and engage with industry professionals
           </p>
         </div>
-        <button
+        {isOwner && <button
           onClick={() => setIsAddModalOpen(true)}
           className="text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
           style={{ backgroundColor: "#6EA9CB" }}
@@ -247,7 +247,7 @@ const PollCommentSection = ({ isOwner, industryData }) => {
         >
           <Plus className="w-4 h-4" />
           <span>Create Poll</span>
-        </button>
+        </button>}
       </div>
 
       <div className="space-y-6">

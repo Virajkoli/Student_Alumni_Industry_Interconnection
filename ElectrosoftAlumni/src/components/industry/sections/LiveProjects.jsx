@@ -623,7 +623,7 @@ const LiveProjects = ({ isOwner, industryData }) => {
             Collaborate on real-world projects and solve industry challenges
           </p>
         </div>
-        <button
+        {isOwner &&<button
           onClick={handleNewProject}
           className="px-4 py-2 rounded-lg transition-colors text-white"
           style={{ backgroundColor: "#6EA9CB" }}
@@ -631,7 +631,7 @@ const LiveProjects = ({ isOwner, industryData }) => {
           onMouseLeave={(e) => (e.target.style.backgroundColor = "#6EA9CB")}
         >
           Post New Project
-        </button>
+        </button>}
       </div>
 
       <div className="space-y-6">

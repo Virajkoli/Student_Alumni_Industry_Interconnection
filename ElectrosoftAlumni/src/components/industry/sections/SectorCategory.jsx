@@ -192,7 +192,7 @@ const SectorCategory = ({ isOwner, industryData }) => {
               Industry Sectors
             </h2>
           </div>
-          <button
+          {isOwner &&<button
             onClick={handleAddNew}
             className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors duration-200 shadow-sm hover:shadow"
             style={{ backgroundColor: "#6EA9CB" }}
@@ -201,7 +201,7 @@ const SectorCategory = ({ isOwner, industryData }) => {
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add Sector
-          </button>
+          </button>}
         </div>
       </div>
 

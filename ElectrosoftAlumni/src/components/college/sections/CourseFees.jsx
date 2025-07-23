@@ -45,8 +45,15 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
       setError(null);
       const response = await apiService.getCollegeFees(collegeId);
       if (response.success) {
-        setFeesData(response.data);
-        setEditData(response.data);
+        const loadedData = {
+          ...response.data,
+          customFees: response.data.customFees || [],
+          customCharges: response.data.customCharges || [],
+          customFields: response.data.customFields || [],
+          scholarships: response.data.scholarships || []
+        };
+        setFeesData(loadedData);
+        setEditData(loadedData);
       }
     } catch (error) {
       console.error('Error loading fees data:', error);
@@ -57,7 +64,14 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
   };
 
   const handleEditClick = () => {
-    setEditData({ ...feesData });
+    const dataToEdit = {
+      ...feesData,
+      customFees: feesData.customFees || [],
+      customCharges: feesData.customCharges || [],
+      customFields: feesData.customFields || [],
+      scholarships: feesData.scholarships || []
+    };
+    setEditData(dataToEdit);
     setIsEditModalOpen(true);
   };
 
@@ -71,9 +85,18 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
       setSaving(true);
       setError(null);
       
-      const response = await apiService.updateCollegeFees(editData);
+      // Clean the data before sending to ensure arrays don't have empty entries
+      const cleanedData = {
+        ...editData,
+        customFees: editData.customFees.filter(fee => fee.program && fee.amount),
+        customCharges: editData.customCharges.filter(charge => charge.name && charge.amount),
+        customFields: editData.customFields.filter(field => field.label && field.value),
+        scholarships: editData.scholarships.filter(scholarship => scholarship.trim() !== '')
+      };
+      
+      const response = await apiService.updateCollegeFees(cleanedData);
       if (response.success) {
-        setFeesData({ ...editData });
+        setFeesData({ ...cleanedData });
         setIsEditModalOpen(false);
         // Show success message if you have a toast system
       }
@@ -86,7 +109,14 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
   };
 
   const handleCancelEdit = () => {
-    setEditData({ ...feesData });
+    const dataToEdit = {
+      ...feesData,
+      customFees: feesData.customFees || [],
+      customCharges: feesData.customCharges || [],
+      customFields: feesData.customFields || [],
+      scholarships: feesData.scholarships || []
+    };
+    setEditData(dataToEdit);
     setIsEditModalOpen(false);
   };
 
@@ -110,14 +140,14 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
     };
     setEditData((prev) => ({
       ...prev,
-      customFees: [...prev.customFees, newFee],
+      customFees: [...(prev.customFees || []), newFee],
     }));
   };
 
   const handleCustomFeeChange = (feeId, field, value) => {
     setEditData((prev) => ({
       ...prev,
-      customFees: prev.customFees.map((fee) =>
+      customFees: (prev.customFees || []).map((fee) =>
         fee.id === feeId ? { ...fee, [field]: value } : fee
       ),
     }));
@@ -126,7 +156,7 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
   const handleRemoveCustomFee = (feeId) => {
     setEditData((prev) => ({
       ...prev,
-      customFees: prev.customFees.filter((fee) => fee.id !== feeId),
+      customFees: (prev.customFees || []).filter((fee) => fee.id !== feeId),
     }));
   };
 
@@ -139,14 +169,14 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
     };
     setEditData((prev) => ({
       ...prev,
-      customCharges: [...prev.customCharges, newCharge],
+      customCharges: [...(prev.customCharges || []), newCharge],
     }));
   };
 
   const handleCustomChargeChange = (chargeId, field, value) => {
     setEditData((prev) => ({
       ...prev,
-      customCharges: prev.customCharges.map((charge) =>
+      customCharges: (prev.customCharges || []).map((charge) =>
         charge.id === chargeId ? { ...charge, [field]: value } : charge
       ),
     }));
@@ -155,7 +185,7 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
   const handleRemoveCustomCharge = (chargeId) => {
     setEditData((prev) => ({
       ...prev,
-      customCharges: prev.customCharges.filter(
+      customCharges: (prev.customCharges || []).filter(
         (charge) => charge.id !== chargeId
       ),
     }));
@@ -165,14 +195,14 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
   const handleAddScholarship = () => {
     setEditData((prev) => ({
       ...prev,
-      scholarships: [...prev.scholarships, ""],
+      scholarships: [...(prev.scholarships || []), ""],
     }));
   };
 
   const handleScholarshipChange = (index, value) => {
     setEditData((prev) => ({
       ...prev,
-      scholarships: prev.scholarships.map((scholarship, i) =>
+      scholarships: (prev.scholarships || []).map((scholarship, i) =>
         i === index ? value : scholarship
       ),
     }));
@@ -181,7 +211,7 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
   const handleRemoveScholarship = (index) => {
     setEditData((prev) => ({
       ...prev,
-      scholarships: prev.scholarships.filter((_, i) => i !== index),
+      scholarships: (prev.scholarships || []).filter((_, i) => i !== index),
     }));
   };
 
@@ -194,14 +224,14 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
     };
     setEditData((prev) => ({
       ...prev,
-      customFields: [...prev.customFields, newField],
+      customFields: [...(prev.customFields || []), newField],
     }));
   };
 
   const handleCustomFieldChange = (fieldId, property, value) => {
     setEditData((prev) => ({
       ...prev,
-      customFields: prev.customFields.map((field) =>
+      customFields: (prev.customFields || []).map((field) =>
         field.id === fieldId ? { ...field, [property]: value } : field
       ),
     }));
@@ -210,7 +240,7 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
   const handleRemoveCustomField = (fieldId) => {
     setEditData((prev) => ({
       ...prev,
-      customFields: prev.customFields.filter((field) => field.id !== fieldId),
+      customFields: (prev.customFields || []).filter((field) => field.id !== fieldId),
     }));
   };
 
@@ -338,7 +368,7 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
                       </td>
                     </tr>
                     {/* Custom Fees */}
-                    {feesData.customFees &&
+                    {feesData.customFees && feesData.customFees.length > 0 &&
                       feesData.customFees.map((fee, index) => (
                         <tr key={fee.id || index} className="hover:bg-gray-50">
                           <td className="py-3 px-4 font-medium text-gray-900">
@@ -360,7 +390,7 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
                 Scholarships & Financial Aid
               </h3>
               <div className="space-y-3">
-                {feesData.scholarships &&
+                {feesData.scholarships && feesData.scholarships.length > 0 &&
                   feesData.scholarships.map((scholarship, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
@@ -390,20 +420,11 @@ const CourseFees = ({ collegeId = null, isEditable = true }) => {
                   </h4>
                   <p className="text-gray-700">{feesData.mess}</p>
                 </div>
-                <div className="md:col-span-2">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">
-                    Other Charges
-                  </h4>
-                  <p className="text-gray-700">{feesData.other}</p>
-                </div>
               </div>
 
               {/* Custom Charges */}
               {feesData.customCharges && feesData.customCharges.length > 0 && (
                 <div className="mt-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">
-                    Additional Charges
-                  </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {feesData.customCharges.map((charge, index) => (
                       <div key={charge.id || index}>

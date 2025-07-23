@@ -1423,6 +1423,39 @@ class ApiService {
     }
   }
 
+  async updateCollegeAdmissions(admissionsData) {
+    try {
+      const response = await this.api.put("/college-profile/admissions-new", admissionsData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update admissions"
+      );
+    }
+  }
+
+  async updateCollegeAdmission(admissionId, admissionData) {
+    try {
+      const response = await this.api.put(`/college-profile/admissions-new/${admissionId}`, admissionData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update admission record"
+      );
+    }
+  }
+
+  async deleteCollegeAdmission(admissionId) {
+    try {
+      const response = await this.api.delete(`/college-profile/admissions-new/${admissionId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete admission record"
+      );
+    }
+  }
+
   // College Infrastructure (New)
   async getCollegeInfrastructureNew() {
     try {
@@ -2330,7 +2363,23 @@ const collegeAPI = {
   },
 
   async getAdmissions() {
-    return apiService.getCollegeAdmissions();
+    return apiService.getCollegeAdmissionsNew();
+  },
+
+  async updateAdmissions(admissionsData) {
+    return apiService.updateCollegeAdmissions(admissionsData);
+  },
+
+  async createAdmission(admissionData) {
+    return apiService.createCollegeAdmission(admissionData);
+  },
+
+  async updateAdmission(admissionId, admissionData) {
+    return apiService.updateCollegeAdmission(admissionId, admissionData);
+  },
+
+  async deleteAdmission(admissionId) {
+    return apiService.deleteCollegeAdmission(admissionId);
   }
 };
 
@@ -2383,6 +2432,12 @@ const industryAPI = {
 };
 
 const apiService = new ApiService();
+
+// Attach the separate API objects to the main instance
+apiService.collegeAPI = collegeAPI;
+apiService.studentAPI = studentAPI;
+apiService.startupAPI = startupAPI;
+apiService.industryAPI = industryAPI;
 
 export default apiService;
 export { studentAPI, collegeAPI, startupAPI, industryAPI };

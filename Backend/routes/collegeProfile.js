@@ -56,6 +56,9 @@ router.put('/information-new', auth, collegeProfileController.updateCollegeInfor
 
 router.get('/admissions-new', auth, collegeProfileController.getCollegeAdmissionsNew);
 router.post('/admissions-new', auth, collegeProfileController.createCollegeAdmission);
+router.put('/admissions-new', auth, collegeProfileController.updateCollegeAdmissions);
+router.put('/admissions-new/:admissionId', auth, collegeProfileController.updateCollegeAdmission);
+router.delete('/admissions-new/:admissionId', auth, collegeProfileController.deleteCollegeAdmission);
 
 router.get('/infrastructure-new', auth, collegeProfileController.getCollegeInfrastructureNew);
 router.put('/infrastructure-new', auth, collegeProfileController.updateCollegeInfrastructure);

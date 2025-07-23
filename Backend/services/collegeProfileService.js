@@ -818,6 +818,128 @@ class CollegeProfileService {
     }
   }
 
+  async updateCollegeAdmissions(collegeId, admissionsData) {
+    try {
+      // This method handles bulk update of admissions data
+      // It can be used to save all admission form data at once
+      
+      // First, get existing admissions to compare
+      const existingAdmissions = await prisma.college_admissions_new.findMany({
+        where: { college_id: collegeId }
+      });
+
+      const results = [];
+
+      // Handle array of admissions or convert single admission data
+      const admissions = Array.isArray(admissionsData) ? admissionsData : [admissionsData];
+
+      for (const admissionData of admissions) {
+        if (admissionData.id) {
+          // Update existing admission - filter out fields that shouldn't be updated
+          const { id, created_at, updated_at, college_id, colleges, ...updateData } = admissionData;
+          
+          const updatedAdmission = await prisma.college_admissions_new.update({
+            where: { 
+              id: parseInt(admissionData.id),
+              college_id: collegeId 
+            },
+            data: {
+              course_name: updateData.course_name,
+              degree_type: updateData.degree_type || 'Other',
+              duration: updateData.duration || null,
+              eligibility_criteria: updateData.eligibility_criteria || null,
+              entrance_exam: updateData.entrance_exam || null,
+              application_process: updateData.application_process || null,
+              application_fee: updateData.application_fee ? parseFloat(updateData.application_fee) : null,
+              total_seats: updateData.total_seats ? parseInt(updateData.total_seats) : null,
+              admission_url: updateData.admission_url || null,
+              application_start: this.safeParseDatetime(updateData.application_start),
+              application_end: this.safeParseDatetime(updateData.application_end),
+              exam_date: this.safeParseDatetime(updateData.exam_date),
+              result_date: this.safeParseDatetime(updateData.result_date),
+              required_documents: updateData.required_documents || [],
+              reservation_policy: updateData.reservation_policy || null,
+              scholarship_info: updateData.scholarship_info || null,
+              important_dates: updateData.important_dates || {},
+              is_active: updateData.is_active !== undefined ? updateData.is_active : true,
+              updated_at: new Date()
+            }
+          });
+          results.push(updatedAdmission);
+        } else {
+          // Create new admission - filter out id and other non-database fields
+          const { id, created_at, updated_at, college_id, colleges, ...createData } = admissionData;
+          
+          const newAdmission = await prisma.college_admissions_new.create({
+            data: {
+              colleges: {
+                connect: { id: collegeId }
+              },
+              course_name: createData.course_name,
+              degree_type: createData.degree_type || 'Other',
+              duration: createData.duration || null,
+              eligibility_criteria: createData.eligibility_criteria || null,
+              entrance_exam: createData.entrance_exam || null,
+              application_process: createData.application_process || null,
+              application_fee: createData.application_fee ? parseFloat(createData.application_fee) : null,
+              total_seats: createData.total_seats ? parseInt(createData.total_seats) : null,
+              admission_url: createData.admission_url || null,
+              application_start: this.safeParseDatetime(createData.application_start),
+              application_end: this.safeParseDatetime(createData.application_end),
+              exam_date: this.safeParseDatetime(createData.exam_date),
+              result_date: this.safeParseDatetime(createData.result_date),
+              required_documents: createData.required_documents || [],
+              reservation_policy: createData.reservation_policy || null,
+              scholarship_info: createData.scholarship_info || null,
+              important_dates: createData.important_dates || {},
+              is_active: createData.is_active !== undefined ? createData.is_active : true
+            }
+          });
+          results.push(newAdmission);
+        }
+      }
+
+      return results;
+    } catch (error) {
+      throw new Error(`Failed to update college admissions: ${error.message}`);
+    }
+  }
+
+  async updateCollegeAdmission(admissionId, collegeId, admissionData) {
+    try {
+      const updatedAdmission = await prisma.college_admissions_new.update({
+        where: { 
+          id: admissionId,
+          college_id: collegeId 
+        },
+        data: {
+          ...admissionData,
+          application_fee: admissionData.application_fee ? parseFloat(admissionData.application_fee) : null,
+          total_seats: admissionData.total_seats ? parseInt(admissionData.total_seats) : null,
+          required_documents: admissionData.required_documents || [],
+          updated_at: new Date()
+        }
+      });
+      return updatedAdmission;
+    } catch (error) {
+      throw new Error(`Failed to update college admission: ${error.message}`);
+    }
+  }
+
+  async deleteCollegeAdmission(admissionId, collegeId) {
+    try {
+      await prisma.college_admissions_new.delete({
+        where: { 
+          id: admissionId,
+          college_id: collegeId 
+        }
+      });
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete college admission: ${error.message}`);
+    }
+  }
+
   // COLLEGE INFRASTRUCTURE SECTION (NEW)
   async getCollegeInfrastructureNew(collegeId) {
     try {
@@ -1205,10 +1327,17 @@ class CollegeProfileService {
 
   async getFees(collegeId) {
     try {
+      console.log('🔍 Getting fees for college:', collegeId);
+      
       const fees = await prisma.college_fees.findMany({
         where: { college_id: collegeId },
         orderBy: { created_at: 'desc' }
       });
+
+      console.log('📋 Found', fees.length, 'fee records');
+      if (fees.length > 0) {
+        console.log('📊 Sample fee record:', JSON.stringify(fees[0], null, 2));
+      }
 
       // Transform fees data to match frontend structure
       const feesStructure = {
@@ -1229,6 +1358,8 @@ class CollegeProfileService {
 
       // Track if we found any scholarships in the database
       let hasDbScholarships = false;
+      let allCustomCharges = new Map(); // Use Map to avoid duplicates
+      let allCustomFields = new Map(); // Use Map to avoid duplicates
 
       // Process database fees and populate structure
       for (const fee of fees) {
@@ -1264,7 +1395,35 @@ class CollegeProfileService {
           hasDbScholarships = true;
           feesStructure.scholarships = [...new Set([...feesStructure.scholarships, ...fee.scholarships])];
         }
+
+        // Extract custom charges and fields from fee_structure JSON
+        if (fee.fee_structure) {
+          if (fee.fee_structure.customCharges && Array.isArray(fee.fee_structure.customCharges)) {
+            fee.fee_structure.customCharges.forEach(charge => {
+              if (charge.id && charge.name && charge.amount) {
+                allCustomCharges.set(charge.id, charge);
+              }
+            });
+          }
+          
+          if (fee.fee_structure.customFields && Array.isArray(fee.fee_structure.customFields)) {
+            fee.fee_structure.customFields.forEach(field => {
+              if (field.id && field.label && field.value) {
+                allCustomFields.set(field.id, field);
+              }
+            });
+          }
+        }
       }
+
+      // Add unique custom charges and fields to the result
+      feesStructure.customCharges.push(...Array.from(allCustomCharges.values()));
+      feesStructure.customFields = Array.from(allCustomFields.values());
+
+      console.log('🎯 Final fees structure custom data:');
+      console.log('- Custom charges:', feesStructure.customCharges.length);
+      console.log('- Custom fields:', feesStructure.customFields.length);
+      console.log('- Custom fees:', feesStructure.customFees.length);
 
       // If no scholarships found in database, provide default ones for new colleges
       if (!hasDbScholarships && fees.length === 0) {
@@ -1285,6 +1444,9 @@ class CollegeProfileService {
 
   async updateFees(collegeId, feesData) {
     try {
+      console.log('🔄 Updating fees for college:', collegeId);
+      console.log('📋 Input fees data:', JSON.stringify(feesData, null, 2));
+      
       // Start transaction
       return await prisma.$transaction(async (tx) => {
         // Clear existing fees for this college
@@ -1320,6 +1482,10 @@ class CollegeProfileService {
                 academic_year: academicYear,
                 scholarships: feesData.scholarships || [],
                 payment_modes: ['Online', 'Offline'],
+                fee_structure: {
+                  customCharges: feesData.customCharges || [],
+                  customFields: feesData.customFields || []
+                },
                 created_at: new Date(),
                 updated_at: new Date()
               });
@@ -1342,6 +1508,10 @@ class CollegeProfileService {
                   academic_year: academicYear,
                   scholarships: feesData.scholarships || [],
                   payment_modes: ['Online', 'Offline'],
+                  fee_structure: {
+                    customCharges: feesData.customCharges || [],
+                    customFields: feesData.customFields || []
+                  },
                   created_at: new Date(),
                   updated_at: new Date()
                 });
@@ -1384,13 +1554,43 @@ class CollegeProfileService {
             academic_year: academicYear,
             scholarships: feesData.scholarships || [],
             payment_modes: ['Online', 'Offline'],
+            fee_structure: {
+              customCharges: feesData.customCharges || [],
+              customFields: feesData.customFields || []
+            },
             created_at: new Date(),
             updated_at: new Date()
           });
         }
 
+        // If we have custom charges or custom fields but no course fees, create a minimal entry to store them
+        if ((feesData.customCharges && feesData.customCharges.length > 0) || 
+            (feesData.customFields && feesData.customFields.length > 0)) {
+          if (feesToCreate.length === 0) {
+            feesToCreate.push({
+              college_id: collegeId,
+              course_name: 'General',
+              degree_type: 'Other',
+              tuition_fee: 0,
+              total_fee: 0,
+              academic_year: academicYear,
+              scholarships: feesData.scholarships || [],
+              payment_modes: ['Online', 'Offline'],
+              fee_structure: {
+                customCharges: feesData.customCharges || [],
+                customFields: feesData.customFields || []
+              },
+              created_at: new Date(),
+              updated_at: new Date()
+            });
+          }
+        }
+
         // Create all fee records
         if (feesToCreate.length > 0) {
+          console.log('🚀 Creating fees records:', feesToCreate.length);
+          console.log('📊 First record sample:', JSON.stringify(feesToCreate[0], null, 2));
+          
           // Validate all numeric fields before creating
           const validatedFeesToCreate = feesToCreate.map(fee => {
             const validatedFee = { ...fee };
@@ -1417,6 +1617,10 @@ class CollegeProfileService {
           await tx.college_fees.createMany({
             data: validatedFeesToCreate
           });
+          
+          console.log('✅ Successfully created', validatedFeesToCreate.length, 'fee records');
+        } else {
+          console.log('⚠️  No fees to create');
         }
 
         return { message: 'Fees updated successfully' };
@@ -1452,6 +1656,27 @@ class CollegeProfileService {
     
     // Ensure minimum value is 0
     return Math.max(0, parsed);
+  }
+
+  // Helper method to safely parse dates
+  safeParseDatetime(dateValue) {
+    if (!dateValue || dateValue === '') return null;
+    
+    // If it's already a Date object, return it
+    if (dateValue instanceof Date) return dateValue;
+    
+    try {
+      // If it's a string, try to parse it
+      const date = new Date(dateValue);
+      
+      // Check if the date is valid
+      if (isNaN(date.getTime())) return null;
+      
+      return date;
+    } catch (error) {
+      console.warn('Invalid date format:', dateValue, error.message);
+      return null;
+    }
   }
 
   // Helper method to safely parse integers

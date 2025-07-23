@@ -1407,4 +1407,325 @@ router.post(
   uploadCoverImage
 );
 
+// ===================================
+// PING/CONNECTION ROUTES - Must come before any generic /:id routes!
+// ===================================
+
+// POST /api/students/ping/:studentId - Send ping request to student
+router.post("/ping/:studentId", authMiddleware, async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const senderId = req.user.id;
+    const senderType = req.user.role;
+
+    console.log(`Ping request: User ${senderId} (${senderType}) -> Student ${studentId}`);
+
+    // Validate student exists
+    const student = await prisma.student.findUnique({
+      where: { id: parseInt(studentId) },
+    });
+
+    if (!student) {
+      console.log(`Student ${studentId} not found`);
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    // Check if ping already exists
+    const existingPing = await prisma.ping_networks.findFirst({
+      where: {
+        sender_profile_id: senderId,
+        sender_profile_type: senderType,
+        receiver_profile_id: parseInt(studentId),
+        receiver_profile_type: "student",
+      },
+    });
+
+    if (existingPing) {
+      console.log(`Ping already exists: ${existingPing.id}, status: ${existingPing.status}`);
+      return res.status(400).json({
+        success: false,
+        message: "Connection request already exists",
+      });
+    }
+
+    // Create ping request
+    const ping = await prisma.ping_networks.create({
+      data: {
+        sender_profile_id: senderId,
+        sender_profile_type: senderType,
+        receiver_profile_id: parseInt(studentId),
+        receiver_profile_type: "student",
+        status: "pending",
+      },
+    });
+
+    console.log(`Ping created successfully: ${ping.id}`);
+
+    res.status(201).json({
+      success: true,
+      message: "Ping request sent successfully",
+      data: ping,
+    });
+  } catch (error) {
+    console.error("Error sending ping request:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to send ping request",
+      error: error.message,
+    });
+  }
+});
+
+// GET /api/students/ping-requests - Get ping requests for current student
+router.get("/ping-requests", authMiddleware, async (req, res) => {
+  try {
+    console.log(`Fetching ping requests for user: ${req.user.id}, role: ${req.user.role}`);
+    
+    if (req.user.role !== "student") {
+      console.log(`Access denied: User role is ${req.user.role}, not student`);
+      return res.status(403).json({
+        success: false,
+        message: "Only students can access this endpoint",
+      });
+    }
+
+    const pingRequests = await prisma.ping_networks.findMany({
+      where: {
+        receiver_profile_id: req.user.id,
+        receiver_profile_type: "student",
+        status: "pending",
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+
+    console.log(`Found ${pingRequests.length} ping requests for student ${req.user.id}`);
+
+    // Manually fetch sender details based on profile type
+    const enrichedRequests = await Promise.all(
+      pingRequests.map(async (request) => {
+        let sender = null;
+        
+        console.log(`Processing request ${request.id} from ${request.sender_profile_type} ${request.sender_profile_id}`);
+        
+        if (request.sender_profile_type === "student") {
+          sender = await prisma.student.findUnique({
+            where: { id: request.sender_profile_id },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              profilePicture: true,
+              headline: true,
+              collegeName: true,
+            },
+          });
+        } else if (request.sender_profile_type === "industry") {
+          sender = await prisma.industry.findUnique({
+            where: { id: request.sender_profile_id },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              logoUrl: true,
+              description: true,
+            },
+          });
+          // Map industry fields to match expected format
+          if (sender) {
+            sender.firstName = sender.name;
+            sender.lastName = "";
+            sender.profilePicture = sender.logoUrl;
+            sender.headline = sender.description;
+          }
+        } else if (request.sender_profile_type === "college") {
+          sender = await prisma.college.findUnique({
+            where: { id: request.sender_profile_id },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              logoUrl: true,
+            },
+          });
+          // Map college fields to match expected format
+          if (sender) {
+            sender.firstName = sender.name;
+            sender.lastName = "";
+            sender.profilePicture = sender.logoUrl;
+          }
+        }
+        
+        console.log(`Sender details for request ${request.id}:`, sender);
+        
+        return {
+          ...request,
+          sender,
+        };
+      })
+    );
+
+    console.log(`Returning ${enrichedRequests.length} enriched ping requests`);
+
+    res.json({
+      success: true,
+      data: enrichedRequests,
+    });
+  } catch (error) {
+    console.error("Error fetching ping requests:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch ping requests",
+      error: error.message,
+    });
+  }
+});
+
+// PUT /api/students/ping/:requestId/accept - Accept ping request
+router.put("/ping/:requestId/accept", authMiddleware, async (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const studentId = req.user.id;
+
+    console.log(`Accepting ping request ${requestId} by student ${studentId}`);
+
+    // Find the ping request
+    const pingRequest = await prisma.ping_networks.findUnique({
+      where: { id: parseInt(requestId) },
+    });
+
+    if (!pingRequest) {
+      return res.status(404).json({
+        success: false,
+        message: "Ping request not found",
+      });
+    }
+
+    // Verify the current user is the receiver
+    if (pingRequest.receiver_profile_id !== studentId || pingRequest.receiver_profile_type !== "student") {
+      return res.status(403).json({
+        success: false,
+        message: "You can only accept ping requests sent to you",
+      });
+    }
+
+    // Update the ping status
+    const updatedPing = await prisma.ping_networks.update({
+      where: { id: parseInt(requestId) },
+      data: { status: "accepted" },
+    });
+
+    console.log(`Ping request ${requestId} accepted successfully`);
+
+    res.json({
+      success: true,
+      message: "Ping request accepted successfully",
+      data: updatedPing,
+    });
+  } catch (error) {
+    console.error("Error accepting ping request:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to accept ping request",
+      error: error.message,
+    });
+  }
+});
+
+// PUT /api/students/ping/:requestId/decline - Decline ping request
+router.put("/ping/:requestId/decline", authMiddleware, async (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const studentId = req.user.id;
+
+    console.log(`Declining ping request ${requestId} by student ${studentId}`);
+
+    // Find the ping request
+    const pingRequest = await prisma.ping_networks.findUnique({
+      where: { id: parseInt(requestId) },
+    });
+
+    if (!pingRequest) {
+      return res.status(404).json({
+        success: false,
+        message: "Ping request not found",
+      });
+    }
+
+    // Verify the current user is the receiver
+    if (pingRequest.receiver_profile_id !== studentId || pingRequest.receiver_profile_type !== "student") {
+      return res.status(403).json({
+        success: false,
+        message: "You can only decline ping requests sent to you",
+      });
+    }
+
+    // Update the ping status
+    const updatedPing = await prisma.ping_networks.update({
+      where: { id: parseInt(requestId) },
+      data: { status: "declined" },
+    });
+
+    console.log(`Ping request ${requestId} declined successfully`);
+
+    res.json({
+      success: true,
+      message: "Ping request declined successfully",
+      data: updatedPing,
+    });
+  } catch (error) {
+    console.error("Error declining ping request:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to decline ping request",
+      error: error.message,
+    });
+  }
+});
+
+// GET /api/students/connection-count/:studentId? - Get connection count for student
+router.get("/connection-count/:studentId?", authMiddleware, async (req, res) => {
+  try {
+    const studentId = req.params.studentId ? parseInt(req.params.studentId) : req.user.id;
+    
+    console.log(`Fetching connection count for student: ${studentId}, requested by: ${req.user.id} (${req.user.role})`);
+
+    const connectionCount = await prisma.ping_networks.count({
+      where: {
+        OR: [
+          {
+            sender_profile_id: studentId,
+            sender_profile_type: "student",
+            status: "accepted",
+          },
+          {
+            receiver_profile_id: studentId,
+            receiver_profile_type: "student", 
+            status: "accepted",
+          },
+        ],
+      },
+    });
+
+    console.log(`Connection count for student ${studentId}: ${connectionCount}`);
+
+    res.json({
+      success: true,
+      count: connectionCount,
+    });
+  } catch (error) {
+    console.error("Error fetching connection count:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch connection count",
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;

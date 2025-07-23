@@ -88,6 +88,39 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
     }
   };
 
+  // Helper functions for rendering user info
+  const getAuthorDisplayName = (author) => {
+    if (!author) return "Anonymous User";
+    
+    if (author.full_name) return author.full_name;
+    if (author.firstName && author.lastName) {
+      return `${author.firstName} ${author.lastName}`;
+    }
+    if (author.firstName) return author.firstName;
+    if (author.name) return author.name;
+    return "Anonymous User";
+  };
+
+  const getAuthorInitials = (author) => {
+    if (!author) return "U";
+    
+    const displayName = getAuthorDisplayName(author);
+    const names = displayName.split(" ");
+    if (names.length >= 2) {
+      return `${names[0].charAt(0)}${names[1].charAt(0)}`.toUpperCase();
+    }
+    return displayName.charAt(0).toUpperCase();
+  };
+
+  const getAuthorRole = (author) => {
+    if (!author) return "User";
+    
+    if (author.userType) {
+      return author.userType.charAt(0).toUpperCase() + author.userType.slice(1);
+    }
+    return "Industry";
+  };
+
   const handleLike = async (postId) => {
     try {
       await apiService.reactToPost(postId, { reactionType: "like" });
@@ -144,23 +177,49 @@ const FeedArea = ({ refreshTrigger, onRefreshReady, isOwner = false }) => {
         {/* Post Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden relative">
               {user?.profile_pic ? (
                 <img
                   src={apiService.getMediaUrl(user.profile_pic)}
-                  alt={user.full_name}
+                  alt={getAuthorDisplayName(user)}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.warn(
+                      "❌ Profile picture failed to load:",
+                      user.profile_pic
+                    );
+                    // Hide the failed image and show initials
+                    e.target.style.display = "none";
+                    const initialsEl = e.target.parentNode.querySelector(
+                      ".initials-fallback"
+                    );
+                    if (initialsEl) initialsEl.style.display = "flex";
+                  }}
+                  onLoad={(e) => {
+                    console.log(
+                      "✅ Profile picture loaded:",
+                      user.profile_pic
+                    );
+                    // Hide initials when image loads
+                    const initialsEl = e.target.parentNode.querySelector(".initials-fallback");
+                    if (initialsEl) initialsEl.style.display = "none";
+                  }}
                 />
-              ) : (
-                user?.full_name?.charAt(0).toUpperCase() || "U"
-              )}
+              ) : null}
+              <span
+                className={`initials-fallback absolute inset-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 ${
+                  user?.profile_pic ? "hidden" : ""
+                }`}
+              >
+                {getAuthorInitials(user)}
+              </span>
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 text-sm">
-                {user?.full_name || "Anonymous User"}
+                {getAuthorDisplayName(user)}
               </h4>
               <p className="text-gray-600 text-xs">
-                {post.userType === "industry" ? "Industry" : post.userType}
+                {getAuthorRole(user)}
               </p>
               <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
                 <Clock className="w-3 h-3" />

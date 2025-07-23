@@ -4,7 +4,7 @@ import PostCreator from "../../components/industry/PostCreator";
 import FeedArea from "../../components/industry/FeedArea";
 import NewsSidebar from "../../components/industry/NewsSidebar";
 import ContentRenderer from "../../components/industry/ContentRenderer";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import apiService from "../../services/apiService";
 
@@ -34,6 +34,16 @@ const IndustryProfilePage = () => {
 
   const { id: routeId } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // If no routeId and user is an industry, redirect to their own profile
+  useEffect(() => {
+    if (!routeId && user?.role === "industry" && user?.id) {
+      console.log("Redirecting industry user to their own profile...");
+      navigate(`/industry/profile/${user.id}`, { replace: true });
+      return;
+    }
+  }, [routeId, user, navigate]);
 
   // Check if current user is the owner of this profile
   // For industry profiles, user.id should match the industry.id
@@ -77,8 +87,20 @@ const IndustryProfilePage = () => {
         // Fetch specific industry profile by ID
         response = await apiService.getIndustryProfile(routeId);
       } else {
-        // Fetch current user's industry profile
-        response = await apiService.getIndustryProfile();
+        // Only fetch current user's profile if the user is actually an industry
+        if (user?.role === "industry") {
+          response = await apiService.getCurrentIndustryProfile();
+        } else {
+          // If user is not an industry and no routeId provided, provide helpful guidance
+          if (user?.role === "student") {
+            setError("This is the industry profile section. You can browse industry profiles from the search page or industry directory.");
+          } else if (user?.role === "college") {
+            setError("This is the industry profile section. You can browse industry profiles from the search page or industry directory.");
+          } else {
+            setError("Please specify an industry ID in the URL to view an industry profile, or login as an industry to view your own profile.");
+          }
+          return;
+        }
       }
 
       console.log("📊 Industry profile data loaded:", response);

@@ -16,7 +16,12 @@ export default function IndustryDashboard() {
   }, [location]);
 
   const handleCompleteProfile = () => {
-    navigate("/industry/profile");
+    // Navigate to industry's own profile with their ID
+    if (user?.id) {
+      navigate(`/industry/profile/${user.id}`);
+    } else {
+      navigate("/industry/profile");
+    }
   };
 
   const handlePostJobs = () => {

@@ -1571,11 +1571,25 @@ class ApiService {
       const endpoint = industryId
         ? `/industries/${industryId}`
         : "/industries/me";
-      const response = await this.api.get(endpoint); // ✅ Use `this.api` properly
+      const response = await this.api.get(endpoint);
       return response.data;
     } catch (error) {
+      console.error("API Error in getIndustryProfile:", error.response?.data);
       throw new Error(
         error.response?.data?.message || "Failed to get industry profile"
+      );
+    }
+  }
+
+  // Get current authenticated industry's profile (only for industry users)
+  async getCurrentIndustryProfile() {
+    try {
+      const response = await this.api.get("/industries/me");
+      return response.data;
+    } catch (error) {
+      console.error("API Error in getCurrentIndustryProfile:", error.response?.data);
+      throw new Error(
+        error.response?.data?.message || "Failed to get current industry profile. Make sure you're logged in as an industry."
       );
     }
   }
@@ -1635,6 +1649,28 @@ class ApiService {
     });
   }
 
+  async uploadIndustryCoverImage(formData) {
+    if (!formData || !formData.has("coverImage")) {
+      throw new Error("No file uploaded");
+    }
+    return this.api.post("/industries/cover-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
+  async uploadIndustryProfileImage(formData) {
+    if (!formData || !formData.has("profileImage")) {
+      throw new Error("No file uploaded");
+    }
+    return this.api.post("/industries/profile-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
   // Ping/Connection methods
   async sendPingRequest(studentId) {
     try {
@@ -1671,11 +1707,11 @@ class ApiService {
 
   async rejectPingRequest(requestId) {
     try {
-      const response = await this.api.put(`/students/ping/${requestId}/reject`);
+      const response = await this.api.put(`/students/ping/${requestId}/decline`);
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to reject ping request"
+        error.response?.data?.message || "Failed to decline ping request"
       );
     }
   }
@@ -1691,9 +1727,12 @@ class ApiService {
     }
   }
 
-  async getConnectionCount() {
+  async getConnectionCount(studentId = null) {
     try {
-      const response = await this.api.get("/students/connections/count");
+      const endpoint = studentId 
+        ? `/students/connection-count/${studentId}`
+        : `/students/connection-count`;
+      const response = await this.api.get(endpoint);
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1714,12 +1753,12 @@ class ApiService {
   }
 
   // Role-based page helpers
-  getRoleProfilePage(role) {
+  getRoleProfilePage(role, userId = null) {
     const rolePages = {
-      student: "/student/profile",
-      college: "/college/profile",
-      startup: "/startup/profile",
-      industry: "/industry/profile",
+      student: userId ? `/student/profile/${userId}` : "/student/profile",
+      college: userId ? `/college/profile/${userId}` : "/college/profile", 
+      startup: userId ? `/startup/profile/${userId}` : "/startup/profile",
+      industry: userId ? `/industry/profile/${userId}` : "/industry/profile",
     };
     return rolePages[role] || "/profile";
   }
@@ -1976,6 +2015,87 @@ class ApiService {
     } catch (error) {
       throw new Error(
         error.response?.data?.message || "Failed to add college review"
+      );
+    }
+  }
+
+  // Industry Ping/Connection methods
+  async sendIndustryPingRequest(industryId) {
+    try {
+      const response = await this.api.post(`/industries/ping/${industryId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to send ping request to industry"
+      );
+    }
+  }
+
+  async getIndustryPingRequests() {
+    try {
+      const response = await this.api.get("/industries/ping-requests");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch industry ping requests"
+      );
+    }
+  }
+
+  async acceptIndustryPingRequest(requestId) {
+    try {
+      const response = await this.api.put(`/industries/ping/${requestId}/accept`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to accept industry ping request"
+      );
+    }
+  }
+
+  async rejectIndustryPingRequest(requestId) {
+    try {
+      const response = await this.api.put(`/industries/ping/${requestId}/reject`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to reject industry ping request"
+      );
+    }
+  }
+
+  async getIndustryConnections() {
+    try {
+      const response = await this.api.get("/industries/connections");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch industry connections"
+      );
+    }
+  }
+
+  async getIndustryConnectionCount(industryId = null) {
+    try {
+      const url = industryId 
+        ? `/industries/connections/count?industryId=${industryId}`
+        : "/industries/connections/count";
+      const response = await this.api.get(url);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch industry connection count"
+      );
+    }
+  }
+
+  async checkIndustryPingStatus(industryId) {
+    try {
+      const response = await this.api.get(`/industries/ping-status/${industryId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to check industry ping status"
       );
     }
   }

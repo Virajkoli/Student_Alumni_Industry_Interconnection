@@ -1,6 +1,22 @@
 import React, { useState } from "react";
-import { Edit3, X, MapPin, Phone, Mail, Globe, Camera } from "lucide-react";
+import {
+  Edit3,
+  X,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Camera,
+  Plus,
+  User,
+  UserPlus,
+  Clock,
+  Check,
+  Bell,
+} from "lucide-react";
 import { useEffect } from "react";
+import { toast } from "react-hot-toast";
+import apiService from "../../services/apiService";
 
 const styles = {
   hideScrollbar: {
@@ -24,7 +40,9 @@ const HorizontalProfileNavbar = ({
   const [profileData, setProfileData] = useState({});
   const [editData, setEditData] = useState({});
   const [initialized, setInitialized] = useState(false);
-
+  const [coverPicUrl, setCoverPicUrl] = useState("");
+  const [profilePicUrl, setProfilePicUrl] = useState("");
+  const [isImageEditModalOpen, setIsImageEditModalOpen] = useState(false);
   // Quick Stats State - Dynamic counts
   const [projectCount, setProjectCount] = useState(0);
   const [connectionCount, setConnectionCount] = useState(0);
@@ -33,8 +51,17 @@ const HorizontalProfileNavbar = ({
   // Real-time project stats from localStorage or parent component
   const [projectStats, setProjectStats] = useState({
     total: 0,
-    
   });
+
+  // Ping/Connection state
+  const [pingStatus, setPingStatus] = useState("none"); // none, sent, received, accepted
+  const [pingRequests, setPingRequests] = useState([]);
+  const [isPingRequestsModalOpen, setIsPingRequestsModalOpen] = useState(false);
+  const [isLoadingPing, setIsLoadingPing] = useState(false);
+
+  // Connection modal state
+  const [connections, setConnections] = useState([]);
+  const [isConnectionModalOpen, setIsConnectionModalOpen] = useState(false);
 
   const navigationItems = [
     { id: "posts", name: "Posts", description: "Your posts and activities" },
@@ -91,19 +118,19 @@ const HorizontalProfileNavbar = ({
   const fetchProjectCount = async () => {
     try {
       setIsLoadingStats(true);
-      
+
       // Try to get real project data from localStorage first (where LiveProjects stores data)
-      const storedProjects = localStorage.getItem('industryProjects');
+      const storedProjects = localStorage.getItem("industryProjects");
       let projects = [];
-      
+
       if (storedProjects) {
         try {
           projects = JSON.parse(storedProjects);
         } catch (e) {
-          console.warn('Failed to parse stored projects:', e);
+          console.warn("Failed to parse stored projects:", e);
         }
       }
-      
+
       // If no stored data, create some sample data or use API
       if (!projects || projects.length === 0) {
         // You can replace this with actual API call
@@ -112,21 +139,20 @@ const HorizontalProfileNavbar = ({
           { id: 2, status: "In Progress" },
           { id: 3, status: "Open" },
           { id: 4, status: "Completed" },
-          { id: 5, status: "Open" }
+          { id: 5, status: "Open" },
         ];
       }
-      
+
       // Calculate stats
       const stats = {
         total: projects.length,
-        open: projects.filter(p => p.status === "Open").length,
-        inProgress: projects.filter(p => p.status === "In Progress").length,
-        completed: projects.filter(p => p.status === "Completed").length
+        open: projects.filter((p) => p.status === "Open").length,
+        inProgress: projects.filter((p) => p.status === "In Progress").length,
+        completed: projects.filter((p) => p.status === "Completed").length,
       };
-      
+
       setProjectCount(stats.total);
       setProjectStats(stats);
-      
     } catch (error) {
       console.error("Error fetching project count:", error);
       setProjectCount(0);
@@ -139,13 +165,113 @@ const HorizontalProfileNavbar = ({
   // Fetch connection count
   const fetchConnectionCount = async () => {
     try {
-      // Simulate API call for industry connections
-      const count = Math.floor(Math.random() * 1000) + 200; // Random between 200-1200
-      setConnectionCount(count);
+      let response;
+      if (isOwner) {
+        // Industry owner viewing their own profile
+        response = await apiService.getIndustryConnectionCount();
+      } else {
+        // Non-owner viewing an industry profile
+        response = await apiService.getIndustryConnectionCount(
+          industryData?.id
+        );
+      }
+      setConnectionCount(response.data.count);
     } catch (error) {
       console.error("Error fetching connection count:", error);
+      // Fallback to 0 for now
       setConnectionCount(0);
     }
+  };
+
+  // Ping/Connection functions
+  const fetchPingStatus = async () => {
+    if (!industryData?.id || isOwner) return;
+
+    try {
+      const response = await apiService.checkIndustryPingStatus(
+        industryData.id
+      );
+      setPingStatus(response.data.status);
+    } catch (error) {
+      console.error("Failed to fetch industry ping status:", error);
+    }
+  };
+
+  const fetchPingRequests = async () => {
+    try {
+      console.log("Fetching ping requests for industry owner...");
+      const response = await apiService.getIndustryPingRequests();
+      console.log("Ping requests response:", response);
+      setPingRequests(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch industry ping requests:", error);
+      console.error("Error details:", error.response?.data);
+      toast.error("Failed to load ping requests");
+    }
+  };
+
+  const handleSendPing = async () => {
+    if (!industryData?.id) return;
+
+    setIsLoadingPing(true);
+    try {
+      console.log("Sending ping to industry:", industryData.id);
+      await apiService.sendIndustryPingRequest(industryData.id);
+      setPingStatus("sent");
+      toast.success("Ping request sent to industry successfully!");
+      console.log("Ping sent successfully");
+    } catch (error) {
+      console.error("Failed to send industry ping:", error);
+      console.error("Error details:", error.response?.data);
+      toast.error(error.message || "Failed to send ping request");
+    } finally {
+      setIsLoadingPing(false);
+    }
+  };
+
+  const handleAcceptPing = async (requestId) => {
+    try {
+      await apiService.acceptIndustryPingRequest(requestId);
+      await fetchPingRequests();
+      await fetchConnectionCount();
+      toast.success("Ping request accepted!");
+    } catch (error) {
+      console.error("Failed to accept industry ping:", error);
+      toast.error("Failed to accept ping request");
+    }
+  };
+
+  const handleRejectPing = async (requestId) => {
+    try {
+      await apiService.rejectIndustryPingRequest(requestId);
+      await fetchPingRequests();
+      toast.success("Ping request rejected");
+    } catch (error) {
+      console.error("Failed to reject industry ping:", error);
+      toast.error("Failed to reject ping request");
+    }
+  };
+
+  const openPingRequestsModal = () => {
+    setIsPingRequestsModalOpen(true);
+    fetchPingRequests();
+  };
+
+  // Connection functions
+  const fetchConnections = async () => {
+    try {
+      const response = await apiService.getIndustryConnections();
+      setConnections(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch industry connections:", error);
+      toast.error("Failed to load connections");
+      setConnections([]);
+    }
+  };
+
+  const openConnectionModal = () => {
+    setIsConnectionModalOpen(true);
+    fetchConnections();
   };
 
   // Open project modal (if owner)
@@ -159,15 +285,62 @@ const HorizontalProfileNavbar = ({
     }
   };
 
+  const handleUploadCoverPic = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("coverImage", file);
+      const response = await apiService.uploadIndustryCoverImage(formData);
+      
+      // Update local state with new cover picture URL
+      setCoverPicUrl(response.data.cover_picture);
+      toast.success("Cover picture updated");
+    } catch (error) {
+      console.error("Failed to upload cover picture:", error);
+      toast.error(error.message || "Upload failed");
+    }
+  };
+
+  const handleUploadProfilePic = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("profileImage", file);
+      const response = await apiService.uploadIndustryProfileImage(formData);
+      
+      // Update local state with new profile picture URL
+      setProfilePicUrl(response.data.profile_picture);
+      toast.success("Profile picture updated");
+    } catch (error) {
+      console.error("Failed to upload profile picture:", error);
+      toast.error(error.message || "Upload failed");
+    }
+  };
+  
+
   useEffect(() => {
     if (industryData && !initialized) {
       setProfileData(industryData);
       setEditData(industryData);
       setInitialized(true);
 
+      // Initialize image URLs from industry data
+      if (industryData.backgroundUrl) {
+        setCoverPicUrl(industryData.backgroundUrl);
+      }
+      if (industryData.logoUrl) {
+        setProfilePicUrl(industryData.logoUrl);
+      }
+
       // Fetch quick stats when profile loads
       fetchProjectCount();
       fetchConnectionCount();
+
+      // Fetch ping status if not owner
+      if (!isOwner) {
+        fetchPingStatus();
+      } else {
+        // If user is owner, fetch ping requests to show count
+        fetchPingRequests();
+      }
     }
 
     // Listen for project updates from LiveProjects component
@@ -176,17 +349,17 @@ const HorizontalProfileNavbar = ({
     };
 
     // Add event listeners for real-time updates
-    window.addEventListener('projectAdded', handleProjectUpdate);
-    window.addEventListener('projectUpdated', handleProjectUpdate);
-    window.addEventListener('projectDeleted', handleProjectUpdate);
+    window.addEventListener("projectAdded", handleProjectUpdate);
+    window.addEventListener("projectUpdated", handleProjectUpdate);
+    window.addEventListener("projectDeleted", handleProjectUpdate);
 
     // Cleanup event listeners
     return () => {
-      window.removeEventListener('projectAdded', handleProjectUpdate);
-      window.removeEventListener('projectUpdated', handleProjectUpdate);
-      window.removeEventListener('projectDeleted', handleProjectUpdate);
+      window.removeEventListener("projectAdded", handleProjectUpdate);
+      window.removeEventListener("projectUpdated", handleProjectUpdate);
+      window.removeEventListener("projectDeleted", handleProjectUpdate);
     };
-  }, [industryData, initialized]);
+  }, [industryData, initialized, isOwner]);
 
   const handleItemClick = (item) => {
     setActiveItem(item.id);
@@ -217,6 +390,10 @@ const HorizontalProfileNavbar = ({
     setEditData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleImageEditClick = () => {
+    setIsImageEditModalOpen(true);
+  };
+
   return (
     <>
       <div
@@ -224,48 +401,58 @@ const HorizontalProfileNavbar = ({
         style={{ backgroundColor: "#F7FAFC", borderColor: "#DCE8F2" }}
       >
         {/* Profile Header - Horizontal */}
+        {/* Profile Header */}
         <div className="relative">
-          {/* Increased height from h-24 to h-32 */}
+          {/* Cover Photo */}
           <div
-            className="h-44"
+            className="h-44 bg-gradient-to-r from-blue-400 to-indigo-500"
             style={{
-              background: "linear-gradient(135deg, #B5D3E7 0%, #6EA9CB 100%)",
+              backgroundImage: coverPicUrl ? `url(${coverPicUrl})` : "none",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
           ></div>
-          {/* Edit Button - Only show if user is owner */}
+
+          {/* Edit Background/Profile Image Button - Top right of background */}
           {isOwner && (
             <button
-              onClick={handleEditClick}
-              className="absolute top-4 right-4 p-2 hover:opacity-80 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
-              style={{ backgroundColor: "rgba(110, 169, 203, 0.3)" }}
-              title="Edit Profile"
+              // onClick={() => document.getElementById("coverPicInput").click()}
+              onClick={handleImageEditClick}
+              className="absolute top-4 right-4 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
+              title="Edit Background & Profile Image"
             >
-              <Edit3 className="w-5 h-5" />
+              <Camera className="w-7 h-7 invert" />
             </button>
           )}
-          {/* Larger profile image, adjusted positioning */}
+          <input
+            type="file"
+            id="coverPicInput"
+            style={{ display: "none" }}
+            onChange={(e) => handleUploadCoverPic(e.target.files[0])}
+          />
+
+          {/* Profile Image */}
           <div className="absolute -bottom-14 left-8">
-            <div
-              className="w-28 h-28 rounded-full p-1.5 shadow-xl"
-              style={{ backgroundColor: "#F7FAFC" }}
-            >
-              <div
-                className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
-                style={{
-                  background:
-                    "linear-gradient(to bottom right, #DCE8F2, #B5D3E7)",
-                }}
-              >
+            <div className="w-28 h-28 bg-white rounded-full p-1.5 shadow-xl">
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center overflow-hidden">
                 <img
-                  src="/api/placeholder/112/112"
+                  src={profilePicUrl || "/default-avatar.png"}
                   alt="Profile"
-                  className="w-full h-full object-cover rounded-full"
+                  className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.target.style.display = "none";
+                    e.target.onerror = null; // Prevent infinite loop
+                    e.target.src = "/default-avatar.png";
                   }}
                 />
               </div>
             </div>
+
+            <input
+              type="file"
+              id="profilePicInput"
+              style={{ display: "none" }}
+              onChange={(e) => handleUploadProfilePic(e.target.files[0])}
+            />
           </div>
         </div>
 
@@ -295,12 +482,73 @@ const HorizontalProfileNavbar = ({
               </div>
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
-              <button
-                className="py-2 px-5 text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-colors duration-200"
-                style={{ backgroundColor: "#6EA9CB" }}
-              >
-                Connect
-              </button>
+              {/* Dynamic Ping/Connect Button */}
+              {!isOwner && (
+                <>
+                  {pingStatus === "none" && (
+                    <button
+                      onClick={handleSendPing}
+                      disabled={isLoadingPing}
+                      className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90 flex items-center gap-2"
+                      style={{ backgroundColor: "#6EA9CB" }}
+                    >
+                      {isLoadingPing ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <UserPlus className="w-4 h-4" />
+                      )}
+                      {isLoadingPing ? "Sending..." : "Connect"}
+                    </button>
+                  )}
+
+                  {pingStatus === "sent" && (
+                    <button
+                      disabled
+                      className="py-2 px-5 bg-gray-400 text-white rounded-lg text-sm font-semibold flex items-center gap-2"
+                    >
+                      <Clock className="w-4 h-4" />
+                      Request Sent
+                    </button>
+                  )}
+
+                  {pingStatus === "received" && (
+                    <button
+                      onClick={openPingRequestsModal}
+                      className="py-2 px-5 bg-orange-500 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-orange-600 flex items-center gap-2"
+                    >
+                      <Bell className="w-4 h-4" />
+                      Respond to Request
+                    </button>
+                  )}
+
+                  {pingStatus === "accepted" && (
+                    <button
+                      disabled
+                      className="py-2 px-5 bg-green-500 text-white rounded-lg text-sm font-semibold flex items-center gap-2"
+                    >
+                      <Check className="w-4 h-4" />
+                      Connected
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* Connection Requests Button for Owner */}
+              {isOwner && (
+                <button
+                  onClick={openPingRequestsModal}
+                  className="py-2 px-5 text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:opacity-90 flex items-center gap-2"
+                  style={{ backgroundColor: "#6EA9CB" }}
+                >
+                  <Bell className="w-4 h-4" />
+                  Connection Requests
+                  {pingRequests.length > 0 && (
+                    <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                      {pingRequests.length}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
@@ -321,7 +569,10 @@ const HorizontalProfileNavbar = ({
                   } p-2 rounded-lg transition-colors`}
                   title={isOwner ? "View your live projects" : "Total Projects"}
                 >
-                  <span className="font-bold text-lg" style={{ color: "#1F2D3D" }}>
+                  <span
+                    className="font-bold text-lg"
+                    style={{ color: "#1F2D3D" }}
+                  >
                     {isLoadingStats ? "..." : projectStats.total}
                   </span>
                 </button>
@@ -360,9 +611,18 @@ const HorizontalProfileNavbar = ({
 
             {/* Connections */}
             <div className="text-center">
-              <span className="font-bold text-lg" style={{ color: "#007AFF" }}>
-                {connectionCount}+
-              </span>
+              <button
+                onClick={openConnectionModal}
+                className="hover:bg-gray-100 p-2 rounded-lg transition-colors cursor-pointer"
+                title="View connections"
+              >
+                <span
+                  className="font-bold text-lg"
+                  style={{ color: "#007AFF" }}
+                >
+                  {connectionCount}
+                </span>
+              </button>
               <span
                 className="block text-sm"
                 style={{ color: "#1F2D3D", opacity: 0.7 }}
@@ -430,6 +690,152 @@ const HorizontalProfileNavbar = ({
           </div>
         </div>
       </div>
+
+       {/* Edit Background & Profile Image Modal */}
+            {isImageEditModalOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        Edit Images
+                      </h2>
+                      <button
+                        onClick={() => setIsImageEditModalOpen(false)}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      >
+                        <X className="w-5 h-5 text-gray-500" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="p-6 space-y-6">
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium text-gray-900">
+                        Background Image
+                      </h3>
+                      <div className="relative">
+                        <div
+                          className="w-full h-32 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg overflow-hidden"
+                          style={{
+                            backgroundImage: `url(${coverPicUrl})`,
+                          }}
+                        ></div>
+                        {isOwner && (
+                          <button
+                            onClick={() =>
+                              document.getElementById("coverPicInputModal").click()
+                            }
+                            className="absolute bottom-2 right-2 p-2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-700 rounded-full transition-all duration-200"
+                          >
+                            <Camera className="w-4 h-4" />
+                          </button>
+                        )}
+                        <input
+                          type="file"
+                          id="coverPicInputModal"
+                          style={{ display: "none" }}
+                          onChange={(e) => handleUploadCoverPic(e.target.files[0])}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() =>
+                            document.getElementById("coverPicInputModal").click()
+                          }
+                          className="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
+                        >
+                          Upload New
+                        </button>
+                        <button
+                          onClick={() => setCoverPicUrl("")}
+                          className="flex-1 py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium text-gray-900">
+                        Profile Picture
+                      </h3>
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
+                            <img
+                              src={profilePicUrl || "/default-avatar.png"}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.onerror = null; // Prevent infinite loop
+                                e.target.src = "/default-avatar.png";
+                              }}
+                            />
+                          </div>
+                          {isOwner && (
+                            <button
+                              onClick={() =>
+                                document
+                                  .getElementById("profilePicInputModal")
+                                  .click()
+                              }
+                              className="absolute -bottom-1 -right-1 p-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+                            >
+                              <Camera className="w-3 h-3" />
+                            </button>
+                          )}
+                          <input
+                            type="file"
+                            id="profilePicInputModal"
+                            style={{ display: "none" }}
+                            onChange={(e) =>
+                              handleUploadProfilePic(e.target.files[0])
+                            }
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-600 mb-3">
+                            JPG, PNG or GIF (max. 2MB)
+                          </p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() =>
+                                document
+                                  .getElementById("profilePicInputModal")
+                                  .click()
+                              }
+                              className="py-2 px-4 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
+                            >
+                              Upload New
+                            </button>
+                            <button
+                              onClick={() => setProfilePicUrl("")}
+                              className="py-2 px-4 bg-gray-50 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+                    <button
+                      onClick={() => setIsImageEditModalOpen(false)}
+                      className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => setIsImageEditModalOpen(false)}
+                      className="px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors hover:opacity-90"
+                      style={{ backgroundColor: "#6EA9CB" }}
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
       {/* Edit Profile Modal */}
       {isEditModalOpen && (
@@ -666,6 +1072,214 @@ const HorizontalProfileNavbar = ({
                   style={{ backgroundColor: "#6EA9CB" }}
                 >
                   Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ping Requests Modal */}
+      {isPingRequestsModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Connection Requests ({pingRequests.length})
+                </h2>
+                <button
+                  onClick={() => setIsPingRequestsModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {pingRequests.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <Bell className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-gray-500 mb-2">No connection requests</p>
+                  <p className="text-sm text-gray-400">
+                    When someone sends you a connection request, it will appear
+                    here
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {pingRequests.map((request) => (
+                    <div
+                      key={request.id}
+                      className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg"
+                    >
+                      <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                        <img
+                          src={
+                            request.sender?.profilePicture ||
+                            "/default-avatar.png"
+                          }
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/default-avatar.png";
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 truncate">
+                          {request.sender?.firstName} {request.sender?.lastName}
+                        </h4>
+                        <p className="text-sm text-gray-500 truncate">
+                          {request.sender?.headline ||
+                            request.sender?.collegeName}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(request.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleAcceptPing(request.id)}
+                          className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                          title="Accept"
+                        >
+                          <Check className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleRejectPing(request.id)}
+                          className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                          title="Reject"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+              <button
+                onClick={() => setIsPingRequestsModalOpen(false)}
+                className="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Connections Modal */}
+      {isConnectionModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  My Connections ({connectionCount})
+                </h2>
+                <button
+                  onClick={() => setIsConnectionModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {connections.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 mb-4">No connections yet</p>
+                  <p className="text-sm text-gray-400">
+                    Connect with other students, colleges, and industry
+                    professionals to build your network
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {connections.map((connection) => (
+                    <div
+                      key={connection.id}
+                      className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                        <img
+                          src={
+                            connection.connectionUser?.profilePicture ||
+                            "/default-avatar.png"
+                          }
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/default-avatar.png";
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 truncate">
+                          {connection.connectionUser?.firstName}{" "}
+                          {connection.connectionUser?.lastName}
+                        </h4>
+                        <p className="text-sm text-gray-500 truncate">
+                          {connection.connectionUser?.headline ||
+                            connection.connectionUser?.collegeName}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Connected on{" "}
+                          {new Date(connection.updated_at).toLocaleDateString()}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          // Navigate to their profile
+                          window.open(
+                            `/student/profile/${connection.connectionUser?.id}`,
+                            "_blank"
+                          );
+                        }}
+                        className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      >
+                        View Profile
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setIsConnectionModalOpen(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Close
                 </button>
               </div>
             </div>

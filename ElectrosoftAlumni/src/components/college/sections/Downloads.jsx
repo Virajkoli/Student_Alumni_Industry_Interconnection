@@ -9,7 +9,7 @@ import {
   Eye,
   Upload,
 } from "lucide-react";
-import  apiService  from "../../../services/apiService";
+import apiService from "../../../services/apiService";
 
 const Downloads = () => {
   // const apiService = new apiService();
@@ -38,13 +38,15 @@ const Downloads = () => {
       const response = await apiService.getCollegeDownloads();
       if (response.success) {
         const data = response.data;
-        setDownloadsData({
+        const downloadsData = {
           forms: data.forms || [],
           brochures: data.brochures || [],
           syllabus: data.syllabus || [],
           other: data.other || [],
           customFields: [],
-        });
+        };
+        setDownloadsData(downloadsData);
+        setEditData({ ...downloadsData }); // Also update editData
       }
     } catch (error) {
       console.error("Error fetching downloads:", error);
@@ -54,7 +56,15 @@ const Downloads = () => {
   };
 
   const handleEditClick = () => {
-    setEditData({ ...downloadsData });
+    // Ensure all arrays are properly initialized
+    const dataToEdit = {
+      forms: downloadsData.forms || [],
+      brochures: downloadsData.brochures || [],
+      syllabus: downloadsData.syllabus || [],
+      other: downloadsData.other || [],
+      customFields: downloadsData.customFields || [],
+    };
+    setEditData(dataToEdit);
     setIsEditModalOpen(true);
   };
 
@@ -117,8 +127,12 @@ const Downloads = () => {
       }
 
       // Refresh data
-      await fetchDownloads();
+      setDownloadsData({ ...editData });
       setIsEditModalOpen(false);
+      // Refresh data from server after a brief delay
+      setTimeout(() => {
+        fetchDownloads();
+      }, 500);
     } catch (error) {
       console.error("Error saving downloads:", error);
       alert("Failed to save downloads. Please try again.");

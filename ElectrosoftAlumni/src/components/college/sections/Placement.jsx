@@ -36,6 +36,7 @@ const Placement = () => {
       const response = await apiService.getCollegePlacements();
       if (response.success) {
         setPlacementData(response.data);
+        setEditData({ ...response.data }); // Also update editData
       }
     } catch (error) {
       console.error("Error fetching placement data:", error);
@@ -46,7 +47,16 @@ const Placement = () => {
   };
 
   const handleEditClick = () => {
-    setEditData({ ...placementData });
+    // Ensure all arrays are properly initialized
+    const dataToEdit = {
+      ...placementData,
+      highlights: placementData.highlights || [],
+      internships: placementData.internships || [],
+      support: placementData.support || [],
+      topRecruiters: placementData.topRecruiters || [],
+      customFields: placementData.customFields || [],
+    };
+    setEditData(dataToEdit);
     setIsEditModalOpen(true);
   };
 
@@ -57,8 +67,10 @@ const Placement = () => {
       if (response.success) {
         setPlacementData({ ...editData });
         setIsEditModalOpen(false);
-        // Optionally refresh data
-        await fetchPlacementData();
+        // Refresh data to get server-side updates
+        setTimeout(() => {
+          fetchPlacementData();
+        }, 500);
       }
     } catch (error) {
       console.error("Error saving placement data:", error);

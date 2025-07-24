@@ -643,6 +643,483 @@ router.post(
   }
 );
 
+// ============= FACULTY SECTION =============
+
+// GET /api/colleges/faculty - Get faculty information for a college
+router.get("/faculty", authMiddleware, async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({
+      where: { id: req.user.id },
+      include: {
+        college_information_new: true,
+      },
+    });
+
+    if (!college) {
+      return res.status(404).json({
+        success: false,
+        message: "College not found",
+      });
+    }
+
+    // Get faculty data from custom_fields in college_information_new or create default
+    let facultyData = {
+      strength: [
+        "Experienced faculty members across all departments",
+        "Faculty with advanced qualifications",
+        "Regular faculty development programs",
+        "Active research collaborations",
+      ],
+      departments: [
+        "Computer Science & Engineering",
+        "Electronics & Communication",
+        "Mechanical Engineering",
+        "Civil Engineering",
+      ],
+      achievements: [
+        "Research papers published in international journals",
+        "Patents filed by faculty members",
+        "Industry collaborations with leading companies",
+        "Faculty recognition in conferences",
+      ],
+      statistics: {
+        totalFaculty: college.totalFaculty
+          ? college.totalFaculty.toString()
+          : "0",
+        phdFaculty: "70%",
+        facultyStudentRatio: "1:15",
+        researchGrants: "₹10 Cr",
+        publications: "100+",
+        patents: "25+",
+      },
+      customFields: [],
+    };
+
+    // If faculty data exists in custom_fields, use it
+    if (college.college_information_new?.custom_fields?.faculty) {
+      facultyData = college.college_information_new.custom_fields.faculty;
+    }
+
+    res.json({
+      success: true,
+      data: facultyData,
+    });
+  } catch (error) {
+    console.error("Error fetching faculty data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch faculty data",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/faculty - Save faculty information
+router.post("/faculty", authMiddleware, async (req, res) => {
+  try {
+    const { strength, departments, achievements, statistics, customFields } =
+      req.body;
+
+    const facultyData = {
+      strength: strength || [],
+      departments: departments || [],
+      achievements: achievements || [],
+      statistics: statistics || {},
+      customFields: customFields || [],
+    };
+
+    // First, ensure college_information_new record exists
+    let collegeInfo = await prisma.college_information_new.findUnique({
+      where: { college_id: req.user.id },
+    });
+
+    if (!collegeInfo) {
+      // Create new record
+      collegeInfo = await prisma.college_information_new.create({
+        data: {
+          college_id: req.user.id,
+          custom_fields: { faculty: facultyData },
+        },
+      });
+    } else {
+      // Update existing record
+      const updatedCustomFields = {
+        ...collegeInfo.custom_fields,
+        faculty: facultyData,
+      };
+
+      collegeInfo = await prisma.college_information_new.update({
+        where: { college_id: req.user.id },
+        data: {
+          custom_fields: updatedCustomFields,
+        },
+      });
+    }
+
+    // Also update totalFaculty in colleges table if provided in statistics
+    if (statistics.totalFaculty) {
+      const totalFaculty =
+        parseInt(statistics.totalFaculty.replace(/\D/g, "")) || null;
+      await prisma.college.update({
+        where: { id: req.user.id },
+        data: { totalFaculty },
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Faculty information saved successfully",
+      data: facultyData,
+    });
+  } catch (error) {
+    console.error("Error saving faculty data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to save faculty data",
+      error: error.message,
+    });
+  }
+});
+
+// PUT /api/colleges/faculty - Update faculty information
+router.put("/faculty", authMiddleware, async (req, res) => {
+  try {
+    const { strength, departments, achievements, statistics, customFields } =
+      req.body;
+
+    const facultyData = {
+      strength: strength || [],
+      departments: departments || [],
+      achievements: achievements || [],
+      statistics: statistics || {},
+      customFields: customFields || [],
+    };
+
+    // Ensure college_information_new record exists
+    let collegeInfo = await prisma.college_information_new.findUnique({
+      where: { college_id: req.user.id },
+    });
+
+    if (!collegeInfo) {
+      // Create new record if it doesn't exist
+      collegeInfo = await prisma.college_information_new.create({
+        data: {
+          college_id: req.user.id,
+          custom_fields: { faculty: facultyData },
+        },
+      });
+    } else {
+      // Update existing record
+      const updatedCustomFields = {
+        ...collegeInfo.custom_fields,
+        faculty: facultyData,
+      };
+
+      collegeInfo = await prisma.college_information_new.update({
+        where: { college_id: req.user.id },
+        data: {
+          custom_fields: updatedCustomFields,
+        },
+      });
+    }
+
+    // Also update totalFaculty in colleges table if provided in statistics
+    if (statistics.totalFaculty) {
+      const totalFaculty =
+        parseInt(statistics.totalFaculty.replace(/\D/g, "")) || null;
+      await prisma.college.update({
+        where: { id: req.user.id },
+        data: { totalFaculty },
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Faculty information updated successfully",
+      data: facultyData,
+    });
+  } catch (error) {
+    console.error("Error updating faculty data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update faculty data",
+      error: error.message,
+    });
+  }
+});
+
+// ============= DOWNLOADS SECTION =============
+
+// GET /api/colleges/downloads - Get all downloads for a college
+router.get("/downloads", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const downloads = await prisma.college_downloads.findMany({
+      where: { college_id: req.user.id },
+      orderBy: { created_at: "desc" },
+    });
+
+    // Group downloads by category
+    const groupedDownloads = downloads.reduce((acc, download) => {
+      const category = download.category.toLowerCase();
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push({
+        id: download.id,
+        name: download.title,
+        description: download.description,
+        fileSize: download.file_size,
+        format: download.file_type,
+        url: download.file_url,
+        uploadDate: download.created_at.toISOString().split("T")[0],
+        downloadCount: download.download_count,
+        isPublic: download.is_public,
+      });
+      return acc;
+    }, {});
+
+    res.json({
+      success: true,
+      data: groupedDownloads,
+    });
+  } catch (error) {
+    console.error("Error fetching downloads:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch downloads",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/downloads - Add a new download
+router.post(
+  "/downloads",
+  authMiddleware,
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      if (req.user.role !== "college") {
+        return res.status(403).json({
+          success: false,
+          message: "Only colleges can access this endpoint",
+        });
+      }
+
+      const {
+        title,
+        description,
+        category,
+        fileType,
+        fileSize,
+        fileUrl,
+        isPublic,
+      } = req.body;
+      let uploadedFileUrl = fileUrl;
+
+      // If a file was uploaded, use Cloudinary URL
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "college-downloads",
+          resource_type: "auto",
+        });
+        uploadedFileUrl = result.secure_url;
+      }
+
+      const newDownload = await prisma.college_downloads.create({
+        data: {
+          college_id: req.user.id,
+          title,
+          description,
+          file_type: fileType || "PDF",
+          category,
+          file_url: uploadedFileUrl,
+          file_size: fileSize,
+          is_public: isPublic !== undefined ? isPublic : true,
+        },
+      });
+
+      res.json({
+        success: true,
+        data: {
+          id: newDownload.id,
+          name: newDownload.title,
+          description: newDownload.description,
+          fileSize: newDownload.file_size,
+          format: newDownload.file_type,
+          url: newDownload.file_url,
+          uploadDate: newDownload.created_at.toISOString().split("T")[0],
+          downloadCount: newDownload.download_count,
+          isPublic: newDownload.is_public,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating download:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to create download",
+        error: error.message,
+      });
+    }
+  }
+);
+
+// PUT /api/colleges/downloads/:id - Update a download
+router.put("/downloads/:id", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const downloadId = parseInt(req.params.id);
+    const {
+      title,
+      description,
+      category,
+      fileType,
+      fileSize,
+      fileUrl,
+      isPublic,
+    } = req.body;
+
+    // Check if download belongs to the college
+    const existingDownload = await prisma.college_downloads.findFirst({
+      where: {
+        id: downloadId,
+        college_id: req.user.id,
+      },
+    });
+
+    if (!existingDownload) {
+      return res.status(404).json({
+        success: false,
+        message: "Download not found",
+      });
+    }
+
+    const updatedDownload = await prisma.college_downloads.update({
+      where: { id: downloadId },
+      data: {
+        title,
+        description,
+        file_type: fileType,
+        category,
+        file_url: fileUrl,
+        file_size: fileSize,
+        is_public: isPublic,
+        updated_at: new Date(),
+      },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        id: updatedDownload.id,
+        name: updatedDownload.title,
+        description: updatedDownload.description,
+        fileSize: updatedDownload.file_size,
+        format: updatedDownload.file_type,
+        url: updatedDownload.file_url,
+        uploadDate: updatedDownload.created_at.toISOString().split("T")[0],
+        downloadCount: updatedDownload.download_count,
+        isPublic: updatedDownload.is_public,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating download:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update download",
+      error: error.message,
+    });
+  }
+});
+
+// DELETE /api/colleges/downloads/:id - Delete a download
+router.delete("/downloads/:id", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "college") {
+      return res.status(403).json({
+        success: false,
+        message: "Only colleges can access this endpoint",
+      });
+    }
+
+    const downloadId = parseInt(req.params.id);
+
+    // Check if download belongs to the college
+    const existingDownload = await prisma.college_downloads.findFirst({
+      where: {
+        id: downloadId,
+        college_id: req.user.id,
+      },
+    });
+
+    if (!existingDownload) {
+      return res.status(404).json({
+        success: false,
+        message: "Download not found",
+      });
+    }
+
+    await prisma.college_downloads.delete({
+      where: { id: downloadId },
+    });
+
+    res.json({
+      success: true,
+      message: "Download deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting download:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete download",
+      error: error.message,
+    });
+  }
+});
+
+// POST /api/colleges/downloads/:id/increment - Increment download count
+router.post("/downloads/:id/increment", async (req, res) => {
+  try {
+    const downloadId = parseInt(req.params.id);
+
+    const updatedDownload = await prisma.college_downloads.update({
+      where: { id: downloadId },
+      data: {
+        download_count: {
+          increment: 1,
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        downloadCount: updatedDownload.download_count,
+      },
+    });
+  } catch (error) {
+    console.error("Error incrementing download count:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to increment download count",
+      error: error.message,
+    });
+  }
+});
+
 // GET /api/colleges/:id - Get college information (main endpoint)
 router.get("/:id", async (req, res) => {
   try {
@@ -1292,278 +1769,6 @@ router.delete("/:id/campuses/:campusId", auth, async (req, res) => {
       success: false,
       message: "Internal server error",
       error: process.env.NODE_ENV === "development" ? error.message : undefined,
-    });
-  }
-});
-
-// ============= DOWNLOADS SECTION =============
-
-// GET /api/colleges/downloads - Get all downloads for a college
-router.get("/downloads", authMiddleware, async (req, res) => {
-  try {
-    if (req.user.role !== "college") {
-      return res.status(403).json({
-        success: false,
-        message: "Only colleges can access this endpoint",
-      });
-    }
-
-    const downloads = await prisma.college_downloads.findMany({
-      where: { college_id: req.user.id },
-      orderBy: { created_at: "desc" },
-    });
-
-    // Group downloads by category
-    const groupedDownloads = downloads.reduce((acc, download) => {
-      const category = download.category.toLowerCase();
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push({
-        id: download.id,
-        name: download.title,
-        description: download.description,
-        fileSize: download.file_size,
-        format: download.file_type,
-        url: download.file_url,
-        uploadDate: download.created_at.toISOString().split("T")[0],
-        downloadCount: download.download_count,
-        isPublic: download.is_public,
-      });
-      return acc;
-    }, {});
-
-    res.json({
-      success: true,
-      data: groupedDownloads,
-    });
-  } catch (error) {
-    console.error("Error fetching downloads:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch downloads",
-      error: error.message,
-    });
-  }
-});
-
-// POST /api/colleges/downloads - Add a new download
-router.post(
-  "/downloads",
-  authMiddleware,
-  upload.single("file"),
-  async (req, res) => {
-    try {
-      if (req.user.role !== "college") {
-        return res.status(403).json({
-          success: false,
-          message: "Only colleges can access this endpoint",
-        });
-      }
-
-      const {
-        title,
-        description,
-        category,
-        fileType,
-        fileSize,
-        fileUrl,
-        isPublic,
-      } = req.body;
-      let uploadedFileUrl = fileUrl;
-
-      // If a file was uploaded, use Cloudinary URL
-      if (req.file) {
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          folder: "college-downloads",
-          resource_type: "auto",
-        });
-        uploadedFileUrl = result.secure_url;
-      }
-
-      const newDownload = await prisma.college_downloads.create({
-        data: {
-          college_id: req.user.id,
-          title,
-          description,
-          file_type: fileType || "PDF",
-          category,
-          file_url: uploadedFileUrl,
-          file_size: fileSize,
-          is_public: isPublic !== undefined ? isPublic : true,
-        },
-      });
-
-      res.json({
-        success: true,
-        data: {
-          id: newDownload.id,
-          name: newDownload.title,
-          description: newDownload.description,
-          fileSize: newDownload.file_size,
-          format: newDownload.file_type,
-          url: newDownload.file_url,
-          uploadDate: newDownload.created_at.toISOString().split("T")[0],
-          downloadCount: newDownload.download_count,
-          isPublic: newDownload.is_public,
-        },
-      });
-    } catch (error) {
-      console.error("Error creating download:", error);
-      res.status(500).json({
-        success: false,
-        message: "Failed to create download",
-        error: error.message,
-      });
-    }
-  }
-);
-
-// PUT /api/colleges/downloads/:id - Update a download
-router.put("/downloads/:id", authMiddleware, async (req, res) => {
-  try {
-    if (req.user.role !== "college") {
-      return res.status(403).json({
-        success: false,
-        message: "Only colleges can access this endpoint",
-      });
-    }
-
-    const downloadId = parseInt(req.params.id);
-    const {
-      title,
-      description,
-      category,
-      fileType,
-      fileSize,
-      fileUrl,
-      isPublic,
-    } = req.body;
-
-    // Check if download belongs to the college
-    const existingDownload = await prisma.college_downloads.findFirst({
-      where: {
-        id: downloadId,
-        college_id: req.user.id,
-      },
-    });
-
-    if (!existingDownload) {
-      return res.status(404).json({
-        success: false,
-        message: "Download not found",
-      });
-    }
-
-    const updatedDownload = await prisma.college_downloads.update({
-      where: { id: downloadId },
-      data: {
-        title,
-        description,
-        file_type: fileType,
-        category,
-        file_url: fileUrl,
-        file_size: fileSize,
-        is_public: isPublic,
-        updated_at: new Date(),
-      },
-    });
-
-    res.json({
-      success: true,
-      data: {
-        id: updatedDownload.id,
-        name: updatedDownload.title,
-        description: updatedDownload.description,
-        fileSize: updatedDownload.file_size,
-        format: updatedDownload.file_type,
-        url: updatedDownload.file_url,
-        uploadDate: updatedDownload.created_at.toISOString().split("T")[0],
-        downloadCount: updatedDownload.download_count,
-        isPublic: updatedDownload.is_public,
-      },
-    });
-  } catch (error) {
-    console.error("Error updating download:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update download",
-      error: error.message,
-    });
-  }
-});
-
-// DELETE /api/colleges/downloads/:id - Delete a download
-router.delete("/downloads/:id", authMiddleware, async (req, res) => {
-  try {
-    if (req.user.role !== "college") {
-      return res.status(403).json({
-        success: false,
-        message: "Only colleges can access this endpoint",
-      });
-    }
-
-    const downloadId = parseInt(req.params.id);
-
-    // Check if download belongs to the college
-    const existingDownload = await prisma.college_downloads.findFirst({
-      where: {
-        id: downloadId,
-        college_id: req.user.id,
-      },
-    });
-
-    if (!existingDownload) {
-      return res.status(404).json({
-        success: false,
-        message: "Download not found",
-      });
-    }
-
-    await prisma.college_downloads.delete({
-      where: { id: downloadId },
-    });
-
-    res.json({
-      success: true,
-      message: "Download deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error deleting download:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete download",
-      error: error.message,
-    });
-  }
-});
-
-// POST /api/colleges/downloads/:id/increment - Increment download count
-router.post("/downloads/:id/increment", async (req, res) => {
-  try {
-    const downloadId = parseInt(req.params.id);
-
-    const updatedDownload = await prisma.college_downloads.update({
-      where: { id: downloadId },
-      data: {
-        download_count: {
-          increment: 1,
-        },
-      },
-    });
-
-    res.json({
-      success: true,
-      data: {
-        downloadCount: updatedDownload.download_count,
-      },
-    });
-  } catch (error) {
-    console.error("Error incrementing download count:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to increment download count",
-      error: error.message,
     });
   }
 });

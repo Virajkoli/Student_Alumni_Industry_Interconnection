@@ -30,8 +30,15 @@ router.get('/programs', auth, collegeProfileController.getPrograms);
 router.post('/programs', auth, collegeProfileController.createProgram);
 
 router.get('/alumni', auth, collegeProfileController.getAlumni);
+router.put('/alumni', auth, collegeProfileController.updateAlumni);
+router.post('/alumni', auth, collegeProfileController.createAlumni);
+router.delete('/alumni/:alumniId', auth, collegeProfileController.deleteAlumni);
+
 router.get('/events', auth, collegeProfileController.getEvents);
 router.post('/events', auth, collegeProfileController.createEvent);
+router.put('/events', auth, collegeProfileController.updateEvents);
+router.put('/events/:eventId', auth, collegeProfileController.updateEvent);
+router.delete('/events/:eventId', auth, collegeProfileController.deleteEvent);
 
 router.get('/facilities', auth, collegeProfileController.getFacilities);
 router.get('/placements', auth, collegeProfileController.getPlacements);

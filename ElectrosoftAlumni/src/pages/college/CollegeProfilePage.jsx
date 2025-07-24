@@ -625,17 +625,11 @@ const CollegeProfilePage = () => {
         );
       case "events":
         return (
-          <Events
-            data={formData["events"]}
-            onEdit={() => openSectionForm("events")}
-          />
+          <Events />
         );
       case "alumni":
         return (
-          <Alumni
-            data={formData["alumni"]}
-            onEdit={() => openSectionForm("alumni")}
-          />
+          <Alumni />
         );
       case "review":
         return (

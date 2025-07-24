@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit, X, Plus, Minus } from "lucide-react";
+import apiService from "../../../services/apiService";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const Events = () => {
+  const { user } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [eventsData, setEventsData] = useState({
     annualEvents: [
@@ -42,14 +47,213 @@ const Events = () => {
 
   const [editData, setEditData] = useState({ ...eventsData });
 
+  // Load events data from backend
+  useEffect(() => {
+    const loadEventsData = async () => {
+      if (!user) {
+        console.log("⚠️ No user found, skipping events load");
+        setIsLoading(false);
+        return;
+      }
+
+      if (user.role !== "college") {
+        console.log(`⚠️ User role is '${user.role}', not 'college'. Skipping events load`);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        console.log("🎉 Loading college events data for user:", user.id, user.email);
+        console.log("🔗 API Base URL:", apiService.collegeAPI);
+        console.log("🔗 Making request to events endpoint...");
+        
+        const response = await apiService.collegeAPI.getEvents();
+
+        if (response.success && response.data && response.data.length > 0) {
+          console.log("✅ Events data loaded:", response.data);
+          
+          // Transform database data to frontend format
+          const transformedData = {
+            annualEvents: response.data
+              .filter(event => event.event_type === 'Annual' || event.event_type === 'Yearly')
+              .map(event => `${event.title} - ${event.description || 'Annual event'}`),
+            
+            techCulture: response.data
+              .filter(event => event.event_type === 'Technical' || event.event_type === 'Cultural')
+              .map(event => `${event.title} - ${event.description || 'Tech/Cultural event'}`),
+            
+            seminars: response.data
+              .filter(event => event.event_type === 'Seminar' || event.event_type === 'Workshop')
+              .map(event => `${event.title} - ${event.description || 'Educational seminar'}`),
+            
+            conferences: response.data
+              .filter(event => event.event_type === 'Conference' || event.event_type === 'Symposium')
+              .map(event => `${event.title} - ${event.description || 'Academic conference'}`),
+            
+            customFields: [],
+            dbEvents: response.data // Keep original db data for reference
+          };
+
+          // If no events match specific types, use defaults
+          if (transformedData.annualEvents.length === 0) {
+            transformedData.annualEvents = eventsData.annualEvents;
+          }
+          if (transformedData.techCulture.length === 0) {
+            transformedData.techCulture = eventsData.techCulture;
+          }
+          if (transformedData.seminars.length === 0) {
+            transformedData.seminars = eventsData.seminars;
+          }
+          if (transformedData.conferences.length === 0) {
+            transformedData.conferences = eventsData.conferences;
+          }
+
+          setEventsData(transformedData);
+          setEditData(transformedData);
+        } else {
+          console.log("📝 No events data found, using default data");
+          // Keep default data if no database data exists
+        }
+      } catch (error) {
+        console.error("❌ Error loading events data:", error);
+        console.error("❌ Error details:", {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+          code: error.code,
+          config: {
+            url: error.config?.url,
+            baseURL: error.config?.baseURL,
+            method: error.config?.method
+          }
+        });
+        
+        let errorMessage = "Failed to load events data. Using default information.";
+        
+        if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
+          errorMessage = "Network error: Unable to connect to the server. Please check your internet connection and ensure the backend server is running.";
+        } else if (error.message.includes("Failed to get college events")) {
+          errorMessage = "Unable to connect to the server. Please ensure you're logged in as a college user and try again.";
+        } else if (error.response?.status === 401) {
+          errorMessage = "Authentication failed. Please log in again.";
+        } else if (error.response?.status === 403) {
+          errorMessage = "Access denied. College privileges required.";
+        }
+        
+        setError(errorMessage);
+        // Keep default data on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEventsData();
+  }, [user]);
+
   const handleEditClick = () => {
     setEditData({ ...eventsData });
     setIsEditModalOpen(true);
   };
 
-  const handleSave = () => {
-    setEventsData({ ...editData });
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    if (!user || user.role !== "college") {
+      setError("Authentication required");
+      return;
+    }
+
+    try {
+      console.log("💾 Saving events data...", editData);
+
+      // Transform frontend data to database format
+      const dbEventsData = [
+        // Annual Events
+        ...editData.annualEvents.map((event, index) => {
+          const [title, description] = event.split(' - ');
+          return {
+            title: title || `Annual Event ${index + 1}`,
+            description: description || event,
+            event_type: 'Annual',
+            start_date: new Date().toISOString(),
+            end_date: null,
+            venue: 'College Campus',
+            organizer: 'College Administration',
+            registration_url: null,
+            image_url: null,
+            is_active: true
+          };
+        }),
+        
+        // Tech & Cultural Events
+        ...editData.techCulture.map((event, index) => {
+          const [title, description] = event.split(' - ');
+          return {
+            title: title || `Tech/Cultural Event ${index + 1}`,
+            description: description || event,
+            event_type: 'Technical',
+            start_date: new Date().toISOString(),
+            end_date: null,
+            venue: 'College Campus',
+            organizer: 'College Administration',
+            registration_url: null,
+            image_url: null,
+            is_active: true
+          };
+        }),
+        
+        // Seminars
+        ...editData.seminars.map((event, index) => {
+          const [title, description] = event.split(' - ');
+          return {
+            title: title || `Seminar ${index + 1}`,
+            description: description || event,
+            event_type: 'Seminar',
+            start_date: new Date().toISOString(),
+            end_date: null,
+            venue: 'College Campus',
+            organizer: 'College Administration',
+            registration_url: null,
+            image_url: null,
+            is_active: true
+          };
+        }),
+        
+        // Conferences
+        ...editData.conferences.map((event, index) => {
+          const [title, description] = event.split(' - ');
+          return {
+            title: title || `Conference ${index + 1}`,
+            description: description || event,
+            event_type: 'Conference',
+            start_date: new Date().toISOString(),
+            end_date: null,
+            venue: 'College Campus',
+            organizer: 'College Administration',
+            registration_url: null,
+            image_url: null,
+            is_active: true
+          };
+        })
+      ];
+
+      console.log("🔄 Transformed events data for database:", dbEventsData);
+
+      const response = await apiService.collegeAPI.updateEvents(dbEventsData);
+
+      if (response.success) {
+        console.log("✅ Events data saved successfully");
+        setEventsData({ ...editData });
+        setIsEditModalOpen(false);
+        setError(null);
+      } else {
+        throw new Error(response.message || "Failed to save");
+      }
+    } catch (error) {
+      console.error("❌ Error saving events data:", error);
+      setError("Failed to save events information. Please try again.");
+    }
   };
 
   const handleCancelEdit = () => {
@@ -147,91 +351,136 @@ const Events = () => {
 
   return (
     <>
-      <div className="p-8 max-w-4xl mx-auto">
-        {/* Events Section */}
-        <div className="bg-white rounded-lg mb-8">
-          {/* Header */}
-          <div className="flex items-center justify-between p-8 border-b border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-900">Events & Activities</h2>
-            <button
-              onClick={handleEditClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-              title="Edit events information"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="p-8">
-            {/* Annual Events */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Annual Events
-              </h3>
-              <div className="space-y-3">
-                {eventsData.annualEvents &&
-                  eventsData.annualEvents.map((event, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed text-base">{event}</p>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Tech & Cultural Events */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Tech & Cultural Events
-              </h3>
-              <div className="space-y-3">
-                {eventsData.techCulture &&
-                  eventsData.techCulture.map((event, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
-                        {index + 1}
-                      </div>
-                      <p className="text-gray-700 leading-relaxed pt-0.5 text-base">{event}</p>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Seminars & Workshops */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Seminars & Workshops
-              </h3>
-              <div className="space-y-3">
-                {eventsData.seminars &&
-                  eventsData.seminars.map((seminar, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed text-base">{seminar}</p>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Conferences */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Conferences
-              </h3>
-              <div className="space-y-3">
-                {eventsData.conferences &&
-                  eventsData.conferences.map((conference, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed text-base">{conference}</p>
-                    </div>
-                  ))}
+      {/* Loading State */}
+      {isLoading && (
+        <div className="p-8 max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg p-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+              <div className="space-y-4">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Error State */}
+      {error && !isLoading && (
+        <div className="p-8 max-w-4xl mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h3 className="text-red-800 font-semibold mb-2">Error Loading Events Data</h3>
+            <p className="text-red-700 mb-4">{error}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Retry
+              </button>
+              {error.includes("logged in") && (
+                <button
+                  onClick={() => window.location.href = '/auth/login'}
+                  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Go to Login
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      {!isLoading && (
+        <div className="p-8 max-w-4xl mx-auto">
+          {/* Events Section */}
+          <div className="bg-white rounded-lg mb-8">
+            {/* Header */}
+            <div className="flex items-center justify-between p-8 border-b border-gray-200">
+              <h2 className="text-2xl font-semibold text-gray-900">Events & Activities</h2>
+              <button
+                onClick={handleEditClick}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                title="Edit events information"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-8">
+              {/* Annual Events */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Annual Events
+                </h3>
+                <div className="space-y-3">
+                  {eventsData.annualEvents &&
+                    eventsData.annualEvents.map((event, index) => (
+                      <div key={index} className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                          {index + 1}
+                        </div>
+                        <p className="text-gray-700 leading-relaxed pt-0.5 text-base">{event}</p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Tech & Cultural Events */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Tech & Cultural Events
+                </h3>
+                <div className="space-y-3">
+                  {eventsData.techCulture &&
+                    eventsData.techCulture.map((event, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
+                        <p className="text-gray-700 leading-relaxed text-base">{event}</p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Seminars & Workshops */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Seminars & Workshops
+                </h3>
+                <div className="space-y-3">
+                  {eventsData.seminars &&
+                    eventsData.seminars.map((seminar, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0 mt-2"></div>
+                        <p className="text-gray-700 leading-relaxed text-base">{seminar}</p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Conferences */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Conferences & Symposiums
+                </h3>
+                <div className="space-y-3">
+                  {eventsData.conferences &&
+                    eventsData.conferences.map((conference, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0 mt-2"></div>
+                        <p className="text-gray-700 leading-relaxed text-base">{conference}</p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Modal */}
       {isEditModalOpen && (

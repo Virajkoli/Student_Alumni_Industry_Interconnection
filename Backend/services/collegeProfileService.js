@@ -416,6 +416,123 @@ class CollegeProfileService {
     }
   }
 
+  async updateCollegeEvents(collegeId, eventsData) {
+    try {
+      // Handle both array and object input
+      if (Array.isArray(eventsData)) {
+        // Bulk update: delete existing and create new
+        await prisma.college_events.deleteMany({
+          where: { college_id: collegeId }
+        });
+
+        const events = await Promise.all(
+          eventsData.map(eventData => 
+            prisma.college_events.create({
+              data: {
+                college_id: collegeId,
+                ...eventData
+              }
+            })
+          )
+        );
+        return events;
+      } else {
+        // Single event update
+        return await this.createCollegeEvent(collegeId, eventsData);
+      }
+    } catch (error) {
+      throw new Error(`Failed to update college events: ${error.message}`);
+    }
+  }
+
+  async updateCollegeEvent(eventId, collegeId, eventData) {
+    try {
+      const event = await prisma.college_events.update({
+        where: { 
+          id: eventId,
+          college_id: collegeId // Ensure the event belongs to this college
+        },
+        data: eventData
+      });
+      return event;
+    } catch (error) {
+      throw new Error(`Failed to update college event: ${error.message}`);
+    }
+  }
+
+  async deleteCollegeEvent(eventId, collegeId) {
+    try {
+      await prisma.college_events.delete({
+        where: { 
+          id: eventId,
+          college_id: collegeId // Ensure the event belongs to this college
+        }
+      });
+    } catch (error) {
+      throw new Error(`Failed to delete college event: ${error.message}`);
+    }
+  }
+
+  // =============================================
+  // COLLEGE ALUMNI (Updated with CRUD operations)
+  // =============================================
+  
+  async updateCollegeAlumni(collegeId, alumniData) {
+    try {
+      // Handle both array and object input
+      if (Array.isArray(alumniData)) {
+        // Bulk update: delete existing and create new
+        await prisma.college_alumni.deleteMany({
+          where: { college_id: collegeId }
+        });
+
+        const alumni = await Promise.all(
+          alumniData.map(alumniRecord => 
+            prisma.college_alumni.create({
+              data: {
+                college_id: collegeId,
+                ...alumniRecord
+              }
+            })
+          )
+        );
+        return alumni;
+      } else {
+        // Single alumni record update
+        return await this.createCollegeAlumni(collegeId, alumniData);
+      }
+    } catch (error) {
+      throw new Error(`Failed to update college alumni: ${error.message}`);
+    }
+  }
+
+  async createCollegeAlumni(collegeId, alumniData) {
+    try {
+      const alumni = await prisma.college_alumni.create({
+        data: {
+          college_id: collegeId,
+          ...alumniData
+        }
+      });
+      return alumni;
+    } catch (error) {
+      throw new Error(`Failed to create college alumni: ${error.message}`);
+    }
+  }
+
+  async deleteCollegeAlumni(alumniId, collegeId) {
+    try {
+      await prisma.college_alumni.delete({
+        where: { 
+          id: alumniId,
+          college_id: collegeId // Ensure the alumni belongs to this college
+        }
+      });
+    } catch (error) {
+      throw new Error(`Failed to delete college alumni: ${error.message}`);
+    }
+  }
+
   // =============================================
   // COLLEGE FACILITIES
   // =============================================

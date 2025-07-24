@@ -2121,11 +2121,78 @@ class ApiService {
   // College Alumni methods
   async getCollegeAlumni() {
     try {
-      const response = await this.api.get("/colleges/alumni");
+      const response = await this.api.get("/college-profile/alumni");
       return response.data;
     } catch (error) {
       throw new Error(
         error.response?.data?.message || "Failed to fetch college alumni"
+      );
+    }
+  }
+
+  async updateCollegeAlumni(alumniData) {
+    try {
+      const response = await this.api.put("/college-profile/alumni", alumniData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college alumni"
+      );
+    }
+  }
+
+  async createCollegeAlumni(alumniData) {
+    try {
+      const response = await this.api.post("/college-profile/alumni", alumniData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create college alumni"
+      );
+    }
+  }
+
+  async deleteCollegeAlumni(alumniId) {
+    try {
+      const response = await this.api.delete(`/college-profile/alumni/${alumniId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete college alumni"
+      );
+    }
+  }
+
+  // College Events methods (enhanced)
+  async updateCollegeEvents(eventsData) {
+    try {
+      const response = await this.api.put("/college-profile/events", eventsData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college events"
+      );
+    }
+  }
+
+  async updateCollegeEvent(eventId, eventData) {
+    try {
+      const response = await this.api.put(`/college-profile/events/${eventId}`, eventData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college event"
+      );
+    }
+  }
+
+  async deleteCollegeEvent(eventId) {
+    try {
+      const response = await this.api.delete(`/college-profile/events/${eventId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete college event"
       );
     }
   }
@@ -2597,8 +2664,51 @@ const collegeAPI = {
     return apiService.getCollegeAlumni();
   },
 
+  async updateAlumni(alumniData) {
+    return apiService.updateCollegeAlumni(alumniData);
+  },
+
+  async createAlumni(alumniData) {
+    return apiService.createCollegeAlumni(alumniData);
+  },
+
+  async deleteAlumni(alumniId) {
+    return apiService.deleteCollegeAlumni(alumniId);
+  },
+
   async getEvents() {
-    return apiService.getCollegeEvents();
+    try {
+      const endpoint = "/college-profile/events";
+      const response = await apiService.api.get(endpoint);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college events"
+      );
+    }
+  },
+
+  async updateEvents(eventsData) {
+    return apiService.updateCollegeEvents(eventsData);
+  },
+
+  async createEvent(eventData) {
+    try {
+      const response = await apiService.api.post("/college-profile/events", eventData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to create college event"
+      );
+    }
+  },
+
+  async updateEvent(eventId, eventData) {
+    return apiService.updateCollegeEvent(eventId, eventData);
+  },
+
+  async deleteEvent(eventId) {
+    return apiService.deleteCollegeEvent(eventId);
   },
 
   async getFacilities() {

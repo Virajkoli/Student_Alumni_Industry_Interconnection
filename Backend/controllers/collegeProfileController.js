@@ -389,6 +389,132 @@ class CollegeProfileController {
     }
   }
 
+  async updateEvents(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const eventsData = req.body;
+      
+      const updatedEvents = await collegeProfileService.updateCollegeEvents(collegeId, eventsData);
+      
+      res.json({
+        success: true,
+        data: updatedEvents,
+        message: 'Events updated successfully'
+      });
+    } catch (error) {
+      console.error('Update events error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update events'
+      });
+    }
+  }
+
+  async updateEvent(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const eventId = parseInt(req.params.eventId);
+      const eventData = req.body;
+      
+      const updatedEvent = await collegeProfileService.updateCollegeEvent(eventId, collegeId, eventData);
+      
+      res.json({
+        success: true,
+        data: updatedEvent,
+        message: 'Event updated successfully'
+      });
+    } catch (error) {
+      console.error('Update event error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update event'
+      });
+    }
+  }
+
+  async deleteEvent(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const eventId = parseInt(req.params.eventId);
+      
+      await collegeProfileService.deleteCollegeEvent(eventId, collegeId);
+      
+      res.json({
+        success: true,
+        message: 'Event deleted successfully'
+      });
+    } catch (error) {
+      console.error('Delete event error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to delete event'
+      });
+    }
+  }
+
+  // Alumni methods
+  async updateAlumni(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const alumniData = req.body;
+      
+      const updatedAlumni = await collegeProfileService.updateCollegeAlumni(collegeId, alumniData);
+      
+      res.json({
+        success: true,
+        data: updatedAlumni,
+        message: 'Alumni updated successfully'
+      });
+    } catch (error) {
+      console.error('Update alumni error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update alumni'
+      });
+    }
+  }
+
+  async createAlumni(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const alumniData = req.body;
+      
+      const newAlumni = await collegeProfileService.createCollegeAlumni(collegeId, alumniData);
+      
+      res.status(201).json({
+        success: true,
+        data: newAlumni,
+        message: 'Alumni created successfully'
+      });
+    } catch (error) {
+      console.error('Create alumni error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to create alumni'
+      });
+    }
+  }
+
+  async deleteAlumni(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const alumniId = parseInt(req.params.alumniId);
+      
+      await collegeProfileService.deleteCollegeAlumni(alumniId, collegeId);
+      
+      res.json({
+        success: true,
+        message: 'Alumni deleted successfully'
+      });
+    } catch (error) {
+      console.error('Delete alumni error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to delete alumni'
+      });
+    }
+  }
+
   // Facilities
   async getFacilities(req, res) {
     try {

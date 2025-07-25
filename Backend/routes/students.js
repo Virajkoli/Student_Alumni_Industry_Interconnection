@@ -134,9 +134,29 @@ const getStudentProfile = async (req, res) => {
   try {
     console.log("Fetching complete profile for student ID:", req.user.id);
 
-    // Get main student info
-    const student = await Student.findByPk(req.user.id, {
-      attributes: { exclude: ["password"] },
+    // Get main student info using Prisma
+    const student = await prisma.student.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        contactNo: true,
+        collegeName: true,
+        interestedField: true,
+        otherField: true,
+        profilePicture: true,
+        coverPicture: true,
+        headline: true,
+        location: true,
+        isActive: true,
+        isEmailVerified: true,
+        lastLogin: true,
+        loginCount: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!student) {
@@ -146,10 +166,10 @@ const getStudentProfile = async (req, res) => {
       });
     }
 
-    // Get all profile sections
+    // Get all profile sections using Prisma
     const [
       about,
-      experience,
+      experiences,
       education,
       skills,
       courses,
@@ -157,61 +177,61 @@ const getStudentProfile = async (req, res) => {
       projects,
       recommendations,
     ] = await Promise.all([
-      StudentAbout.findOne({ where: { student_id: req.user.id } }),
-      StudentExperience.findAll({
+      prisma.student_about.findFirst({ where: { student_id: req.user.id } }),
+      prisma.student_experience.findMany({
         where: { student_id: req.user.id },
-        order: [["start_date", "DESC"]],
+        orderBy: { start_date: "desc" },
       }),
-      StudentEducation.findAll({
+      prisma.student_education.findMany({
         where: { student_id: req.user.id },
-        order: [["end_year", "DESC"]],
+        orderBy: { end_year: "desc" },
       }),
-      StudentSkills.findAll({
+      prisma.student_skills.findMany({
         where: { student_id: req.user.id },
-        order: [["skill_name", "ASC"]],
+        orderBy: { skill_name: "asc" },
       }),
-      StudentCourses.findAll({
+      prisma.student_courses.findMany({
         where: { student_id: req.user.id },
-        order: [["completion_date", "DESC"]],
+        orderBy: { completion_date: "desc" },
       }),
-      StudentCertifications.findAll({
+      prisma.student_certifications.findMany({
         where: { student_id: req.user.id },
-        order: [["issue_date", "DESC"]],
+        orderBy: { issue_date: "desc" },
       }),
-      StudentProjects.findAll({
+      prisma.student_projects.findMany({
         where: { student_id: req.user.id },
-        order: [["start_date", "DESC"]],
+        orderBy: { start_date: "desc" },
       }),
-      StudentRecommendations.findAll({
+      prisma.student_recommendations.findMany({
         where: { student_id: req.user.id },
-        order: [["id", "DESC"]],
+        orderBy: { id: "desc" },
       }),
     ]);
 
     res.json({
       success: true,
       data: {
-        basicInfo: {
-          id: student.id,
-          first_name: student.first_name,
-          last_name: student.last_name,
-          email: student.email,
-          contact_no: student.contact_no,
-          college_name: student.college_name,
-          interested_field: student.interested_field,
-          other_field: student.other_field,
-          profile_picture: student.profile_picture,
-          cover_picture: student.cover_picture,
-          created_at: student.created_at,
-        },
-        about: about?.summary || null,
-        experience: experience || [],
+        id: student.id,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        email: student.email,
+        contactNo: student.contactNo,
+        collegeName: student.collegeName,
+        interestedField: student.interestedField,
+        otherField: student.otherField,
+        profilePicture: student.profilePicture,
+        coverPicture: student.coverPicture,
+        headline: student.headline,
+        location: student.location,
+        about: about?.summary || "",
+        experiences: experiences || [],
         education: education || [],
         skills: skills || [],
         courses: courses || [],
         certifications: certifications || [],
         projects: projects || [],
         recommendations: recommendations || [],
+        createdAt: student.createdAt,
       },
     });
   } catch (error) {
@@ -237,7 +257,10 @@ const updateBasicInfo = async (req, res) => {
       other_field,
     } = req.body;
 
-    const student = await Student.findByPk(req.user.id);
+    const student = await prisma.student.findUnique({
+      where: { id: req.user.id },
+    });
+
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -245,26 +268,30 @@ const updateBasicInfo = async (req, res) => {
       });
     }
 
-    await student.update({
-      first_name,
-      last_name,
-      contact_no,
-      college_name,
-      interested_field,
-      other_field: interested_field === "Other" ? other_field : null,
+    const updatedStudent = await prisma.student.update({
+      where: { id: req.user.id },
+      data: {
+        firstName: first_name,
+        lastName: last_name,
+        contactNo: contact_no,
+        collegeName: college_name,
+        interestedField: interested_field,
+        otherField: interested_field === "Other" ? other_field : null,
+        updatedAt: new Date(),
+      },
     });
 
     res.json({
       success: true,
       message: "Basic info updated successfully",
       data: {
-        id: student.id,
-        first_name: student.first_name,
-        last_name: student.last_name,
-        contact_no: student.contact_no,
-        college_name: student.college_name,
-        interested_field: student.interested_field,
-        other_field: student.other_field,
+        id: updatedStudent.id,
+        firstName: updatedStudent.firstName,
+        lastName: updatedStudent.lastName,
+        contactNo: updatedStudent.contactNo,
+        collegeName: updatedStudent.collegeName,
+        interestedField: updatedStudent.interestedField,
+        otherField: updatedStudent.otherField,
       },
     });
   } catch (error) {
@@ -283,18 +310,14 @@ const updateAbout = async (req, res) => {
   try {
     const { summary } = req.body;
 
-    let about = await StudentAbout.findOne({
+    const about = await prisma.student_about.upsert({
       where: { student_id: req.user.id },
-    });
-
-    if (about) {
-      await about.update({ summary });
-    } else {
-      about = await StudentAbout.create({
+      update: { summary },
+      create: {
         student_id: req.user.id,
         summary,
-      });
-    }
+      },
+    });
 
     res.json({
       success: true,
@@ -1085,7 +1108,10 @@ const uploadProfileImage = async (req, res) => {
 
     const profile_picture = uploadResult.secure_url;
 
-    const student = await Student.findByPk(req.user.id);
+    const student = await prisma.student.findUnique({
+      where: { id: req.user.id },
+    });
+
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -1093,7 +1119,10 @@ const uploadProfileImage = async (req, res) => {
       });
     }
 
-    await student.update({ profile_picture });
+    await prisma.student.update({
+      where: { id: req.user.id },
+      data: { profilePicture: profile_picture },
+    });
 
     res.json({
       success: true,
@@ -1134,7 +1163,10 @@ const uploadCoverImage = async (req, res) => {
 
     const cover_picture = uploadResult.secure_url;
 
-    const student = await Student.findByPk(req.user.id);
+    const student = await prisma.student.findUnique({
+      where: { id: req.user.id },
+    });
+
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -1142,7 +1174,10 @@ const uploadCoverImage = async (req, res) => {
       });
     }
 
-    await student.update({ cover_picture });
+    await prisma.student.update({
+      where: { id: req.user.id },
+      data: { coverPicture: cover_picture },
+    });
 
     res.json({
       success: true,
@@ -1165,9 +1200,40 @@ const getStudentById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Get main student info
-    const student = await Student.findByPk(id, {
-      attributes: { exclude: ["password"] },
+    // Validate ID parameter
+    const studentId = parseInt(id);
+    if (isNaN(studentId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid student ID",
+      });
+    }
+
+    // Get main student info using Prisma
+    const student = await prisma.student.findUnique({
+      where: {
+        id: studentId,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        contactNo: true,
+        collegeName: true,
+        interestedField: true,
+        otherField: true,
+        profilePicture: true,
+        coverPicture: true,
+        headline: true,
+        location: true,
+        isActive: true,
+        isEmailVerified: true,
+        lastLogin: true,
+        loginCount: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!student) {
@@ -1177,10 +1243,10 @@ const getStudentById = async (req, res) => {
       });
     }
 
-    // Get all profile sections
+    // Get all profile sections using Prisma
     const [
       about,
-      experience,
+      experiences,
       education,
       skills,
       courses,
@@ -1188,34 +1254,36 @@ const getStudentById = async (req, res) => {
       projects,
       recommendations,
     ] = await Promise.all([
-      StudentAbout.findOne({ where: { student_id: id } }),
-      StudentExperience.findAll({
-        where: { student_id: id },
-        order: [["created_at", "DESC"]],
+      prisma.student_about.findFirst({
+        where: { student_id: studentId },
       }),
-      StudentEducation.findAll({
-        where: { student_id: id },
-        order: [["created_at", "DESC"]],
+      prisma.student_experience.findMany({
+        where: { student_id: studentId },
+        orderBy: { start_date: "desc" },
       }),
-      StudentSkills.findAll({
-        where: { student_id: id },
-        order: [["created_at", "DESC"]],
+      prisma.student_education.findMany({
+        where: { student_id: studentId },
+        orderBy: { end_year: "desc" },
       }),
-      StudentCourses.findAll({
-        where: { student_id: id },
-        order: [["created_at", "DESC"]],
+      prisma.student_skills.findMany({
+        where: { student_id: studentId },
+        orderBy: { skill_name: "asc" },
       }),
-      StudentCertifications.findAll({
-        where: { student_id: id },
-        order: [["created_at", "DESC"]],
+      prisma.student_courses.findMany({
+        where: { student_id: studentId },
+        orderBy: { completion_date: "desc" },
       }),
-      StudentProjects.findAll({
-        where: { student_id: id },
-        order: [["created_at", "DESC"]],
+      prisma.student_certifications.findMany({
+        where: { student_id: studentId },
+        orderBy: { issue_date: "desc" },
       }),
-      StudentRecommendations.findAll({
-        where: { student_id: id },
-        order: [["created_at", "DESC"]],
+      prisma.student_projects.findMany({
+        where: { student_id: studentId },
+        orderBy: { start_date: "desc" },
+      }),
+      prisma.student_recommendations.findMany({
+        where: { student_id: studentId },
+        orderBy: { id: "desc" },
       }),
     ]);
 
@@ -1223,24 +1291,26 @@ const getStudentById = async (req, res) => {
       success: true,
       data: {
         id: student.id,
-        firstName: student.first_name,
-        lastName: student.last_name,
+        firstName: student.firstName,
+        lastName: student.lastName,
         email: student.email,
-        contactNo: student.contact_no,
-        collegeName: student.college_name,
-        interestedField: student.interested_field,
-        otherField: student.other_field,
-        profilePicture: student.profile_picture,
-        coverPicture: student.cover_picture,
+        contactNo: student.contactNo,
+        collegeName: student.collegeName,
+        interestedField: student.interestedField,
+        otherField: student.otherField,
+        profilePicture: student.profilePicture,
+        coverPicture: student.coverPicture,
+        headline: student.headline,
+        location: student.location,
         about: about?.summary || "",
-        experience: experience || [],
+        experiences: experiences || [],
         education: education || [],
         skills: skills || [],
         courses: courses || [],
         certifications: certifications || [],
         projects: projects || [],
         recommendations: recommendations || [],
-        createdAt: student.created_at,
+        createdAt: student.createdAt,
       },
     });
   } catch (error) {
@@ -1267,8 +1337,21 @@ const getStudentAdditionalInfo = async (req, res) => {
       });
     }
 
-    const student = await Student.findByPk(id, {
-      attributes: { exclude: ["password"] },
+    const student = await prisma.student.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        contactNo: true,
+        collegeName: true,
+        interestedField: true,
+        otherField: true,
+        profilePicture: true,
+        coverPicture: true,
+        createdAt: true,
+      },
     });
 
     if (!student) {
@@ -1282,16 +1365,16 @@ const getStudentAdditionalInfo = async (req, res) => {
       success: true,
       data: {
         id: student.id,
-        first_name: student.first_name,
-        last_name: student.last_name,
+        firstName: student.firstName,
+        lastName: student.lastName,
         email: student.email,
-        contact_no: student.contact_no,
-        college_name: student.college_name,
-        interested_field: student.interested_field,
-        other_field: student.other_field,
-        profile_picture: student.profile_picture,
-        cover_picture: student.cover_picture,
-        created_at: student.created_at,
+        contactNo: student.contactNo,
+        collegeName: student.collegeName,
+        interestedField: student.interestedField,
+        otherField: student.otherField,
+        profilePicture: student.profilePicture,
+        coverPicture: student.coverPicture,
+        createdAt: student.createdAt,
       },
     });
   } catch (error) {
@@ -1327,7 +1410,10 @@ const updateStudentAdditionalInfo = async (req, res) => {
       other_field,
     } = req.body;
 
-    const student = await Student.findByPk(id);
+    const student = await prisma.student.findUnique({
+      where: { id: parseInt(id) },
+    });
+
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -1335,26 +1421,30 @@ const updateStudentAdditionalInfo = async (req, res) => {
       });
     }
 
-    await student.update({
-      first_name,
-      last_name,
-      contact_no,
-      college_name,
-      interested_field,
-      other_field: interested_field === "Other" ? other_field : null,
+    const updatedStudent = await prisma.student.update({
+      where: { id: parseInt(id) },
+      data: {
+        firstName: first_name,
+        lastName: last_name,
+        contactNo: contact_no,
+        collegeName: college_name,
+        interestedField: interested_field,
+        otherField: interested_field === "Other" ? other_field : null,
+        updatedAt: new Date(),
+      },
     });
 
     res.json({
       success: true,
       message: "Additional info updated successfully",
       data: {
-        id: student.id,
-        first_name: student.first_name,
-        last_name: student.last_name,
-        contact_no: student.contact_no,
-        college_name: student.college_name,
-        interested_field: student.interested_field,
-        other_field: student.other_field,
+        id: updatedStudent.id,
+        firstName: updatedStudent.firstName,
+        lastName: updatedStudent.lastName,
+        contactNo: updatedStudent.contactNo,
+        collegeName: updatedStudent.collegeName,
+        interestedField: updatedStudent.interestedField,
+        otherField: updatedStudent.otherField,
       },
     });
   } catch (error) {
@@ -1366,59 +1456,18 @@ const updateStudentAdditionalInfo = async (req, res) => {
   }
 };
 
-// Routes
-router.get("/profile", auth, getStudentProfile);
-router.get("/:id", auth, getStudentById);
-router.get("/:id/additional-info", auth, getStudentAdditionalInfo);
-router.put("/:id/additional-info", auth, updateStudentAdditionalInfo);
-router.put("/basic-info", auth, updateBasicInfo);
-router.put("/about", auth, updateAbout);
-router.post("/experience", auth, addExperience);
-router.put("/experience/:id", auth, updateExperience);
-router.delete("/experience/:id", auth, deleteExperience);
-router.post("/projects", auth, addProject);
-router.put("/projects/:id", auth, updateProject);
-router.delete("/projects/:id", auth, deleteProject);
-router.post("/education", auth, addEducation);
-router.put("/education/:id", auth, updateEducation);
-router.delete("/education/:id", auth, deleteEducation);
-router.post("/skills", auth, addSkill);
-router.put("/skills/:id", auth, updateSkill);
-router.delete("/skills/:id", auth, deleteSkill);
-router.post("/courses", auth, addCourse);
-router.put("/courses/:id", auth, updateCourse);
-router.delete("/courses/:id", auth, deleteCourse);
-router.post("/certifications", auth, addCertification);
-router.put("/certifications/:id", auth, updateCertification);
-router.delete("/certifications/:id", auth, deleteCertification);
-router.post("/recommendations", auth, addRecommendation);
-router.put("/recommendations/:id", auth, updateRecommendation);
-router.delete("/recommendations/:id", auth, deleteRecommendation);
-router.post(
-  "/profile-image",
-  auth,
-  upload.single("profile_picture"),
-  uploadProfileImage
-);
-router.post(
-  "/cover-image",
-  auth,
-  upload.single("cover_picture"),
-  uploadCoverImage
-);
-
 // ===================================
-// PING/CONNECTION ROUTES - Must come before any generic /:id routes!
+// PING/CONNECTION ROUTES
 // ===================================
-
-// POST /api/students/ping/:studentId - Send ping request to student
 router.post("/ping/:studentId", authMiddleware, async (req, res) => {
   try {
     const { studentId } = req.params;
     const senderId = req.user.id;
     const senderType = req.user.role;
 
-    console.log(`Ping request: User ${senderId} (${senderType}) -> Student ${studentId}`);
+    console.log(
+      `Ping request: User ${senderId} (${senderType}) -> Student ${studentId}`
+    );
 
     // Validate student exists
     const student = await prisma.student.findUnique({
@@ -1444,7 +1493,9 @@ router.post("/ping/:studentId", authMiddleware, async (req, res) => {
     });
 
     if (existingPing) {
-      console.log(`Ping already exists: ${existingPing.id}, status: ${existingPing.status}`);
+      console.log(
+        `Ping already exists: ${existingPing.id}, status: ${existingPing.status}`
+      );
       return res.status(400).json({
         success: false,
         message: "Connection request already exists",
@@ -1482,8 +1533,10 @@ router.post("/ping/:studentId", authMiddleware, async (req, res) => {
 // GET /api/students/ping-requests - Get ping requests for current student
 router.get("/ping-requests", authMiddleware, async (req, res) => {
   try {
-    console.log(`Fetching ping requests for user: ${req.user.id}, role: ${req.user.role}`);
-    
+    console.log(
+      `Fetching ping requests for user: ${req.user.id}, role: ${req.user.role}`
+    );
+
     if (req.user.role !== "student") {
       console.log(`Access denied: User role is ${req.user.role}, not student`);
       return res.status(403).json({
@@ -1503,15 +1556,19 @@ router.get("/ping-requests", authMiddleware, async (req, res) => {
       },
     });
 
-    console.log(`Found ${pingRequests.length} ping requests for student ${req.user.id}`);
+    console.log(
+      `Found ${pingRequests.length} ping requests for student ${req.user.id}`
+    );
 
     // Manually fetch sender details based on profile type
     const enrichedRequests = await Promise.all(
       pingRequests.map(async (request) => {
         let sender = null;
-        
-        console.log(`Processing request ${request.id} from ${request.sender_profile_type} ${request.sender_profile_id}`);
-        
+
+        console.log(
+          `Processing request ${request.id} from ${request.sender_profile_type} ${request.sender_profile_id}`
+        );
+
         if (request.sender_profile_type === "student") {
           sender = await prisma.student.findUnique({
             where: { id: request.sender_profile_id },
@@ -1560,9 +1617,9 @@ router.get("/ping-requests", authMiddleware, async (req, res) => {
             sender.profilePicture = sender.logoUrl;
           }
         }
-        
+
         console.log(`Sender details for request ${request.id}:`, sender);
-        
+
         return {
           ...request,
           sender,
@@ -1607,7 +1664,10 @@ router.put("/ping/:requestId/accept", authMiddleware, async (req, res) => {
     }
 
     // Verify the current user is the receiver
-    if (pingRequest.receiver_profile_id !== studentId || pingRequest.receiver_profile_type !== "student") {
+    if (
+      pingRequest.receiver_profile_id !== studentId ||
+      pingRequest.receiver_profile_type !== "student"
+    ) {
       return res.status(403).json({
         success: false,
         message: "You can only accept ping requests sent to you",
@@ -1658,7 +1718,10 @@ router.put("/ping/:requestId/decline", authMiddleware, async (req, res) => {
     }
 
     // Verify the current user is the receiver
-    if (pingRequest.receiver_profile_id !== studentId || pingRequest.receiver_profile_type !== "student") {
+    if (
+      pingRequest.receiver_profile_id !== studentId ||
+      pingRequest.receiver_profile_type !== "student"
+    ) {
       return res.status(403).json({
         success: false,
         message: "You can only decline ping requests sent to you",
@@ -1688,44 +1751,148 @@ router.put("/ping/:requestId/decline", authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/students/connection-count/:studentId? - Get connection count for student
-router.get("/connection-count/:studentId?", authMiddleware, async (req, res) => {
+// GET /api/students/ping-status/:studentId - Check ping status between current user and student
+router.get("/ping-status/:studentId", authMiddleware, async (req, res) => {
   try {
-    const studentId = req.params.studentId ? parseInt(req.params.studentId) : req.user.id;
-    
-    console.log(`Fetching connection count for student: ${studentId}, requested by: ${req.user.id} (${req.user.role})`);
+    const { studentId } = req.params;
+    const currentUserId = req.user.id;
+    const currentUserType = req.user.role;
 
-    const connectionCount = await prisma.ping_networks.count({
+    console.log(
+      `Checking ping status between ${currentUserId} (${currentUserType}) and student ${studentId}`
+    );
+
+    // Check if ping exists in either direction
+    const ping = await prisma.ping_networks.findFirst({
       where: {
         OR: [
           {
-            sender_profile_id: studentId,
-            sender_profile_type: "student",
-            status: "accepted",
+            sender_profile_id: currentUserId,
+            sender_profile_type: currentUserType,
+            receiver_profile_id: parseInt(studentId),
+            receiver_profile_type: "student",
           },
           {
-            receiver_profile_id: studentId,
-            receiver_profile_type: "student", 
-            status: "accepted",
+            sender_profile_id: parseInt(studentId),
+            sender_profile_type: "student",
+            receiver_profile_id: currentUserId,
+            receiver_profile_type: currentUserType,
           },
         ],
       },
     });
 
-    console.log(`Connection count for student ${studentId}: ${connectionCount}`);
-
     res.json({
       success: true,
-      count: connectionCount,
+      status: ping?.status || "none",
     });
   } catch (error) {
-    console.error("Error fetching connection count:", error);
+    console.error("Error checking ping status:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch connection count",
+      message: "Failed to check ping status",
       error: error.message,
     });
   }
 });
+
+// GET /api/students/connection-count/:studentId? - Get connection count for student
+router.get(
+  "/connection-count/:studentId?",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const studentId = req.params.studentId
+        ? parseInt(req.params.studentId)
+        : req.user.id;
+
+      console.log(
+        `Fetching connection count for student: ${studentId}, requested by: ${req.user.id} (${req.user.role})`
+      );
+
+      // Validate studentId
+      if (!studentId || isNaN(studentId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid student ID",
+        });
+      }
+
+      const connectionCount = await prisma.ping_networks.count({
+        where: {
+          OR: [
+            {
+              sender_profile_id: studentId,
+              sender_profile_type: "student",
+              status: "accepted",
+            },
+            {
+              receiver_profile_id: studentId,
+              receiver_profile_type: "student",
+              status: "accepted",
+            },
+          ],
+        },
+      });
+
+      console.log(
+        `Connection count for student ${studentId}: ${connectionCount}`
+      );
+
+      res.json({
+        success: true,
+        count: connectionCount,
+      });
+    } catch (error) {
+      console.error("Error fetching connection count:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch connection count",
+        error: error.message,
+      });
+    }
+  }
+);
+
+// Routes
+router.get("/profile", auth, getStudentProfile);
+router.get("/:id", auth, getStudentById);
+router.get("/:id/additional-info", auth, getStudentAdditionalInfo);
+router.put("/:id/additional-info", auth, updateStudentAdditionalInfo);
+router.put("/basic-info", auth, updateBasicInfo);
+router.put("/about", auth, updateAbout);
+router.post("/experience", auth, addExperience);
+router.put("/experience/:id", auth, updateExperience);
+router.delete("/experience/:id", auth, deleteExperience);
+router.post("/projects", auth, addProject);
+router.put("/projects/:id", auth, updateProject);
+router.delete("/projects/:id", auth, deleteProject);
+router.post("/education", auth, addEducation);
+router.put("/education/:id", auth, updateEducation);
+router.delete("/education/:id", auth, deleteEducation);
+router.post("/skills", auth, addSkill);
+router.put("/skills/:id", auth, updateSkill);
+router.delete("/skills/:id", auth, deleteSkill);
+router.post("/courses", auth, addCourse);
+router.put("/courses/:id", auth, updateCourse);
+router.delete("/courses/:id", auth, deleteCourse);
+router.post("/certifications", auth, addCertification);
+router.put("/certifications/:id", auth, updateCertification);
+router.delete("/certifications/:id", auth, deleteCertification);
+router.post("/recommendations", auth, addRecommendation);
+router.put("/recommendations/:id", auth, updateRecommendation);
+router.delete("/recommendations/:id", auth, deleteRecommendation);
+router.post(
+  "/profile-image",
+  auth,
+  upload.single("profile_picture"),
+  uploadProfileImage
+);
+router.post(
+  "/cover-image",
+  auth,
+  upload.single("cover_picture"),
+  uploadCoverImage
+);
 
 module.exports = router;

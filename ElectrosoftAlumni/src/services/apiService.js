@@ -1725,7 +1725,7 @@ class ApiService {
 
   // File upload methods
   async uploadProfileImage(formData) {
-    if (!formData || !formData.has("profileImage")) {
+    if (!formData || !formData.has("profile_picture")) {
       throw new Error("No file uploaded");
     }
     return this.api.post("/students/profile-image", formData, {
@@ -1736,7 +1736,7 @@ class ApiService {
   }
 
   async uploadCoverImage(formData) {
-    if (!formData || !formData.has("coverImage")) {
+    if (!formData || !formData.has("cover_picture")) {
       throw new Error("No file uploaded");
     }
     return this.api.post("/students/cover-image", formData, {
@@ -2132,7 +2132,10 @@ class ApiService {
 
   async updateCollegeAlumni(alumniData) {
     try {
-      const response = await this.api.put("/college-profile/alumni", alumniData);
+      const response = await this.api.put(
+        "/college-profile/alumni",
+        alumniData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -2143,7 +2146,10 @@ class ApiService {
 
   async createCollegeAlumni(alumniData) {
     try {
-      const response = await this.api.post("/college-profile/alumni", alumniData);
+      const response = await this.api.post(
+        "/college-profile/alumni",
+        alumniData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -2154,7 +2160,9 @@ class ApiService {
 
   async deleteCollegeAlumni(alumniId) {
     try {
-      const response = await this.api.delete(`/college-profile/alumni/${alumniId}`);
+      const response = await this.api.delete(
+        `/college-profile/alumni/${alumniId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -2166,7 +2174,10 @@ class ApiService {
   // College Events methods (enhanced)
   async updateCollegeEvents(eventsData) {
     try {
-      const response = await this.api.put("/college-profile/events", eventsData);
+      const response = await this.api.put(
+        "/college-profile/events",
+        eventsData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -2177,7 +2188,10 @@ class ApiService {
 
   async updateCollegeEvent(eventId, eventData) {
     try {
-      const response = await this.api.put(`/college-profile/events/${eventId}`, eventData);
+      const response = await this.api.put(
+        `/college-profile/events/${eventId}`,
+        eventData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -2188,7 +2202,9 @@ class ApiService {
 
   async deleteCollegeEvent(eventId) {
     try {
-      const response = await this.api.delete(`/college-profile/events/${eventId}`);
+      const response = await this.api.delete(
+        `/college-profile/events/${eventId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -2694,7 +2710,10 @@ const collegeAPI = {
 
   async createEvent(eventData) {
     try {
-      const response = await apiService.api.post("/college-profile/events", eventData);
+      const response = await apiService.api.post(
+        "/college-profile/events",
+        eventData
+      );
       return response.data;
     } catch (error) {
       throw new Error(

@@ -52,6 +52,14 @@ app.options(
       "https://electrosoft-alumni.vercel.app", // Additional frontend URL
       "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
       "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
+      "https://n55tb9bt-5000.inc1.devtunnels.ms/",
+      "https://n55tb9bt-5173.inc1.devtunnels.ms/",
+      "http://192.168.31.202:5173",
+      "http://192.168.31.202:5000",
+      // Allow requests with no origin (like mobile apps or curl requests)
+
+      // Allow requests with no origin (like mobile apps or curl requests)
+
       /^https:\/\/.*\.vercel\.app$/, // Allow all Vercel subdomains
       process.env.FRONTEND_URL, // Environment variable for production
     ].filter(Boolean), // Remove any undefined values
@@ -91,6 +99,10 @@ app.use(
         "https://electrosoft-alumni.vercel.app", // Additional frontend URL
         "https://laughing-barnacle-wpvgwprrrg9fv4rw-5173.app.github.dev",
         "https://laughing-barnacle-wpvgwprrrg9fv4rw-5174.app.github.dev",
+        "https://n55tb9bt-5000.inc1.devtunnels.ms",
+        "https://n55tb9bt-5173.inc1.devtunnels.ms",
+        "http://192.168.31.202:5173",
+        "http://192.168.31.202:5000",
         process.env.FRONTEND_URL, // Environment variable for production
       ].filter(Boolean);
 

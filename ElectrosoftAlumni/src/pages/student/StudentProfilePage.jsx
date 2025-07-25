@@ -120,6 +120,8 @@ const StudentProfilePage = () => {
           interested_field: data.interestedField || data.interested_field || "",
           other_field: data.otherField || data.other_field || "",
           about: data.about?.summary || data.about || "",
+          profilePicture: data.profile_picture || data.profilePicture,
+          coverPicture: data.cover_picture || data.coverPicture,
         };
 
         setProfileData(mappedData);
@@ -202,7 +204,7 @@ const StudentProfilePage = () => {
       console.log("💾 Updating profile data:", updatedProfileData);
 
       // Map frontend data back to backend structure
-      const basicInfoData = {
+      const profileUpdatePayload = {
         first_name: updatedProfileData.firstName,
         last_name: updatedProfileData.lastName,
         contact_no: updatedProfileData.contact_no,
@@ -211,10 +213,12 @@ const StudentProfilePage = () => {
         interested_field:
           updatedProfileData.interested_field || updatedProfileData.headline,
         other_field: updatedProfileData.other_field,
+        profile_picture: updatedProfileData.profilePicture, // Add this
+        cover_picture: updatedProfileData.coverPicture, // Add this
       };
 
       // Update basic info
-      await apiService.updateStudentProfile(basicInfoData);
+      await apiService.updateStudentProfile(profileUpdatePayload);
 
       // Update about section specifically if it exists
       if (updatedProfileData.about !== undefined) {
@@ -226,6 +230,8 @@ const StudentProfilePage = () => {
 
       // Update local state
       setProfileData(updatedProfileData);
+      // No, we should refetch instead of just setting local state
+      await fetchProfileData();
 
       console.log("✅ Profile updated successfully");
     } catch (error) {
@@ -375,6 +381,7 @@ const StudentProfilePage = () => {
               <StudentProfileHeader
                 profileData={profileData}
                 onProfileUpdate={isOwner ? handleProfileUpdate : null}
+                onDataRefresh={isOwner ? fetchProfileData : null}
                 onNavigationChange={handleNavigationChange}
                 customNavigations={customNavigations}
                 onCustomNavigationUpdate={isOwner ? setCustomNavigations : null}

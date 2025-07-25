@@ -1064,8 +1064,8 @@ class ApiService {
   // College Information methods
   async getCollegeInformation(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/information/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/information/${collegeId}`
         : "/college-profile/information";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1078,28 +1078,39 @@ class ApiService {
 
   async updateCollegeInformation(collegeId, informationData) {
     try {
-      console.log('🔄 API: Updating college information...');
-      console.log('Arguments length:', arguments.length);
-      
+      console.log("🔄 API: Updating college information...");
+      console.log("Arguments length:", arguments.length);
+
       // If only one parameter is passed, treat it as informationData
       if (arguments.length === 1) {
         informationData = collegeId;
-        console.log('📤 Sending data:', informationData);
-        const response = await this.api.put("/college-profile/information", informationData);
-        console.log('✅ API Response:', response.status, response.data);
+        console.log("📤 Sending data:", informationData);
+        const response = await this.api.put(
+          "/college-profile/information",
+          informationData
+        );
+        console.log("✅ API Response:", response.status, response.data);
         return response.data;
       } else {
         // If two parameters, include collegeId in the data or use appropriate endpoint
-        console.log('📤 Sending data for college', collegeId, ':', informationData);
-        const response = await this.api.put("/college-profile/information", informationData);
-        console.log('✅ API Response:', response.status, response.data);
+        console.log(
+          "📤 Sending data for college",
+          collegeId,
+          ":",
+          informationData
+        );
+        const response = await this.api.put(
+          "/college-profile/information",
+          informationData
+        );
+        console.log("✅ API Response:", response.status, response.data);
         return response.data;
       }
     } catch (error) {
-      console.error('❌ API Error:', error);
-      console.error('Error response:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      
+      console.error("❌ API Error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+
       // Try to get a meaningful error message
       let errorMessage = "Failed to update college information";
       if (error.response?.data?.message) {
@@ -1109,7 +1120,7 @@ class ApiService {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       throw new Error(errorMessage);
     }
   }
@@ -1117,8 +1128,8 @@ class ApiService {
   // College Sections methods
   async getCollegeAbout(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/about/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/about/${collegeId}`
         : "/college-profile/about";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1142,8 +1153,8 @@ class ApiService {
 
   async getCollegeDepartments(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/departments/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/departments/${collegeId}`
         : "/college-profile/departments";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1156,8 +1167,8 @@ class ApiService {
 
   async getCollegeFaculty(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/faculty/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/faculty/${collegeId}`
         : "/college-profile/faculty";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1170,8 +1181,8 @@ class ApiService {
 
   async getCollegePrograms(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/programs/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/programs/${collegeId}`
         : "/college-profile/programs";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1184,8 +1195,8 @@ class ApiService {
 
   async getCollegeAlumni(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/alumni/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/alumni/${collegeId}`
         : "/college-profile/alumni";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1198,8 +1209,8 @@ class ApiService {
 
   async getCollegeEvents(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/events/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/events/${collegeId}`
         : "/college-profile/events";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1212,8 +1223,8 @@ class ApiService {
 
   async getCollegeFacilities(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/facilities/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/facilities/${collegeId}`
         : "/college-profile/facilities";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1226,8 +1237,8 @@ class ApiService {
 
   async getCollegePlacements(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/placements/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/placements/${collegeId}`
         : "/college-profile/placements";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1240,8 +1251,8 @@ class ApiService {
 
   async getCollegeRankings(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/rankings/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/rankings/${collegeId}`
         : "/college-profile/rankings";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1254,8 +1265,8 @@ class ApiService {
 
   async getCollegeAdmissions(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/admissions/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/admissions/${collegeId}`
         : "/college-profile/admissions";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1269,8 +1280,8 @@ class ApiService {
   // College Campuses methods
   async getCollegeCampuses(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/campuses/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/campuses/${collegeId}`
         : "/college-profile/campuses";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1283,7 +1294,10 @@ class ApiService {
 
   async createCollegeCampus(campusData) {
     try {
-      const response = await this.api.post("/college-profile/campuses", campusData);
+      const response = await this.api.post(
+        "/college-profile/campuses",
+        campusData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1294,7 +1308,10 @@ class ApiService {
 
   async updateCollegeCampus(campusId, campusData) {
     try {
-      const response = await this.api.put(`/college-profile/campuses/${campusId}`, campusData);
+      const response = await this.api.put(
+        `/college-profile/campuses/${campusId}`,
+        campusData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1307,7 +1324,7 @@ class ApiService {
     try {
       // If it's an array of campuses, handle bulk update
       if (Array.isArray(campusesData)) {
-        const promises = campusesData.map(campus => {
+        const promises = campusesData.map((campus) => {
           if (campus.id) {
             return this.updateCollegeCampus(campus.id, campus);
           } else {
@@ -1318,7 +1335,10 @@ class ApiService {
         return { success: true, data: results };
       } else {
         // Single campus update
-        const response = await this.api.put("/college-profile/campuses", campusesData);
+        const response = await this.api.put(
+          "/college-profile/campuses",
+          campusesData
+        );
         return response.data;
       }
     } catch (error) {
@@ -1330,7 +1350,9 @@ class ApiService {
 
   async deleteCollegeCampus(campusId) {
     try {
-      const response = await this.api.delete(`/college-profile/campuses/${campusId}`);
+      const response = await this.api.delete(
+        `/college-profile/campuses/${campusId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1342,7 +1364,10 @@ class ApiService {
   // Campus Map Location methods
   async updateCampusLocation(campusId, locationData) {
     try {
-      const response = await this.api.put(`/college-profile/campuses/${campusId}/location`, locationData);
+      const response = await this.api.put(
+        `/college-profile/campuses/${campusId}/location`,
+        locationData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1353,7 +1378,9 @@ class ApiService {
 
   async getCampusesWithLocations() {
     try {
-      const response = await this.api.get("/college-profile/campuses/locations");
+      const response = await this.api.get(
+        "/college-profile/campuses/locations"
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1364,7 +1391,9 @@ class ApiService {
 
   async getCampusesMap(collegeId) {
     try {
-      const response = await this.api.get(`/college-profile/campuses/map/${collegeId}`);
+      const response = await this.api.get(
+        `/college-profile/campuses/map/${collegeId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1376,7 +1405,7 @@ class ApiService {
   // =============================================
   // NEW COLLEGE PROFILE SECTIONS
   // =============================================
-  
+
   // College Information (New)
   async getCollegeInformationNew() {
     try {
@@ -1391,7 +1420,10 @@ class ApiService {
 
   async updateCollegeInformationNew(informationData) {
     try {
-      const response = await this.api.put("/college-profile/information-new", informationData);
+      const response = await this.api.put(
+        "/college-profile/information-new",
+        informationData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1414,7 +1446,10 @@ class ApiService {
 
   async createCollegeAdmission(admissionData) {
     try {
-      const response = await this.api.post("/college-profile/admissions-new", admissionData);
+      const response = await this.api.post(
+        "/college-profile/admissions-new",
+        admissionData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1425,7 +1460,10 @@ class ApiService {
 
   async updateCollegeAdmissions(admissionsData) {
     try {
-      const response = await this.api.put("/college-profile/admissions-new", admissionsData);
+      const response = await this.api.put(
+        "/college-profile/admissions-new",
+        admissionsData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1436,7 +1474,10 @@ class ApiService {
 
   async updateCollegeAdmission(admissionId, admissionData) {
     try {
-      const response = await this.api.put(`/college-profile/admissions-new/${admissionId}`, admissionData);
+      const response = await this.api.put(
+        `/college-profile/admissions-new/${admissionId}`,
+        admissionData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1447,7 +1488,9 @@ class ApiService {
 
   async deleteCollegeAdmission(admissionId) {
     try {
-      const response = await this.api.delete(`/college-profile/admissions-new/${admissionId}`);
+      const response = await this.api.delete(
+        `/college-profile/admissions-new/${admissionId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1459,7 +1502,9 @@ class ApiService {
   // College Infrastructure (New)
   async getCollegeInfrastructureNew() {
     try {
-      const response = await this.api.get("/college-profile/infrastructure-new");
+      const response = await this.api.get(
+        "/college-profile/infrastructure-new"
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1470,11 +1515,15 @@ class ApiService {
 
   async updateCollegeInfrastructure(infrastructureData) {
     try {
-      const response = await this.api.put("/college-profile/infrastructure-new", infrastructureData);
+      const response = await this.api.put(
+        "/college-profile/infrastructure-new",
+        infrastructureData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to update college infrastructure"
+        error.response?.data?.message ||
+          "Failed to update college infrastructure"
       );
     }
   }
@@ -1493,7 +1542,10 @@ class ApiService {
 
   async updateCollegeContact(contactData) {
     try {
-      const response = await this.api.put("/college-profile/contact-new", contactData);
+      const response = await this.api.put(
+        "/college-profile/contact-new",
+        contactData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1519,7 +1571,10 @@ class ApiService {
 
   async createCollegeAcademic(academicData) {
     try {
-      const response = await this.api.post("/college-profile/academics", academicData);
+      const response = await this.api.post(
+        "/college-profile/academics",
+        academicData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1530,7 +1585,10 @@ class ApiService {
 
   async updateCollegeAcademics(academicsData) {
     try {
-      const response = await this.api.put("/college-profile/academics", academicsData);
+      const response = await this.api.put(
+        "/college-profile/academics",
+        academicsData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1541,7 +1599,9 @@ class ApiService {
 
   async deleteCollegeAcademic(academicId) {
     try {
-      const response = await this.api.delete(`/college-profile/academics/${academicId}`);
+      const response = await this.api.delete(
+        `/college-profile/academics/${academicId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1553,8 +1613,8 @@ class ApiService {
   // College Fees
   async getCollegeFees(collegeId = null) {
     try {
-      const endpoint = collegeId 
-        ? `/college-profile/fees/${collegeId}` 
+      const endpoint = collegeId
+        ? `/college-profile/fees/${collegeId}`
         : "/college-profile/fees";
       const response = await this.api.get(endpoint);
       return response.data;
@@ -1620,9 +1680,13 @@ class ApiService {
       const response = await this.api.get("/industries/me");
       return response.data;
     } catch (error) {
-      console.error("API Error in getCurrentIndustryProfile:", error.response?.data);
+      console.error(
+        "API Error in getCurrentIndustryProfile:",
+        error.response?.data
+      );
       throw new Error(
-        error.response?.data?.message || "Failed to get current industry profile. Make sure you're logged in as an industry."
+        error.response?.data?.message ||
+          "Failed to get current industry profile. Make sure you're logged in as an industry."
       );
     }
   }
@@ -1740,7 +1804,9 @@ class ApiService {
 
   async rejectPingRequest(requestId) {
     try {
-      const response = await this.api.put(`/students/ping/${requestId}/decline`);
+      const response = await this.api.put(
+        `/students/ping/${requestId}/decline`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1762,7 +1828,7 @@ class ApiService {
 
   async getConnectionCount(studentId = null) {
     try {
-      const endpoint = studentId 
+      const endpoint = studentId
         ? `/students/connection-count/${studentId}`
         : `/students/connection-count`;
       const response = await this.api.get(endpoint);
@@ -1789,7 +1855,7 @@ class ApiService {
   getRoleProfilePage(role, userId = null) {
     const rolePages = {
       student: userId ? `/student/profile/${userId}` : "/student/profile",
-      college: userId ? `/college/profile/${userId}` : "/college/profile", 
+      college: userId ? `/college/profile/${userId}` : "/college/profile",
       startup: userId ? `/startup/profile/${userId}` : "/startup/profile",
       industry: userId ? `/industry/profile/${userId}` : "/industry/profile",
     };
@@ -1829,7 +1895,8 @@ class ApiService {
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to send ping request to college"
+        error.response?.data?.message ||
+          "Failed to send ping request to college"
       );
     }
   }
@@ -1884,7 +1951,8 @@ class ApiService {
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to fetch college connection count"
+        error.response?.data?.message ||
+          "Failed to fetch college connection count"
       );
     }
   }
@@ -1928,7 +1996,10 @@ class ApiService {
 
   async updateCollegeProgram(programId, programData) {
     try {
-      const response = await this.api.put(`/colleges/programs/${programId}`, programData);
+      const response = await this.api.put(
+        `/colleges/programs/${programId}`,
+        programData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
@@ -1983,13 +2054,66 @@ class ApiService {
     }
   }
 
-  async addCollegeFaculty(facultyData) {
+  async saveCollegeFaculty(facultyData) {
     try {
       const response = await this.api.post("/colleges/faculty", facultyData);
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to add college faculty"
+        error.response?.data?.message || "Failed to save college faculty"
+      );
+    }
+  }
+
+  async updateCollegeFaculty(facultyData) {
+    try {
+      const response = await this.api.put("/colleges/faculty", facultyData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college faculty"
+      );
+    }
+  }
+
+  // Individual Faculty Member methods
+  async addFacultyMember(memberData) {
+    try {
+      const response = await this.api.post(
+        "/colleges/faculty/member",
+        memberData
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to add faculty member"
+      );
+    }
+  }
+
+  async updateFacultyMember(memberId, memberData) {
+    try {
+      const response = await this.api.put(
+        `/colleges/faculty/member/${memberId}`,
+        memberData
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update faculty member"
+      );
+    }
+  }
+
+  async deleteFacultyMember(memberId) {
+    try {
+      const response = await this.api.delete(
+        `/colleges/faculty/member/${memberId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete faculty member"
       );
     }
   }
@@ -2087,11 +2211,127 @@ class ApiService {
 
   async addCollegePlacement(placementData) {
     try {
-      const response = await this.api.post("/colleges/placements", placementData);
+      const response = await this.api.post(
+        "/colleges/placements",
+        placementData
+      );
       return response.data;
     } catch (error) {
       throw new Error(
         error.response?.data?.message || "Failed to add college placement"
+      );
+    }
+  }
+
+  async savePlacementData(placementData) {
+    try {
+      const response = await this.api.post(
+        "/colleges/placements",
+        placementData
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to save placement data"
+      );
+    }
+  }
+
+  async uploadCompanyLogo(file) {
+    try {
+      const formData = new FormData();
+      formData.append("logo", file);
+
+      const response = await this.api.post(
+        "/colleges/placements/upload-logo",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to upload company logo"
+      );
+    }
+  }
+
+  // College Downloads methods
+  async getCollegeDownloads() {
+    try {
+      const response = await this.api.get("/colleges/downloads");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch college downloads"
+      );
+    }
+  }
+
+  async addCollegeDownload(downloadData) {
+    try {
+      // If downloadData is FormData, send as is, otherwise as JSON
+      const response = await this.api.post(
+        "/colleges/downloads",
+        downloadData,
+        {
+          headers:
+            downloadData instanceof FormData
+              ? {
+                  "Content-Type": "multipart/form-data",
+                }
+              : {
+                  "Content-Type": "application/json",
+                },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to add college download"
+      );
+    }
+  }
+
+  async updateCollegeDownload(downloadId, downloadData) {
+    try {
+      const response = await this.api.put(
+        `/colleges/downloads/${downloadId}`,
+        downloadData
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college download"
+      );
+    }
+  }
+
+  async deleteCollegeDownload(downloadId) {
+    try {
+      const response = await this.api.delete(
+        `/colleges/downloads/${downloadId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete college download"
+      );
+    }
+  }
+
+  async incrementDownloadCount(downloadId) {
+    try {
+      const response = await this.api.post(
+        `/colleges/downloads/${downloadId}/increment`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to increment download count"
       );
     }
   }
@@ -2126,7 +2366,8 @@ class ApiService {
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to send ping request to industry"
+        error.response?.data?.message ||
+          "Failed to send ping request to industry"
       );
     }
   }
@@ -2137,29 +2378,36 @@ class ApiService {
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to fetch industry ping requests"
+        error.response?.data?.message ||
+          "Failed to fetch industry ping requests"
       );
     }
   }
 
   async acceptIndustryPingRequest(requestId) {
     try {
-      const response = await this.api.put(`/industries/ping/${requestId}/accept`);
+      const response = await this.api.put(
+        `/industries/ping/${requestId}/accept`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to accept industry ping request"
+        error.response?.data?.message ||
+          "Failed to accept industry ping request"
       );
     }
   }
 
   async rejectIndustryPingRequest(requestId) {
     try {
-      const response = await this.api.put(`/industries/ping/${requestId}/reject`);
+      const response = await this.api.put(
+        `/industries/ping/${requestId}/reject`
+      );
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to reject industry ping request"
+        error.response?.data?.message ||
+          "Failed to reject industry ping request"
       );
     }
   }
@@ -2177,21 +2425,24 @@ class ApiService {
 
   async getIndustryConnectionCount(industryId = null) {
     try {
-      const url = industryId 
+      const url = industryId
         ? `/industries/connections/count?industryId=${industryId}`
         : "/industries/connections/count";
       const response = await this.api.get(url);
       return response.data;
     } catch (error) {
       throw new Error(
-        error.response?.data?.message || "Failed to fetch industry connection count"
+        error.response?.data?.message ||
+          "Failed to fetch industry connection count"
       );
     }
   }
 
   async checkIndustryPingStatus(industryId) {
     try {
-      const response = await this.api.get(`/industries/ping-status/${industryId}`);
+      const response = await this.api.get(
+        `/industries/ping-status/${industryId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error(

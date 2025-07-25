@@ -259,10 +259,7 @@ class AuthService {
         if (model) {
           const foundUser = await model.findFirst({
             where: {
-              OR: [
-                { email: email },
-                { googleId: finalGoogleId },
-              ],
+              OR: [{ email: email }, { googleId: finalGoogleId }],
             },
           });
 
@@ -275,7 +272,13 @@ class AuthService {
       }
 
       if (!user) {
-        throw new Error("User not found. Please register with Google first.");
+        // Auto-register the user as a student (default role) if they don't exist
+        console.log("User not found, auto-registering as student...");
+        const registrationResult = await this.registerWithGoogle(
+          userData,
+          "student"
+        );
+        return registrationResult;
       }
 
       // Check if this is actually a Google OAuth user
@@ -436,16 +439,15 @@ class AuthService {
       const finalGoogleId = googleId || id;
 
       if (!email || !finalGoogleId) {
-        throw new Error("Email and Google ID are required for Google registration");
+        throw new Error(
+          "Email and Google ID are required for Google registration"
+        );
       }
 
       // Check if user already exists
       const existingUser = await model.findFirst({
         where: {
-          OR: [
-            { email: userData.email },
-            { googleId: finalGoogleId },
-          ],
+          OR: [{ email: userData.email }, { googleId: finalGoogleId }],
         },
       });
 
@@ -455,7 +457,10 @@ class AuthService {
           where: { id: existingUser.id },
           data: {
             googleId: finalGoogleId,
-            profilePicture: userData.imageUrl || userData.profilePicture || userData.profile_picture,
+            profilePicture:
+              userData.imageUrl ||
+              userData.profilePicture ||
+              userData.profile_picture,
             lastLogin: new Date(),
             loginCount: { increment: 1 },
           },
@@ -476,7 +481,10 @@ class AuthService {
         email: userData.email,
         password: "", // Empty password for OAuth users
         googleId: finalGoogleId,
-        profilePicture: userData.imageUrl || userData.profilePicture || userData.profile_picture,
+        profilePicture:
+          userData.imageUrl ||
+          userData.profilePicture ||
+          userData.profile_picture,
         isEmailVerified: true, // Google emails are verified
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -484,8 +492,14 @@ class AuthService {
 
       // Add role-specific fields
       if (role === "student") {
-        userToCreate.firstName = userData.firstName || userData.first_name || userData.name?.split(' ')[0];
-        userToCreate.lastName = userData.lastName || userData.last_name || userData.name?.split(' ').slice(1).join(' ');
+        userToCreate.firstName =
+          userData.firstName ||
+          userData.first_name ||
+          userData.name?.split(" ")[0];
+        userToCreate.lastName =
+          userData.lastName ||
+          userData.last_name ||
+          userData.name?.split(" ").slice(1).join(" ");
         userToCreate.contactNo = userData.contactNo || userData.contact_no;
         userToCreate.collegeName =
           userData.collegeName ||
@@ -535,8 +549,14 @@ class AuthService {
           ? parseInt(userToCreate.totalFaculty)
           : null;
       } else if (role === "startup") {
-        userToCreate.firstName = userData.firstName || userData.first_name || userData.name?.split(' ')[0];
-        userToCreate.lastName = userData.lastName || userData.last_name || userData.name?.split(' ').slice(1).join(' ');
+        userToCreate.firstName =
+          userData.firstName ||
+          userData.first_name ||
+          userData.name?.split(" ")[0];
+        userToCreate.lastName =
+          userData.lastName ||
+          userData.last_name ||
+          userData.name?.split(" ").slice(1).join(" ");
         userToCreate.startupName =
           userData.startupName || userData.startup_name;
         userToCreate.startupStage =
@@ -549,8 +569,14 @@ class AuthService {
         userToCreate.website = userData.website;
         userToCreate.contactNo = userData.contactNo || userData.contact_no;
       } else if (role === "industry") {
-        userToCreate.firstName = userData.firstName || userData.first_name || userData.name?.split(' ')[0];
-        userToCreate.lastName = userData.lastName || userData.last_name || userData.name?.split(' ').slice(1).join(' ');
+        userToCreate.firstName =
+          userData.firstName ||
+          userData.first_name ||
+          userData.name?.split(" ")[0];
+        userToCreate.lastName =
+          userData.lastName ||
+          userData.last_name ||
+          userData.name?.split(" ").slice(1).join(" ");
         userToCreate.companyName =
           userData.companyName || userData.company_name;
         userToCreate.industryType =

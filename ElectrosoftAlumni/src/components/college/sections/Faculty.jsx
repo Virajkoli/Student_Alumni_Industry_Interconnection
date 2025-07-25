@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit, X, Plus, Minus } from "lucide-react";
+import apiService from "../../../services/apiService";
 
 const Faculty = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const [facultyData, setFacultyData] = useState({
     strength: [
@@ -49,14 +52,67 @@ const Faculty = () => {
 
   const [editData, setEditData] = useState({ ...facultyData });
 
+  // Fetch faculty data on component mount
+  useEffect(() => {
+    fetchFacultyData();
+  }, []);
+
+  const fetchFacultyData = async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.getCollegeFaculty();
+      if (response.success) {
+        const data = response.data;
+        setFacultyData(data);
+        setEditData({ ...data });
+      }
+    } catch (error) {
+      console.error("Error fetching faculty data:", error);
+      // Keep default data if fetch fails
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEditClick = () => {
-    setEditData({ ...facultyData });
+    const editDataWithArrays = {
+      ...facultyData,
+      strength: Array.isArray(facultyData.strength)
+        ? [...facultyData.strength]
+        : [],
+      departments: Array.isArray(facultyData.departments)
+        ? [...facultyData.departments]
+        : [],
+      achievements: Array.isArray(facultyData.achievements)
+        ? [...facultyData.achievements]
+        : [],
+      customFields: Array.isArray(facultyData.customFields)
+        ? [...facultyData.customFields]
+        : [],
+      statistics: facultyData.statistics || {},
+    };
+    setEditData(editDataWithArrays);
     setIsEditModalOpen(true);
   };
 
-  const handleSave = () => {
-    setFacultyData(editData);
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const response = await apiService.saveCollegeFaculty(editData);
+      if (response.success) {
+        setFacultyData(editData);
+        setIsEditModalOpen(false);
+        // Optionally refresh data from server
+        setTimeout(() => {
+          fetchFacultyData();
+        }, 100);
+      }
+    } catch (error) {
+      console.error("Error saving faculty data:", error);
+      alert("Failed to save faculty data. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -66,58 +122,85 @@ const Faculty = () => {
 
   // Strength handlers
   const handleStrengthChange = (index, value) => {
-    const newStrength = [...editData.strength];
+    const currentStrength = Array.isArray(editData.strength)
+      ? editData.strength
+      : [];
+    const newStrength = [...currentStrength];
     newStrength[index] = value;
     setEditData({ ...editData, strength: newStrength });
   };
 
   const handleAddStrength = () => {
+    const currentStrength = Array.isArray(editData.strength)
+      ? editData.strength
+      : [];
     setEditData({
       ...editData,
-      strength: [...editData.strength, ""],
+      strength: [...currentStrength, ""],
     });
   };
 
   const handleRemoveStrength = (index) => {
-    const newStrength = editData.strength.filter((_, i) => i !== index);
+    const currentStrength = Array.isArray(editData.strength)
+      ? editData.strength
+      : [];
+    const newStrength = currentStrength.filter((_, i) => i !== index);
     setEditData({ ...editData, strength: newStrength });
   };
 
   // Departments handlers
   const handleDepartmentChange = (index, value) => {
-    const newDepartments = [...editData.departments];
+    const currentDepartments = Array.isArray(editData.departments)
+      ? editData.departments
+      : [];
+    const newDepartments = [...currentDepartments];
     newDepartments[index] = value;
     setEditData({ ...editData, departments: newDepartments });
   };
 
   const handleAddDepartment = () => {
+    const currentDepartments = Array.isArray(editData.departments)
+      ? editData.departments
+      : [];
     setEditData({
       ...editData,
-      departments: [...editData.departments, ""],
+      departments: [...currentDepartments, ""],
     });
   };
 
   const handleRemoveDepartment = (index) => {
-    const newDepartments = editData.departments.filter((_, i) => i !== index);
+    const currentDepartments = Array.isArray(editData.departments)
+      ? editData.departments
+      : [];
+    const newDepartments = currentDepartments.filter((_, i) => i !== index);
     setEditData({ ...editData, departments: newDepartments });
   };
 
   // Achievements handlers
   const handleAchievementChange = (index, value) => {
-    const newAchievements = [...editData.achievements];
+    const currentAchievements = Array.isArray(editData.achievements)
+      ? editData.achievements
+      : [];
+    const newAchievements = [...currentAchievements];
     newAchievements[index] = value;
     setEditData({ ...editData, achievements: newAchievements });
   };
 
   const handleAddAchievement = () => {
+    const currentAchievements = Array.isArray(editData.achievements)
+      ? editData.achievements
+      : [];
     setEditData({
       ...editData,
-      achievements: [...editData.achievements, ""],
+      achievements: [...currentAchievements, ""],
     });
   };
 
   const handleRemoveAchievement = (index) => {
-    const newAchievements = editData.achievements.filter((_, i) => i !== index);
+    const currentAchievements = Array.isArray(editData.achievements)
+      ? editData.achievements
+      : [];
+    const newAchievements = currentAchievements.filter((_, i) => i !== index);
     setEditData({ ...editData, achievements: newAchievements });
   };
 
@@ -136,21 +219,30 @@ const Faculty = () => {
       label: "",
       value: "",
     };
+    const currentCustomFields = Array.isArray(editData.customFields)
+      ? editData.customFields
+      : [];
     setEditData({
       ...editData,
-      customFields: [...editData.customFields, newField],
+      customFields: [...currentCustomFields, newField],
     });
   };
 
   const handleCustomFieldChange = (fieldId, property, value) => {
-    const newCustomFields = editData.customFields.map((field) =>
+    const currentCustomFields = Array.isArray(editData.customFields)
+      ? editData.customFields
+      : [];
+    const newCustomFields = currentCustomFields.map((field) =>
       field.id === fieldId ? { ...field, [property]: value } : field
     );
     setEditData({ ...editData, customFields: newCustomFields });
   };
 
   const handleRemoveCustomField = (fieldId) => {
-    const newCustomFields = editData.customFields.filter(
+    const currentCustomFields = Array.isArray(editData.customFields)
+      ? editData.customFields
+      : [];
+    const newCustomFields = currentCustomFields.filter(
       (field) => field.id !== fieldId
     );
     setEditData({ ...editData, customFields: newCustomFields });
@@ -166,7 +258,8 @@ const Faculty = () => {
             <h2 className="text-xl font-semibold text-gray-900">Faculty</h2>
             <button
               onClick={handleEditClick}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              disabled={loading}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50"
               title="Edit faculty information"
             >
               <Edit className="w-5 h-5" />
@@ -175,108 +268,123 @@ const Faculty = () => {
 
           {/* Content */}
           <div className="p-6">
-            {/* Faculty Statistics */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Faculty Statistics
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">
-                    Total Faculty
-                  </h4>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {facultyData.statistics.totalFaculty}
-                  </p>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">
-                    Ph.D. Faculty
-                  </h4>
-                  <p className="text-2xl font-bold text-green-600">
-                    {facultyData.statistics.phdFaculty}
-                  </p>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">
-                    Faculty:Student Ratio
-                  </h4>
-                  <p className="text-2xl font-bold text-purple-600">
-                    {facultyData.statistics.facultyStudentRatio}
-                  </p>
-                </div>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">
+                  Loading faculty information...
+                </span>
               </div>
-            </div>
-
-            {/* Faculty Strength */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Faculty Strength
-              </h3>
-              <div className="space-y-3">
-                {facultyData.strength &&
-                  facultyData.strength.map((item, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{item}</p>
+            ) : (
+              <>
+                {/* Faculty Statistics */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Faculty Statistics
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-1">
+                        Total Faculty
+                      </h4>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {facultyData.statistics.totalFaculty}
+                      </p>
                     </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Departments */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Departments
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {facultyData.departments &&
-                  facultyData.departments.map((dept, index) => (
-                    <div
-                      key={index}
-                      className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium"
-                    >
-                      {dept}
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-1">
+                        Ph.D. Faculty
+                      </h4>
+                      <p className="text-2xl font-bold text-green-600">
+                        {facultyData.statistics.phdFaculty}
+                      </p>
                     </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Achievements */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Faculty Achievements
-              </h3>
-              <div className="space-y-3">
-                {facultyData.achievements &&
-                  facultyData.achievements.map((item, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
-                      <p className="text-gray-700 leading-relaxed">{item}</p>
+                    <div className="bg-purple-50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-1">
+                        Faculty:Student Ratio
+                      </h4>
+                      <p className="text-2xl font-bold text-purple-600">
+                        {facultyData.statistics.facultyStudentRatio}
+                      </p>
                     </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Custom Fields Display */}
-            {facultyData.customFields &&
-              facultyData.customFields.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">
-                    Additional Information
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {facultyData.customFields.map((field, index) => (
-                      <div key={field.id || index}>
-                        <h5 className="text-sm font-medium text-gray-900 mb-1">
-                          {field.label}
-                        </h5>
-                        <p className="text-gray-700">{field.value}</p>
-                      </div>
-                    ))}
                   </div>
                 </div>
-              )}
+
+                {/* Faculty Strength */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Faculty Strength
+                  </h3>
+                  <div className="space-y-3">
+                    {facultyData.strength &&
+                      facultyData.strength.map((item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2"></div>
+                          <p className="text-gray-700 leading-relaxed">
+                            {item}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Departments */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Departments
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {facultyData.departments &&
+                      facultyData.departments.map((dept, index) => (
+                        <div
+                          key={index}
+                          className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium"
+                        >
+                          {dept}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Achievements */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Faculty Achievements
+                  </h3>
+                  <div className="space-y-3">
+                    {facultyData.achievements &&
+                      facultyData.achievements.map((item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-2"></div>
+                          <p className="text-gray-700 leading-relaxed">
+                            {item}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Custom Fields Display */}
+                {facultyData.customFields &&
+                  facultyData.customFields.length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">
+                        Additional Information
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {facultyData.customFields.map((field, index) => (
+                          <div key={field.id || index}>
+                            <h5 className="text-sm font-medium text-gray-900 mb-1">
+                              {field.label}
+                            </h5>
+                            <p className="text-gray-700">{field.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -571,9 +679,10 @@ const Faculty = () => {
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Changes
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

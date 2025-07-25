@@ -640,10 +640,7 @@ const CollegeProfilePage = () => {
         );
       case "hostel":
         return (
-          <Hostel
-            data={formData["hostel"]}
-            onEdit={() => openSectionForm("hostel")}
-          />
+          <Hostel />
         );
       default:
         return null;

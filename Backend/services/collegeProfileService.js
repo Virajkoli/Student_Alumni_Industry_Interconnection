@@ -1845,6 +1845,218 @@ class CollegeProfileService {
       throw new Error(`Failed to get college profile summary: ${error.message}`);
     }
   }
+
+  // =============================================
+  // COLLEGE HOSTEL/ACCOMMODATION
+  // =============================================
+  
+  async getHostel(collegeId) {
+    try {
+      // First, try to get complete hostel data from college_infrastructure_new.hostel_details
+      const infrastructure = await prisma.college_infrastructure_new.findUnique({
+        where: { college_id: collegeId }
+      });
+      
+      if (infrastructure && infrastructure.hostel_details) {
+        try {
+          console.log('✅ Found complete hostel data in infrastructure table');
+          const hostelData = JSON.parse(infrastructure.hostel_details);
+          return hostelData;
+        } catch (parseError) {
+          console.error('❌ Error parsing hostel_details JSON:', parseError);
+          // Fall back to default structure if JSON parsing fails
+        }
+      }
+      
+      // Fallback: Get basic hostel data from college_hostels table
+      const hostelRecords = await prisma.college_hostels.findMany({
+        where: { 
+          college_id: collegeId,
+          is_active: true 
+        }
+      });
+      
+      // Get any additional hostel info from college table if it has hostel_details field
+      const college = await prisma.college.findUnique({
+        where: { id: collegeId },
+        select: {
+          id: true,
+          // Check if college table has any hostel-related fields
+        }
+      });
+      
+      // Try to get structured hostel data or return default structure
+      let hostelData = {
+        facilities: [
+          "Separate hostels for boys and girls",
+          "24/7 security and CCTV surveillance", 
+          "WiFi connectivity in all rooms",
+          "Common room with TV and recreational facilities",
+          "Laundry facilities",
+          "Medical facilities and first aid"
+        ],
+        rooms: [
+          {
+            type: "Single Occupancy",
+            description: "Individual rooms with attached bathroom",
+            amenities: "Study table, bed, wardrobe, chair",
+            fees: "₹35,000/year"
+          },
+          {
+            type: "Double Occupancy", 
+            description: "Shared rooms with attached bathroom",
+            amenities: "Study table, bed, wardrobe, chair for each student",
+            fees: "₹25,000/year"
+          },
+          {
+            type: "Triple Occupancy",
+            description: "Shared rooms with common bathroom",
+            amenities: "Study table, bed, wardrobe, chair for each student", 
+            fees: "₹20,000/year"
+          }
+        ],
+        mess: {
+          facilities: [
+            "Hygienic food preparation",
+            "Vegetarian and non-vegetarian options",
+            "Special dietary accommodations",
+            "Clean dining hall with proper seating"
+          ],
+          mealTimings: [
+            "Breakfast: 7:30 AM - 9:30 AM",
+            "Lunch: 12:30 PM - 2:30 PM", 
+            "Evening Snacks: 5:00 PM - 6:00 PM",
+            "Dinner: 7:30 PM - 9:30 PM"
+          ],
+          fees: "₹15,000/year"
+        },
+        rules: [
+          "Visitors allowed only during specified hours",
+          "No smoking or alcohol consumption", 
+          "Maintain cleanliness in rooms and common areas",
+          "Report any maintenance issues promptly",
+          "Follow hostel curfew timings",
+          "Respect fellow residents"
+        ]
+      };
+      
+      // If we have existing hostel records, try to integrate them
+      if (hostelRecords && hostelRecords.length > 0) {
+        const mainHostel = hostelRecords[0];
+        
+        // Update room data from database if available
+        if (mainHostel.fees_per_year) {
+          hostelData.rooms = hostelData.rooms.map(room => ({
+            ...room,
+            fees: `₹${mainHostel.fees_per_year}/year`
+          }));
+        }
+        
+        // Update facilities if available
+        if (mainHostel.facilities && mainHostel.facilities.length > 0) {
+          hostelData.facilities = mainHostel.facilities;
+        }
+      }
+      
+      console.log('📝 Using default/basic hostel data structure');
+      return hostelData;
+    } catch (error) {
+      console.error('Get hostel error:', error);
+      throw new Error(`Failed to get hostel information: ${error.message}`);
+    }
+  }
+  
+  async updateHostel(collegeId, hostelData) {
+    try {
+      console.log('📝 Updating hostel data for college:', collegeId);
+      console.log('📝 Hostel data:', JSON.stringify(hostelData, null, 2));
+      
+      // Store the complete hostel data in college_infrastructure_new.hostel_details as JSON
+      const hostelDataJson = JSON.stringify(hostelData);
+      
+      // Update or create infrastructure record with hostel details
+      const existingInfrastructure = await prisma.college_infrastructure_new.findUnique({
+        where: { college_id: collegeId }
+      });
+      
+      if (existingInfrastructure) {
+        // Update existing record
+        await prisma.college_infrastructure_new.update({
+          where: { college_id: collegeId },
+          data: {
+            hostel_details: hostelDataJson,
+            updated_at: new Date()
+          }
+        });
+      } else {
+        // Create new record
+        await prisma.college_infrastructure_new.create({
+          data: {
+            college_id: collegeId,
+            hostel_details: hostelDataJson,
+            created_at: new Date(),
+            updated_at: new Date()
+          }
+        });
+      }
+      
+      // Also update or create hostel records in college_hostels table for basic data
+      if (hostelData.rooms && hostelData.rooms.length > 0) {
+        // Get existing hostel records
+        const existingHostels = await prisma.college_hostels.findMany({
+          where: { 
+            college_id: collegeId,
+            is_active: true 
+          }
+        });
+        
+        // Update first room type as main hostel record
+        const mainRoom = hostelData.rooms[0];
+        const fees = mainRoom.fees ? parseFloat(mainRoom.fees.replace(/[^\d.]/g, '')) : null;
+        
+        if (existingHostels.length > 0) {
+          // Update existing record
+          await prisma.college_hostels.update({
+            where: { id: existingHostels[0].id },
+            data: {
+              name: mainRoom.type || 'Main Hostel',
+              type: mainRoom.type || 'Mixed',
+              fees_per_year: fees,
+              facilities: hostelData.facilities || [],
+              mess_facility: hostelData.mess ? true : false,
+              updated_at: new Date()
+            }
+          });
+        } else {
+          // Create new record
+          await prisma.college_hostels.create({
+            data: {
+              college_id: collegeId,
+              name: mainRoom.type || 'Main Hostel',
+              type: mainRoom.type || 'Mixed',
+              capacity: 100, // Default value
+              fees_per_year: fees,
+              facilities: hostelData.facilities || [],
+              mess_facility: hostelData.mess ? true : false,
+              created_at: new Date(),
+              updated_at: new Date()
+            }
+          });
+        }
+      }
+      
+      console.log('✅ Hostel data updated successfully in database');
+      
+      return {
+        success: true,
+        message: 'Hostel information updated successfully',
+        data: hostelData
+      };
+    } catch (error) {
+      console.error('❌ Update hostel error:', error);
+      throw new Error(`Failed to update hostel information: ${error.message}`);
+    }
+  }
 }
 
 module.exports = CollegeProfileService;

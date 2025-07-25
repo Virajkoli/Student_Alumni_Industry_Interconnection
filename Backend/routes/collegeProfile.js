@@ -84,6 +84,10 @@ router.post('/academics', auth, collegeProfileController.createAcademic);
 router.put('/academics', auth, collegeProfileController.updateAcademics);
 router.delete('/academics/:academicId', auth, collegeProfileController.deleteAcademic);
 
+// College hostel/accommodation routes
+router.get('/hostel', auth, collegeProfileController.getHostel);
+router.put('/hostel', auth, collegeProfileController.updateHostel);
+
 // College students routes (legacy)
 router.get('/students', auth, collegeProfileController.getStudents);
 

@@ -1131,6 +1131,50 @@ class CollegeProfileController {
       });
     }
   }
+
+  // =============================================
+  // COLLEGE HOSTEL/ACCOMMODATION
+  // =============================================
+  
+  async getHostel(req, res) {
+    try {
+      const collegeId = parseInt(req.params.collegeId) || req.user.id;
+      
+      const hostelData = await collegeProfileService.getHostel(collegeId);
+      
+      res.json({
+        success: true,
+        data: hostelData
+      });
+    } catch (error) {
+      console.error('Get college hostel error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get college hostel information'
+      });
+    }
+  }
+  
+  async updateHostel(req, res) {
+    try {
+      const collegeId = req.user.id;
+      const hostelData = req.body;
+      
+      const result = await collegeProfileService.updateHostel(collegeId, hostelData);
+      
+      res.json({
+        success: true,
+        data: result,
+        message: 'College hostel information updated successfully'
+      });
+    } catch (error) {
+      console.error('Update college hostel error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update college hostel information'
+      });
+    }
+  }
 }
 
 module.exports = CollegeProfileController;

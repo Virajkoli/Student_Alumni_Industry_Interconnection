@@ -2490,6 +2490,54 @@ const collegeAPI = {
 
   async deleteAdmission(admissionId) {
     return apiService.deleteCollegeAdmission(admissionId);
+  },
+
+  // Campus methods
+  async getCampuses() {
+    return apiService.getCollegeCampuses();
+  },
+
+  async createCampus(campusData) {
+    return apiService.createCollegeCampus(campusData);
+  },
+
+  async updateCampuses(campusesData) {
+    return apiService.updateCollegeCampuses(campusesData);
+  },
+
+  async updateCampus(campusId, campusData) {
+    return apiService.updateCollegeCampus(campusId, campusData);
+  },
+
+  async deleteCampus(campusId) {
+    return apiService.deleteCollegeCampus(campusId);
+  },
+
+  async getCampusesWithLocations() {
+    return apiService.getCampusesWithLocations();
+  },
+
+  // Hostel methods
+  async getHostel() {
+    try {
+      const response = await apiService.api.get("/college-profile/hostel");
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get college hostel information"
+      );
+    }
+  },
+
+  async updateHostel(hostelData) {
+    try {
+      const response = await apiService.api.put("/college-profile/hostel", hostelData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update college hostel information"
+      );
+    }
   }
 };
 

@@ -56,6 +56,7 @@ app.options(
       "https://n55tb9bt-5173.inc1.devtunnels.ms/",
       "http://192.168.31.202:5173",
       "http://192.168.31.202:5000",
+      "https://scaips-backend.onrender.com/",
       // Allow requests with no origin (like mobile apps or curl requests)
 
       // Allow requests with no origin (like mobile apps or curl requests)
